@@ -1,9 +1,5 @@
 = Metanorma mnconvert
 
-image:https://github.com/metanorma/mnconvert/workflows/ubuntu/badge.svg["Build Status", link="https://github.com/metanorma/mnconvert/actions?workflow=ubuntu"]
-image:https://github.com/metanorma/mnconvert/workflows/macos/badge.svg["Build Status", link="https://github.com/metanorma/mnconvert/actions?workflow=macos"]
-image:https://github.com/metanorma/mnconvert/workflows/windows/badge.svg["Build Status", link="https://github.com/metanorma/mnconvert/actions?workflow=windows"]
-
 == Installing Build Tools
 
 You will need the `maven` build tool and `make`.
@@ -51,6 +47,7 @@ java -jar mnconvert.jar xml_file [options]
 - `--check-type`, `-ct` - check against XSD NISO (value 'xsd-niso', default), DTD ISO (value 'dtd-iso'), DTD NISO (value 'dtd-niso')
                             
 Common options:
+
 - `--version`, `-v` - display application version, optional
 - `--debug`, `-d` turn-on debug mode (print additional debug information into output file), optional
 
