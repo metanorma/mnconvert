@@ -18,11 +18,10 @@ You will need the `maven` build tool and `make`.
 
 [source,sh]
 ----
-java -jar mnconvert.jar xml_file [options]
+java -jar mnconvert.jar xml_file --check-type xsd-niso
 ----
 
-options:
-- `--check-type`, `-ct` - Check against XSD NISO (value xsd-niso, default), DTD ISO (dtd-iso), DTD NISO (dtd-niso) (Default: xsd-niso)
+- `--check-type`, `-ct` - Check against XSD NISO (value xsd-niso), DTD ISO (dtd-iso), DTD NISO (dtd-niso)
 
 
 === 2. Convert ISO/NISO STS xml to Metanorma xml or adoc.
