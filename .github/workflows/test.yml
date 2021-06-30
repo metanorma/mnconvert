@@ -93,3 +93,12 @@ jobs:
           user_name: ${{ github.actor }}
           user_email: ${{ format('{0}@users.noreply.github.com', github.actor) }}
           commit_message: "${{ format('Deploy to GitHub Pages: {0}', github.sha) }}"
+
+      - name: Notify mn-samples-bsi
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.METANORMA_CI_PAT_TOKEN }}
+          repository: metanorma/mn-samples-bsi
+          event-type: metanorma/mnconvert
+          client-payload: '{ "ref": "${{ github.ref }}" }'
+

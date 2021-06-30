@@ -1,8 +1,8 @@
-[submodule "mn-samples-iso"]
+[submodule "tests/mn-samples-iso"]
 	path = tests/mn-samples-iso
-	url = https://github.com/metanorma/mn-samples-iso.git
+	url = https://github.com/metanorma/mn-samples-iso
 	branch = gh-pages
 [submodule "tests/iso-8601-1"]
 	path = tests/iso-8601-1
-	url = git@github.com:metanorma/iso-8601-1.git
+	url = https://github.com/metanorma/iso-8601-1
 	branch = master
