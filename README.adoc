@@ -14,7 +14,7 @@ You will need the `maven` build tool and `make`.
 == Usage
 
 
-1. Check ISO/NISO STS xml against XSD, DTD.
+=== 1. Check ISO/NISO STS xml against XSD, DTD.
 
 [source,sh]
 ----
@@ -25,7 +25,7 @@ options:
 - `--check-type`, `-ct` - Check against XSD NISO (value xsd-niso, default), DTD ISO (dtd-iso), DTD NISO (dtd-niso) (Default: xsd-niso)
 
 
-2. Convert ISO/NISO STS xml to Metanorma xml or adoc.
+=== 2. Convert ISO/NISO STS xml to Metanorma xml or adoc.
 
 [source,sh]
 ----
@@ -39,7 +39,7 @@ java -jar mnconvert.jar xml_file [options]
 - `--split-bibdata`, `-sb` - create Metanorma Adoc and Relaton XML, optional
 - `--type`, `-t` - type of standard to generate (iso, bsi, etc.), optional
 
-3. Convert Metanorma xml to ISO/NISO STS xml.
+=== 3. Convert Metanorma xml to ISO/NISO STS xml.
 
 [source,sh]
 ----
