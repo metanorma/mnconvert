@@ -99,9 +99,6 @@ bundle:
 documents.html: documents.rxl
 	bundle exec relaton xml2html documents.rxl
 
-documents.adoc: target/$(JAR_FILE) documents
-	java -jar $< ${SRCFILESTS} --output ${DESTMNADOC}
-
 
 documents:
 	mkdir $@
