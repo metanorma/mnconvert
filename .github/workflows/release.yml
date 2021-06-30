@@ -28,7 +28,9 @@ jobs:
 
       - run: sudo snap install yq
 
-      - run: make test
+      - run: make testMN2STS
+
+      - run: make testSTS2MN
 
       - run: make all
 

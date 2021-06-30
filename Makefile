@@ -13,9 +13,13 @@ SRCDIR := src/test/resources
 # SRCFILE := $(SRCDIR)/iso-tc154-8601-1-en.xml
 SRCFILE := $(SRCDIR)/iso-rice-en.cd.mn.xml $(SRCDIR)/iso-tc154-8601-1-en.mn.xml
 
+SRCFILESTS := $(SRCDIR)/rice-en.final.sts.xml
+
 DESTDIR := documents
 DESTSTSXML := $(patsubst %.mn.xml,%.sts.xml,$(patsubst src/test/resources/%,documents/%,$(SRCFILE)))
 DESTSTSHTML := $(patsubst %.xml,%.html,$(DESTSTSXML))
+
+DESTMNADOC := $(patsubst %.sts.xml,%.mn.adoc,$(patsubst src/test/resources/%,documents/%,$(SRCFILESTS)))
 
 SAXON_URL := https://repo1.maven.org/maven2/net/sf/saxon/Saxon-HE/10.1/Saxon-HE-10.1.jar
 STS2HTMLXSL := https://www.iso.org/schema/isosts/resources/isosts2html_standalone.xsl
@@ -55,8 +59,12 @@ documents/%.mn.xml: src/test/resources/%.mn.xml
 target/$(JAR_FILE):
 	mvn --settings settings.xml -DskipTests clean package shade:shade
 
-test: tests/mn-samples-iso/documents/international-standard/rice-en.cd.xml target/$(JAR_FILE)
+testMN2STS: tests/mn-samples-iso/documents/international-standard/rice-en.cd.xml target/$(JAR_FILE)
 	mvn -DinputMNXML=$< --settings settings.xml test surefire-report:report
+
+testSTS2MN:
+	mvn -DinputSTSXML=$(SRCFILESTS) --settings settings.xml test surefire-report:report
+
 
 deploy:
 	mvn --settings settings.xml -Dmaven.test.skip=true clean deploy shade:shade
@@ -73,6 +81,9 @@ mn2stsDTD_NISO: $(DESTSTSXML) target/$(JAR_FILE) | documents
 mn2stsDTD_ISO: $(DESTSTSXML) target/$(JAR_FILE) | documents
 	@$(foreach xml,$(DESTSTSXML),java -jar target/$(JAR_FILE) $(xml) --check-type dtd-iso $(CMD_AND))
 
+documents.adoc: target/$(JAR_FILE) documents
+	java -jar $< ${SRCFILESTS} --output ${DESTMNADOC}
+
 saxon.jar:
 	curl -sSL $(SAXON_URL) -o $@
 
@@ -88,6 +99,10 @@ bundle:
 documents.html: documents.rxl
 	bundle exec relaton xml2html documents.rxl
 
+documents.adoc: target/$(JAR_FILE) documents
+	java -jar $< ${SRCFILESTS} --output ${DESTMNADOC}
+
+
 documents:
 	mkdir $@
 
@@ -96,7 +111,7 @@ clean:
 	rm -rf documents
 
 publish: published
-published: documents.html
+published: documents.html documents.adoc
 	mkdir $@
 ifeq ($(OS),Windows_NT)
 	xcopy documents $@\ /E
