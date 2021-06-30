@@ -1,0 +1,133 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--Tag library software copyright Mulberry Technologies, Inc., 2002-2008-->
+      <link rel="stylesheet" href="ISOSTS-style.css" type="text/css">
+      <title>Element: Title Wrapper</title>
+   </head>
+   <body class="main">
+      <div class="pageheader">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="sponsor">International Organization for Standardization (ISO)</h4>
+      </div>
+      <div class="header">
+         <h1 class="elementtag">&lt;title-wrap&gt;</h1>
+         <h1 class="elementname">Title Wrapper</h1>
+      </div>
+      <div class="definition">
+         <p class="para">Wrapper element for the title of the document.</p>
+      </div>
+      <div class="remarks">
+         <h2 class="header">Remarks</h2>
+         <p class="para"><strong>Usage.</strong> May occur multiple times when the title is
+            given in multiple languages. The <a href="n-cvd0.html" target="main" title="@xml:lang"><span class="attrname">Language</span></a> attribute
+            is used to indicate the language of the title. For monolingual documents, the title
+            in the principal language of the document comes first and then the title in another
+            official language; the principal title and alternate title are styled differently.
+            For multilingual documents, they are styled similarly.
+         </p>
+         <p class="para">This element is part of the ISOSTS customization of the JATS
+            journal publishing vocabulary; it is not part of the base vocabulary.
+         </p>
+      </div>
+      <div class="attrlist">
+         <h2 class="header">Attributes</h2>
+         <h5 class="header"><a href="n-8ag0.html" target="main"><span class="attrtag">id</span></a> <a href="n-8ag0.html" target="main"><span class="attrname">Identifier</span></a></h5>
+         <h5 class="header"><a href="n-cvd0.html" target="main"><span class="attrtag">xml:lang</span></a> <a href="n-cvd0.html" target="main"><span class="attrname">Language</span></a></h5>
+      </div>
+      <div class="relatedelem">
+         <h2 class="header">Related Elements</h2>
+         <p class="para">ISO titles may have from one to three parts. The main title (<a href="n-pau0.html" target="main" title="Main Title Element"><span class="elementtag">&lt;main&gt;</span></a>) is required; it may optionally be preceded
+            by an introductory title (<a href="n-tua0.html" target="main" title="Introductory Title Element"><span class="elementtag">&lt;intro&gt;</span></a>) which
+            provides context if the main title is otherwise unclear, and it may optionally be
+            followed by a complementary title (<a href="n-2830.html" target="main" title="Complementary Title Element"><span class="elementtag">&lt;compl&gt;</span></a>) which provides details of the topic (and the title of the part, for multi-part
+            standards). The <a href="n-nt80.html" target="main" title="Full Title"><span class="elementtag">&lt;full&gt;</span></a> element contains
+            the full title of the sta 
+         </p>
+      </div>
+      <div class="modeldesc">
+         <h2 class="header">Model Description</h2>
+         <p class="para">The following, in order:
+            <ul class="bullist">
+               <li>
+                  <a href="n-tua0.html" target="main" title="Introductory Title Element"><span class="elementtag">&lt;intro&gt;</span></a> <a href="n-tua0.html" target="main" title="<intro&gt;"><span class="elementname">Introductory Title Element</span></a>, zero or one
+               </li>
+               <li>
+                  <a href="n-pau0.html" target="main" title="Main Title Element"><span class="elementtag">&lt;main&gt;</span></a> <a href="n-pau0.html" target="main" title="<main&gt;"><span class="elementname">Main Title Element</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-2830.html" target="main" title="Complementary Title Element"><span class="elementtag">&lt;compl&gt;</span></a> <a href="n-2830.html" target="main" title="<compl&gt;"><span class="elementname">Complementary Title Element</span></a>, zero or one
+               </li>
+               <li>
+                  <a href="n-nt80.html" target="main" title="Full Title"><span class="elementtag">&lt;full&gt;</span></a> <a href="n-nt80.html" target="main" title="<full&gt;"><span class="elementname">Full Title</span></a>
+                  
+               </li>
+            </ul>
+            
+         </p>
+      </div>
+      <div class="elementcontext">
+         <h3 class="header">This element may be contained in:</h3>
+         <p class="para">
+            <a href="n-vta0.html" target="main" title="ISO Metadata"><span class="elementtag">&lt;iso-meta&gt;</span></a>,
+            <a href="el_nat-meta.html" target="main" title="NAT Metadata"><span class="elementtag">&lt;nat-meta&gt;</span></a>,
+            <a href="el_reg-meta.html" target="main" title="Regional-body Metadata"><span class="elementtag">&lt;reg-meta&gt;</span></a>
+         </p>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example</h3>
+         <div class="taggedexamp"><pre class="taggedtext">
+               
+&lt;standard&gt;
+  &lt;front&gt;
+    &lt;iso-meta&gt;
+      <strong><span class="focus">&lt;title-wrap xml:lang="en"&gt;
+        &lt;intro&gt;Welding consumables&lt;/intro&gt;
+        &lt;main&gt;Covered electrodes for manual metal arc welding of
+	  non-alloy and fine grain steels&lt;/main&gt;
+        &lt;compl&gt;Classification&lt;/compl&gt;
+        &lt;full&gt;Welding consumables &amp;mdash; Covered electrodes for
+	  manual metal arc welding of non-alloy and fine grain steels
+	  &amp;mdash; Classification&lt;/full&gt;
+      &lt;/title-wrap&gt;</span></strong>
+      <strong><span class="focus">&lt;title-wrap xml:lang="fr"&gt;
+        &lt;intro&gt;Produits consommables pour le soudage&lt;/intro&gt;
+        &lt;main&gt;&amp;Eacute;lectrodes enrob&amp;eacute;es pour le soudage manuel
+	  &amp;agrave; l'arc des aciers non alli&amp;eacute; et des aciers
+	  &amp;agrave; grains fins&lt;/main&gt;
+        &lt;compl&gt;Classification&lt;/compl&gt;
+        &lt;full&gt;Produits consommables pour le soudage &amp;mdash;
+	  &amp;Eacute;lectrodes enrob&amp;eacute;es pour le soudage manuel
+	  &amp;agrave; l'arc des aciers non alli&amp;eacute; et des aciers
+	  &amp;agrave; grains fins &amp;mdash; Classification&lt;/full&gt;
+      &lt;/title-wrap&gt;</span></strong>
+      &lt;doc-ident&gt;...&lt;/doc-ident&gt;
+      &lt;std-ident&gt;...&lt;/std-ident&gt;
+      &lt;content-language&gt;en&lt;/content-language&gt;
+      &lt;std-ref type="dated"&gt;ISO 2560:2009&lt;/std-ref&gt;
+      &lt;std-ref type="undated"&gt;ISO 2560&lt;/std-ref&gt;
+      &lt;doc-ref&gt;ISO 2560:2009(E)&lt;/doc-ref&gt;
+      &lt;pub-date&gt;2009-05-30&lt;/pub-date&gt;
+      &lt;release-date&gt;2009-05-30&lt;/release-date&gt;
+      &lt;comm-ref&gt;ISO/TC 44/SC 3&lt;/comm-ref&gt;
+      &lt;secretariat&gt;ANSI&lt;/secretariat&gt;
+      ...
+    &lt;/iso-meta&gt;
+  &lt;/front&gt;
+  &lt;body&gt;...&lt;/body&gt;
+&lt;/standard&gt;
+
+
+            </pre></div>
+      </div>
+      <div class="moduledefined">
+         <h2 class="header">Module</h2>
+         <p class="moduledefined">ISOSTS-iso-metadata.ent</p>
+      </div>
+      <div class="pagefooter">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="pubdate">Version of July 2013</h4>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE standard SYSTEM "../ISOSTS.dtd">
+<standard>
+  <front>
+    <iso-meta>
+      <title-wrap xml:lang="en">
+        <intro>Welding consumables</intro>
+        <main>Covered electrodes for manual metal arc welding of non-alloy and
+fine grain steels</main>
+        <compl>Classification</compl>
+        <full>Welding consumables &mdash; Covered electrodes for manual metal arc
+welding of non-alloy and fine grain steels &mdash; Classification</full>
+      </title-wrap>
+      <title-wrap xml:lang="fr">
+        <intro>Produits consommables pour le soudage</intro>
+        <main>&Eacute;lectrodes enrob&eacute;es pour le soudage manuel &agrave; l'arc
+des aciers non alli&eacute; et des aciers &agrave; grains fins</main>
+        <compl>Classification</compl>
+        <full>Produits consommables pour le soudage &mdash; &Eacute;lectrodes
+enrob&eacute;es pour le soudage manuel &agrave; l'arc des aciers non alli&eacute; et
+des aciers &agrave; grains fins &mdash; Classification</full>
+      </title-wrap>
+      <doc-ident>
+        <sdo>ISO</sdo>
+        <proj-id>?????</proj-id>
+        <language>en</language>
+        <release-version>IS</release-version>
+        <urn>urn:iso:std:iso:2560:ed-3:v1:en</urn>
+      </doc-ident>
+      <std-ident>
+        <originator>ISO</originator>
+        <doc-type>is</doc-type>
+        <doc-number>2560</doc-number>
+        <part-number></part-number>
+        <edition>3</edition>
+        <version></version>
+        <suppl-type></suppl-type>
+        <suppl-number></suppl-number>
+        <suppl-version></suppl-version>
+      </std-ident>
+      <content-language>en</content-language>
+      <std-ref type="dated">ISO 2560:2009</std-ref>
+      <std-ref type="undated">ISO 2560</std-ref>
+      <doc-ref>ISO 2560</doc-ref>
+      <pub-date>2009-05-30</pub-date>
+      <release-date>2009-05-30</release-date>
+      <comm-ref>ISO/TC 44/SC 3</comm-ref>
+      <secretariat>ANSI</secretariat>
+      <ics>25.160.20</ics>
+      <page-count count="29"/>
+      <custom-meta-group>
+        <custom-meta>
+          <meta-name>document-purpose</meta-name>
+          <meta-value>test of iso-meta element</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>document-status</meta-name>
+          <meta-value>incomplete</meta-value>
+        </custom-meta>
+      </custom-meta-group>
+
+    </iso-meta>
+
+  </front>
+  <body>
+    <!--* dummy body, real text of document goes here. *-->
+  </body>
+</standard>

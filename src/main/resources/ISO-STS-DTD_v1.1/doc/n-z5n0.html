@@ -1,0 +1,109 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--Tag library software copyright Mulberry Technologies, Inc., 2002-2008-->
+      <link rel="stylesheet" href="ISOSTS-style.css" type="text/css">
+      <title>Attribute: Position</title>
+   </head>
+   <body class="main">
+      <div class="pageheader">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="sponsor">International Organization for Standardization (ISO)</h4>
+      </div>
+      <div class="header">
+         <h1 class="attrtag">position</h1>
+         <h1 class="attrname">Position</h1>
+      </div>
+      <div class="definition">
+         <p class="para">Typically indicates whether a display object (for example, figure, table, boxed
+            text) must be anchored in its exact location within the text or may float to a
+            different location in the document (for example, top of the next page, into the next
+            column, within a separate window). Also used to indicate that the display object
+            should be placed in the margin or used as a background image behind the text.
+         </p>
+      </div>
+      <div class="usage">
+         <h2 class="header">Usage</h2>
+         <p class="para">This attribute is used:
+            <ul class="bullist">
+               <li>On the <a href="n-wc80.html" target="main" title="Figure"><span class="elementtag">&lt;fig&gt;</span></a> element
+                  	      representing an individual figure, and
+               </li>
+               <li>On other elements representing display objects
+                  		(for example, on the <a href="n-twc0.html" target="main" title="Boxed Text"><span class="elementtag">&lt;boxed-text&gt;</span></a> or
+                  		<a href="n-xa80.html" target="main" title="Figure Group"><span class="elementtag">&lt;fig-group&gt;</span></a> elements).
+               </li>
+            </ul>
+            	
+         </p>
+      </div>
+      <div class="attrvalueinfo">
+         <h2 class="header">Attribute Values</h2>
+         <div class="attrvalues">
+            <h4 class="header"><span class="headerlabel">In Elements</span></h4><a href="n-twc0.html" target="main" title="Boxed Text"><span class="elementtag">&lt;boxed-text&gt;</span></a>, <a href="n-iic0.html" target="main" title="Chemical Structure Wrapper"><span class="elementtag">&lt;chem-struct-wrap&gt;</span></a>, <a href="n-xa80.html" target="main" title="Figure Group"><span class="elementtag">&lt;fig-group&gt;</span></a>, <a href="n-f980.html" target="main" title="Graphic"><span class="elementtag">&lt;graphic&gt;</span></a>, <a href="n-x4u0.html" target="main" title="Media Object"><span class="elementtag">&lt;media&gt;</span></a>, <a href="n-ngx0.html" target="main" title="Preformatted Text"><span class="elementtag">&lt;preformat&gt;</span></a>, <a href="n-tqs0.html" target="main" title="Supplementary Material"><span class="elementtag">&lt;supplementary-material&gt;</span></a>, <a href="n-j5t0.html" target="main" title="Table Wrapper"><span class="elementtag">&lt;table-wrap&gt;</span></a>, <a href="n-pxt0.html" target="main" title="Table Wrapper Group"><span class="elementtag">&lt;table-wrap-group&gt;</span></a><table class="attrtable">
+               <tr>
+                  <th class="attrvalue">Value</th>
+                  <th class="attrmeaning">Meaning</th>
+               </tr>
+               <tr class="attrrow">
+                  <td class="attrvalue">anchor</td>
+                  <td class="attrmeaning">The object must remain in its exact location in the text
+                     flow.
+                  </td>
+               </tr>
+               <tr class="attrrow">
+                  <td class="attrvalue">background</td>
+                  <td class="attrmeaning">The object (typically an image) is used as background displayed
+                     visually “behind” the narrative text.
+                  </td>
+               </tr>
+               <tr class="attrrow">
+                  <td class="attrvalue">float</td>
+                  <td class="attrmeaning">The object is not anchored and may be moved to a new column, a new
+                     window, a new page, the end of the document, etc.
+                  </td>
+               </tr>
+               <tr class="attrrow">
+                  <td class="attrvalue">margin</td>
+                  <td class="attrmeaning">In print, the object should be placed in the margin or gutter; online,
+                     the object should remain closely associated with the text.
+                  </td>
+               </tr>
+               <tr>
+                  <td class="attrrestrict" colspan="2"><strong>Default value: </strong>float
+                  </td>
+               </tr>
+            </table>
+         </div>
+         <div class="attrvalues">
+            <h4 class="header"><span class="headerlabel">In Element</span></h4>
+            <h5><a href="n-wc80.html" target="main" title="Figure"><span class="elementtag">&lt;fig&gt;</span></a></h5>
+            <table class="attrtable">
+               <tr>
+                  <th class="attrvalue">Value</th>
+                  <th class="attrmeaning">Meaning</th>
+               </tr>
+               <tr class="attrrow">
+                  <td class="attrvalue">Data characters</td>
+                  <td class="attrmeaning">Text, numbers, or special characters.</td>
+               </tr>
+               <tr>
+                  <td class="attrrestrict" colspan="2"><strong>Default value: </strong>float
+                  </td>
+               </tr>
+            </table>
+            <h4 class="header"><span class="headerlabel">Suggested usage</span></h4>
+            <p class="para">The values of the <a href="n-z5n0.html" target="main" title="Position"><span class="attrtag">@position</span></a> attribute are not
+               	      constrained when it appears on the <a href="n-wc80.html" target="main" title="Figure"><span class="elementtag">&lt;fig&gt;</span></a> element.  Meaningful
+               	      values include those in the enumeration above; also
+               	      <tt>float-left</tt> and <tt>float-right</tt>.
+               	    
+            </p>
+         </div>
+      </div>
+      <div class="pagefooter">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="pubdate">Version of July 2013</h4>
+      </div>
+   </body>
+</html>

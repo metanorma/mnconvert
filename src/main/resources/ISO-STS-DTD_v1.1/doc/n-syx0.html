@@ -1,0 +1,122 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--Tag library software copyright Mulberry Technologies, Inc., 2002-2008-->
+      <link rel="stylesheet" href="ISOSTS-style.css" type="text/css">
+      <title>Element: Publication Date</title>
+   </head>
+   <body class="main">
+      <div class="pageheader">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="sponsor">International Organization for Standardization (ISO)</h4>
+      </div>
+      <div class="header">
+         <h1 class="elementtag">&lt;pub-date&gt;</h1>
+         <h1 class="elementname">Publication Date</h1>
+      </div>
+      <div class="definition">
+         <p class="para">Date on which a standard is (or was) first published. </p>
+      </div>
+      <div class="remarks">
+         <h2 class="header">Remarks</h2>
+         <p class="para">
+            	  For working drafts, committee drafts, draft international
+            	  standards, final drafts, and the first publications of
+            	  international standards, this is the date of publication of
+            	  the document.  For later editions and alternate-language
+            	  versions of a standard, it is the date of first publication
+            	  of the standard.
+            	
+         </p>
+         <p class="para">This element is part of the base JATS journal publishing vocabulary; 
+            its definition and documentation have been modified to reflect its
+            use in the ISOSTS customization of JATS.
+         </p>
+      </div>
+      <div class="attrlist">
+         <h2 class="header">Attribute</h2>
+         <h5 class="header"><a href="n-wfn0.html" target="main"><span class="attrtag">pub-type</span></a> <a href="n-wfn0.html" target="main"><span class="attrname">Type of Publication</span></a></h5>
+      </div>
+      <div class="relatedelem">
+         <h2 class="header">Related Elements</h2>
+         <p class="para">See also <a href="n-g7v0.html" target="main" title="Release Date"><span class="elementtag">&lt;release-date&gt;</span></a>.
+         </p>
+         <p class="para">The <a href="n-syx0.html" target="main" title="Publication Date"><span class="elementtag">&lt;pub-date&gt;</span></a> element records
+            	  the date on which (the first published version of) an 
+            	  international standard was first published; 
+            	  the <a href="n-g7v0.html" target="main" title="Release Date"><span class="elementtag">&lt;release-date&gt;</span></a> element records
+            	  the date on which a particular version of an international 
+            	  standard is published.
+            	  Later corrections, amendments, editions, and
+            	  alternate language versions for a standard will all carry
+            	  the same <a href="n-syx0.html" target="main" title="Publication Date"><span class="elementtag">&lt;pub-date&gt;</span></a> as the
+            	  original publication; the different dates on which they
+            	  are published will be reflected in different values 
+            	  for their <a href="n-g7v0.html" target="main" title="Release Date"><span class="elementtag">&lt;release-date&gt;</span></a> elements.
+            	
+         </p>
+      </div>
+      <div class="modeldesc">
+         <h2 class="header">Model Description</h2>
+         <p class="para">Text, numbers, or special characters, zero or more</p>
+      </div>
+      <div class="elementcontext">
+         <h3 class="header">This element may be contained in:</h3>
+         <p class="para">
+            <a href="n-vta0.html" target="main" title="ISO Metadata"><span class="elementtag">&lt;iso-meta&gt;</span></a>,
+            <a href="el_nat-meta.html" target="main" title="NAT Metadata"><span class="elementtag">&lt;nat-meta&gt;</span></a>,
+            <a href="el_reg-meta.html" target="main" title="Regional-body Metadata"><span class="elementtag">&lt;reg-meta&gt;</span></a>
+         </p>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example</h3>
+         <div class="taggedexamp"><pre class="taggedtext">
+	  
+&lt;standard&gt;
+  &lt;front&gt;
+    &lt;iso-meta&gt;
+      &lt;title-wrap xml:lang="en"&gt;...&lt;/title-wrap&gt;
+      &lt;doc-ident&gt;
+        &lt;sdo&gt;ISO&lt;/sdo&gt;
+        &lt;proj-id&gt;?????&lt;/proj-id&gt;
+        &lt;language&gt;en&lt;/language&gt;
+        &lt;release-version&gt;IS&lt;/release-version&gt;
+        &lt;urn&gt;urn:iso:std:iso:2560:ed-3:v1:en&lt;/urn&gt;
+      &lt;/doc-ident&gt;
+      &lt;std-ident&gt;
+        &lt;originator&gt;ISO&lt;/originator&gt;
+        &lt;doc-type&gt;is&lt;/doc-type&gt;
+        &lt;doc-number&gt;2560&lt;/doc-number&gt;
+         &lt;edition&gt;3&lt;/edition&gt;
+        &lt;version&gt;1&lt;/version&gt;
+       &lt;/std-ident&gt;      
+      &lt;content-language&gt;en&lt;/content-language&gt;
+      &lt;std-ref type="dated"&gt;ISO 2560&lt;/std-ref&gt;
+      &lt;std-ref type="undated"&gt;ISO 2560:2009&lt;/std-ref&gt;
+      &lt;doc-ref&gt;ISO 2560:2009(en)&lt;/doc-ref&gt;
+      <strong><span class="focus">&lt;pub-date&gt;2009-05-30&lt;/pub-date&gt;</span></strong>
+      &lt;release-date&gt;2009-05-30&lt;/release-date&gt;
+      &lt;comm-ref&gt;ISO/TC 44/SC 3&lt;/comm-ref&gt;
+      &lt;secretariat&gt;ANSI&lt;/secretariat&gt;
+      &lt;ics&gt;25.160.20&lt;/ics&gt;
+      &lt;page-count count="29"/&gt;
+      ...   
+    &lt;/iso-meta&gt;
+    
+  &lt;/front&gt;
+  &lt;body&gt;...&lt;/body&gt;
+&lt;/standard&gt;
+
+
+	</pre></div>
+      </div>
+      <div class="moduledefined">
+         <h2 class="header">Module</h2>
+         <p class="moduledefined">JATS-articlemeta0.ent</p>
+      </div>
+      <div class="pagefooter">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="pubdate">Version of July 2013</h4>
+      </div>
+   </body>
+</html>

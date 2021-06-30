@@ -1,0 +1,168 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--Tag library software copyright Mulberry Technologies, Inc., 2002-2008-->
+      <link rel="stylesheet" href="ISOSTS-style.css" type="text/css">
+      <title>Element: ISO Metadata</title>
+   </head>
+   <body class="main">
+      <div class="pageheader">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="sponsor">International Organization for Standardization (ISO)</h4>
+      </div>
+      <div class="header">
+         <h1 class="elementtag">&lt;iso-meta&gt;</h1>
+         <h1 class="elementname">ISO Metadata</h1>
+      </div>
+      <div class="definition">
+         <p class="para">Container for ISO-specific metadata describing the standard; contains all the
+            information needed to produce the title page and back cover of the document.
+         </p>
+      </div>
+      <div class="remarks">
+         <h2 class="header">Remarks</h2>
+         <p class="para">This element contains one or more document titles (typically English and French),
+            a document-identity section, the standard reference for the document, ICS
+            classification information, an indication of the number of pages in the document (for
+            pricing purposes), a flag indicating the need for special proof-processing, and
+            optionally additional custom metadata.
+         </p>
+         <p class="para">This element is part of the ISOSTS customization of the JATS
+            journal publishing vocabulary; it is not part of the base vocabulary.
+         </p>
+      </div>
+      <div class="attrlist">
+         <h2 class="header">Attribute</h2>
+         <h5 class="header"><a href="n-8ag0.html" target="main"><span class="attrtag">id</span></a> <a href="n-8ag0.html" target="main"><span class="attrname">Identifier</span></a></h5>
+      </div>
+      <div class="relatedelem">
+         <h2 class="header">Related Elements</h2>
+         <p class="para">Metadata required by other bodies working with a document may be recorded in the
+            <a href="el_reg-meta.html" target="main" title="Regional-body Metadata"><span class="elementtag">&lt;reg-meta&gt;</span></a> or the <a href="n-t4w0.html" target="main" title="National-body Metadata"><span class="elementtag">&lt;nat-meta&gt;</span></a> element.
+         </p>
+      </div>
+      <div class="modeldesc">
+         <h2 class="header">Model Description</h2>
+         <p class="para">The following, in order:
+            <ul class="bullist">
+               <li>
+                  <a href="n-pr70.html" target="main" title="Title Wrapper"><span class="elementtag">&lt;title-wrap&gt;</span></a> <a href="n-pr70.html" target="main" title="<title-wrap&gt;"><span class="elementname">Title Wrapper</span></a>, one or more
+               </li>
+               <li>
+                  <a href="n-d750.html" target="main" title="Document Identification Section"><span class="elementtag">&lt;doc-ident&gt;</span></a> <a href="n-d750.html" target="main" title="<doc-ident&gt;"><span class="elementname">Document Identification Section</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-fp40.html" target="main" title="Standard Reference"><span class="elementtag">&lt;std-ident&gt;</span></a> <a href="n-fp40.html" target="main" title="<std-ident&gt;"><span class="elementname">Standard Reference</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-vs30.html" target="main" title="Document Language"><span class="elementtag">&lt;content-language&gt;</span></a> <a href="n-vs30.html" target="main" title="<content-language&gt;"><span class="elementname">Document Language</span></a>, one or more
+               </li>
+               <li>
+                  <a href="n-5b40.html" target="main" title="Standard Reference"><span class="elementtag">&lt;std-ref&gt;</span></a> <a href="n-5b40.html" target="main" title="<std-ref&gt;"><span class="elementname">Standard Reference</span></a>, one or more
+               </li>
+               <li>
+                  <a href="n-qf50.html" target="main" title="Document Reference"><span class="elementtag">&lt;doc-ref&gt;</span></a> <a href="n-qf50.html" target="main" title="<doc-ref&gt;"><span class="elementname">Document Reference</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-syx0.html" target="main" title="Publication Date"><span class="elementtag">&lt;pub-date&gt;</span></a> <a href="n-syx0.html" target="main" title="<pub-date&gt;"><span class="elementname">Publication Date</span></a>, zero or one
+               </li>
+               <li>
+                  <a href="n-g7v0.html" target="main" title="Release Date"><span class="elementtag">&lt;release-date&gt;</span></a> <a href="n-g7v0.html" target="main" title="<release-date&gt;"><span class="elementname">Release Date</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-isu0.html" target="main" title="Other Metadata Date"><span class="elementtag">&lt;meta-date&gt;</span></a> <a href="n-isu0.html" target="main" title="<meta-date&gt;"><span class="elementname">Other Metadata Date</span></a>, zero or more
+               </li>
+               <li>
+                  <a href="n-v530.html" target="main" title="Committee, Subcommittee, Working Group"><span class="elementtag">&lt;comm-ref&gt;</span></a> <a href="n-v530.html" target="main" title="<comm-ref&gt;"><span class="elementname">Committee, Subcommittee, Working Group</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-9a40.html" target="main" title="Secretariat"><span class="elementtag">&lt;secretariat&gt;</span></a> <a href="n-9a40.html" target="main" title="<secretariat&gt;"><span class="elementname">Secretariat</span></a>, one or more
+               </li>
+               <li>
+                  <a href="n-bz80.html" target="main" title="International Classification for Standards"><span class="elementtag">&lt;ics&gt;</span></a> <a href="n-bz80.html" target="main" title="<ics&gt;"><span class="elementname">International Classification for Standards</span></a>, zero or more
+               </li>
+               <li>
+                  <a href="n-pux0.html" target="main" title="Page Count"><span class="elementtag">&lt;page-count&gt;</span></a> <a href="n-pux0.html" target="main" title="<page-count&gt;"><span class="elementname">Page Count</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-fsa0.html" target="main" title="Is-Proof Flag"><span class="elementtag">&lt;is-proof&gt;</span></a> <a href="n-fsa0.html" target="main" title="<is-proof&gt;"><span class="elementname">Is-Proof Flag</span></a>, zero or one
+               </li>
+               <li>
+                  <a href="n-3m40.html" target="main" title="Cross Reference to Other Standard"><span class="elementtag">&lt;std-xref&gt;</span></a> <a href="n-3m40.html" target="main" title="<std-xref&gt;"><span class="elementname">Cross Reference to Other Standard</span></a>, zero or more
+               </li>
+               <li>
+                  <a href="n-itx0.html" target="main" title="Permissions"><span class="elementtag">&lt;permissions&gt;</span></a> <a href="n-itx0.html" target="main" title="<permissions&gt;"><span class="elementname">Permissions</span></a>, zero or more
+               </li>
+               <li>
+                  <a href="n-3y30.html" target="main" title="Custom Metadata Group"><span class="elementtag">&lt;custom-meta-group&gt;</span></a> <a href="n-3y30.html" target="main" title="<custom-meta-group&gt;"><span class="elementname">Custom Metadata Group</span></a>, zero or more
+               </li>
+            </ul>
+            
+         </p>
+      </div>
+      <div class="elementcontext">
+         <h3 class="header">This element may be contained in:</h3>
+         <p class="para"><a href="n-k480.html" target="main" title="Front Matter"><span class="elementtag">&lt;front&gt;</span></a></p>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example</h3>
+         <div class="taggedexamp"><pre class="taggedtext">
+               
+&lt;standard&gt;
+  &lt;front&gt;
+    <strong><span class="focus">&lt;iso-meta&gt;
+      &lt;title-wrap xml:lang="en"&gt;
+        &lt;intro&gt;Welding consumables&lt;/intro&gt;
+        &lt;main&gt;Covered electrodes for manual metal arc welding of
+	  non-alloy and fine grain steels&lt;/main&gt;
+        &lt;compl&gt;Classification&lt;/compl&gt;
+        &lt;full&gt;Welding consumables &amp;mdash; Covered electrodes for
+	  manual metal arc welding of non-alloy and fine grain steels
+	  &amp;mdash; Classification&lt;/full&gt;
+      &lt;/title-wrap&gt;
+      &lt;title-wrap xml:lang="fr"&gt;
+        &lt;intro&gt;Produits consommables pour le soudage&lt;/intro&gt;
+        &lt;main&gt;&amp;Eacute;lectrodes enrob&amp;eacute;es pour le soudage manuel
+	  &amp;agrave; l'arc des aciers non alli&amp;eacute; et des aciers
+	  &amp;agrave; grains fins&lt;/main&gt;
+        &lt;compl&gt;Classification&lt;/compl&gt;
+        &lt;full&gt;Produits consommables pour le soudage &amp;mdash;
+	  &amp;Eacute;lectrodes enrob&amp;eacute;es pour le soudage manuel
+	  &amp;agrave; l'arc des aciers non alli&amp;eacute; et des aciers
+	  &amp;agrave; grains fins &amp;mdash; Classification&lt;/full&gt;
+      &lt;/title-wrap&gt;
+      &lt;doc-ident&gt;...&lt;/doc-ident&gt;
+      &lt;std-ident&gt;...&lt;/std-ident&gt;
+      &lt;content-language&gt;en&lt;/content-language&gt;
+      &lt;std-ref type="dated"&gt;ISO 2560:2009&lt;/std-ref&gt;
+      &lt;std-ref type="undated"&gt;ISO 2560&lt;/std-ref&gt;
+      &lt;doc-ref&gt;ISO 2560:2009(E)&lt;/doc-ref&gt;
+      &lt;pub-date&gt;2009-05-30&lt;/pub-date&gt;
+      &lt;release-date&gt;2009-05-30&lt;/release-date&gt;
+      &lt;comm-ref&gt;ISO/TC 44/SC 3&lt;/comm-ref&gt;
+      &lt;secretariat&gt;ANSI&lt;/secretariat&gt;
+      ...
+    &lt;/iso-meta&gt;</span></strong>
+  &lt;/front&gt;
+  &lt;body&gt;...&lt;/body&gt;
+&lt;/standard&gt;
+
+
+            </pre></div>
+      </div>
+      <div class="moduledefined">
+         <h2 class="header">Module</h2>
+         <p class="moduledefined">ISOSTS-iso-metadata.ent</p>
+      </div>
+      <div class="pagefooter">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="pubdate">Version of July 2013</h4>
+      </div>
+   </body>
+</html>

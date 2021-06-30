@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="utf-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <include href="ISOSTS-classes.ent.rng"/>
+  <include href="JATS-journalpubcustom-classes0.ent.rng"/>
+  <include href="JATS-default-classes0.ent.rng"/>
+  <include href="ISOSTS-mixes.ent.rng"/>
+  <include href="JATS-journalpubcustom-mixes0.ent.rng"/>
+  <include href="JATS-default-mixes0.ent.rng"/>
+  <include href="ISOSTS-models.ent.rng"/>
+  <include href="JATS-journalpubcustom-models0.ent.rng"/>
+  <include href="JATS-common0.ent.rng"/>
+  <include href="JATS-articlemeta0.ent.rng"/>
+  <include href="JATS-backmatter0.ent.rng"/>
+  <include href="JATS-display0.ent.rng"/>
+  <include href="JATS-format0.ent.rng"/>
+  <include href="JATS-funding0.ent.rng"/>
+  <include href="JATS-link0.ent.rng"/>
+  <include href="JATS-list0.ent.rng"/>
+  <include href="JATS-math0.ent.rng"/>
+  <include href="JATS-nlmcitation0.ent.rng"/>
+  <include href="JATS-para0.ent.rng"/>
+  <include href="JATS-phrase0.ent.rng"/>
+  <include href="JATS-references0.ent.rng"/>
+  <include href="JATS-related-object0.ent.rng"/>
+  <include href="JATS-section0.ent.rng"/>
+  <include href="JATS-mathmlsetup0.ent.rng"/>
+  <include href="JATS-XHTMLtablesetup0.ent.rng"/>
+  <include href="JATS-chars0.ent.rng"/>
+  <include href="ISOSTS-iso-metadata.ent.rng"/>
+  <include href="ISOSTS-reg-metadata.ent.rng"/>
+  <include href="ISOSTS-nat-metadata.ent.rng"/>
+  <include href="ISOSTS-tbx-setup.ent.rng"/>
+  <define name="dtd-version">
+    <optional>
+      <attribute name="dtd-version" a:defaultValue="1.1">
+        <value type="string" datatypeLibrary="">1.1</value>
+      </attribute>
+    </optional>
+  </define>
+  <define name="standard-atts">
+    <ref name="dtd-version"/>
+    <optional>
+      <attribute name="specific-use"/>
+    </optional>
+    <optional>
+      <attribute name="xml:lang" a:defaultValue="en">
+        <data type="NMTOKEN"/>
+      </attribute>
+    </optional>
+    <ref name="XLINK.xmlns.attrib"/>
+    <ref name="MATHML.xmlns.attrib"/>
+    <ref name="TBX.xmlns.attrib"/>
+    <ref name="Schema.xmlns.attrib"/>
+  </define>
+  <define name="body-atts">
+    <optional>
+      <attribute name="specific-use"/>
+    </optional>
+  </define>
+  <define name="sub-part-atts">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="xml:lang">
+        <data type="NMTOKEN"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="part-type"/>
+    </optional>
+    <optional>
+      <attribute name="specific-use"/>
+    </optional>
+    <ref name="originator-attribute"/>
+  </define>
+  <define name="term-sec-atts">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="xml:lang">
+        <data type="NMTOKEN"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="sec-type"/>
+    </optional>
+    <optional>
+      <attribute name="specific-use"/>
+    </optional>
+    <ref name="originator-attribute"/>
+  </define>
+  <define name="standard">
+    <element name="standard">
+      <ref name="standard-attlist"/>
+      <ref name="front"/>
+      <ref name="body"/>
+      <optional>
+        <ref name="back"/>
+      </optional>
+    </element>
+  </define>
+  <define name="standard-attlist" combine="interleave">
+    <ref name="standard-atts"/>
+  </define>
+  <define name="front-model">
+    <choice>
+      <group>
+        <ref name="iso-meta"/>
+        <zeroOrMore>
+          <ref name="reg-meta"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="nat-meta"/>
+        </zeroOrMore>
+      </group>
+      <group>
+        <oneOrMore>
+          <ref name="reg-meta"/>
+        </oneOrMore>
+        <zeroOrMore>
+          <ref name="nat-meta"/>
+        </zeroOrMore>
+      </group>
+      <oneOrMore>
+        <ref name="nat-meta"/>
+      </oneOrMore>
+    </choice>
+    <optional>
+      <ref name="front-back.class"/>
+    </optional>
+    <zeroOrMore>
+      <ref name="sec"/>
+    </zeroOrMore>
+  </define>
+  <define name="front">
+    <element name="front">
+      <ref name="front-attlist"/>
+      <ref name="front-model"/>
+    </element>
+  </define>
+  <define name="front-attlist" combine="interleave">
+    <empty/>
+  </define>
+  <define name="body-model">
+    <zeroOrMore>
+      <ref name="para-level"/>
+    </zeroOrMore>
+    <zeroOrMore>
+      <choice>
+        <ref name="sec-level"/>
+        <ref name="sub-part.class"/>
+      </choice>
+    </zeroOrMore>
+    <optional>
+      <ref name="sig-block"/>
+    </optional>
+  </define>
+  <define name="body">
+    <element name="body">
+      <ref name="body-attlist"/>
+      <ref name="body-model"/>
+    </element>
+  </define>
+  <define name="body-attlist" combine="interleave">
+    <ref name="body-atts"/>
+  </define>
+  <define name="sub-part-model">
+    <optional>
+      <ref name="label"/>
+    </optional>
+    <ref name="title"/>
+    <ref name="body"/>
+    <optional>
+      <ref name="back"/>
+    </optional>
+  </define>
+  <define name="sub-part">
+    <element name="sub-part">
+      <ref name="sub-part-attlist"/>
+      <ref name="sub-part-model"/>
+    </element>
+  </define>
+  <define name="sub-part-attlist" combine="interleave">
+    <ref name="sub-part-atts"/>
+  </define>
+  <define name="term-sec-model">
+    <optional>
+      <ref name="label"/>
+    </optional>
+    <ref name="tbx.termEntry"/>
+    <zeroOrMore>
+      <ref name="term-display"/>
+    </zeroOrMore>
+    <zeroOrMore>
+      <ref name="para-level"/>
+    </zeroOrMore>
+    <zeroOrMore>
+      <ref name="term-sec.class"/>
+    </zeroOrMore>
+    <zeroOrMore>
+      <ref name="sec-back-matter-mix"/>
+    </zeroOrMore>
+  </define>
+  <define name="term-sec">
+    <element name="term-sec">
+      <ref name="term-sec-attlist"/>
+      <ref name="term-sec-model"/>
+    </element>
+  </define>
+  <define name="term-sec-attlist" combine="interleave">
+    <ref name="term-sec-atts"/>
+  </define>
+  <define name="term-display-model">
+    <zeroOrMore>
+      <ref name="title"/>
+    </zeroOrMore>
+    <zeroOrMore>
+      <ref name="para-level"/>
+    </zeroOrMore>
+  </define>
+  <define name="term-display-atts">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="xml:lang" a:defaultValue="en">
+        <data type="NMTOKEN"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="term-display">
+    <element name="term-display">
+      <ref name="term-display-attlist"/>
+      <ref name="term-display-model"/>
+    </element>
+  </define>
+  <define name="term-display-attlist" combine="interleave">
+    <ref name="term-display-atts"/>
+  </define>
+  <define name="non-normative-note-model">
+    <optional>
+      <ref name="label"/>
+    </optional>
+    <zeroOrMore>
+      <ref name="para-level"/>
+    </zeroOrMore>
+  </define>
+  <define name="non-normative-note-atts">
+    <optional>
+      <attribute name="content-type"/>
+    </optional>
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <ref name="originator-attribute"/>
+  </define>
+  <define name="non-normative-note">
+    <element name="non-normative-note">
+      <ref name="non-normative-note-attlist"/>
+      <ref name="non-normative-note-model"/>
+    </element>
+  </define>
+  <define name="non-normative-note-attlist" combine="interleave">
+    <ref name="non-normative-note-atts"/>
+  </define>
+  <define name="non-normative-example-model">
+    <optional>
+      <ref name="label"/>
+    </optional>
+    <zeroOrMore>
+      <ref name="para-level"/>
+    </zeroOrMore>
+  </define>
+  <define name="non-normative-example-atts">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <ref name="originator-attribute"/>
+  </define>
+  <define name="non-normative-example">
+    <element name="non-normative-example">
+      <ref name="non-normative-example-attlist"/>
+      <ref name="non-normative-example-model"/>
+    </element>
+  </define>
+  <define name="non-normative-example-attlist" combine="interleave">
+    <ref name="non-normative-example-atts"/>
+  </define>
+  <define name="num-atts">
+    <optional>
+      <attribute name="dsep"/>
+    </optional>
+    <optional>
+      <attribute name="gsep"/>
+    </optional>
+    <optional>
+      <attribute name="specific-use"/>
+    </optional>
+  </define>
+  <define name="num">
+    <element name="num">
+      <ref name="num-attlist"/>
+      <text/>
+    </element>
+  </define>
+  <define name="num-attlist" combine="interleave">
+    <ref name="num-atts"/>
+  </define>
+  <define name="back-model">
+    <optional>
+      <ref name="label"/>
+    </optional>
+    <zeroOrMore>
+      <ref name="title"/>
+    </zeroOrMore>
+    <zeroOrMore>
+      <ref name="doc-back-matter-mix"/>
+    </zeroOrMore>
+  </define>
+  <define name="back">
+    <element name="back">
+      <ref name="back-attlist"/>
+      <ref name="back-model"/>
+    </element>
+  </define>
+  <define name="back-attlist" combine="interleave">
+    <empty/>
+  </define>
+  <define name="annex-type">
+    <element name="annex-type">
+      <ref name="annex-type-attlist"/>
+      <text/>
+    </element>
+  </define>
+  <define name="annex-type-attlist" combine="interleave">
+    <empty/>
+  </define>
+  <start>
+    <choice>
+      <ref name="nlm-citation"/>
+      <ref name="standard"/>
+      <ref name="publisher"/>
+      <ref name="tex-math"/>
+      <ref name="article-meta"/>
+      <ref name="overline-start"/>
+      <ref name="unstructured-kwd-group"/>
+      <ref name="underline-end"/>
+      <ref name="string-date"/>
+      <ref name="underline-start"/>
+      <ref name="x"/>
+      <ref name="sec-meta"/>
+      <ref name="floats-group"/>
+      <ref name="overline-end"/>
+    </choice>
+  </start>
+</grammar>

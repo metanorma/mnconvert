@@ -1,0 +1,116 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--Tag library software copyright Mulberry Technologies, Inc., 2002-2008-->
+      <link rel="stylesheet" href="ISOSTS-style.css" type="text/css">
+      <title>Element: Definition List: Definition Item</title>
+   </head>
+   <body class="main">
+      <div class="pageheader">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="sponsor">International Organization for Standardization (ISO)</h4>
+      </div>
+      <div class="header">
+         <h1 class="elementtag">&lt;def-item&gt;</h1>
+         <h1 class="elementname">Definition List: Definition Item</h1>
+      </div>
+      <div class="definition">
+         <p class="para">Container element for one term/definition pair in a definition list.</p>
+      </div>
+      <div class="remarks">
+         <h2 class="header">Remarks</h2>
+         <p class="para">The <a href="n-ic50.html" target="main" title="Definition List"><span class="elementtag">&lt;def-list&gt;</span></a> element
+            should not be used to tag the formal terms and definitions
+            provided in section 3 of many International Standards, or
+            corresponding terms and definitions clauses in other
+            documents.  Such terms and definitions sections should be marked
+            up using <a href="n-qc70.html" target="main" title="Terminology Section"><span class="elementtag">&lt;term-sec&gt;</span></a> and 
+            the individual definitions should normally be marked up using
+            <a href="n-z7t0.html" target="main" title="Term Entry (TBX Tag Set)"><span class="elementtag">&lt;tbx:termEntry&gt;</span></a>.
+         </p>
+         <p class="para">
+            See the <a href="tbx/index.html" target="_new" class="external">separate
+               documentation</a> for a full description of
+            the use of 
+            <a href="n-z7t0.html" target="main" title="Term Entry (TBX Tag Set)"><span class="elementtag">&lt;tbx:termEntry&gt;</span></a>.
+            
+         </p>
+      </div>
+      <div class="attrlist">
+         <h2 class="header">Attributes</h2>
+         <h5 class="header"><a href="n-8ag0.html" target="main"><span class="attrtag">id</span></a> <a href="n-8ag0.html" target="main"><span class="attrname">Identifier</span></a></h5>
+         <h5 class="header"><a href="n-du60.html" target="main"><span class="attrtag">specific-use</span></a> <a href="n-du60.html" target="main"><span class="attrname">Specific Use</span></a></h5>
+         <h5 class="header"><a href="n-cvd0.html" target="main"><span class="attrtag">xml:lang</span></a> <a href="n-cvd0.html" target="main"><span class="attrname">Language</span></a></h5>
+      </div>
+      <div class="relatedelem">
+         <h2 class="header">Related Elements</h2>
+         <p class="para">A <a href="n-ic50.html" target="main" title="Definition List"><span class="elementtag">&lt;def-list&gt;</span></a> may have a <a href="n-6g70.html" target="main" title="Title"><span class="elementtag">&lt;title&gt;</span></a> naming the entire list, followed by optional headings for
+            terms and their definitions. <a href="n-nmt0.html" target="main" title="Definition List: Term Head"><span class="elementtag">&lt;term-head&gt;</span></a> contains the
+            heading over the first (term) column, and <a href="n-5930.html" target="main" title="Definition List: Definition Head"><span class="elementtag">&lt;def-head&gt;</span></a>
+            contains the heading for the second (definition) column; neither serves as a
+            container element for terms or definitions. Individual <a href="n-aht0.html" target="main" title="Definition List: Term"><span class="elementtag">&lt;term&gt;</span></a>s and their <a href="n-8b30.html" target="main" title="Definition List: Definition"><span class="elementtag">&lt;def&gt;</span></a>s are paired
+            in <a href="n-t250.html" target="main" title="Definition List: Definition Item"><span class="elementtag">&lt;def-item&gt;</span></a>s. 
+         </p>
+      </div>
+      <div class="modeldesc">
+         <h2 class="header">Model Description</h2>
+         <p class="para">The following, in order:
+            <ul class="bullist">
+               <li>
+                  <a href="n-aht0.html" target="main" title="Definition List: Term"><span class="elementtag">&lt;term&gt;</span></a> <a href="n-aht0.html" target="main" title="<term&gt;"><span class="elementname">Definition List: Term</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-8b30.html" target="main" title="Definition List: Definition"><span class="elementtag">&lt;def&gt;</span></a> <a href="n-8b30.html" target="main" title="<def&gt;"><span class="elementname">Definition List: Definition</span></a>, zero or more
+               </li>
+            </ul>
+            
+         </p>
+      </div>
+      <div class="elementcontext">
+         <h3 class="header">This element may be contained in:</h3>
+         <p class="para"><a href="n-ic50.html" target="main" title="Definition List"><span class="elementtag">&lt;def-list&gt;</span></a></p>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example</h3>
+         <div class="taggedexamp"><pre class="taggedtext">
+&lt;standard&gt;
+  &lt;front&gt;
+    &lt;iso-meta&gt;...&lt;/iso-meta&gt;
+  &lt;/front&gt;
+  &lt;body&gt;
+    ...
+    &lt;sec&gt;
+      &lt;label&gt;4.1&lt;/label&gt;
+      &lt;title&gt;Univariate symbols&lt;/title&gt;
+      &lt;p&gt;The symbols used when there is only one quality
+        characteristic in the class are as follows.&lt;/p&gt;
+      &lt;def-list list-type="symbol-list"&gt;
+        <strong><span class="focus">&lt;def-item&gt;
+          &lt;term&gt;&lt;italic&gt;f&lt;sub&gt;s&lt;/sub&gt;&lt;/italic&gt;&lt;/term&gt;
+          &lt;def&gt;
+            &lt;p&gt;factor that relates the maximum sample standard
+              deviation (&lt;abbrev&gt;MSSD&lt;/abbrev&gt;) to the difference between
+              &lt;italic&gt;U&lt;/italic&gt; and &lt;italic&gt;L&lt;/italic&gt;
+              (&lt;xref rid="anx-d"&gt;see Annex D&lt;/xref&gt;)&lt;/p&gt;
+          &lt;/def&gt;
+        &lt;/def-item&gt;</span></strong>
+      &lt;/def-list&gt;
+      ...
+      &lt;/sec&gt;
+  &lt;/body&gt;
+  ...
+&lt;/standard&gt;
+
+</pre></div>
+      </div>
+      <div class="moduledefined">
+         <h2 class="header">Module</h2>
+         <p class="moduledefined">JATS-list0.ent</p>
+      </div>
+      <div class="pagefooter">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="pubdate">Version of July 2013</h4>
+      </div>
+   </body>
+</html>

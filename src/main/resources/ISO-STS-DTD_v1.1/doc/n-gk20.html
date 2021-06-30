@@ -1,0 +1,143 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--Tag library software copyright Mulberry Technologies, Inc., 2002-2008-->
+      <link rel="stylesheet" href="ISOSTS-style.css" type="text/css">
+      <title>Element: Type of Annex</title>
+   </head>
+   <body class="main">
+      <div class="pageheader">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="sponsor">International Organization for Standardization (ISO)</h4>
+      </div>
+      <div class="header">
+         <h1 class="elementtag">&lt;annex-type&gt;</h1>
+         <h1 class="elementname">Type of Annex</h1>
+      </div>
+      <div class="definition">
+         <p class="para">Denotes whether an annex is normative or informative</p>
+      </div>
+      <div class="remarks">
+         <h2 class="header">Remarks</h2>
+         <p class="para">This element is part of the ISOSTS customization of the JATS
+            journal publishing vocabulary; it is not part of the base vocabulary.
+         </p>
+         <p class="para">Expected values are “<tt>(normative)</tt>”
+            	  and “<tt>(informative)</tt>”; other values
+            	  are valid and may be needed in contexts other than ISO work.
+            	
+         </p>
+      </div>
+      <div class="modeldesc">
+         <h2 class="header">Model Description</h2>
+         <p class="para">Text, numbers, or special characters</p>
+      </div>
+      <div class="elementcontext">
+         <h3 class="header">This element may be contained in:</h3>
+         <p class="para"><a href="n-3320.html" target="main" title="Appendix"><span class="elementtag">&lt;app&gt;</span></a></p>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example</h3>
+         <div class="taggedexamp"><pre class="taggedtext">
+&lt;standard&gt;
+  &lt;front&gt;
+    &lt;iso-meta&gt;
+      &lt;title-wrap xml:lang='en'&gt;
+        &lt;main&gt;Sampling procedures for inspection by variables&lt;/main&gt;...&lt;/title-wrap&gt;
+      ...
+    &lt;/iso-meta&gt;
+    
+    &lt;sec sec-type="foreword"&gt;
+      &lt;title&gt;Foreword&lt;/title&gt;
+      &lt;p&gt;ISO (the International Organization for Standardization) is a ...&lt;/p&gt;...
+    &lt;/sec&gt;
+    &lt;sec sec-type="intro"&gt;
+      &lt;title&gt;Introduction&lt;/title&gt;
+      &lt;p&gt;This part of ISO&nbsp;3951 specifies ...&lt;/p&gt;
+      ...
+    &lt;/sec&gt;  
+  &lt;/front&gt;
+  &lt;body&gt;
+    &lt;sec sec-type="scope"&gt;
+      &lt;label&gt;1&lt;/label&gt;
+      &lt;title&gt;Scope&lt;/title&gt;
+      &lt;p&gt;This part of ISO&nbsp;3951 specifies an acceptance sampling system
+	of single sampling plans for inspection by variables, indexed
+	in terms of the Acceptance Quality Limit (AQL).&lt;/p&gt;
+      ...
+    &lt;/sec&gt;   
+    &lt;sec sec-type="norm-refs"&gt;
+      &lt;label&gt;2&lt;/label&gt;
+      &lt;title&gt;Normative references&lt;/title&gt;
+      &lt;p&gt;The following referenced documents are indispensable 
+        ...&lt;/p&gt;
+      &lt;ref-list&gt;
+        &lt;ref content-type="standard"&gt;
+            &lt;std&gt;ISO 2859-1:1999, Sampling procedures for inspection
+	      by attributes — Part 1: Sampling schemes indexed by
+	      acceptance quality limit (AQL) for lot-by-lot
+	      inspection&lt;/std&gt;
+        &lt;/ref&gt;
+      &lt;/ref-list&gt;
+    &lt;/sec&gt;   
+    &lt;sec sec-type="terms"&gt;
+      &lt;label&gt;3&lt;/label&gt;
+      &lt;title&gt;Terms and definitions&lt;/title&gt;
+      &lt;p&gt;For the purposes of this document, the terms and definitions
+	given in ...&lt;/p&gt;
+     &lt;sec&gt;
+       &lt;label&gt;3.1&lt;/label&gt;
+       &lt;title&gt;inspection by variables&lt;/title&gt;
+       &lt;p&gt;inspection by measuring the magnitude(s) of a
+	  characteristic(s) of an item&lt;/p&gt;
+       &lt;p&gt;&lt;ext-link ext-link-type="iso-std"&gt;[ISO 3534-2]&lt;/ext-link&gt;&lt;/p&gt;
+     &lt;/sec&gt;
+      ...     
+      &lt;sec&gt;
+        &lt;label&gt;3.8&lt;/label&gt;
+        &lt;title&gt;consumer’s risk quality&lt;/title&gt;
+        &lt;p&gt;CRQ&lt;/p&gt;
+        &lt;p&gt;quality level (3.7) of a process which, in the acceptance
+	  sampling plan, corresponds to a specified consumer’s
+	  risk&lt;/p&gt;
+        &lt;list list-type="simple"&gt;
+          &lt;list-item&gt;
+            &lt;label&gt;NOTE 1&lt;/label&gt;
+            &lt;p&gt;In this part of ISO 3951, the quality level is the
+	      process fraction nonconforming.&lt;/p&gt;
+          &lt;/list-item&gt;
+          &lt;list-item&gt;
+            &lt;label&gt;NOTE 2&lt;/label&gt;
+            &lt;p&gt;In this part of ISO 3951, the consumer’s risk quality
+	      is such that the consumer’s risk is 10%.&lt;/p&gt;
+          &lt;/list-item&gt;       
+        &lt;/list&gt;
+&lt;/sec&gt;
+      ...       
+    &lt;/sec&gt;
+    ...    
+  &lt;/body&gt;
+  &lt;back&gt;
+ &lt;app-group&gt;
+   &lt;app content-type="norm-annex"&gt;
+     &lt;label&gt;Annex A&lt;/label&gt;
+     <strong><span class="focus">&lt;annex-type&gt;(normative)&lt;/annex-type&gt;</span></strong>
+     &lt;title&gt;Tables for determining the appropriate sample size&lt;/title&gt;
+     &lt;table-wrap&gt;...&lt;/table-wrap&gt;
+   &lt;/app&gt;
+ &lt;/app-group&gt; 
+  &lt;/back&gt;
+&lt;/standard&gt;
+
+</pre></div>
+      </div>
+      <div class="moduledefined">
+         <h2 class="header">Module</h2>
+         <p class="moduledefined">ISOSTS.dtd</p>
+      </div>
+      <div class="pagefooter">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="pubdate">Version of July 2013</h4>
+      </div>
+   </body>
+</html>

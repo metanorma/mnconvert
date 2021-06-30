@@ -1,0 +1,4655 @@
+<html xmlns:css="http://www.iso.org/ns/css-parser">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <title>Test cases for CSS parser</title>
+   </head>
+   <body>
+      <h2>Test cases for CSS parser</h2>
+      <table border="1" cellpadding="3">
+         <thead>
+            <tr>
+               <th>CSS definition</th>
+               <th>Parse OK</th>
+               <th>Error message</th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr>
+               <td>border-collapse:collapse;</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-family:Times New Roman</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 4.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:solid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 50px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:2.0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:2.0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:2.0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:2.0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.53px 0 4.53px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:dashed 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:dashed 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:solid 3px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:dashed 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:dashed 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 25px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:solid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:solid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:solid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:Solid 0px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: Solid<br></td>
+            </tr>
+            <tr>
+               <td>bordercollapse: collapse</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 1.86px 0 1.86px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top: 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#c0c0c0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.73px 0 4.73px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 70px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 160px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 176px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.73px 0 3.73px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-collapse: collapse</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:double</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:double</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color:red</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color:green</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#E6E6E6</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-family:Courier,monospace</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color:purple</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:collapse-collapse</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>TNR</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: TNR<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.13px 0 4.13px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#e0e0e0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 2.46px 0 2.46px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:transparent</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border: solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 1.92px 0 1.92px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.86px 0 3.86px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 21px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 20px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 10px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.53px 0 7.53px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.99px 0 7.99px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-lbottom:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 30px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>bordeR:solid 2px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid css property name: 'bordeR'<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 12px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding: 5px 0 5px 5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 1.86px 0 20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 40px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 60px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>borrder-bottom:solid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 40px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 10px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 1.99px 0 1.99px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#C0C0C0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:Solid 2px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: Solid<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 25px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 10.0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#7f7f7f</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 0 0 4.8px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>transform: rotate(-90deg)</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.8px 0 4.8px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 5.66px 0 5.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom: 1px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top: 1px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>normal</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: normal<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 15px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:solid right:solid 1px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: right:solid<br></td>
+            </tr>
+            <tr>
+               <td>border-right: 0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left: 0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom: 0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top: 0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.53px 0 20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.53px 0 7.53pxpx</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: 7.53pxpx<br></td>
+            </tr>
+            <tr>
+               <td>background-color:#000000</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color:white</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>text-alignment: center</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:1.0px 1.0px 0 1.0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>boder:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>boder-bottom:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 2.66px 0 2.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 6.60px 0 6.60px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 37px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 50px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.60px 0 3.60px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:1.0px 3.80px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 35px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 38px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 30px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 40px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#bfbfbf</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom: solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom: solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top: solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top: solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>boader-collapse:collapse</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.13px 0 7.13px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>boder-collapse:collapse</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#e6e6e6</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 25px 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 30 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 10px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#b3b3b3</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: border-bottom<br></td>
+            </tr>
+            <tr>
+               <td>solid 0px</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: solid 0px<br></td>
+            </tr>
+            <tr>
+               <td>border-bottom: 2px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:2px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:soid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#b2b2b2</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 1.86px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 1.0px 0 1.0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 60px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:2px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#B2B2B2</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-ccollapse:collapse</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color: gray</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 50px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 30px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 40px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-family:Courier New</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 9px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#ffff9a</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#ffcc9a</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:double</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:double</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:solid 3px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right: 1px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left: 1px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom: 3px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>solid</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: solid<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.00px 0 4.00px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 15px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: border-right<br></td>
+            </tr>
+            <tr>
+               <td>italic-normal</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: italic-normal<br></td>
+            </tr>
+            <tr>
+               <td>background-color:#cccccc</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 50px 0 7.13px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 40px 0 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 60px 0 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 50px 0 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 30px 0 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 70px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 75px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 55px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 15px 0 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-weight: italic</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-family: Times New Roman</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>text-alignment: right</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom: 2.0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top: 2.0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:bottom:solid 0px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: bottom:solid<br></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 7px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 75px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 73px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 68px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 103px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 90px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 9px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 6px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:dashed 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:2.0px dashed</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:2.0px dashed</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 3.80pxborder-right:solid 1px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: 3.80pxborder-right:solid<br></td>
+            </tr>
+            <tr>
+               <td>color:blue</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 12px 0 5.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 6.66px 0 6.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.66px 0 3.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 6.20px 0 6.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:solid px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.66</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#CCCCCC</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>borde-top:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:1.92px 3.80px 0 2.87px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 1.92px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:1.92px 3.80px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 3.86px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 31px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 17px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 2.06px 0 2.06px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 50px 0 2.06px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 48px 0 2.06px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#848484</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:1.86px 3.80px 1.86px 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 35px 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 20px 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>.</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: .<br></td>
+            </tr>
+            <tr>
+               <td>background-color:#e5e5e5</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-botttom:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:1.3333334px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>Border-top:2px solid</td>
+               <td style="background-color: red">false</td>
+               <td>invalid css property name: 'Border-top'<br></td>
+            </tr>
+            <tr>
+               <td>border-top: 2px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>transform: rotate(+90deg)</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:1.33px 1.33px 0 1.33px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>v</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: v<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 11px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>0 7.53px 0 7.53px</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: 0 7.53px 0 7.53px<br></td>
+            </tr>
+            <tr>
+               <td>border-left:double</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:1.0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:10px 3.80px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 10px 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:dashed 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 8px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>px</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: px<br></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 40px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#eaeaea</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:2px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>0 3.80px 0 3.80px</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: 0 3.80px 0 3.80px<br></td>
+            </tr>
+            <tr>
+               <td>background-color:#a6a6a6</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:dashed 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>collapse</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: collapse<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 35px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom-solid 0px</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: border-bottom-solid 0px<br></td>
+            </tr>
+            <tr>
+               <td>border:solid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 28px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 15px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 11.33px 0 11.33px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 25px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 47px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 36px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 32px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 16px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-weight: bold</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-family: Courier, monospace</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-weight: normal</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.39px 0 4.39px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:1.0px double #000000</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 1.86px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-color:#800101</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-family: Times New Romanfont-color:#7BBD7B</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 7.53px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-family:courier New</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color: #800080</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color: #FF0000</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color: #307D7E</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color: #0000FF</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color: #0000A0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color: #C0C0C0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color: #FF00000</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color:navy</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-family:Courier,monospacer</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color: #347235</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>purle</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: purle<br></td>
+            </tr>
+            <tr>
+               <td>background-color:#f2f2f2</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-family: Times New 1Roman</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 37.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.53</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 22px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 5px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 2px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 18px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 8px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 0px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:7.53px 4.73px 0 4.73px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:soliid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:solid 0.5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:solid 0.5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 33px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 30px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 7.53px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 45px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 7px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-collapse:collapsep</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#d9d9d9</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>bodrer-bottom:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:dotted 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>b</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: b<br></td>
+            </tr>
+            <tr>
+               <td>border-collapse:collapse:</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: collapse:<br></td>
+            </tr>
+            <tr>
+               <td>font-color: #800000</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-color: #008000</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:25px 3.80px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>solid 2px</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: solid 2px<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 64px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-collapse</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: border-collapse<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 55px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>bold_arial</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: bold_arial<br></td>
+            </tr>
+            <tr>
+               <td>background-color:#E1E1E1</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>=</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: =<br></td>
+            </tr>
+            <tr>
+               <td>background-color:#999999</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.00px 0 3.00px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-collapse:collapseborder-collapse:collapse</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: collapseborder-collapse:collapse<br></td>
+            </tr>
+            <tr>
+               <td>border</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: border<br></td>
+            </tr>
+            <tr>
+               <td>border-right: 2px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:gray</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color: silver</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 12px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 13px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:bottom:solid 2px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: bottom:solid<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 29.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 30.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 4px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 6px 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 8px 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 6.0px 0 6.0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 30px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 5.66px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 0 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:solid 3px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 6.72px 0 6.72px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 28px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>bordeer-bottom:solid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-collapse:coolapse</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#d8d8d8</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>x</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: x<br></td>
+            </tr>
+            <tr>
+               <td>arial</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: arial<br></td>
+            </tr>
+            <tr>
+               <td>courier</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: courier<br></td>
+            </tr>
+            <tr>
+               <td>font-family: arial,monospace</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-family:Arial,sans-serif</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-family: Arial, monospace</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-family: TNR, monospace</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-family: Times New Roman, monospace</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 5 5px 5</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-family: arial, monospace</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding: 5px 0 5px 30px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding: 5px 0 5px 10px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding: 5px 0 5px 15px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:solid 2p</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: 2p<br></td>
+            </tr>
+            <tr>
+               <td>background-color:#909090</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#CECECE</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-boottom:solid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#FFFFFF</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 6px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:solid 0xp</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: 0xp<br></td>
+            </tr>
+            <tr>
+               <td>border-bottom:Solid 2px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: Solid<br></td>
+            </tr>
+            <tr>
+               <td>padding:15px 3.80px 0 30px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 15px 30px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-sright:dashed 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:solid 0=2px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: 0=2px<br></td>
+            </tr>
+            <tr>
+               <td>border-right:1.0px dashed #000000</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:2.0px dashed #000000</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:2.0px dashed #000000</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:2.0px dashed #000000</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:1.0px dashed #000000</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:1.0px dashed</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:1.0px dashed</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:2.0px dashed</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:1.0px dashed</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:1.13px 1.13px 0 1.13px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 0 border-bottom:solid 0px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: border-bottom:solid<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 5.33px 0 5.33px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 65px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:1.92px 7.67px 0 7.67px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 32px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 13px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 47px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 23px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 17px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 37px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:dashed</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:dashed</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 165px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 180px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 0 border-top:solid 1px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: border-top:solid<br></td>
+            </tr>
+            <tr>
+               <td>border:-right:solid 2px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: -right:solid<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 99px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-style: italic</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:solid 2.5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: border-top:<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.92px 0 7.92px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:solid 2pxl</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: 2pxl<br></td>
+            </tr>
+            <tr>
+               <td>align:right</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-weight:bold</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 55px 0 3.73px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 65px 0 3.73px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color: #BEBEBE</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color: #D5D5D5</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 9px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:ssolid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#686868</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#E8E8E8</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color:#FFFFFF</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:top:solid 0px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: top:solid<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 80px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:3.80px 7.20px 0 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:top:solid 2px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: top:solid<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 17px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>f</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: f<br></td>
+            </tr>
+            <tr>
+               <td>sec_Border-collapse:collapse</td>
+               <td style="background-color: red">false</td>
+               <td>invalid css property name: 'sec_Border-collapse'<br></td>
+            </tr>
+            <tr>
+               <td>sec_Boder-collapse:collapse</td>
+               <td style="background-color: red">false</td>
+               <td>invalid css property name: 'sec_Boder-collapse'<br></td>
+            </tr>
+            <tr>
+               <td>border-top</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: border-top<br></td>
+            </tr>
+            <tr>
+               <td>border-bottom:solid 2.0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>borer-bottom:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:1.3333334px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 15px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 12px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 18px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 10px 0 2.06px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 2.06px 0 10px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 26px 0 2.06px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:3.80px 3.80px 1.86px 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:8px 3.80px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 58px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 45px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 39px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 46px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 55px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 57px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 42px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5.66px 7.20px 3.80px 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:Solid 2px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: Solid<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 5.59px 0 5.59px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 5.59px 0 20.59px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 35.59px 0 20.59px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 15px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 80px 0 4.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 40px 0 4.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:4.93px 9.46px 4.93px 9.46px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 5</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 5px 0 5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 36px 0 4.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:padding:0 4.66px 0 4.66px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: padding:0<br></td>
+            </tr>
+            <tr>
+               <td>border-bottom:1px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:none</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 10px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.00px 0 75px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>c</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: c<br></td>
+            </tr>
+            <tr>
+               <td>border-to:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right: solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left: solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:sold 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>boder-top:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:7.53px 3.80px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:1.0px 3.80px 1.0px 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>top-bottom:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color: #347C17</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color: #347C2C</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color: #8D38C9</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-botom:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>'</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: '<br></td>
+            </tr>
+            <tr>
+               <td>padding:5px 10px 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 10px 0 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 10px 0 6.60px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 2.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color:gray</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-color: #ffffff</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:solid:1px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: solid:1px<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 4</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 2</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 2.80px 0 2.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>bordersolid 2px</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: bordersolid 2px<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 9.46px 0 9.46px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 15.12px 0 7.53px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>alignment:center</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-style: normal</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom: 0px solid border-bottom:solid 2px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: border-bottom:solid<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 98px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>px 0 7.20px</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: px 0 7.20px<br></td>
+            </tr>
+            <tr>
+               <td>collapse:collapse-border</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:3.80px 3.80px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right: 2.0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 13.99px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left: 2.0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:dashed 1.0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:dashed 1.0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 35px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 24px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:sold 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left: 2px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 3.80px 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 9.66px 0 9.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#a2a2a2</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:solid 2.0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:solid 2.0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:solid 2.0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#E0E0E0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-collpase:collapse</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 140px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 150px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 110px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-coolapse:collapse</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.00px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:15px 0 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:20px 0 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:30px 0 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:35px 0 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:40px 0 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 30px 0 4.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 30px 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 25px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 3.80pxborder-bottom:solid 1px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: 3.80pxborder-bottom:solid<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.67px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:2.0px dashed #000000</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color:maroon</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:2px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 1.86px 0 12px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 1.86px 0 6px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 10px 0 1.86px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 12px 0 1.86px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 27px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 1.86px 0 15px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 75px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 5.27px 0 5.27px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 22px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:1.86px 3.80px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 1.99px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 5.73px 0 5.73px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>ing:0 3.80px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 70px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 100px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 115px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 125px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 90px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 65px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 50px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom: dashed</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left: dashed</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 18px 15px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:15px 15px 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>bold_courier</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: bold_courier<br></td>
+            </tr>
+            <tr>
+               <td>background-color:#f3f3f3</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 163px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>bordr-bottom:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-tpp:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>bordrr-bottom:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 14px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#000</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#D9D9D9</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.67px 0 7.67px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right solid 0px</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: border-right solid 0px<br></td>
+            </tr>
+            <tr>
+               <td>border-left solid 0px</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: border-left solid 0px<br></td>
+            </tr>
+            <tr>
+               <td>background-color:#ffff00</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:silver</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:white</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:10px 3.80px 0 12px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 10px 12px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-collapse-collapse</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: border-collapse-collapse<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 50px 0 4.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>boreder-bottom: 1px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>1px solid</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: 1px solid<br></td>
+            </tr>
+            <tr>
+               <td>border-bottom:solid:2px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: solid:2px<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 8.13px 0 8.13px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:solid 1px-border-bottom:solid 1px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: 1px-border-bottom:solid<br></td>
+            </tr>
+            <tr>
+               <td>border-bottom:solid1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right: 0px solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>bborder-bottom:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:solid 2.5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right: solid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left: solid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0px 8 0px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:solid 2.5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:solid 2.5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-famiy: Times New Roman</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: Times<br>invalid style-value found: New<br>invalid style-value found: Roman<br></td>
+            </tr>
+            <tr>
+               <td>padding:0px 0 0px 5</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0px 0 0px 8</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:double 6px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:solid 3px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom: solid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top: solid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:double 6px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>bordercollapse:collapse</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background color:silver</td>
+               <td style="background-color: red">false</td>
+               <td>invalid css property name: 'background color'<br></td>
+            </tr>
+            <tr>
+               <td>0px solid</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: 0px solid<br></td>
+            </tr>
+            <tr>
+               <td>background-color: #F665AB</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-color: #FFFFFF</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-color: #347C17</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color: #387C44</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color: #7D1B7E</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color: red</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 72px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>left-bottom:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 95px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom-style:dashed</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right-style:dashed</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>2</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: 2<br></td>
+            </tr>
+            <tr>
+               <td>4</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: 4<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 100px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom: 2px dotted</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 0border-right:solid 0px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: 0border-right:solid<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 95px 0 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>order-collapse:collapse</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#726E6D</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#BFBFBF</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 48px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border: solid 2 px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 15px 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom-style:dotted</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 8px 0 1.86px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>addition</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: addition<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 25px 0 50px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 36px 0 50px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-collapses:collapse</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>borde:top:solid 2px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: top:solid<br></td>
+            </tr>
+            <tr>
+               <td>font-size: smaller</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 82px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 20px 0 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 59px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 42px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 51px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 43px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:sollid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:soid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:17px 3.80px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 20 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:dotted 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:solidd 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left: 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:1px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:20px 3.80px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 10px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 28px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding: 5px 0 5px 8px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>adding:0 3.80px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 160px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.73px 0 15px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 77px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-botom: 0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:10px 2.66px 0 2.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.53px 0 18px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 5.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.8px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 25px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#99ccff</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#ccffff</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-collapose:collapse</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-collapse:collpase</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5.66px 7.20px 0 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right-style: dashed</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left-style: dashed</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-BOTTOM:solid 2px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid css property name: 'border-BOTTOM'<br></td>
+            </tr>
+            <tr>
+               <td>bodrer-top:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 14.33px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 30</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>t</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: t<br></td>
+            </tr>
+            <tr>
+               <td>border-bottom:solid 0x</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: 0x<br></td>
+            </tr>
+            <tr>
+               <td>boeder-bottom:0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 40px 0 3.8px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 60px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 18px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.60px 0 29px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 50px 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 18.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-family:Times new Roman</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-family:font-family:Times new Roman</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-TOP:solid 1px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid css property name: 'border-TOP'<br></td>
+            </tr>
+            <tr>
+               <td>border- top: 1px solid</td>
+               <td style="background-color: red">false</td>
+               <td>invalid css property name: 'border- top'<br></td>
+            </tr>
+            <tr>
+               <td>padding: 5px 5 5px 5</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 30px 5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:soldi 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 6.60px 0 9px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.20px 0 4.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color: #ffffff</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color: #15317E</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color: #5CB3FF</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color: #9E7BFF</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color: #38ACEC</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color: #98AFC7</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color: #8AFB17</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color: #CCFB5D</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color: #FFF380</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color: #57E964</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color: #153E7E</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-tight:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.86px 0 7.86px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:1.86px 7.20px 1.86px 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5.66px 7.20px 5.66px 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>bodrer-top:solid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.93px 0 4.93px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 53px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 56px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>borde:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-collpase:collpase</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 02</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>boder-collapse:collapse:</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: collapse:<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 26px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#F3F3F3</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:solid 1.5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:solid 1.5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:solid 1.5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:solid 1.5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>text-align: left</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>bortder-bottom:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>:0 3.80px 0 3.80px</td>
+               <td style="background-color: red">false</td>
+               <td>empty css property name found before colon :0 3.80px 0 3.80px<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 1.0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0px 5px 30px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 23.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>borde-bottom:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 2.46px 0 5.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:10 7.20px 0 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:solid 1 px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left: solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 55px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-botttom:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>BORDER-RIGHT:SOLID 2PX</td>
+               <td style="background-color: red">false</td>
+               <td>invalid css property name: 'BORDER-RIGHT'<br></td>
+            </tr>
+            <tr>
+               <td>text-alignment:right</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>text-alilgnment: right</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>order:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-collapse:collapes</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 8.80px 0 8.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 38px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top 0px solid</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: border-top 0px solid<br></td>
+            </tr>
+            <tr>
+               <td>normal_courier</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: normal_courier<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 45px 0 4.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 22px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 37px 0 4.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:solid 2Px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: 2Px<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80Px 0 3.80Px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: 3.80Px<br>invalid style-value found: 3.80Px<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.73px 0 23px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#ffffff</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-botom:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:1.0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom,: 1px solid</td>
+               <td style="background-color: red">false</td>
+               <td>invalid css property name: 'border-bottom,'<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.93px 0 3.93px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 0 0 20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom: 1px dotted</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:1px dotted</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:1px dotted</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:1px dotted</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 36px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 38px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.73px 0 3.73</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#eeece1</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:solid 3px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-color:#0000A0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:1.0px double #000000</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:Solid 2px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: Solid<br></td>
+            </tr>
+            <tr>
+               <td>padding:1.33px 1.86px 0 1.86px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:1.33px 5.66px 0 5.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right: 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:solid bottom 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:1px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:1px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:black</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:1.0px 5.66px 0 5.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:2.0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:solid 2pxx</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: 2pxx<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.53px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 16px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top: solid 1.0pt</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom: solid 1.0pt</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>1</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: 1<br></td>
+            </tr>
+            <tr>
+               <td>border-bottom:2.0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 8.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#ffcc00</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#ffc000</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-color: Red</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: Red<br></td>
+            </tr>
+            <tr>
+               <td>font-color: Green</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: Green<br></td>
+            </tr>
+            <tr>
+               <td>font-color: #0E8100</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-color: #F30000</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-color: green</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-color: red</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-color: #FF0000</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-color: #800080</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: padding:<br></td>
+            </tr>
+            <tr>
+               <td>border-borrom:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>font-family:ArialMT</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 0 0 30px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 0 0 7.53px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>boader-collapase:collapse</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding: 15px 0 5px 5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom :0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top :0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:solid 2px border:solid 2px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: border:solid<br></td>
+            </tr>
+            <tr>
+               <td>border-top:ssolid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>bordder-bottom:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top::solid 0px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: :solid<br></td>
+            </tr>
+            <tr>
+               <td>padding:padding:0 3.80px 0 3.80px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: padding:0<br></td>
+            </tr>
+            <tr>
+               <td>boredr-top:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>boredr-left:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding: 0px 0 5px 5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 54px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:soid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:double 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>boreder-bottom:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.53px 0 20.53px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.59px 0 4.59px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding: 3px 3 3px 3</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding: 3px 5 3px 5</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding: 3px 2 3px 2</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:3px 2 3px 2</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-tight:solid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 53px 0 6.60px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>]</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: ]<br></td>
+            </tr>
+            <tr>
+               <td>border-top:solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:3.80px 0 0 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-solid 2px</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: border-solid 2px<br></td>
+            </tr>
+            <tr>
+               <td>padding:4.8px 9.6px 4.8px 9.6px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:solid2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background:#B7B7B7</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 5.00px 0 5.00px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom solid 0px</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: border-bottom solid 0px<br></td>
+            </tr>
+            <tr>
+               <td>padding:1.0px 1.13px 1.0px 1.13px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:1.86px 4.66px 1.86px 4.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>bodrer-bottom:solid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:7px 3.80px 0 17px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:7px 3.80px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 7px 17px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 7px 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 5.66px 0 20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#dbe5f1</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 120px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 115px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:dashed 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:1.0px 3.86px 0 3.86px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:1.92px 3.86px 1.92px 3.86px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 0 0 18.0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 0 0 36.0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-collapes:collapse</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 63px 0 5.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 57px 0 5.66px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 20px 0 7.13px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 15px 0 7.13px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 25px 0 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.20px 0 90px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 13px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 24px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 23px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>boder-botom:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>transform:rotate(+90deg)</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:20px 0 5px 5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 2.87px 0 2.87px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#747474</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:7.20px 7.20px 0 7.20px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:10px 0 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:8px 0 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right: solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>boredr-right:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 0 5px 16px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:soild 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-collapse:collaspe</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border:soild 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0px 0 0px 5px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0px 0 0px 15px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 4px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 8px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 33.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 32px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:solid 1.3333334px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:7.20px 3.80px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 6.99px 0 6.99px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 21px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.8px 0 50px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 13.20px 0 11.33px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:2.0px solid #c0c0c0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:2.0px solid #c0c0c0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:2.0px solid #c0c0c0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:1px solid #c0c0c0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>color:#c0c0c0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-left:1px solid #c0c0c0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-botom:solid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>solid 1px</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: solid 1px<br></td>
+            </tr>
+            <tr>
+               <td>boorder-bottom:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>frame-right: 0px solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:1.0px double</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:3.80px 1.86px 3.80px 1.86px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:3.80px 0 3.80px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-righr:solid 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:5px 5px 5px 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>boeder-collapse:collapse</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 12px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 0</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#F2F2F2</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#AAAAAA</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:none</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top:oslid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#8c8c8c</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 0 0 7.67px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 7.53px 0 31px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:3.00px 3.80px 3.00px 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>bortder-top:solid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 6.40px 0 6.40px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>transform: rotate(-90deg) border-left:solid 2px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: border-left:solid<br></td>
+            </tr>
+            <tr>
+               <td>border:solid</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color: #D9D9D9</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border: splod 2px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#aaaaaa</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-padding:0 3.80px 0 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>transform: rotate(90deg)</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-bottom:solid 2pxl</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: 2pxl<br></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 34px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 4.66px 0 37px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#b8b8b8</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:3.86px 3.80px 3.86px 3.80px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>bottom:solid 0px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#C9C9C9</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>background-color:#BEBEBE</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-right:</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: border-right:<br></td>
+            </tr>
+            <tr>
+               <td>border-bottom-style: dashed</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>border-top-style: dashed</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>dashed</td>
+               <td style="background-color: red">false</td>
+               <td>css property without values: dashed<br></td>
+            </tr>
+            <tr>
+               <td>border-right:solid 2px border-top:solid 2px</td>
+               <td style="background-color: red">false</td>
+               <td>invalid style-value found: border-top:solid<br></td>
+            </tr>
+            <tr>
+               <td>boredr-bottom:solid 1px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+            <tr>
+               <td>padding:0 3.80px 0 29px</td>
+               <td>true</td>
+               <td></td>
+            </tr>
+         </tbody>
+      </table>
+   </body>
+</html>

@@ -1,0 +1,211 @@
+<!doctype html>
+<!--[if IEMobile 7]><html class="no-js iem7 oldie"><![endif]-->
+<!--[if lt IE 7]><html class="no-js ie6 oldie" lang="en"><![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js ie7 oldie" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js ie8 oldie" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<!--[if (gte IE 9)|(gt IEMobile 7)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>ISOSTS XHTML table to CALS conversion</title>
+<meta name="description" content="ISOSTS XHTML table to CALS conversion">
+<meta name="author" content="ISO/CS">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0">
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="http://www.iso.org/sites/iso2012/css/ie/style.css">
+<link rel="stylesheet" media="print" href="http://www.iso.org/sites/iso2012/css/ie/print.css">
+
+<!-- For progressively larger displays -->
+<!-- For progressively larger displays -->
+<link rel="stylesheet" media="only screen and (min-width: 480px)" href="http://www.iso.org/sites/iso2012/css/ie/480.css">
+<link rel="stylesheet" media="only screen and (min-width: 600px)" href="http://www.iso.org/sites/iso2012/css/ie/600.css">
+<link rel="stylesheet" media="only screen and (min-width: 768px)" href="http://www.iso.org/sites/iso2012/css/ie/768.css">
+<link rel="stylesheet" media="only screen and (min-width: 992px)" href="http://www.iso.org/sites/iso2012/css/ie/992.css">
+
+<!-- For Retina displays -->
+<link rel="stylesheet" media="only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min-device-pixel-ratio: 1.5)" href="http://www.iso.org/sites/iso2012/css/ie/2x.css">
+
+<!-- FlexSlider -->
+<link rel="stylesheet" href="http://www.iso.org/sites/iso2012/css/ie/flexslider.css">
+
+<!-- JavaScript -->
+<script src="http://www.iso.org/sites/iso2012/js/modernizr-2.5.3.cust.min.js?ver1.0"></script>
+
+<!--Microsoft. Delete if not required -->
+<meta http-equiv="cleartype" content="on">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+<!--[if (lt IE 9) & (!IEMobile)]>
+<link rel="stylesheet" href="http://www.iso.org/sites/iso2012/css/ie/480.css">
+<link rel="stylesheet" href="http://www.iso.org/sites/iso2012/css/ie/768.css">
+<link rel="stylesheet" href="http://www.iso.org/sites/iso2012/css/ie/992.css">
+<![endif]-->
+<!--[if (lt IE 9) & (!IEMobile)]>
+<script src="selectivizr-min.js"></script>
+<![endif]-->
+<style>
+table.grid {
+  border: solid 2px;
+}
+.grid th {
+  border: solid 2px;
+  background-color: lightgrey;
+}
+.grid td {
+  border: solid 1px;
+}
+</style>
+</head>
+<body class="clearfix">
+<!-- Banner -->
+<header role="banner">
+<div class="inner clearfix">
+<a href="http://www.iso.org/schema/isosts/"><h1><span>Home</span></h1></a>
+</div>
+</header>
+<!-- Toolbar -->
+<div class="content clearfix">
+        <h1>ISOSTS XHTML table to CALS conversion</h1>
+    <p>The script <a href="isosts2cals.xsl">isosts2cals.xsl</a> transforms XHTML tables into CALS tables targeting the <a href="https://www.oasis-open.org/specs/tm9901.html">OASIS Exchange Table model
+        DTD TR 9901:1999</a>. The script requires an XSLT 2 processor and has been tested with <a href="http://saxon.sourceforge.net/">Saxon 9.4 HE</a>.</p>
+        <p>The resulting CALS table use the namespace prefix "oasis" which is bound to the identifier '-//OASIS//DTD XML Exchange Table Model 19990315//EN'. 
+           To remove the namespace from the resulting CALS tables use the script <a href="remove_oasis_ns.xsl">remove_oasis_ns.xsl</a>.</p>
+        <p>The full package can be downloaded as a <a href="isosts2cals.zip">zip</a>.</p>
+        <h2>Mapping definition</h2>
+        <h3>Table border</h3>
+        <table class="grid">
+            <col width="30%" />
+            <col width="30%" />
+            <col width="30%" />
+            <thead>
+                <tr>
+                    <th>XHTML</th>
+                    <th>CALS</th>
+                    <th>Comments</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>&lt;table></td>
+                    <td>&lt;table frame="none"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>&lt;table border="1"></td>
+                    <td>&lt;table frame="all" colsep="yes" rowsep="yes"></td>
+                    <td>Implicitly sets the default col and row separator</td>
+                </tr>
+                <tr>
+                    <td>&lt;table frame="box|border"></td>
+                    <td>&lt;table frame="all"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>&lt;table frame="above"></td>
+                    <td>&lt;table frame="top"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>&lt;table frame="below"></td>
+                    <td>&lt;table frame="bottom"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>&lt;table frame="hsides"></td>
+                    <td>&lt;table frame="topbot"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>&lt;table frame="lhs|rhs|void"></td>
+                    <td>&lt;table frame="none"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>&lt;table frame="vsides"></td>
+                    <td>&lt;table frame="side"></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+        <h3>Default table colsep and rowsep and the impact of @rules</h3>
+        <p>NOTE: separators generated through the @rules settings are always generated, regardless individual CSS settings of the table cell.</p>
+        <table class="grid">
+            <col width="30%" />
+            <col width="30%" />
+            <col width="30%" />
+            <thead>
+                <tr>
+                    <th>XHTML</th>
+                    <th>CALS</th>
+                    <th>Comments</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>&lt;table border="1"></td>
+                    <td>&lt;table colsep="yes" rowsep="yes"></td>
+                    <td>colsep and rowsep can be overwritten by individual cell CSS</td>
+                </tr>
+                <tr>
+                    <td>&lt;table rules="all"></td>
+                    <td>&lt;table colsep="yes" rowsep="yes"></td>
+                    <td>creates row and col separator for any cell</td>
+                </tr>
+                <tr>
+                    <td>&lt;table rules="rows"></td>
+                    <td>&lt;table frame="all" colsep="no" rowsep="yes"></td>
+                    <td>creates row separator for any cell</td>
+                </tr>
+                <tr>
+                    <td>&lt;table rules="cols"></td>
+                    <td>&lt;table colsep="yes" rowsep="no"></td>
+                    <td>creates col separator for any cell</td>
+                </tr>
+                <tr>
+                    <td>&lt;table rules="groups"></td>
+                    <td>&lt;table colsep="no" rowsep="no"></td>
+                    <td>creates row separator for cells in last row of table header, body and footer</td>
+                </tr>
+            </tbody>
+        </table>
+        <h3>Table cell border</h3>
+        <p>The border of individual table cell are defined as CSS in the XHTML table model. How the different CSS settings translate into CALS @colsep and @rowsep attributes is documented in the
+            following <a href="test/css2colrowsep-test.html">test cases</a>. The fact that the CSS settings of the next cell or row can impact the current cell separator settings is taken into account. For example
+            "border-left: solid 1px" of the next cell will generate a visual separator between the current and next cell.</p>
+        <p>Because the CALS DTD doesn't allow different border styles or thicknesses, any border style other than <b>none</b> or <b>hidden</b> and any border thickness greater than 0 will generate
+            a separator (colsep=yes, rowsep=yes).</p>
+      <h2>Validation</h2>
+      <p>The <a href="http://www.iso.org/schema/isosts/">ISOSTS DTD</a> only defines the XHTML table model and a converted file with CALS tables will not be valid anymore against this DTD. 
+          To test the generated CALS tables against the CALS DTD the script <a href="flatten_cals.xsl">flatten_cals.xsl</a> can be used to generate an XML containing only CALS tables without namespace prefix.
+          This XML can then be validated against a <a href="tm9901.dtd">test version</a> of the CALS DTD. This version is slightly modified to allow multiple tables in a single file.  
+      </p>
+        <h2>Test cases</h2>
+        <table class="grid">
+        <col width="30%" />
+        <col width="30%" />
+        <col width="30%" />
+        <thead>
+            <tr>
+                <th>ISOSTS with XHTML</th>
+                <th>HTML preview</th>
+                <th>CALS conversion</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="test/isosts_tables.xml">isosts_tables.xml</a></td>
+                <td><a href="test/isosts_tables.html">isosts_tables.html</a></td>
+                <td><a href="test/isosts_tables.cals.xml">isosts_tables.cals.xml</a></td>
+            </tr>
+        </tbody>
+        </table>
+        <h2>Items to discuss, things you want to share ...</h2>
+        <p>Please see on <a href="https://connect.iso.org/x/3gHm">ISO Connect</a>.  
+</div>
+</body>
+</html>

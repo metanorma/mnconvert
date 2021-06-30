@@ -15,6 +15,7 @@ You will need the `maven` build tool and `make`.
 
 
 1. Check ISO/NISO STS xml against XSD, DTD.
+
 [source,sh]
 ----
 java -jar mnconvert.jar xml_file [options]
@@ -25,6 +26,7 @@ options:
 
 
 2. Convert ISO/NISO STS xml to Metanorma xml or adoc.
+
 [source,sh]
 ----
 java -jar mnconvert.jar xml_file [options]
@@ -38,6 +40,7 @@ java -jar mnconvert.jar xml_file [options]
 - `--type`, `-t` - type of standard to generate (iso, bsi, etc.), optional
 
 3. Convert Metanorma xml to ISO/NISO STS xml.
+
 [source,sh]
 ----
 java -jar mnconvert.jar xml_file [options]
@@ -59,13 +62,13 @@ e.g.
 java -jar target/mnconvert-1.0.jar tests/iso-tc154-8601-1-en.xml --output tests/iso-tc154-8601-1-en.out.xml
 ----
 
-NOTE: Input XML format (Metanorma or STS ISO/NISO) determines programmatically by root element of input file:
-- Metanorma XML - *-standard or metanorma-collection
-- ISO/STS in another cases
+NOTE: Input XML format (Metanorma or STS ISO/NISO) determines programmatically by root element of input file: +
+- Metanorma XML - *-standard or metanorma-collection +
+- ISO/STS in another cases +
 but you can specify it obviously by parameter --input-format, -if (values: metanorma|sts)
 
-NOTE: Output format (Metanorma or STS) determines programmatically by root element of input file:
-- STS NISO XML for input Metanorma XML
+NOTE: Output format (Metanorma or STS) determines programmatically by root element of input file: +
+- STS NISO XML for input Metanorma XML +
 - Metanorma for input STS ISO/NISO XML
 
 

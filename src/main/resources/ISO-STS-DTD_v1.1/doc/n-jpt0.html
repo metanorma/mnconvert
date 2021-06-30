@@ -1,0 +1,353 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--Tag library software copyright Mulberry Technologies, Inc., 2002-2008-->
+      <link rel="stylesheet" href="ISOSTS-style.css" type="text/css">
+      <title>Element: Display Form of Term Entry</title>
+   </head>
+   <body class="main">
+      <div class="pageheader">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="sponsor">International Organization for Standardization (ISO)</h4>
+      </div>
+      <div class="header">
+         <h1 class="elementtag">&lt;term-display&gt;</h1>
+         <h1 class="elementname">Display Form of Term Entry</h1>
+      </div>
+      <div class="definition">
+         <p class="para">Container for appearance-oriented markup of a
+            	  terminology entry as a supplement or alternative
+            	  to <a href="n-z7t0.html" target="main" title="Term Entry (TBX Tag Set)"><span class="elementtag">&lt;tbx:termEntry&gt;</span></a>.
+         </p>
+      </div>
+      <div class="remarks">
+         <h2 class="header">Remarks</h2>
+         <p class="para">This element is part of the ISOSTS customization of the JATS
+            journal publishing vocabulary; it is not part of the base vocabulary.
+         </p>
+      </div>
+      <div class="attrlist">
+         <h2 class="header">Attributes</h2>
+         <h5 class="header"><a href="n-8ag0.html" target="main"><span class="attrtag">id</span></a> <a href="n-8ag0.html" target="main"><span class="attrname">Identifier</span></a></h5>
+         <h5 class="header"><a href="n-cvd0.html" target="main"><span class="attrtag">xml:lang</span></a> <a href="n-cvd0.html" target="main"><span class="attrname">Language</span></a></h5>
+      </div>
+      <div class="relatedelem">
+         <h2 class="header">Related Elements</h2>
+         <p class="para">See also <a href="n-z7t0.html" target="main" title="Term Entry (TBX Tag Set)"><span class="elementtag">&lt;tbx:termEntry&gt;</span></a>.
+         </p>
+         <p class="para">TBX is a concept-oriented encoding of terminological data;
+            	  the <a href="n-z7t0.html" target="main" title="Term Entry (TBX Tag Set)"><span class="elementtag">&lt;tbx:termEntry&gt;</span></a>
+            	  corresponds to one entry in a terminological database (and
+            	  may contain any number of synonymous terms in multiple
+            	  languages).
+            	  The <a href="n-jpt0.html" target="main" title="Display Form of Term Entry"><span class="elementtag">&lt;term-display&gt;</span></a> element
+            	  is an appearance-oriented encoding of terminological data
+            	  which may be used when it is difficult to generate the 
+            	  desired formatted display from the TBX entry, or (in a 
+            	  data conversion process) when it is difficult to create a
+            	  useful TBX term entry from an appearance-oriented input
+            	  document.
+         </p>
+         <p class="para">
+            	  The two encodings may appear side-by-side as equivalents;
+            	  processes that consume ISOSTS documents should be prepared
+            	  to see either or both forms of a term entry and to
+            	  use one or the other (or both) as appropriate.
+            	
+         </p>
+      </div>
+      <div class="modeldesc">
+         <h2 class="header">Model Description</h2>
+         <p class="para">The following, in order:
+            <ul class="bullist">
+               <li>
+                  <a href="n-6g70.html" target="main" title="Title"><span class="elementtag">&lt;title&gt;</span></a> <a href="n-6g70.html" target="main" title="<title&gt;"><span class="elementname">Title</span></a>, zero or more
+               </li>
+               <li>Any combination of:
+                  <ul class="bullist">
+                     <li>
+                        <a href="n-kr00.html" target="main" title="Address/Contact Information"><span class="elementtag">&lt;address&gt;</span></a> <a href="n-kr00.html" target="main" title="<address&gt;"><span class="elementname">Address/Contact Information</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-f900.html" target="main" title="Alternatives for Processing"><span class="elementtag">&lt;alternatives&gt;</span></a> <a href="n-f900.html" target="main" title="<alternatives&gt;"><span class="elementname">Alternatives for Processing</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-6420.html" target="main" title="Array (Simple Tabular Array)"><span class="elementtag">&lt;array&gt;</span></a> <a href="n-6420.html" target="main" title="<array&gt;"><span class="elementname">Array (Simple Tabular Array)</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-twc0.html" target="main" title="Boxed Text"><span class="elementtag">&lt;boxed-text&gt;</span></a> <a href="n-twc0.html" target="main" title="<boxed-text&gt;"><span class="elementname">Boxed Text</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-iic0.html" target="main" title="Chemical Structure Wrapper"><span class="elementtag">&lt;chem-struct-wrap&gt;</span></a> <a href="n-iic0.html" target="main" title="<chem-struct-wrap&gt;"><span class="elementname">Chemical Structure Wrapper</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-wc80.html" target="main" title="Figure"><span class="elementtag">&lt;fig&gt;</span></a> <a href="n-wc80.html" target="main" title="<fig&gt;"><span class="elementname">Figure</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-xa80.html" target="main" title="Figure Group"><span class="elementtag">&lt;fig-group&gt;</span></a> <a href="n-xa80.html" target="main" title="<fig-group&gt;"><span class="elementname">Figure Group</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-f980.html" target="main" title="Graphic"><span class="elementtag">&lt;graphic&gt;</span></a> <a href="n-f980.html" target="main" title="<graphic&gt;"><span class="elementname">Graphic</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-x4u0.html" target="main" title="Media Object"><span class="elementtag">&lt;media&gt;</span></a> <a href="n-x4u0.html" target="main" title="<media&gt;"><span class="elementname">Media Object</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-6ew0.html" target="main" title="Non-normative Note"><span class="elementtag">&lt;non-normative-note&gt;</span></a> <a href="n-6ew0.html" target="main" title="<non-normative-note&gt;"><span class="elementname">Non-normative Note</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-asw0.html" target="main" title="Non-normative Example"><span class="elementtag">&lt;non-normative-example&gt;</span></a> <a href="n-asw0.html" target="main" title="<non-normative-example&gt;"><span class="elementname">Non-normative Example</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-ngx0.html" target="main" title="Preformatted Text"><span class="elementtag">&lt;preformat&gt;</span></a> <a href="n-ngx0.html" target="main" title="<preformat&gt;"><span class="elementname">Preformatted Text</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-tqs0.html" target="main" title="Supplementary Material"><span class="elementtag">&lt;supplementary-material&gt;</span></a> <a href="n-tqs0.html" target="main" title="<supplementary-material&gt;"><span class="elementname">Supplementary Material</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-j5t0.html" target="main" title="Table Wrapper"><span class="elementtag">&lt;table-wrap&gt;</span></a> <a href="n-j5t0.html" target="main" title="<table-wrap&gt;"><span class="elementname">Table Wrapper</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-pxt0.html" target="main" title="Table Wrapper Group"><span class="elementtag">&lt;table-wrap-group&gt;</span></a> <a href="n-pxt0.html" target="main" title="<table-wrap-group&gt;"><span class="elementname">Table Wrapper Group</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-k850.html" target="main" title="Formula, Display"><span class="elementtag">&lt;disp-formula&gt;</span></a> <a href="n-k850.html" target="main" title="<disp-formula&gt;"><span class="elementname">Formula, Display</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-ax50.html" target="main" title="Formula, Display Group"><span class="elementtag">&lt;disp-formula-group&gt;</span></a> <a href="n-ax50.html" target="main" title="<disp-formula-group&gt;"><span class="elementname">Formula, Display Group</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-t2x0.html" target="main" title="Paragraph"><span class="elementtag">&lt;p&gt;</span></a> <a href="n-t2x0.html" target="main" title="<p&gt;"><span class="elementname">Paragraph</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-ic50.html" target="main" title="Definition List"><span class="elementtag">&lt;def-list&gt;</span></a> <a href="n-ic50.html" target="main" title="<def-list&gt;"><span class="elementname">Definition List</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-t3u0.html" target="main" title="List"><span class="elementtag">&lt;list&gt;</span></a> <a href="n-t3u0.html" target="main" title="<list&gt;"><span class="elementname">List</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-ybu0.html" target="main" title="Math (MathML 2.0 Tag Set)"><span class="elementtag">&lt;mml:math&gt;</span></a> <a href="n-ybu0.html" target="main" title="<mml:math&gt;"><span class="elementname">Math (MathML 2.0 Tag Set)</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-rkv0.html" target="main" title="Related Article Information"><span class="elementtag">&lt;related-article&gt;</span></a> <a href="n-rkv0.html" target="main" title="<related-article&gt;"><span class="elementname">Related Article Information</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-6uv0.html" target="main" title="Related Object Information"><span class="elementtag">&lt;related-object&gt;</span></a> <a href="n-6uv0.html" target="main" title="<related-object&gt;"><span class="elementname">Related Object Information</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-pv50.html" target="main" title="Quote, Displayed"><span class="elementtag">&lt;disp-quote&gt;</span></a> <a href="n-pv50.html" target="main" title="<disp-quote&gt;"><span class="elementname">Quote, Displayed</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-i640.html" target="main" title="Speech"><span class="elementtag">&lt;speech&gt;</span></a> <a href="n-i640.html" target="main" title="<speech&gt;"><span class="elementname">Speech</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-jr40.html" target="main" title="Statement, Formal"><span class="elementtag">&lt;statement&gt;</span></a> <a href="n-jr40.html" target="main" title="<statement&gt;"><span class="elementname">Statement, Formal</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-h5e0.html" target="main" title="Verse Form for Poetry"><span class="elementtag">&lt;verse-group&gt;</span></a> <a href="n-h5e0.html" target="main" title="<verse-group&gt;"><span class="elementname">Verse Form for Poetry</span></a>
+                        
+                     </li>
+                  </ul>
+                  
+               </li>
+            </ul>
+            
+         </p>
+      </div>
+      <div class="elementcontext">
+         <h3 class="header">This element may be contained in:</h3>
+         <p class="para"><a href="n-qc70.html" target="main" title="Terminology Section"><span class="elementtag">&lt;term-sec&gt;</span></a></p>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example</h3>
+         <div class="taggedexamp"><pre class="taggedtext">
+	  
+&lt;standard xmlns:tbx="urn:iso:std:iso:30042:ed-1"&gt;
+  &lt;front&gt;
+    &lt;iso-meta&gt;
+      &lt;title-wrap xml:lang="en"&gt;
+        &lt;intro&gt;Small craft&lt;/intro&gt;
+        &lt;main&gt;Hull construction and scantlings&lt;/main&gt;
+        &lt;compl&gt;Rudders&lt;/compl&gt;
+        &lt;full&gt;Small craft &amp;mdash; Hull construction and scantlings
+        &amp;mdash; Part 8: Rudders&lt;/full&gt;
+      &lt;/title-wrap&gt;
+      &lt;title-wrap xml:lang="fr"&gt;
+        &lt;intro&gt;Petits navires&lt;/intro&gt;
+        &lt;main&gt;Construction de coques et &amp;eacute;chantillonnage&lt;/main&gt;
+        &lt;compl&gt;Gouvernails&lt;/compl&gt;
+        &lt;full&gt;Petits navires &amp;mdash; Construction de coques et &amp;eacute;chantillonnage
+        &amp;mdash; Partie 8: Gouvernails&lt;/full&gt;
+      &lt;/title-wrap&gt;
+      &lt;doc-ident&gt;
+        &lt;sdo&gt;ISO&lt;/sdo&gt;
+        &lt;proj-id&gt;?????&lt;/proj-id&gt;
+        &lt;language&gt;en&lt;/language&gt;
+        &lt;release-version&gt;IS&lt;/release-version&gt;
+        &lt;urn&gt;urn:iso:std:iso:12215:-8:ed-1:v1:en&lt;/urn&gt;
+      &lt;/doc-ident&gt;
+      &lt;std-ident&gt;
+        &lt;originator&gt;ISO&lt;/originator&gt;
+        &lt;doc-type&gt;is&lt;/doc-type&gt;
+        &lt;doc-number&gt;12215&lt;/doc-number&gt;
+        &lt;part-number&gt;8&lt;/part-number&gt;
+        &lt;edition&gt;1&lt;/edition&gt;
+        &lt;version&gt;1&lt;/version&gt;
+        &lt;suppl-type&gt;&lt;/suppl-type&gt;
+        &lt;suppl-number&gt;&lt;/suppl-number&gt;
+        &lt;suppl-version&gt;&lt;/suppl-version&gt;
+      &lt;/std-ident&gt;
+      &lt;content-language&gt;en&lt;/content-language&gt;
+      &lt;std-ref type="dated"&gt;ISO 12215-8:2009&lt;/std-ref&gt;
+      &lt;std-ref type="undated"&gt;ISO 12215-8&lt;/std-ref&gt;
+      &lt;doc-ref&gt;ISO 12215-8:2009(E)&lt;/doc-ref&gt;
+      &lt;pub-date&gt;2009-01-19&lt;/pub-date&gt;
+      &lt;release-date&gt;2009-01-19&lt;/release-date&gt;
+      &lt;comm-ref&gt;ISO/TC 188&lt;/comm-ref&gt;
+      &lt;secretariat&gt;SIS&lt;/secretariat&gt;
+      &lt;ics&gt;47.080&lt;/ics&gt;
+      &lt;page-count count="44"/&gt;
+      &lt;!-- isProof --&gt;
+    &lt;/iso-meta&gt;
+
+  &lt;/front&gt;
+  &lt;body&gt;
+    &lt;sec sec-type="scope"&gt;
+      &lt;label&gt;1&lt;/label&gt;
+      &lt;title&gt;Scope&lt;/title&gt;
+      &lt;p&gt;This part of ISO 12215 ...&lt;/p&gt;
+    &lt;/sec&gt;
+    &lt;sec sec-type="norm-refs"&gt;
+      &lt;label&gt;2&lt;/label&gt;
+      &lt;title&gt;Normative references&lt;/title&gt;
+      &lt;p&gt;The following referenced documents ...&lt;/p&gt;
+    &lt;/sec&gt;
+    &lt;sec&gt;
+      &lt;label&gt;3&lt;/label&gt;
+      &lt;title&gt;Terms and definitions&lt;/title&gt;
+
+      &lt;p&gt;For the purposes of this document, the following
+      terms and definitions apply.&lt;/p&gt;
+
+      &lt;term-sec&gt;
+        &lt;label&gt;3.1&lt;/label&gt;
+
+        &lt;tbx:termEntry&gt;...&lt;/tbx:termEntry&gt;
+
+        <strong><span class="focus">&lt;term-display&gt;
+          &lt;title&gt;design categories&lt;/title&gt;
+          &lt;p&gt;
+            sea and wind conditions for which a craft is assessed
+            by this part of ISO&nbsp;12215 to be suitable, provided
+            the craft is correctly handled in the sense of
+            good seamanship and operated at a speed appropriate
+            to the prevailing sea state
+          &lt;/p&gt;
+        &lt;/term-display&gt;</span></strong>
+
+        &lt;term-sec&gt;
+          &lt;label&gt;3.1.1&lt;/label&gt;
+
+          &lt;tbx:termEntry&gt;...&lt;/tbx:termEntry&gt;
+
+          <strong><span class="focus">&lt;term-display&gt;
+            &lt;title&gt;design category A ("ocean")&lt;/title&gt;
+            &lt;p&gt;
+              category of craft considered suitable to operate
+              in seas with significant wave heights above 4&nbsp;m
+              and wind speeds in excess of Beaufort Force&nbsp;8,
+              but excluding abnormal conditions such as hurricanes
+            &lt;/p&gt;
+          &lt;/term-display&gt;</span></strong>
+        &lt;/term-sec&gt;
+        &lt;term-sec&gt;
+          &lt;label&gt;3.1.2&lt;/label&gt;
+
+          &lt;tbx:termEntry&gt;...&lt;/tbx:termEntry&gt;
+
+          <strong><span class="focus">&lt;term-display&gt;
+            &lt;title&gt;design category B ("offshore")&lt;/title&gt;
+            &lt;p&gt;
+              category of craft considered suitable to operate
+              in seas with significant wave heights up to 4&nbsp;m
+              and winds of Beaufort Force&nbsp;8 or less
+            &lt;/p&gt;
+          &lt;/term-display&gt;</span></strong>
+        &lt;/term-sec&gt;
+
+        &lt;term-sec&gt;
+          &lt;label&gt;3.1.3&lt;/label&gt;
+
+          &lt;tbx:termEntry&gt;...&lt;/tbx:termEntry&gt;
+
+          <strong><span class="focus">&lt;term-display&gt;
+            &lt;title&gt;design category C ("inshore")&lt;/title&gt;
+            &lt;p&gt;
+              category of craft considered suitable to operate
+              in seas with significant wave heights up to 2&nbsp;m
+              and a typical steady wind force of Beaufort Force&nbsp;6 or less
+            &lt;/p&gt;
+          &lt;/term-display&gt;</span></strong>
+        &lt;/term-sec&gt;
+        &lt;term-sec&gt;
+          &lt;label&gt;3.1.1&lt;/label&gt;
+
+          &lt;tbx:termEntry&gt;...&lt;/tbx:termEntry&gt;
+
+          <strong><span class="focus">&lt;term-display&gt;
+            &lt;title&gt;design category D ("sheltered waters")&lt;/title&gt;
+            &lt;p&gt;
+              category of craft considered suitable to operate
+              in waters with significant wave heights
+              up to and including 0,3&nbsp;m
+              with occasional waves of 0,5&nbsp;m height,
+              for example from passing vessels,
+              and a typical steady wind force
+              of Beaufort Force&nbsp;4 or less
+            &lt;/p&gt;
+          &lt;/term-display&gt;</span></strong>
+        &lt;/term-sec&gt;
+      &lt;/term-sec&gt;
+    &lt;/sec&gt;
+  &lt;/body&gt;
+&lt;/standard&gt;
+
+
+	</pre></div>
+      </div>
+      <div class="moduledefined">
+         <h2 class="header">Module</h2>
+         <p class="moduledefined">ISOSTS.dtd</p>
+      </div>
+      <div class="pagefooter">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="pubdate">Version of July 2013</h4>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,209 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--Tag library software copyright Mulberry Technologies, Inc., 2002-2008-->
+      <link rel="stylesheet" href="ISOSTS-style.css" type="text/css">
+      <title>Element: Permissions</title>
+   </head>
+   <body class="main">
+      <div class="pageheader">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="sponsor">International Organization for Standardization (ISO)</h4>
+      </div>
+      <div class="header">
+         <h1 class="elementtag">&lt;permissions&gt;</h1>
+         <h1 class="elementname">Permissions</h1>
+      </div>
+      <div class="definition">
+         <p class="para">Container element for copyright and license information. </p>
+      </div>
+      <div class="modeldesc">
+         <h2 class="header">Model Description</h2>
+         <p class="para">The following, in order:
+            <ul class="bullist">
+               <li>
+                  <a href="n-rn30.html" target="main" title="Copyright Statement"><span class="elementtag">&lt;copyright-statement&gt;</span></a> <a href="n-rn30.html" target="main" title="<copyright-statement&gt;"><span class="elementname">Copyright Statement</span></a>, zero or more
+               </li>
+               <li>
+                  <a href="n-5r30.html" target="main" title="Copyright Year"><span class="elementtag">&lt;copyright-year&gt;</span></a> <a href="n-5r30.html" target="main" title="<copyright-year&gt;"><span class="elementname">Copyright Year</span></a>, zero or more
+               </li>
+               <li>
+                  <a href="n-6g30.html" target="main" title="Copyright Holder"><span class="elementtag">&lt;copyright-holder&gt;</span></a> <a href="n-6g30.html" target="main" title="<copyright-holder&gt;"><span class="elementname">Copyright Holder</span></a>, zero or more
+               </li>
+               <li>
+                  <a href="n-uba0.html" target="main" title="License Information"><span class="elementtag">&lt;license&gt;</span></a> <a href="n-uba0.html" target="main" title="<license&gt;"><span class="elementname">License Information</span></a>, zero or more
+               </li>
+            </ul>
+            
+         </p>
+      </div>
+      <div class="elementcontext">
+         <h3 class="header">This element may be contained in:</h3>
+         <p class="para">
+            <a href="n-vta0.html" target="main" title="ISO Metadata"><span class="elementtag">&lt;iso-meta&gt;</span></a>,
+            <a href="el_nat-meta.html" target="main" title="NAT Metadata"><span class="elementtag">&lt;nat-meta&gt;</span></a>,
+            <a href="el_reg-meta.html" target="main" title="Regional-body Metadata"><span class="elementtag">&lt;reg-meta&gt;</span></a>
+         </p>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example 1</h3>
+         <p class="para">In some cases there may be multiple copyright holders
+            	  mentioned in the footer of a standard, as in the following
+            	  example from ISO/TS 16949:2009(E).
+         </p>
+         <div class="taggedexamp"><pre class="taggedtext">
+	  
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE standard PUBLIC "-//ISO//DTD ISO Standards Tag Set (ISOSTS) DTD v0.6 20111216//EN" "ISOSTS.dtd"&gt;
+&lt;standard&gt;
+  &lt;front&gt; 
+    &lt;iso-meta&gt;
+      &lt;title-wrap xml:lang='en'&gt;
+	&lt;intro&gt;Quality management systems&lt;/intro&gt;
+        &lt;main&gt;Particular requirements for the application of ISO
+	  9001:2008 for automotive production and relevant service
+	  part organizations&lt;/main&gt;
+        &lt;full&gt;
+	  Quality management systems &amp;mdash;
+	  Particular requirements for the application of ISO
+	  9001:2008 for automotive production and relevant service
+	  part organizations&lt;/full&gt;
+      &lt;/title-wrap&gt;
+      &lt;title-wrap xml:lang='fr'&gt;
+	&lt;intro&gt;Systèmes de management de la qualite&lt;/intro&gt;
+        &lt;main&gt;Exigences particulières pour l'application de l'ISO
+	  9001:2008 pour la production de série et de pièces de
+	  rechange dans l'industrie automobile&lt;/main&gt;
+        &lt;full&gt;
+	  Systèmes de management de la qualite &amp;mdash;
+	  Exigences particulières pour l'application de l'ISO
+	  9001:2008 pour la production de série et de pièces de
+	  rechange dans l'industrie automobile
+	&lt;/full&gt;
+      &lt;/title-wrap&gt;    
+      &lt;doc-ident&gt;...      
+        &lt;urn&gt;urn:iso:std:iso:ts:16949:ed-3:en&lt;/urn&gt;
+      &lt;/doc-ident&gt;
+      &lt;std-ident&gt;
+        &lt;originator&gt;ISO&lt;/originator&gt;
+        &lt;doc-type&gt;ts&lt;/doc-type&gt;
+        &lt;doc-number&gt;16949&lt;/doc-number&gt;
+        &lt;edition&gt;3&lt;/edition&gt;
+	&lt;version&gt;1&lt;/version&gt;
+	&lt;suppl-type&gt;&lt;/suppl-type&gt;
+        &lt;suppl-number&gt;&lt;/suppl-number&gt;
+        &lt;suppl-version&gt;&lt;/suppl-version&gt;
+      &lt;/std-ident&gt;
+      &lt;content-language&gt;en&lt;/content-language&gt;
+      &lt;std-ref type="dated"&gt;ISO/TS 16949:2009&lt;/std-ref&gt;
+      &lt;std-ref type="undated"&gt;ISO/TS 16949&lt;/std-ref&gt;
+      &lt;doc-ref&gt;ISO/TS 16949:2009(E)&lt;/doc-ref&gt;
+      &lt;pub-date&gt;2002-06-15&lt;/pub-date&gt;
+      &lt;release-date&gt;2009-06-15&lt;/release-date&gt;
+      &lt;comm-ref&gt;ISO/TC 176&lt;/comm-ref&gt;
+      &lt;secretariat&gt;???&lt;/secretariat&gt;
+      &lt;ics&gt;03.120.10&lt;/ics&gt;
+      &lt;ics&gt;43.020&lt;/ics&gt;
+      &lt;page-count count="39"/&gt;
+      <strong><span class="focus">&lt;permissions&gt;
+	&lt;copyright-statement&gt;
+	  &amp;copy; ISO 2009 – All rights reserved
+	&lt;/copyright-statement&gt;
+	&lt;copyright-statement&gt; 
+	  &amp;copy; ANFIA, &amp;copy; FIEV, &amp;copy; SMMT, &amp;copy; VDA, &amp;copy;
+	  Chrysler, &amp;copy; Ford Motor Company, &amp;copy; General Motors
+	  Corp. – All rights reserved 
+	&lt;/copyright-statement&gt;
+	&lt;copyright-statement&gt;
+	  &amp;copy; PSA Peugeot Citroën, &amp;copy; Renault – All rights reserved
+	&lt;/copyright-statement&gt;
+      &lt;/permissions&gt;</span></strong>
+    &lt;/iso-meta&gt;
+    ...          
+  &lt;/front&gt;
+  &lt;body&gt;...&lt;/body&gt;
+&lt;/standard&gt;
+
+
+	</pre></div>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example 2</h3>
+         <p class="para">In the following example, the <a href="n-f900.html" target="main" title="Alternatives for Processing"><span class="elementtag">&lt;alternatives&gt;</span></a> element is used to wrap a
+            mathematical expression encoded in MathML with a graphic
+            image of the same expression for use in environments where
+            MathML is not supported.
+         </p>
+         <div class="taggedexamp"><pre class="taggedtext">
+...
+    &lt;p&gt;The following discussion makes use of
+      some properties of the three-by-three identity matrix:&lt;/p&gt;
+    &lt;disp-formula&gt;
+    &lt;alternatives&gt;
+    &lt;mml:math&gt;
+      &lt;mml:mrow&gt;
+	&lt;mml:mo&gt; ( &lt;/mml:mo&gt;
+	&lt;mml:mtable&gt;
+	  &lt;mml:mtr&gt;
+	    &lt;mml:mtd&gt; &lt;mml:mn&gt;1&lt;/mml:mn&gt; &lt;/mml:mtd&gt;
+	    &lt;mml:mtd&gt; &lt;mml:mn&gt;0&lt;/mml:mn&gt; &lt;/mml:mtd&gt;
+	    &lt;mml:mtd&gt; &lt;mml:mn&gt;0&lt;/mml:mn&gt; &lt;/mml:mtd&gt;
+	  &lt;/mml:mtr&gt;
+	  &lt;mml:mtr&gt;
+	    &lt;mml:mtd&gt; &lt;mml:mn&gt;0&lt;/mml:mn&gt; &lt;/mml:mtd&gt;
+	    &lt;mml:mtd&gt; &lt;mml:mn&gt;1&lt;/mml:mn&gt; &lt;/mml:mtd&gt;
+	    &lt;mml:mtd&gt; &lt;mml:mn&gt;0&lt;/mml:mn&gt; &lt;/mml:mtd&gt;
+	  &lt;/mml:mtr&gt;
+	  &lt;mml:mtr&gt;
+	    &lt;mml:mtd&gt; &lt;mml:mn&gt;0&lt;/mml:mn&gt; &lt;/mml:mtd&gt;
+	    &lt;mml:mtd&gt; &lt;mml:mn&gt;0&lt;/mml:mn&gt; &lt;/mml:mtd&gt;
+	    &lt;mml:mtd&gt; &lt;mml:mn&gt;1&lt;/mml:mn&gt; &lt;/mml:mtd&gt;
+	  &lt;/mml:mtr&gt;
+	&lt;/mml:mtable&gt;
+	&lt;mml:mo&gt; ) &lt;/mml:mo&gt;
+      &lt;/mml:mrow&gt;
+    &lt;/mml:math&gt;
+      &lt;graphic xlink:href="images/identity-matrix"&gt;
+	&lt;alt-text&gt;A three-by-three identity matrix.&lt;/alt-text&gt;
+	<strong><span class="focus">&lt;permissions&gt;
+	  &lt;copyright-statement&gt;&amp;copy; 1998-2003 W3C &amp;reg; (MIT, ERCIM,
+	  Keio); used by permission&lt;/copyright-statement&gt;
+	  &lt;copyright-year&gt;1998-2003&lt;/copyright-year&gt;
+	  &lt;copyright-holder&gt;W3C &amp;reg; (MIT, ERCIM,
+	  Keio)&lt;/copyright-holder&gt;
+	&lt;/permissions&gt;</span></strong>
+      &lt;/graphic&gt;
+    &lt;/alternatives&gt;
+    &lt;/disp-formula&gt;
+    &lt;p&gt;
+      Analogous observations hold for identity matrices of different sizes.
+    &lt;/p&gt;
+   ...
+
+</pre></div>
+         <p class="para">The graphic rendering of the mathematical expression
+            	is:
+         </p>
+         <div class="formatexamp"><img class="image.desc" src="graphics/identity-matrix.gif"></div>
+         <p class="para">(MathML example and graphic from 
+            	  <a href="http://www.w3.org/TR/MathML2/" target="_new" class="external">Mathematical Markup
+               Language (MathML) Version 2.0 (Second
+               Edition)</a>, W3C Recommendation 21 October
+            2003,
+            	  ed. David Carlisle et al.,
+            	  © 1998-2003 W3C® (MIT, ERCIM, Keio), all rights
+            reserved.
+            	  Used by <a href="http://www.w3.org/Consortium/Legal/2002/copyright-documents-20021231" target="_new" class="external">permission</a>.)
+            	
+         </p>
+      </div>
+      <div class="moduledefined">
+         <h2 class="header">Module</h2>
+         <p class="moduledefined">JATS-common0.ent</p>
+      </div>
+      <div class="pagefooter">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="pubdate">Version of July 2013</h4>
+      </div>
+   </body>
+</html>

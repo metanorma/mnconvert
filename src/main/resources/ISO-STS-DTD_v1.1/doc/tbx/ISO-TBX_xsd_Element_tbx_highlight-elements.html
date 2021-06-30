@@ -1,0 +1,564 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Complex type:highlight-elements</title>
+        <link rel="stylesheet" href="docHtml.css" type="text/css" />
+        <script type="text/javascript"><!--
+                var usedByBoxes = new Array('usedBy_highlight-elements');
+                
+                
+                
+                var diagramBoxes = new Array('diagram_highlight-elements');
+                
+                
+                var attributesBoxes = new Array('attributes_highlight-elements');
+                
+                
+                var button_prefix = 'button_';
+                
+                /**
+                * Returns an element in the current HTML document.
+                *
+                * @param elementID Identifier of HTML element
+                * @return               HTML element object
+                */
+                function getElementObject(elementID) {
+                    var elemObj = null;
+                    if (document.getElementById) {
+                        elemObj = document.getElementById(elementID);
+                    }
+                    return elemObj;
+                }
+                
+                /**
+                * Switches the state of a collapseable box, e.g.
+                * if it's opened, it'll be closed, and vice versa.
+                *
+                * @param boxID Identifier of box
+                */
+                function switchState(boxID) {
+                    var boxObj = getElementObject(boxID);
+                    var buttonObj = getElementObject(button_prefix + boxID);
+                    if (boxObj == null || buttonObj == null) {
+                        // Box or button not found
+                    } else if (boxObj.style.display == "none") {
+                        // Box is closed, so open it
+                        openBox(boxObj, buttonObj);
+                    } else if (boxObj.style.display == "block") {
+                        // Box is opened, so close it
+                        closeBox(boxObj, buttonObj);
+                    }
+                }
+                
+                /**
+                * Opens a collapseable box.
+                *
+                * @param boxObj       Collapseable box
+                * @param buttonObj Button controlling box
+                */
+                function openBox(boxObj, buttonObj) {
+                    if (boxObj == null || buttonObj == null) {
+                        // Box or button not found
+                    } else {
+                        // Change 'display' CSS property of box
+                        boxObj.style.display = "block";
+                        
+                        // Change text of button
+                        if (boxObj.style.display == "block") {
+                            buttonObj.src = "img/btM.gif";
+                        }
+                    }
+                }
+                
+                /**
+                * Closes a collapseable box.
+                *
+                * @param boxObj       Collapseable box
+                * @param buttonObj Button controlling box
+                */
+                function closeBox(boxObj, buttonObj) {
+                    if (boxObj == null || buttonObj == null) {
+                        // Box or button not found
+                    } else {
+                        // Change 'display' CSS property of box
+                        boxObj.style.display = "none";
+                        
+                        // Change text of button
+                        if (boxObj.style.display == "none") {
+                            buttonObj.src = "img/btP.gif";
+                        }
+                    }
+                }
+                
+                function switchStateForAll(buttonObj, boxList) {
+                    if (buttonObj == null) {
+                        // button not found
+                    } else if (buttonObj.value == "+") {
+                        // Expand all
+                        expandAll(boxList);
+                        buttonObj.value = "-";
+                    } else if (buttonObj.value == "-") {
+                        // Collapse all
+                        collapseAll(boxList);
+                        buttonObj.value = "+";
+                    }
+                }
+                
+                /**
+                * Closes all boxes in a given list.
+                *
+                * @param boxList Array of box IDs
+                */
+                function collapseAll(boxList) {
+                    var idx;
+                    for (idx = 0; idx < boxList.length; idx++) {
+                        var boxObj = getElementObject(boxList[idx]);
+                        var buttonObj = getElementObject(button_prefix + boxList[idx]);
+                        closeBox(boxObj, buttonObj);
+                    }
+                }
+                
+                /**
+                * Open all boxes in a given list.
+                *
+                * @param boxList Array of box IDs
+                */
+                function expandAll(boxList) {
+                    var idx;
+                    for (idx = 0; idx < boxList.length; idx++) {
+                        var boxObj = getElementObject(boxList[idx]);
+                        var buttonObj = getElementObject(button_prefix + boxList[idx]);
+                        openBox(boxObj, buttonObj);
+                    }
+                }
+                
+                /**
+                * Update the message presented in the title of the html page.
+                * - If the documentation was splited by namespace we present something like: "Documentation for namespace 'ns'"
+                * - If the documentation was splited by location we present somehing like: "Documentation for 'Schema.xsd'"
+                * - If no split we always present: "Documentation for 'MainSchema.xsd'"
+                */
+                function updatePageTitle(message) {
+                    top.document.title = message;
+                }
+                
+                
+                
+                /**
+                * Finds an HTML element by its ID and makes it floatable over the normal content.
+                *
+                * @param x_displacement The difference in pixels to the right side of the window from
+                *           the left side of the element.
+                * @param y_displacement The difference in pixels to the right side of the window from
+                *           the top of the element.
+                */
+                function findAndFloat(id, x_displacement, y_displacement) {
+                    
+                    var element = getElementObject(id);
+                    
+                    window[id + "_obj"] = element;
+                    
+                    if (document.layers) {
+                        element.style = element;
+                    }
+                    
+                    element.current_y = y_displacement;
+                    element.first_time = true;
+                    
+                    element.floatElement = function () {
+                        // It may be closed by an user action.
+                        
+                        // Target X and Y coordinates.
+                        var x, y;
+                        
+                        var myWidth = 0, myHeight = 0;
+                        if (typeof (window.innerWidth) == 'number') {
+                            //Non-IE
+                            myWidth = window.innerWidth;
+                            myHeight = window.innerHeight;
+                        } else if (document.documentElement && (document.documentElement.clientWidth || document.documentElement.clientHeight)) {
+                            //IE 6+ in 'standards compliant mode'
+                            myWidth = document.documentElement.clientWidth;
+                            myHeight = document.documentElement.clientHeight;
+                        } else if (document.body && (document.body.clientWidth || document.body.clientHeight)) {
+                            //IE 4 compatible
+                            myWidth = document.body.clientWidth;
+                            myHeight = document.body.clientHeight;
+                        }
+                        
+                        
+                        x = myWidth - x_displacement;
+                        
+                        var ns = (navigator.appName.indexOf("Netscape") != - 1);
+                        y = ns? pageYOffset: document.documentElement && document.documentElement.scrollTop?
+                        document.documentElement.scrollTop: document.body.scrollTop;
+                        y = y + y_displacement;
+                        
+                        // The current y is the current coordinate of the floating element.
+                        // This should be at the limit the y target coordinate.
+                        this.current_y += (y - this.current_y) / 1.25;
+                        
+                        // Add the pixels constant after the values
+                        // and move the element.
+                        var px = document.layers? "": "px";
+                        this.style.left = x + px;
+                        this.style.top = this.current_y + px;
+                        
+                        setTimeout(this.id + "_obj.floatElement()", 100);
+                    }
+                    
+                    element.floatElement();
+                    return element;
+                }
+                
+                /**
+                * Finds an HTML element by its ID and makes it floatable over the normal content.
+                *
+                * @param x_displacement The difference in pixels to the right side of the window from
+                *           the left side of the element.
+                * @param y_displacement The difference in pixels to the right side of the window from
+                *           the top of the element.
+                */
+                function selectTOCGroupBy(id, isChunked, indexFileLocation, indexFileNamespace, indexFileComponent) {
+                    
+                    if (! isChunked) {
+                        var selectIds = new Array('toc_group_by_namespace', 'toc_group_by_location', 'toc_group_by_component_type');
+                        // Make all the tabs invisible.
+                        for (i = 0; i < 3; i++) {
+                            var tab = getElementObject(selectIds[i]);
+                            tab.style.display = 'none';
+                        }
+                        var selTab = getElementObject(id);
+                        selTab.style.display = 'block';
+                    } else {
+                        if (id == 'toc_group_by_namespace') {
+                            parent.indexFrame.location = indexFileNamespace;
+                        } else if (id == 'toc_group_by_location') {
+                            parent.indexFrame.location = indexFileLocation;
+                        } else if (id == 'toc_group_by_component_type') {
+                            parent.indexFrame.location = indexFileComponent;
+                        }
+                    }
+                }//--></script>
+    </head>
+    <body><!--
+      <div id="global_controls" class="globalControls" style="position:absolute;right:0;">
+         <table class="rt">
+            <tr>
+               <td class="rt_cornerTopLeft"></td>
+               <td class="rt_lineTop"></td>
+               <td class="rt_cornerTopRight"></td>
+            </tr>
+            <tr>
+               <td class="rt_lineLeft"></td>
+               <td class="rt_content">
+                  <h3>Showing:</h3>
+                  <table>
+                     <tr>
+                        <td><span><input type="checkbox" value="-" checked="checked"
+                                     onclick="switchStateForAll(this, attributesBoxes);"
+                                     class="control" /></span><span class="globalControlName">Attributes </span></td>
+                     </tr>
+                     <tr>
+                        <td><span><input type="checkbox" value="-" checked="checked"
+                                     onclick="switchStateForAll(this, diagramBoxes);"
+                                     class="control" /></span><span class="globalControlName">Diagrams</span></td>
+                     </tr>
+                     <tr>
+                        <td><span><input type="checkbox" value="-" checked="checked"
+                                     onclick="switchStateForAll(this, usedByBoxes);"
+                                     class="control" /></span><span class="globalControlName">Used by </span></td>
+                     </tr>
+                  </table>
+                  <div align="right"><span><input type="button"
+                               onclick="getElementObject('global_controls').style.display = 'none';"
+                               value="Close" /></span></div>
+               </td>
+               <td class="rt_lineRight"></td>
+            </tr>
+            <tr>
+               <td class="rt_cornerBottomLeft"></td>
+               <td class="rt_lineBottom"></td>
+               <td class="rt_cornerBottomRight"></td>
+            </tr>
+         </table>
+      </div>--><!--<div class="componentTitle">Entity <span class="qname"
+      >tbx:highlight-elements</span></div>-->
+        <a id="highlight-elements"></a>
+        <table>
+            <tr>
+                <td><div class="componentTitle">Entity <span class="qname">highlight-elements
+                        </span></div></td>
+                <td width="400">
+                    <img src="img/logo_iso.gif" alt="ISO Logo" align="right" /></td>
+            </tr>
+        </table>
+        <table class="rt">
+            <tr>
+                <td class="rt_cornerTopLeft"></td>
+                <td class="rt_lineTop"></td>
+                <td class="rt_cornerTopRight"></td>
+            </tr>
+            <tr>
+                <td class="rt_lineLeft"></td>
+                <td class="rt_content">
+                    <table class="component">
+                        <tbody>
+                            <tr>
+                                <td class="firstColumn"> Description </td>
+                                <td width="500"><div class="componentDescription">The
+                                        highlight-elements entity encompases a wide range of inline
+                                        markup tags for use in text elements such as definitions,
+                                        notes, and examples, and also in the tbx:term and
+                                        tbx:pronunciation elements. They are implemented through the
+                                        entities basicText and simpleText. All these elements are
+                                        part of the ISO Standards Tag Set (ISOSTS). For more information about
+                                        these elements, see the <a
+                                            href="../index.html"
+                                            target="_blank">ISOSTS documentation</a>. </div></td>
+                            </tr>
+                            <!-- <tr>
+                                <td class="firstColumn">
+                                    <div class="floatLeft"><b>Diagram</b></div>
+                                </td>
+                                <td class="diagram">
+                                    <div id="diagram_highlight-elements" style="display:block"><img
+                                            alt="Diagram" border="0"
+                                            src="img/ISO-TBX_xsd_Element_tbx_highlight-elements.jpeg"
+                                            usemap="#ISO-TBX_xsd_Element_tbx_highlight-elements"
+                                             /><map
+                                            name="ISO-TBX_xsd_Element_tbx_highlight-elements"
+                                            id="ISO-TBX_xsd_Element_tbx_highlight-elements">
+                                            <!-\-<area
+                                    alt="ISO-TBX_xsd_Element_tbx_highlight-elements.tmp#highlight-elements"
+                                    href="ISO-TBX_xsd_Element_tbx_highlight-elements.html#highlight-elements"
+                                    coords="407,60,669,120" />-\->
+                                            <area
+                                                alt="ISO-TBX_xsd_Complex_Type_tbx_basicText-model.tmp#basicText-model"
+                                                href="ISO-TBX_xsd_Complex_Type_tbx_basicText-model.html#basicText-model"
+                                                coords="304,5,559,45" />
+                                            <area
+                                                alt="ISO-TBX_xsd_Attribute_Group_tbx_tbx_entailedTerm-attlist.tmp#tbx.entailedTerm-attlist"
+                                                href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_entailedTerm-attlist.html#tbx.entailedTerm-attlist"
+                                                coords="318,178,521,204" />
+                                            <area
+                                                alt="ISO-TBX_xsd_Element_tbx_entailedTerm.tmp#entailedTerm"
+                                                href="ISO-TBX_xsd_Element_tbx_entailedTerm.html#entailedTerm"
+                                                coords="315,264,416,288" />
+                                        </map></div>
+                                </td>
+                            </tr>-->
+
+                            <tr>
+                                <td class="firstColumn"><b>Contains</b></td>
+                                <td>
+                                    <ul>
+
+                                        <li><b>Block level elements:</b> 
+                                            <a href="../index.html?elem=address" target="isosts_window">address</a> | 
+                                            <a href="../index.html?elem=alternatives" target="isosts_window">alternatives</a> | 
+                                            <a href="../index.html?elem=array" target="isosts_window">array</a> | 
+                                            <a href="../index.html?elem=boxed-text" target="isosts_window">boxed-text</a> | 
+                                            <a href="../index.html?elem=chem-struct-wrap" target="isosts_window">chem-struct-wrap</a> | 
+                                            <a href="../index.html?elem=fig" target="isosts_window">fig</a> | 
+                                            <a href="../index.html?elem=fig-group" target="isosts_window">fig-group</a> | 
+                                            <a href="../index.html?elem=graphic" target="isosts_window">graphic</a> | 
+                                            <a href="../index.html?elem=media" target="isosts_window">media</a> | 
+                                            <a href="../index.html?elem=preformat" target="isosts_window">preformat</a> | 
+                                            <a href="../index.html?elem=supplementary-material" target="isosts_window">supplementary-material</a> | 
+                                            <a href="../index.html?elem=table-wrap" target="isosts_window">table-wrap</a> | 
+                                            <a href="../index.html?elem=table-wrap-group" target="isosts_window">table-wrap-group</a></li>
+                                        <li><b>Emphasis elements:</b> 
+                                            <a href="../index.html?elem=bold" target="isosts_window">bold</a> | 
+                                            <a href="../index.html?elem=italic" target="isosts_window">italic</a> | 
+                                            <a href="../index.html?elem=monospace" target="isosts_window">monospace</a> | 
+                                            <a href="../index.html?elem=num" target="isosts_window">num</a> | 
+                                            <a href="../index.html?elem=overline" target="isosts_window">overline</a> | 
+                                            <a href="../index.html?elem=roman" target="isosts_window">roman</a> | 
+                                            <a href="../index.html?elem=sans-serif" target="isosts_window">sans-serif</a> | 
+                                            <a href="../index.html?elem=sc" target="isosts_window">sc</a> | 
+                                            <a href="../index.html?elem=strike" target="isosts_window">strike</a> | 
+                                            <a href="../index.html?elem=underline" target="isosts_window">underline</a></li>
+                                        <li><b>Super- and subscript elements:</b> 
+                                            <a href="../index.html?elem=sup" target="isosts_window">sup</a> | 
+                                            <a href="../index.html?elem=sub" target="isosts_window">sub</a></li>
+                                        <li><b>List elements:</b> 
+                                            <a href="../index.html?elem=list" target="isosts_window">list</a> | 
+                                            <a href="../index.html?elem=def-list" target="isosts_window">def-list</a></li>
+                                        <li><b>Phrase elements:</b> 
+                                            <a href="../index.html?elem=named-content" target="isosts_window">named-content</a> | 
+                                            <a href="../index.html?elem=styled-content" target="isosts_window">styled-content</a></li>
+                                        <li><b>Link elements:</b> 
+                                            <a href="../index.html?elem=fn" target="isosts_window">fn</a> | 
+                                            <a href="../index.html?elem=target" target="isosts_window">target</a> | 
+                                            <a href="../index.html?elem=xref" target="isosts_window">xref</a></li>
+                                        <li><b>Citation elements:</b> 
+                                            <a href="../index.html?elem=std" target="isosts_window">std</a> | 
+                                            <a href="../index.html?elem=mixed-citation" target="isosts_window">mixed-citation</a> | 
+                                            <a href="../index.html?elem=element-citation" target="isosts_window">element-citation</a></li>
+                                        <li><b>Address elements:</b> 
+                                            <a href="../index.html?elem=email" target="isosts_window">email</a> | 
+                                            <a href="../index.html?elem=ext-link" target="isosts_window">ext-link</a> | 
+                                            <a href="../index.html?elem=uri" target="isosts_window">uri</a></li>
+                                        <li><b>Display elements:</b> 
+                                            <a href="../index.html?elem=inline-graphic" target="isosts_window">inline-graphic</a> | 
+                                            <a href="../index.html?elem=private-char" target="isosts_window">private-char</a></li>
+                                        <li><b>Other elements:</b> 
+                                            <a href="../index.html?elem=break" target="isosts_window">break</a></li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="firstColumn">
+                                    <div class="floatLeft"><b>Used by</b></div>
+                                </td>
+                                <td>
+                                    <div id="usedBy_highlight-elements" style="display:block">
+                                        <table class="usedByTable">
+                                            <tr>
+                                                <!-- <td class="firstColumn">Entities </td>-->
+                                                <td><b><a
+                                                  href="ISO-TBX_xsd_Complex_Type_tbx_basicText-model.html#basicText-model"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('basicText')"
+                                                  >basicText</a></b><!--, <b><a
+                                             href="ISO-TBX_xsd_Complex_Type_tbx_noteText-model.html#noteText-model"
+                                             target="mainFrame" title="urn:iso:std:iso:30042:ed-1"
+                                             onclick="updatePageTitle('noteText-model')"
+                                             >tbx:noteText-model</a></b>-->,
+                                                  <b><a
+                                                  href="ISO-TBX_xsd_Complex_Type_tbx_simpleText-model.html#simpleText-model"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('simpleText')"
+                                                  >simpleText</a></b>
+                                                </td>
+                                            </tr>
+                                            <!--<tr>
+                                                <td class="firstColumn">Elements </td>
+                                                <td><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_definition.html#definition"
+                                                  target="mainFrame"
+                                                  title="urn:iso:std:iso:30042:ed-1"
+                                                  onclick="updatePageTitle('definition')"
+                                                  >definition</a></b>, <b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_example.html#example"
+                                                  target="mainFrame"
+                                                  title="urn:iso:std:iso:30042:ed-1"
+                                                  onclick="updatePageTitle('example')"
+                                                  >example</a></b>, <b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_note.html#note"
+                                                  target="mainFrame"
+                                                  title="urn:iso:std:iso:30042:ed-1"
+                                                  onclick="updatePageTitle('note')">note</a></b>,
+                                                  <b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_pronunciation.html#pronunciation"
+                                                  target="mainFrame"
+                                                  title="urn:iso:std:iso:30042:ed-1"
+                                                  onclick="updatePageTitle('pronunciation')"
+                                                  >pronunciation</a></b>, <b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_source.html#source"
+                                                  target="mainFrame"
+                                                  title="urn:iso:std:iso:30042:ed-1"
+                                                  onclick="updatePageTitle('source')"
+                                                  >source</a></b>, <b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_term.html#term"
+                                                  target="mainFrame"
+                                                  title="urn:iso:std:iso:30042:ed-1"
+                                                  onclick="updatePageTitle('term')">term</a></b>,
+                                                  <b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_usageNote.html#usageNote"
+                                                  target="mainFrame"
+                                                  title="urn:iso:std:iso:30042:ed-1"
+                                                  onclick="updatePageTitle('usageNote')"
+                                                  >usageNote</a></b></td>
+                                            </tr>-->
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="firstColumn"><b>Example of list</b></td>
+                                <td><code>&lt;tbx:note&gt; Nonconformity will generally be
+                                        classified by its degree of<br /> seriousness, such as:
+                                        <br />&lt;list list-type="unordered"&gt;<br />
+                                        &lt;list-item&gt;<br /> &lt;p&gt;&lt;bold&gt;Class
+                                        A.&lt;/bold&gt; Nonconformity of a type considered to<br />
+                                        be of the highest concern for the product or
+                                        service.&lt;/p&gt;<br /> &lt;/list-item&gt;<br />
+                                        &lt;list-item&gt;<br /> &lt;p&gt;&lt;bold&gt;Class
+                                        B.&lt;/bold&gt; Nonconformity of a type considered to<br />
+                                        have the next lower degree of concern.&lt;/p&gt;<br />
+                                        &lt;/list-item&gt;<br /> &lt;/list&gt;</code></td>
+                            </tr>
+                            <tr>
+                                <td class="firstColumn"><b>Example of table</b></td>
+                                <td><code>&lt;tbx:note&gt;<br /> &lt;table-wrap
+                                        id="TN0.170"&gt;<br /> &lt;caption&gt;<br />
+                                        &lt;p&gt;Numbers of patients receiving institutional care
+                                        ...&lt;/p&gt;<br /> &lt;/caption&gt;<br />
+                                        &lt;table&gt;<br /> &lt;tbody&gt;<br />
+                                        <br /> &lt;tr&gt;<br /> &lt;th/&gt;<br /> &lt;th colspan="3"
+                                        align="center" rowspan="1"&gt;Institutional<br />
+                                        care&lt;/th&gt;<br /> &lt;th/&gt;<br /> &lt;th colspan="2"
+                                        align="center" rowspan="1"&gt;&amp;Bed<br /> use
+                                        (days)&lt;/th&gt;<br /> &lt;/tr&gt;<br /> &lt;tr&gt;<br />
+                                        &lt;td&gt;Total&lt;/td&gt;<br /> &lt;td
+                                        align="center"&gt;208/1224&lt;/td&gt;<br /> &lt;td
+                                        align="center"&gt;244/1214&lt;/td&gt;<br /> &lt;td
+                                        align="center"&gt;0.77 (0.52 to 1.13)&lt;/td&gt;<br />
+                                        &lt;td/&gt;<br /> &lt;td
+                                        align="center"&gt;15.0&lt;/td&gt;<br /> &lt;td
+                                        align="center"&gt;16.4&lt;/td&gt;<br /> &lt;/tr&gt;<br />
+                                        <br /> &lt;/tbody&gt;<br /> &lt;/table&gt;<br />
+                                        <br /> &lt;/tbx:note&gt;</code></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </td>
+                <td class="rt_lineRight"></td>
+            </tr>
+            <tr>
+                <td class="rt_cornerBottomLeft"></td>
+                <td class="rt_lineBottom"></td>
+                <td class="rt_cornerBottomRight"></td>
+            </tr>
+        </table>
+        <!--<div class="footer">
+         <hr />
+         <div align="center">XML Schema documentation generated by <a
+               href="http://www.oxygenxml.com" target="_parent"><span class="oXygenLogo"><span
+                     class="redX">&lt;</span>o<span class="redX">X</span>ygen<span class="redX"
+                     >/&gt;</span></span></a><sup>®</sup> XML Editor. </div>
+      </div>--><!--<script type="text/javascript">
+         
+                // The namespace is the selected option in the TOC combo.
+                
+                // Floats the toolbar.
+                var globalControls = getElementObject("global_controls");
+                
+                if (globalControls != null) {
+                    var browser = navigator.appName;
+                    var version = parseFloat(navigator.appVersion.split('MSIE')[1]);
+                    
+                    var IE6 = false;
+                    if ((browser == "Microsoft Internet Explorer") && (version < 7)) {
+                        IE6 = true;
+                    }
+                    
+                    //alert (IE6 + " |V| " + version);
+                    
+                    if (IE6) {
+                        // On IE 6 the 'fixed' property is not supported. We must use javascript.
+                        globalControls.style.position = 'absolute';
+                        // The global controls will do not exist in the TOC frame, when chunking.
+                        findAndFloat("global_controls", 225, 30);
+                    } else {
+                        globalControls.style.position = 'fixed';
+                    }
+                    
+                    globalControls.style.right = '0';
+                }//</script>--></body>
+</html>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE standard SYSTEM "../ISOSTS.dtd">
+<standard>
+  <front>
+    <iso-meta>
+      <title-wrap>
+        <main></main>
+        <full></full>
+      </title-wrap>
+      <doc-ident>
+        <sdo></sdo>
+        <proj-id></proj-id>
+        <language></language>
+        <release-version></release-version>
+      </doc-ident>
+      <std-ident>
+        <originator></originator>
+        <doc-type></doc-type>
+        <doc-number></doc-number>
+        <edition></edition>
+        <version></version>
+      </std-ident>
+      <content-language></content-language>
+      <std-ref></std-ref>
+      <doc-ref></doc-ref>
+      <release-date></release-date>
+      <comm-ref></comm-ref>
+      <secretariat></secretariat>
+    </iso-meta>
+  </front>
+  <body>
+    <sec>
+      <label/>
+      <p>I want to insert a soft break <break/> here</p>
+    </sec>
+  </body>
+</standard>

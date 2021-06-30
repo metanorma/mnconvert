@@ -1,0 +1,146 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--Tag library software copyright Mulberry Technologies, Inc., 2002-2008-->
+      <link rel="stylesheet" href="ISOSTS-style.css" type="text/css">
+      <title>Change history</title>
+   </head>
+   <body class="main">
+      <div class="pageheader">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="sponsor">International Organization for Standardization (ISO)</h4>
+      </div>
+      <h1 class="sectiontitle">Change history</h1>
+      <div class="section"><a name=""></a><h3 class="header">Version 1.1, 2013-07-01</h3>
+         <p class="para">Changes since version 1.0:</p>
+         <ul class="bullist">
+            <li>Rename element <span class="elementtag">&lt;cen-meta&gt;</span> to <a href="el_reg-meta.html" target="main" title="Regional-body Metadata"><span class="elementtag">&lt;reg-meta&gt;</span></a></li>
+            <li>Delete element <span class="elementtag">&lt;leading-org&gt;</span> and remove it from the <a href="el_reg-meta.html" target="main" title="Regional-body Metadata"><span class="elementtag">&lt;reg-meta&gt;</span></a> content model</li>
+            <li>Create element <a href="el_release-version-id.html" target="main" title="Release version id"><span class="elementtag">&lt;release-version-id&gt;</span></a> and add it to the <a href="el_reg-meta.html" target="main" title="Regional-body Metadata"><span class="elementtag">&lt;reg-meta&gt;</span></a> content model</li>
+            <li>Provide content model for element <a href="n-t4w0.html" target="main" title="National-body Metadata"><span class="elementtag">&lt;nat-meta&gt;</span></a></li>
+            <li>Allow 
+                  <a href="n-3m50.html" target="main" title="Email address"><span class="elementtag">&lt;email&gt;</span></a>,
+                  <a href="n-wz50.html" target="main" title="External link"><span class="elementtag">&lt;ext-link&gt;</span></a>,
+                  <a href="n-mce0.html" target="main" title=" Uniform Resource Indicator (URI)"><span class="elementtag">&lt;uri&gt;</span></a>,
+                  <a href="n-g3a0.html" target="main" title="Inline Graphic"><span class="elementtag">&lt;inline-graphic&gt;</span></a>,
+                  <a href="n-ihx0.html" target="main" title="Private Character (Custom or Unicode™)"><span class="elementtag">&lt;private-char&gt;</span></a>
+                  in <a href="tbx/ISO-TBX_xsd_Element_tbx_highlight-elements.html#highlight-elements" target="tbx" title="TBX highlight-elements entity">TBX highlight elements</a>
+            <li>Allow <a href="n-9sc0.html" target="main" title="Line Break"><span class="elementtag">&lt;break&gt;</span></a> inside <a href="n-t2x0.html" target="main" title="Paragraph"><span class="elementtag">&lt;p&gt;</span></a></li>
+         </ul>
+      </div>
+      <div class="section"><a name=""></a><h3 class="header">Version 1.0, 2012-04-26</h3>
+         <p class="para">The only changes are to the version number and release date. The
+            version number has been changed to 1.0 to indicate that this is the first stable release.
+         </p>
+      </div>
+      <div class="section"><a name=""></a><h3 class="header">Version 0.7, 2012-02-14</h3>
+         <p class="para">Changes since version 0.6:</p>
+         <ul class="bullist">
+            <li>Make <a href="n-itx0.html" target="main" title="Permissions"><span class="elementtag">&lt;permissions&gt;</span></a> optional, repeatable in
+               	    the <a href="n-vta0.html" target="main" title="ISO Metadata"><span class="elementtag">&lt;iso-meta&gt;</span></a> 
+               	    and <span class="elementtag">&lt;cen-meta&gt;</span> elements.
+            </li>
+            <li>Added links and citations 
+               	(<a href="n-rd50.html" target="main" title="Element Citation"><span class="elementtag">&lt;element-citation&gt;</span></a>, <a href="n-i6u0.html" target="main" title="Mixed Citation"><span class="elementtag">&lt;mixed-citation&gt;</span></a>, <a href="n-ui40.html" target="main" title="Standard, Cited"><span class="elementtag">&lt;std&gt;</span></a>, <a href="n-fw80.html" target="main" title="Footnote"><span class="elementtag">&lt;fn&gt;</span></a>, <a href="n-x4t0.html" target="main" title="Target of an Internal Link"><span class="elementtag">&lt;target&gt;</span></a>, <a href="n-37t0.html" target="main" title="Entailed Term (TBX Tag Set)"><span class="elementtag">&lt;tbx:entailedTerm&gt;</span></a>, and <a href="n-kse0.html" target="main" title="X(cross) Reference"><span class="elementtag">&lt;xref&gt;</span></a>) 
+               	     to <a href="n-ngx0.html" target="main" title="Preformatted Text"><span class="elementtag">&lt;preformat&gt;</span></a>.
+            </li>
+            <li>Allow <a href="n-wc80.html" target="main" title="Figure"><span class="elementtag">&lt;fig&gt;</span></a> inside <a href="n-kft0.html" target="main" title="Table Data Cell (XHTML table model)"><span class="elementtag">&lt;td&gt;</span></a>.
+            </li>
+            <li>Allow <a href="n-t2x0.html" target="main" title="Paragraph"><span class="elementtag">&lt;p&gt;</span></a> inside <a href="n-kft0.html" target="main" title="Table Data Cell (XHTML table model)"><span class="elementtag">&lt;td&gt;</span></a> to avoid using <a href="n-9sc0.html" target="main" title="Line Break"><span class="elementtag">&lt;break&gt;</span></a> for separating <a href="n-t2x0.html" target="main" title="<p&gt;"><span class="elementname">Paragraph</span></a>s.
+            </li>
+            <li>Allow <a href="n-ui40.html" target="main" title="Standard, Cited"><span class="elementtag">&lt;std&gt;</span></a> and <a href="n-5b40.html" target="main" title="Standard Reference"><span class="elementtag">&lt;std-ref&gt;</span></a> inside all emphasis elements (<a href="n-w5c0.html" target="main" title="Bold"><span class="elementtag">&lt;bold&gt;</span></a>, 
+               <a href="n-7na0.html" target="main" title="Italic"><span class="elementtag">&lt;italic&gt;</span></a>,
+               <a href="n-amu0.html" target="main" title="Monospace Text (Typewriter Text)"><span class="elementtag">&lt;monospace&gt;</span></a>,
+               <a href="n-riw0.html" target="main" title="Number"><span class="elementtag">&lt;num&gt;</span></a>,
+               <a href="n-s9w0.html" target="main" title="Overline"><span class="elementtag">&lt;overline&gt;</span></a>,
+               <a href="n-4iv0.html" target="main" title="Sans Serif"><span class="elementtag">&lt;sans-serif&gt;</span></a>,
+               <a href="n-eqv0.html" target="main" title="Small Caps"><span class="elementtag">&lt;sc&gt;</span></a>,
+               <a href="n-5z40.html" target="main" title="Strike Through"><span class="elementtag">&lt;strike&gt;</span></a>,
+               <a href="n-ym70.html" target="main" title="Underline"><span class="elementtag">&lt;underline&gt;</span></a>).
+            </li>
+            <li>Allow simple links (<a href="n-fw80.html" target="main" title="Footnote"><span class="elementtag">&lt;fn&gt;</span></a>,  <a href="n-x4t0.html" target="main" title="Target of an Internal Link"><span class="elementtag">&lt;target&gt;</span></a>,
+               <a href="n-37t0.html" target="main" title="Entailed Term (TBX Tag Set)"><span class="elementtag">&lt;tbx:entailedTerm&gt;</span></a>,
+               <a href="n-kse0.html" target="main" title="X(cross) Reference"><span class="elementtag">&lt;xref&gt;</span></a>) inside <a href="n-aia0.html" target="main" title="Label of a Figure, Reference, Etc."><span class="elementtag">&lt;label&gt;</span></a>.
+            </li>
+            <li>Allow <a href="n-6ew0.html" target="main" title="Non-normative Note"><span class="elementtag">&lt;non-normative-note&gt;</span></a> after <a href="n-c9x0.html" target="main" title="Reference List (Bibliographic)"><span class="elementtag">&lt;ref-list&gt;</span></a> inside <a href="n-5240.html" target="main" title="Section"><span class="elementtag">&lt;sec&gt;</span></a>.
+            </li>
+         </ul>
+      </div>
+      <div class="section"><a name=""></a><h3 class="header">Version 0.6, 2011-12-16</h3>
+         <p class="para">Changes since version 0.5:</p>
+         <ul class="bullist">
+            <li>Add change history to the tag library.</li>
+            <li>Make <a href="n-gk20.html" target="main" title="Type of Annex"><span class="elementtag">&lt;annex-type&gt;</span></a> optional.
+            </li>
+            <li>Make <a href="n-6g70.html" target="main" title="Title"><span class="elementtag">&lt;title&gt;</span></a> optional in
+               	    the <a href="n-5240.html" target="main" title="Section"><span class="elementtag">&lt;sec&gt;</span></a> 
+               	    and <a href="n-3320.html" target="main" title="Appendix"><span class="elementtag">&lt;app&gt;</span></a> elements
+               	    (but require that at least one of
+               	    <a href="n-6g70.html" target="main" title="Title"><span class="elementtag">&lt;title&gt;</span></a> and <a href="n-aia0.html" target="main" title="Label of a Figure, Reference, Etc."><span class="elementtag">&lt;label&gt;</span></a> appear).
+            </li>
+            <li>Allow <a href="n-9sc0.html" target="main" title="Line Break"><span class="elementtag">&lt;break&gt;</span></a> and
+               	    <a href="n-kse0.html" target="main" title="X(cross) Reference"><span class="elementtag">&lt;xref&gt;</span></a> to appear
+               	    within <a href="n-i6u0.html" target="main" title="Mixed Citation"><span class="elementtag">&lt;mixed-citation&gt;</span></a>
+               	    and <a href="n-rd50.html" target="main" title="Element Citation"><span class="elementtag">&lt;element-citation&gt;</span></a>.
+               	  
+            </li>
+            <li>Allow <a href="n-fw80.html" target="main" title="Footnote"><span class="elementtag">&lt;fn&gt;</span></a> and
+               	    <a href="n-nx80.html" target="main" title="Footnote Group"><span class="elementtag">&lt;fn-group&gt;</span></a> to appear
+               	    within <a href="n-wc80.html" target="main" title="Figure"><span class="elementtag">&lt;fig&gt;</span></a>.
+               	  
+            </li>
+            <li>Allow <a href="n-6ew0.html" target="main" title="Non-normative Note"><span class="elementtag">&lt;non-normative-note&gt;</span></a> 
+               	    to appear within <a href="n-hqx0.html" target="main" title="Reference Item"><span class="elementtag">&lt;ref&gt;</span></a>,
+               	    <a href="n-c9x0.html" target="main" title="Reference List (Bibliographic)"><span class="elementtag">&lt;ref-list&gt;</span></a>, and
+               	    <a href="n-kft0.html" target="main" title="Table Data Cell (XHTML table model)"><span class="elementtag">&lt;td&gt;</span></a>.
+               	  
+            </li>
+            <li>Make <a href="n-37t0.html" target="main" title="Entailed Term (TBX Tag Set)"><span class="elementtag">&lt;tbx:entailedTerm&gt;</span></a> a
+               	    member of <tt>%simple-link.class;</tt>, so that
+               it is allowed to appear within <a href="n-t2x0.html" target="main" title="Paragraph"><span class="elementtag">&lt;p&gt;</span></a>,
+               	    since it is sometimes needed in lists and tables
+               	    occurring within a 
+               	    <a href="n-z7t0.html" target="main" title="Term Entry (TBX Tag Set)"><span class="elementtag">&lt;tbx:termEntry&gt;</span></a>.
+               	    (Note:  because the class is used in other places as
+               	    well,  <a href="n-37t0.html" target="main" title="Entailed Term (TBX Tag Set)"><span class="elementtag">&lt;tbx:entailedTerm&gt;</span></a> will be
+               	    syntactically legal in many places; it is semantically
+               	    appropriate, however, only within term entries.)
+               	  
+            </li>
+            <li>Allow the <a href="n-6f60.html" target="main" title="Style Type"><span class="attrtag">@style-type</span></a> 
+               	    attribute to appear on <a href="n-t2x0.html" target="main" title="Paragraph"><span class="elementtag">&lt;p&gt;</span></a>
+               	    elements to allow manual specification of styling.
+               	  
+            </li>
+            <li>Define <a href="n-n7s0.html" target="main" title="Sub-part of Standard or Standards-Related Document"><span class="elementtag">&lt;sub-part&gt;</span></a>
+               	    to handle cases of numbered sub-parts appearing
+               	    within a part of a standard.
+               	  
+            </li>
+            <li>Allow <a href="n-k7e0.html" target="main" title="Year"><span class="elementtag">&lt;year&gt;</span></a>
+               	    to occur within <a href="n-5b40.html" target="main" title="Standard Reference"><span class="elementtag">&lt;std-ref&gt;</span></a>.
+               	  
+            </li>
+            <li>Change the type of the <a href="n-z5n0.html" target="main" title="Position"><span class="attrtag">@position</span></a>
+               	    attribute on the <a href="n-wc80.html" target="main" title="Figure"><span class="elementtag">&lt;fig&gt;</span></a>
+               	    element to CDATA, eliminating earlier constrained
+               	    list of values.	    
+               	  
+            </li>
+            <li>Allow <a href="n-itx0.html" target="main" title="Permissions"><span class="elementtag">&lt;permissions&gt;</span></a>
+               	    to occur 
+               	    within <a href="n-vta0.html" target="main" title="ISO Metadata"><span class="elementtag">&lt;iso-meta&gt;</span></a>
+               	    and <a href="n-j7c0.html" target="main" title="CEN Metadata"><span class="elementtag">&lt;cen-meta&gt;</span></a>.
+               	  
+            </li>
+         </ul>
+      </div>
+      <div class="section"><a name=""></a><h3 class="header">Version 0.5, 2011-10-06</h3>
+         <p class="para">First draft version.</p>
+      </div>
+      <div class="pagefooter">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="pubdate">Version of July 2013</h4>
+      </div>
+   </body>
+</html>

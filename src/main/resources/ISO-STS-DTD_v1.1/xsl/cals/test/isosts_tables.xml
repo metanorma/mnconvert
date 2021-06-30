@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE standard [
+  <!ENTITY th "header text">
+  <!ENTITY td "table cell text">
+]>
+<standard>
+    <front>
+        <iso-meta>
+            <title-wrap xml:lang="en">
+                <main/>
+                <full>Test cases for XHTML to CALS conversion</full>
+            </title-wrap>
+            <doc-ident>
+                <sdo/>
+                <proj-id/>
+                <language/>
+                <release-version/>
+            </doc-ident>
+            <std-ident>
+                <originator/>
+                <doc-type/>
+                <doc-number/>
+                <edition/>
+                <version/>
+            </std-ident>
+            <content-language>en</content-language>
+            <std-ref/>
+            <doc-ref>XHTML to CALS</doc-ref>
+            <release-date/>
+            <comm-ref/>
+            <secretariat/>
+            <permissions>
+                <copyright-statement>All rights reserved</copyright-statement>
+                <copyright-year>2013</copyright-year>
+                <copyright-holder>ISO</copyright-holder>
+            </permissions>
+        </iso-meta>
+    </front>
+    <body>
+        <sec id="sec_1">
+            <label>1</label>
+            <title>Test tables</title>
+            <table-wrap id="tab_1">
+                <label>Table 1</label>
+                <caption>
+                    <title>No border no col definition table</title>
+                </caption>
+                <table width="650">
+                    <tbody>
+                        <tr>
+                            <td>&td;</td>
+                            <td>&td;</td>
+                        </tr>
+                        <tr>
+                            <td>&td;</td>
+                            <td>&td;</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </table-wrap>
+            <table-wrap id="tab_2">
+                <label>Table 2</label>
+                <caption>
+                    <title>Table with explicit border definitions, 2px table and table header border</title>
+                </caption>
+                <table border="2" rules="groups" style="border-collapse: collapse; border-style: solid;" width="595">
+                    <col width="20.22%"/>
+                    <col width="20.19%"/>
+                    <col width="20.19%"/>
+                    <col width="20.19%"/>
+                    <col width="19.21%"/>
+                    <thead>
+                        <tr>
+                            <th align="center" scope="col" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 2px" valign="top"><bold>&th;</bold></th>
+                            <th align="center" scope="col" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 2px" valign="top"><bold>&th;</bold></th>
+                            <th align="center" scope="col" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 2px" valign="top"><bold>&th;</bold></th>
+                            <th align="center" scope="col" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 2px" valign="top"><bold>&th;</bold></th>
+                            <th align="center" scope="col" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 2px" valign="top"><bold>&th;</bold></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td align="center" scope="row" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                        </tr>
+                        <tr>
+                            <td align="center" scope="row" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </table-wrap>
+            <table-wrap id="tab_3">
+                <label>Table 3</label>
+                <caption>
+                    <title>Spanning cells in header</title>
+                </caption>
+                <table border="2" rules="groups" style="border-collapse: collapse; border-style: solid;" width="595">
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <thead>
+                        <tr>
+                            <th align="center" rowspan="2" scope="col" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 2px" valign="top">&th;</th>
+                            <th align="center" colspan="3" scope="colgroup" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top"
+                                >&th;</th>
+                        </tr>
+                        <tr>
+                            <th align="center" colspan="1" scope="colgroup" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 2px" valign="top"
+                                >&th;</th>
+                            <th align="center" scope="col" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 2px" valign="top">&th;</th>
+                            <th align="center" scope="col" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 2px" valign="top">&th;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td align="center" scope="row" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                        </tr>
+                        <tr>
+                            <td align="center" scope="row" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </table-wrap>
+            <table-wrap id="tab_4">
+                <label>Table 4</label>
+                <caption>
+                    <title>Table with footer</title>
+                </caption>
+                <table border="2" rules="groups" style="border-collapse: collapse; border-style: solid;" width="595">
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <thead>
+                        <tr>
+                            <th align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 2px" valign="top">&th;</th>
+                            <th align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 2px" valign="top">&th;</th>
+                            <th align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 2px" valign="top">&th;</th>
+                            <th align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 2px" valign="top">&th;</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" align="left" style="border-left: solid 1px; border-top: solid 2px; border-right: solid 1px; border-bottom: solid 1px" valign="top">table footer</td>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        <tr>
+                            <td align="center" scope="row" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                        </tr>
+                        <tr>
+                            <td align="center" scope="row" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </table-wrap>
+            <table-wrap id="tab_5">
+                <label>Table 5</label>
+                <caption>
+                    <title>Table with various col and rowspans</title>
+                </caption>
+                <table cellpadding="0" cellspacing="0" frame="box" rules="all" style="border-collapse:collapse; border:solid 2px">
+                    <colgroup>
+                        <col align="center" valign="top" width="35.50"/>
+                        <col align="left" valign="top" width="22.05"/>
+                        <col align="left" valign="top" width="283.95"/>
+                        <col align="center" valign="top" width="47.00"/>
+                        <col align="center" valign="top" width="47.00"/>
+                        <col align="center" valign="top" width="52.50"/>
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th style="border-bottom:solid 2px" valign="middle">&th;</th>
+                            <th align="center" colspan="2" style="border-bottom:solid 2px" valign="middle">&th;</th>
+                            <th style="border-bottom:solid 2px" valign="middle">&th;</th>
+                            <th style="border-bottom:solid 2px" valign="middle">&th;</th>
+                            <th style="border-bottom:solid 2px" valign="middle">&th;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="10">&td;</td>
+                            <td colspan="2">&td;</td>
+                            <td>&td;</td>
+                            <td>&td;</td>
+                            <td>&td;</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">&td;</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">&td;</td>
+                            <td colspan="3">&td;</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">&td;</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">&td;</td>
+                            <td colspan="3">&td;</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="border-bottom: 0px solid;">&td;</td>
+                            <td align="left" colspan="3" style="border-bottom: 0px solid;">&td;</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="border-top: 0px solid;">&td;</td>
+                            <td align="left" colspan="3" style="border-top: 0px solid;">&td;</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">&td;</td>
+                        </tr>
+                        <tr>
+                            <td align="center">&td;</td>
+                            <td colspan="4">&td;</td>
+                        </tr>
+                        <tr>
+                            <td>&td;</td>
+                            <td colspan="4">&td;</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </table-wrap>
+            <table-wrap id="tab_6">
+                <label>Table 6</label>
+                <caption>
+                    <title>Table with specific cells having no border</title>
+                </caption>
+                <table border="2" rules="groups" style="border-collapse: collapse; border-style: solid;" width="595">
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <thead>
+                        <tr>
+                            <th align="center" rowspan="2" scope="col" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 2px" valign="top">&th;</th>
+                            <th align="center" colspan="3" scope="colgroup" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top"
+                                >&th;</th>
+                        </tr>
+                        <tr>
+                            <th align="center" colspan="1" scope="colgroup" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 2px" valign="top"
+                                >&th;</th>
+                            <th align="center" scope="col" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 2px" valign="top">&th;</th>
+                            <th align="center" scope="col" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 2px" valign="top">&th;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td align="center" scope="row" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                        </tr>
+                        <tr>
+                            <td align="center" scope="row" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px;" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px" valign="top">&td;</td>
+                        </tr>
+                        <tr>
+                            <td align="center" scope="row" style="border-left: solid 1px; border-top: 0px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                        </tr>
+                        <tr>
+                            <td align="center" scope="row" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                        </tr>
+                        <tr>
+                            <td align="center" scope="row" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                            <td align="center" style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; border-bottom: solid 1px" valign="top">&td;</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </table-wrap>
+            <table-wrap id="tab_7">
+                <label>Table 7</label>
+                <caption>
+                    <title>Table with col and row spans where CSS of neighboring cells defines colsep and rowsep</title>
+                </caption>
+                <table border="2" rules="none" width="595">
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <thead>
+                        <tr>
+                            <th>table default</th>
+                            <th>table default</th>
+                            <th>table default</th>
+                            <th>table default</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="2" style="border-bottom: solid 0px">rowsep=no</td>
+                            <td>table default</td>
+                            <td rowspan="2">rowsep=yes</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">colsep=yes, rowsep=yes</td>
+                            <td style="border-left: solid 1px">table default</td>
+                        </tr>
+                        <tr>
+                            <td style="border-top: solid 1px">table default</td>
+                            <td style="border-right: solid 0px">colsep=yes</td>
+                            <td style="border-left: solid 1px">table default</td>
+                            <td style="border-top: solid 1px">table default</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </table-wrap>
+            <table-wrap id="tab_8">
+                <label>Table 8</label>
+                <caption>
+                    <title>Table with @rules="rows" should generate rowsep for all rows</title>
+                </caption>
+                <table frame="void" rules="rows" width="595">
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <thead>
+                        <tr>
+                            <th>rowsep=yes</th>
+                            <th>rowsep=yes</th>
+                            <th>rowsep=yes</th>
+                            <th>rowsep=yes</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <td>rowsep=yes</td>
+                            <td>rowsep=yes</td>
+                            <td>rowsep=yes</td>
+                            <td>rowsep=yes</td>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        <tr>
+                            <td>rowsep=yes</td>
+                            <td>rowsep=yes</td>
+                            <td>rowsep=yes</td>
+                            <td>rowsep=yes</td>
+                        </tr>
+                        <tr>
+                            <td>rowsep=yes</td>
+                            <td>rowsep=yes</td>
+                            <td>rowsep=yes</td>
+                            <td>rowsep=yes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </table-wrap>            
+            <table-wrap id="tab_9">
+                <label>Table 9</label>
+                <caption>
+                    <title>Table with @rules="cols" should generate colsep for all cells</title>
+                </caption>
+                <table frame="void" rules="cols" width="595">
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <thead>
+                        <tr>
+                            <th>colsep=yes</th>
+                            <th>colsep=yes</th>
+                            <th>colsep=yes</th>
+                            <th>colsep=yes</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <td>colsep=yes</td>
+                            <td>colsep=yes</td>
+                            <td>colsep=yes</td>
+                            <td>colsep=yes</td>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        <tr>
+                            <td>colsep=yes</td>
+                            <td>colsep=yes</td>
+                            <td>colsep=yes</td>
+                            <td>colsep=yes</td>
+                        </tr>
+                        <tr>
+                            <td>colsep=yes</td>
+                            <td>colsep=yes</td>
+                            <td>colsep=yes</td>
+                            <td>colsep=yes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </table-wrap>            
+            <table-wrap id="tab_10">
+                <label>Table 10</label>
+                <caption>
+                    <title>Table with @rules="groups" which should generate rowsep for last row in theader and table</title>
+                </caption>
+                <table frame="void" rules="groups" width="595">
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <thead>
+                        <tr>
+                            <th>table default</th>
+                            <th>table default</th>
+                            <th>table default</th>
+                            <th>table default</th>
+                        </tr>
+                        <tr>
+                            <th>rowsep=yes</th>
+                            <th>rowsep=yes</th>
+                            <th>rowsep=yes</th>
+                            <th>rowsep=yes</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <td>table default</td>
+                            <td>table default</td>
+                            <td>table default</td>
+                            <td>table default</td>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        <tr>
+                            <td>table default</td>
+                            <td>table default</td>
+                            <td>table default</td>
+                            <td>table default</td>
+                        </tr>
+                        <tr>
+                            <td>rowsep=yes; because its the last tbody row before the tfoot</td>
+                            <td>rowsep=yes</td>
+                            <td>rowsep=yes</td>
+                            <td>rowsep=yes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </table-wrap>
+            <table-wrap id="tab_11">
+                <label>Table 11</label>
+                <caption>
+                    <title>Table with @rules="all" which should generate rowsep and rowsep for all</title>
+                </caption>
+                <table frame="void" rules="all" width="595">
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <col width="25%"/>
+                    <thead>
+                        <tr>
+                            <th>colsep=yes, rowsep=yes</th>
+                            <th>colsep=yes, rowsep=yes</th>
+                            <th>colsep=yes, rowsep=yes</th>
+                            <th>colsep=yes, rowsep=yes</th>
+                        </tr>
+                        <tr>
+                            <th>colsep=yes, rowsep=yes</th>
+                            <th>colsep=yes, rowsep=yes</th>
+                            <th>colsep=yes, rowsep=yes</th>
+                            <th>colsep=yes, rowsep=yes</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <td>colsep=yes, rowsep=yes</td>
+                            <td>colsep=yes, rowsep=yes</td>
+                            <td>colsep=yes, rowsep=yes</td>
+                            <td>colsep=yes, rowsep=yes</td>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        <tr>
+                            <td>colsep=yes, rowsep=yes</td>
+                            <td>colsep=yes, rowsep=yes</td>
+                            <td>colsep=yes, rowsep=yes</td>
+                            <td>colsep=yes, rowsep=yes</td>
+                        </tr>
+                        <tr>
+                            <td>colsep=yes, rowsep=yes</td>
+                            <td>colsep=yes, rowsep=yes</td>
+                            <td>colsep=yes, rowsep=yes</td>
+                            <td>colsep=yes, rowsep=yes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </table-wrap>
+            <table-wrap id="tab_12">
+                <label>Table 12</label>
+                <caption>
+                    <title>Table cell alignment</title>
+                </caption>
+                <table frame="box" rules="all" width="595">
+                    <col/>
+                    <col valign="bottom" align="left"/>
+                    <col char="char"/>
+                    <col charoff="charoff"/>
+                    <col/>
+                    <col valign="bottom"/>
+                    <tbody>
+                        <tr>
+                            <td align="left" valign="top" char="char" charoff="charoff">just lots of text to see the vertical alignment, just lots of text to see the vertical alignment, just lots of text to see the vertical alignment, just lots of text to see the vertical alignment</td>
+                            <td align="center" valign="middle">align="center" valign="middle"</td>
+                            <td align="left" valign="top">align="left" valign="top"</td>
+                            <td align="right" valign="bottom">align="right" valign="bottom"</td>
+                            <td align="char" valign="baseline">align="char"</td>
+                            <td align="justify">align="justify" valign="bottom"</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </table-wrap>
+        </sec>
+    </body>
+</standard>

@@ -1,0 +1,391 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>TBX-ISO-TML - Guidelines</title>
+        <link rel="stylesheet" href="docHtml.css" type="text/css" />
+        <!--<script type="text/javascript">
+         
+                var diagramBoxes = new Array('diagram_ph');
+                
+                
+                var attributesBoxes = new Array('attributes_ph');
+                
+                
+                var button_prefix = 'button_';
+                
+                /**
+                * Returns an element in the current HTML document.
+                *
+                * @param elementID Identifier of HTML element
+                * @return               HTML element object
+                */
+                function getElementObject(elementID) {
+                    var elemObj = null;
+                    if (document.getElementById) {
+                        elemObj = document.getElementById(elementID);
+                    }
+                    return elemObj;
+                }
+                
+                /**
+                * Switches the state of a collapseable box, e.g.
+                * if it's opened, it'll be closed, and vice versa.
+                *
+                * @param boxID Identifier of box
+                */
+                function switchState(boxID) {
+                    var boxObj = getElementObject(boxID);
+                    var buttonObj = getElementObject(button_prefix + boxID);
+                    if (boxObj == null || buttonObj == null) {
+                        // Box or button not found
+                    } else if (boxObj.style.display == "none") {
+                        // Box is closed, so open it
+                        openBox(boxObj, buttonObj);
+                    } else if (boxObj.style.display == "block") {
+                        // Box is opened, so close it
+                        closeBox(boxObj, buttonObj);
+                    }
+                }
+                
+                /**
+                * Opens a collapseable box.
+                *
+                * @param boxObj       Collapseable box
+                * @param buttonObj Button controlling box
+                */
+                function openBox(boxObj, buttonObj) {
+                    if (boxObj == null || buttonObj == null) {
+                        // Box or button not found
+                    } else {
+                        // Change 'display' CSS property of box
+                        boxObj.style.display = "block";
+                        
+                        // Change text of button
+                        if (boxObj.style.display == "block") {
+                            buttonObj.src = "img/btM.gif";
+                        }
+                    }
+                }
+                
+                /**
+                * Closes a collapseable box.
+                *
+                * @param boxObj       Collapseable box
+                * @param buttonObj Button controlling box
+                */
+                function closeBox(boxObj, buttonObj) {
+                    if (boxObj == null || buttonObj == null) {
+                        // Box or button not found
+                    } else {
+                        // Change 'display' CSS property of box
+                        boxObj.style.display = "none";
+                        
+                        // Change text of button
+                        if (boxObj.style.display == "none") {
+                            buttonObj.src = "img/btP.gif";
+                        }
+                    }
+                }
+                
+                function switchStateForAll(buttonObj, boxList) {
+                    if (buttonObj == null) {
+                        // button not found
+                    } else if (buttonObj.value == "+") {
+                        // Expand all
+                        expandAll(boxList);
+                        buttonObj.value = "-";
+                    } else if (buttonObj.value == "-") {
+                        // Collapse all
+                        collapseAll(boxList);
+                        buttonObj.value = "+";
+                    }
+                }
+                
+                /**
+                * Closes all boxes in a given list.
+                *
+                * @param boxList Array of box IDs
+                */
+                function collapseAll(boxList) {
+                    var idx;
+                    for (idx = 0; idx < boxList.length; idx++) {
+                        var boxObj = getElementObject(boxList[idx]);
+                        var buttonObj = getElementObject(button_prefix + boxList[idx]);
+                        closeBox(boxObj, buttonObj);
+                    }
+                }
+                
+                /**
+                * Open all boxes in a given list.
+                *
+                * @param boxList Array of box IDs
+                */
+                function expandAll(boxList) {
+                    var idx;
+                    for (idx = 0; idx < boxList.length; idx++) {
+                        var boxObj = getElementObject(boxList[idx]);
+                        var buttonObj = getElementObject(button_prefix + boxList[idx]);
+                        openBox(boxObj, buttonObj);
+                    }
+                }
+                
+                /**
+                * Update the message presented in the title of the html page.
+                * - If the documentation was splited by namespace we present something like: "Documentation for namespace 'ns'"
+                * - If the documentation was splited by location we present somehing like: "Documentation for 'Schema.xsd'"
+                * - If no split we always present: "Documentation for 'MainSchema.xsd'"
+                */
+                function updatePageTitle(message) {
+                    top.document.title = message;
+                }
+                
+                
+                
+                /**
+                * Finds an HTML element by its ID and makes it floatable over the normal content.
+                *
+                * @param x_displacement The difference in pixels to the right side of the window from
+                *           the left side of the element.
+                * @param y_displacement The difference in pixels to the right side of the window from
+                *           the top of the element.
+                */
+                function findAndFloat(id, x_displacement, y_displacement) {
+                    
+                    var element = getElementObject(id);
+                    
+                    window[id + "_obj"] = element;
+                    
+                    if (document.layers) {
+                        element.style = element;
+                    }
+                    
+                    element.current_y = y_displacement;
+                    element.first_time = true;
+                    
+                    element.floatElement = function () {
+                        // It may be closed by an user action.
+                        
+                        // Target X and Y coordinates.
+                        var x, y;
+                        
+                        var myWidth = 0, myHeight = 0;
+                        if (typeof (window.innerWidth) == 'number') {
+                            //Non-IE
+                            myWidth = window.innerWidth;
+                            myHeight = window.innerHeight;
+                        } else if (document.documentElement && (document.documentElement.clientWidth || document.documentElement.clientHeight)) {
+                            //IE 6+ in 'standards compliant mode'
+                            myWidth = document.documentElement.clientWidth;
+                            myHeight = document.documentElement.clientHeight;
+                        } else if (document.body && (document.body.clientWidth || document.body.clientHeight)) {
+                            //IE 4 compatible
+                            myWidth = document.body.clientWidth;
+                            myHeight = document.body.clientHeight;
+                        }
+                        
+                        
+                        x = myWidth - x_displacement;
+                        
+                        var ns = (navigator.appName.indexOf("Netscape") != - 1);
+                        y = ns? pageYOffset: document.documentElement && document.documentElement.scrollTop?
+                        document.documentElement.scrollTop: document.body.scrollTop;
+                        y = y + y_displacement;
+                        
+                        // The current y is the current coordinate of the floating element.
+                        // This should be at the limit the y target coordinate.
+                        this.current_y += (y - this.current_y) / 1.25;
+                        
+                        // Add the pixels constant after the values
+                        // and move the element.
+                        var px = document.layers? "": "px";
+                        this.style.left = x + px;
+                        this.style.top = this.current_y + px;
+                        
+                        setTimeout(this.id + "_obj.floatElement()", 100);
+                    }
+                    
+                    element.floatElement();
+                    return element;
+                }
+                
+                /**
+                * Finds an HTML element by its ID and makes it floatable over the normal content.
+                *
+                * @param x_displacement The difference in pixels to the right side of the window from
+                *           the left side of the element.
+                * @param y_displacement The difference in pixels to the right side of the window from
+                *           the top of the element.
+                */
+                function selectTOCGroupBy(id, isChunked, indexFileLocation, indexFileNamespace, indexFileComponent) {
+                    
+                    if (! isChunked) {
+                        var selectIds = new Array('toc_group_by_namespace', 'toc_group_by_location', 'toc_group_by_component_type');
+                        // Make all the tabs invisible.
+                        for (i = 0; i < 3; i++) {
+                            var tab = getElementObject(selectIds[i]);
+                            tab.style.display = 'none';
+                        }
+                        var selTab = getElementObject(id);
+                        selTab.style.display = 'block';
+                    } else {
+                        if (id == 'toc_group_by_namespace') {
+                            parent.indexFrame.location = indexFileNamespace;
+                        } else if (id == 'toc_group_by_location') {
+                            parent.indexFrame.location = indexFileLocation;
+                        } else if (id == 'toc_group_by_component_type') {
+                            parent.indexFrame.location = indexFileComponent;
+                        }
+                    }
+                }//</script>-->
+    </head>
+    <body>
+        <a id="guidelines"></a>
+        
+        <table>
+            <tr>
+                <td><div class="componentTitle"><span class="qname">Guidelines </span></div></td>
+                <td width="600">
+                    <img src="img/logo_iso.gif" alt="ISO Logo" align="right" /></td>
+            </tr>
+        </table>
+        
+        <table class="rt">
+            <tr>
+                <td class="rt_cornerTopLeft"></td>
+                <td class="rt_lineTop"></td>
+                <td class="rt_cornerTopRight"></td>
+            </tr>
+            <tr>
+                <td class="rt_lineLeft"></td>
+                <td class="rt_content">
+                    <table class="component">
+                        <tbody>
+                            <tr>
+                                
+                                <td width="700">
+                                    
+                                    <div class="para">
+                                        <p>The content and layout of the <i>Terms and Definitions</i> section of an ISO standard, 
+                                            or of a separate standalone ISO glossary, 
+                                            are governed by well-established terminology management principles which are defined
+                                            by ISO Technical Committee 37. These principles are outlined in this section. For
+                                            more detailed information, refer to <i>ISO 704: Terminology Work - Principles and
+                                                methods</i>. </p>
+                                    </div>
+                                    <div class="componentTitle">Each entry describes one concept</div>
+                                    <div class="para">
+                                        <p>The terms and definitions are organized into numbered clauses, each of which
+                                            describes one and only one concept. Each clause, which is called an "entry",
+                                            corresponds to one &lt;termEntry&gt;. If multiple terms are used for the same
+                                            concept, this set of synonymous terms are all documented within the same entry, each
+                                            within its own &lt;tig&gt; element.</p>
+                                        <p>If a term has multiple meanings, each meaning shall be documented in a separate
+                                            entry. In this case, the entries will contain the same term. Normally, each entry
+                                            would be restricted to a different <i>subject field</i>.</p></div>
+                                    <div class="componentTitle">Choosing a preferred term</div>
+                                    <div class="para"><p>When more than one term is used for a concept (i.e., there are
+                                        synonyms), one of the terms shall be chosen as the <i>preferred term</i>, and shall
+                                        be marked as such by associating a &lt;normativeAuthorization&gt; element with
+                                        this term. This preferred term shall be predominately used to refer to the concept
+                                        in the body of the standard. The other terms may have a normativeAuthorization vaue,
+                                        such as <i>admittedTerm</i> or <i>deprecatedTerm</i> if it is desired to indicate
+                                        their usage, however this is not required.</p>
+                                    </div>
+                                    <div class="componentTitle">Avoiding ambiguous terms</div>
+                                    <div class="para"><p>It is extremely important to avoid the use of ambiguous terms, not only
+                                        in the Terms and Definitions section of a standard, but in the whole body of the
+                                        standard itself. For instance, using the same term to designate different concepts
+                                        is highly discouraged especially when these different usages are not differentiated
+                                        by subject field. Ambiguity may also result when one or more of words in a
+                                        multi-word term are dropped in an effort to be concise. For instance, shortening
+                                        "class attribute" to simply "attribute" would result in ambiguity in a standard
+                                        where attributes are associated with things other than classes.</p>
+                                    </div>
+                                    <div class="componentTitle">Assigning a term type value</div>
+                                    <div class="para"><p>In the case of synonyms described above, often the synonyms correspond
+                                        to abbrevations or spelling variants of a term, or even a representation of the
+                                        concept in the form of a formula, symbol, or equation. In this case it is necessary
+                                        to identify the "type" of term, by using the &lt;termType&gt; element.</p>
+                                    </div>
+                                    <div class="componentTitle">Defining the term</div>
+                                    <div class="para"><p>Each entry requires a definition. The definition is extremely important
+                                        and shall therefore be drafted very carefully. Definitions shall be drafted in
+                                        accordance with ISO 704. Definitions shall only contain the essential information to
+                                        describe the concept, and therefore shall not contain notes, examples, usage notes,
+                                        or other extraneous information. Dedicated elements are available for each of these
+                                        types of information. Definitions are normally expressed in a single sentence. If
+                                        the definition describes a concept that is restricted to a specific area or
+                                        application, use the &lt;subjectField&gt; element to specify the <i>subject
+                                            field</i>.</p>
+                                        <p>If the definition originates from another standard, this source shall be added after
+                                            the definition, in the &lt;source&gt; element.</p>
+                                        <div class="componentTitle">Adding cross references</div>
+                                        <div class="para"><p>Cross references are used to point readers to the entries of terms
+                                            that have a similar, related meaning. To add a cross reference, use
+                                            &lt;crossReference&gt; for pointers to other entries in the same standard, and
+                                            &lt;externalCrossReference&gt; to point to entries in other standards. </p>
+                                            <p>Cross references will appear after the words "Related term:", after the
+                                                definition.</p>
+                                            <p>To hilight a term in a definition that is also defined in Section 3, use
+                                                &lt;entailedTerm&gt; around the term, within the definition.</p></div>
+                                            <div class="componentTitle">Referencing other sections of the standard</div>
+                                            <div class="para"><p>Sometimes it is useful to point the reader to another section
+                                                of the standard, such as a table or figure, for additional information about
+                                                the term and concept. For this purpose, use the element &lt;see&gt;.</p>
+                                            </div>
+                                            
+                                        
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </td>
+                <td class="rt_lineRight"></td>
+            </tr>
+            <tr>
+                <td class="rt_cornerBottomLeft"></td>
+                <td class="rt_lineBottom"></td>
+                <td class="rt_cornerBottomRight"></td>
+            </tr>
+        </table>
+        
+        
+        
+        
+   
+        
+      
+       <!--<script type="text/javascript">
+         
+                        // The namespace is the selected option in the TOC combo.
+                        
+                        // Floats the toolbar.
+                        var globalControls = getElementObject("global_controls");
+                        
+                        if (globalControls != null) {
+                            var browser = navigator.appName;
+                            var version = parseFloat(navigator.appVersion.split('MSIE')[1]);
+                            
+                            var IE6 = false;
+                            if ((browser == "Microsoft Internet Explorer") && (version < 7)) {
+                                IE6 = true;
+                            }
+                            
+                            //alert (IE6 + " |V| " + version);
+                            
+                            if (IE6) {
+                                // On IE 6 the 'fixed' property is not supported. We must use javascript.
+                                globalControls.style.position = 'absolute';
+                                // The global controls will do not exist in the TOC frame, when chunking.
+                                findAndFloat("global_controls", 225, 30);
+                            } else {
+                                globalControls.style.position = 'fixed';
+                            }
+                            
+                            globalControls.style.right = '0';
+                            }//</script>--> </body>
+</html>

@@ -1,0 +1,1704 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<standard xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mml="http://www.w3.org/1998/Math/MathML"
+    xmlns:tbx="urn:iso:std:iso:30042:ed-1">
+    <!-- 
+     |
+     | The purpose of this file is to show TBX markup for a given layout.
+     | The examples are mainly taken from ISO 10241-1:2011, Annex A. 
+     |
+     |-->
+    <front>
+        <iso-meta>
+            <title-wrap xml:lang="en">
+                <main>TBX markup examples</main>
+                <full>TBX markup examples</full>
+            </title-wrap>
+            <doc-ident>
+                <sdo>N/A</sdo>
+                <proj-id>N/A</proj-id>
+                <language>N/A</language>
+                <release-version>N/A</release-version>
+                <urn>N/A</urn>
+            </doc-ident>
+            <std-ident>
+                <originator>N/A</originator>
+                <doc-type>N/A</doc-type>
+                <doc-number>N/A</doc-number>
+                <edition>N/A</edition>
+                <version>N/A</version>
+            </std-ident>
+            <content-language>en</content-language>
+            <std-ref type="dated">TBX examples</std-ref>
+            <doc-ref>TBX examples</doc-ref>
+            <pub-date>N/A</pub-date>
+            <release-date>N/A</release-date>
+            <comm-ref>N/A</comm-ref>
+            <secretariat>N/A</secretariat>
+            <page-count count="0"/>
+        </iso-meta>
+    </front>
+    <body>
+        <sec sec-type="terms">
+            <label>3</label>
+            <title>Terms and definitions</title>
+            <p>For the purposes of this document, the following terms and definitions apply.</p>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a22.31">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:note>...</tbx:note>
+                        <tbx:definition>resultant of upward forces, exerted by the water on a
+                            submerged or floating body, equal to the weight of the water displaced
+                            by this body</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a22.31-1">buoyancy</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:usageNote>test for usage note</tbx:usageNote>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a22.32">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>reference level for soundings in navigation
+                            charts</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a22.32-1">chart datum</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                            <tbx:termType value="fullForm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a22.32-2">CD</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="admittedTerm"/>
+                            <tbx:termType value="acronym"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a23.311">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>numerical reference that indicates whether the flow will be
+                            laminar or turbulent for a given set of conditions</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a23.311-1">critical Reynolds number</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:definition>référence numérique indiquant si un écoulement est soit
+                            laminaire soit turbulent pour un ensemble de conditions
+                            données</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a23.311-2">nombre de Reynolds critique</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:grammaticalGender value="masculine"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="de">
+                        <tbx:definition>numerische Bezugsgröße, die anzeigt, ob die Strömung unter
+                            definierten Bedingungen laminar oder turbulent ist</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a23.311-3">kritische Reynoldszahl</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:grammaticalGender value="feminine"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a24.313">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>language used in a
+                            <tbx:entailedTerm>domain (3.1.2)</tbx:entailedTerm> and
+                            characterized by the use of specific linguistic means of
+                            expression</tbx:definition>
+                        <tbx:note>The specific linguistic means of expression always include domain-
+                            or subject-specific terms and other kinds of designations as well as
+                            phraseology and also may cover stylistic or syntactic
+                            features.</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a24.313-1">special language</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a24.313-2">language for special purposes</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="admittedTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a24.313-3">LSP</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="admittedTerm"/>
+                            <tbx:termType value="acronym"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a25.27">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>substance capable of holding materials together by
+                            adhesion</tbx:definition>
+                        <tbx:note>The term “glue” was used originally for an adhesive prepared from
+                            a hard gelatin. Through general use, the term became synonymous with the
+                            term “adhesive” in referring to adhesives prepared from synthetic
+                            resins. The term “adhesive” is now the preferred general
+                            term.</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a25.27-1">adhesive</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a25.27-2">glue</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="deprecatedTerm"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a25.44418">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>means of stopping or slowing the wheelchair</tbx:definition>
+                        <tbx:note>The running brake may include one or more of the following types
+                            of brake: dynamic brake, regenerative brake and friction brake (either
+                            fail-safe or manually applied).</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a25.4418-1">running brake</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a25.4418-2">dynamic brake</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="deprecatedTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a25.4418-3">friction brake</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="deprecatedTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a25.4418-4">regenerative brake</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="deprecatedTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a25.4418-5">service brake</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="deprecatedTerm"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a26.020513">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>
+                            <!-- target attribute is allowed on hi to point to the internal location of the entailedTerm, and xtarget is allowed to point to an entry in another document -->
+                            <tbx:entailedTerm>Boolean operation (02.05.01)</tbx:entailedTerm> whose
+                            result has the Boolean value 0 if and only if each
+                                <tbx:entailedTerm>operand (02.10.02)</tbx:entailedTerm> has the
+                            Boolean value 0</tbx:definition>
+                        <!-- target attribute is allowed on ref below to point to the internal location of the table.
+                        The following example also tests the script attribute.-->
+                        <tbx:see script="xyz">Table of Boolean operations</tbx:see>
+                        <tbx:tig>
+                            <tbx:term id="a26.020513-1">disjunction</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a26.020513-2">OR operation</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a26.020513-3">INCLUSIVE-OR operation</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a26.020513-4">logical add</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a26.020513-5">logical sum</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="deprecatedTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a26.020513-6">EITHER-OR operation</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="deprecatedTerm"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:definition><tbx:entailedTerm>opération booléenne (02.05.01)</tbx:entailedTerm> dont Ie résultat a Ia valeur booléenne 0 si et seulement si
+                            tous les <tbx:entailedTerm>opérandes (02.10.02)</tbx:entailedTerm> ont
+                            la valeur booléenne 0</tbx:definition>
+                        <!-- target attribute is allowed on ref to point to the internal location of the table -->
+                        <tbx:see>Tableau des opérations booléennes</tbx:see>
+                        <tbx:note>«OU inclusif» a le sens de la conjonction latine «vel».</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a26.020513-7">union</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a26.020513-8">réunion</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a26.020513-9">opération OU</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a26.020513-10">opértion OU inclusif</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a26.2150">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>primary single component or portion of a
+                                <tbx:entailedTerm>dental implant</tbx:entailedTerm> which is
+                            intended to remain within tissues</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a26.2150-1">implant body</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a26.2150-2">dental implant body</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="admittedTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a26.2150-3">implant fixture</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="deprecatedTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a26.2150-4">endosteal implant body</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="deprecatedTerm"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:definition>partie ou composant individuel primaire d'un
+                                <tbx:entailedTerm>implant dentaire</tbx:entailedTerm> conçu pour
+                            rester dans les tissus</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a26.2150-5">corps d'implant</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a26.2150-6">corps d'implant dentaire</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="admittedTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a26.2150-7">fixture</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="deprecatedTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a26.2150-8">corps d'implant endostéal</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="deprecatedTerm"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a27.234">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>deck structure supported by vertical and possibly inclined
+                            piles extending into the sea, frequently in a direction normal to the
+                            coastline</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a27.234-1">jetty</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:geographicalUsage>en GB</tbx:geographicalUsage>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a27.234-2">pier</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:geographicalUsage>en US</tbx:geographicalUsage>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a28.2138">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>diaphragm, usually of fixed size</tbx:definition>
+                        <tbx:note>This term is often used loosely.</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a28.2138-1">stop</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:definition>diaphragme, généralement de format fixe</tbx:definition>
+                        <tbx:note>Ce terme est souvent employé dans le sens large.</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a28.2138-2">arrêt</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="ru">
+                        <tbx:definition>диафрагмa, обычно нерегули¬руемaя</tbx:definition>
+                        <tbx:note>Этoт термин в русскoм языкe сливается с термином «диафрагма» и
+                            отдельно не существует.</tbx:note>
+                        <tbx:tig>
+                            <!-- this shows a case where there is no term, which will be rendered by 5 middle dots -->
+                            <tbx:term id="a28.2138-3"/>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a29.13">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>group of related <tbx:entailedTerm>subjects of standardization (1.2)</tbx:entailedTerm>
+                        </tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a29.13-1">field of standardization</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a29.13-2">domain of standardization</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="deprecatedTerm"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:definition>groupe de <tbx:entailedTerm>sujets de
+                                normalisation (1.2)</tbx:entailedTerm> reliés entre
+                            eux</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a29.13-3">domaine de normalisation</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="ru">
+                        <tbx:definition>совокупность взаимосвязанных <tbx:entailedTerm>объектов
+                                стандартизации (1.2)</tbx:entailedTerm></tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a29.13-4">область стандартизации</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="de">
+                        <tbx:tig>
+                            <tbx:term id="a29.13-5">Normungsgebiet</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="es">
+                        <tbx:tig>
+                            <tbx:term id="a29.13-6">campo de normalización</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="it">
+                        <tbx:tig>
+                            <tbx:term id="a29.13-7">campo di normazione</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="nl">
+                        <tbx:tig>
+                            <tbx:term id="a29.13-8">gebied van normalisatie</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="sv">
+                        <tbx:tig>
+                            <tbx:term id="a29.13-9">standardiser-ingsområde</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a210.14">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>any event or series of events that disrupt ecosystem,
+                            community, or population structure and alters the physical
+                            environment</tbx:definition>
+                        <tbx:source>U.S. ENVIRONMENTAL PROTECTION AGENCY. <italic>Terms of
+                                Environment: Glossary, Abbreviations and Acronyms</italic> online,
+                            viewed 2010-07-29].</tbx:source>
+                        <tbx:xSource xtarget="http://www.epa.gov/OCEPAterms/dterms.html">Available
+                            from: http://www.epa.gov/OCEPAterms/dterms.html.</tbx:xSource>
+                        <tbx:tig>
+                            <tbx:term id="a210.14-1">disturbance</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:pronunciation>/dıˈstɜ:bəns/</tbx:pronunciation>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a211.251">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>hypothesis to be tested by means of a statistical
+                            test</tbx:definition>
+                        <tbx:source>ISO 3534-1:2006, 1.4.1</tbx:source>
+                        <tbx:note>Modified — The examples and notes given in ISO 3534-1:2006 for
+                            this entry have been omitted.</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a211.251-1">null hypothesis</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a211.251-2"><italic>H<sub>O</sub></italic>
+                            </tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="admittedTerm"/>
+                            <tbx:termType value="symbol"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a211.27">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>length of the path travelled by light in vacuum during a
+                            time interval of 1/299 792 458 of a second</tbx:definition>
+                        <tbx:source>BIPM, <italic>Definition of the metre</italic> [online].
+                            Resolution 1 of the 17th meeting of the CGPM (1983) [viewed 2010-07-29]. </tbx:source>
+                        <tbx:xSource xtarget="http://www.bipm.org/en/CGPM/db/17/1/">Available from:
+                            http://www.bipm.org/en/CGPM/db/17/1/.</tbx:xSource>
+                        <tbx:tig>
+                            <tbx:term id="a211.27-1">meter</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a211.27-2">m</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                            <tbx:termType value="symbol"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:definition>longueur du trajet parcouru dans le vide par la lumière
+                            pendant une durée de 1/299 792 458 de seconde</tbx:definition>
+                        <tbx:source>BIPM, <italic>Définition du mètre </italic> [en ligne].
+                            Résolution 1 de la 17e réunion de la CGPM (1983) [consulté le
+                            2010-07-29]. </tbx:source>
+                        <tbx:xSource xtarget="http://www.bipm.org/en/CGPM/db/17/1/">Disponible à
+                            l'adresse: http://www.bipm.org/fr/CGPM/db/17/1/.</tbx:xSource>
+                        <tbx:tig>
+                            <tbx:term id="a211.27-3">mètre</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a211.27-4">m</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                            <tbx:termType value="symbol"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a212.4133">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>rapid, self-sustaining, sub-sonic propagation of
+                                <tbx:entailedTerm>combustion (4.46)</tbx:entailedTerm> in a gaseous
+                            medium, usually with emission of light</tbx:definition>
+                        <tbx:note>The term “flame” also represents the concept defined in
+                            4.134.</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a212.4133-1">flame</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a212.4134">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>to produce <tbx:entailedTerm>flame
+                            (4.133)</tbx:entailedTerm></tbx:definition>
+                        <tbx:note>The term “flame” also represents the concept defined in
+                            4.133.</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a212.4134-1">flame</tbx:term>
+                            <tbx:partOfSpeech value="verb"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a213.496">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:subjectField>general</tbx:subjectField>
+                        <tbx:definition>process of <tbx:entailedTerm>combustion
+                            (4.46)</tbx:entailedTerm> characterized by the emission of heat and <tbx:entailedTerm>fire
+                                effluent (4.105</tbx:entailedTerm>) and usually accompanied by
+                                <tbx:entailedTerm>smoke (4.293)</tbx:entailedTerm>,
+                                <tbx:entailedTerm>flame (4.133)</tbx:entailedTerm>,
+                                <tbx:entailedTerm>glowing (4.168)</tbx:entailedTerm> or a
+                            combination thereof</tbx:definition>
+                        <tbx:note>In the English language the term “fire” is used to designate three
+                            concepts, two of which relate to specific types of self-supporting
+                            combustion with different meanings, and two of them are designated using
+                            two different terms in both French and German.</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a213.496-1">fire</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a213.497">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:subjectField>controlled</tbx:subjectField>
+                        <tbx:definition>self-supporting
+                                <tbx:entailedTerm>combustion (4.46)</tbx:entailedTerm> that has been
+                            deliberately arranged to provide useful effects and is limited in its
+                            extent in time and space</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a213.497-1">fire</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a213.498">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:subjectField>uncontrolled</tbx:subjectField>
+                        <tbx:definition>self-supporting
+                                <tbx:entailedTerm>combustion (4.46)</tbx:entailedTerm> that has not
+                            been deliberately arranged to provide useful effects and is not limited
+                            in its extent in time and space
+                            <!--the following MathML is irrelevant and has been inserted merely as a proof of concept-->.
+                                <mml:math display="block">
+                                <mml:semantics>
+                                    <mml:mrow>
+                                        <mml:mo>[</mml:mo>
+                                        <mml:mi>&#x03B7;</mml:mi>
+                                        <mml:mo>]</mml:mo>
+                                    </mml:mrow>
+                                    <mml:mo>=</mml:mo>
+                                    <mml:munder>
+                                        <mml:mrow>
+                                            <mml:mtext>lim</mml:mtext>
+                                        </mml:mrow>
+                                        <mml:mrow>
+                                            <mml:mi>c</mml:mi>
+                                            <mml:mo>&#x2192;</mml:mo>
+                                            <mml:mtext>0</mml:mtext>
+                                        </mml:mrow>
+                                    </mml:munder>
+                                    <mml:mtext>&#x2009;</mml:mtext>
+                                    <mml:mrow>
+                                        <mml:mo>(</mml:mo>
+                                        <mml:mrow>
+                                            <mml:mfrac>
+                                                <mml:mrow>
+                                                  <mml:mi>&#x03B7;</mml:mi>
+                                                  <mml:mtext>&#x2009;</mml:mtext>
+                                                  <mml:mo>&#x2212;</mml:mo>
+                                                  <mml:mi>&#x03B7;</mml:mi>
+                                                  <mml:mtext>0</mml:mtext>
+                                                </mml:mrow>
+                                                <mml:mrow>
+                                                  <mml:mi>&#x03B7;</mml:mi>
+                                                  <mml:mtext>0</mml:mtext>
+                                                  <mml:mtext>&#x2009;</mml:mtext>
+                                                  <mml:mi>c</mml:mi>
+                                                </mml:mrow>
+                                            </mml:mfrac>
+                                        </mml:mrow>
+                                        <mml:mo>)</mml:mo>
+                                    </mml:mrow>
+                                </mml:semantics>
+                            </mml:math>
+                        </tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a213.498-1">fire</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a213.3121">
+                    <!-- this entry shows different subject fields for different languages -->
+                    <tbx:langSet xml:lang="en">
+                        <tbx:subjectField>encircled power (energy)</tbx:subjectField>
+                        <tbx:note>For clarity, the term “beam waist radius” is always used in
+                            combination with the symbol and its appropriate subscripts: <italic>w
+                                    <sub>0,u</sub></italic> or <italic>w <sub>σ
+                            0</sub>.</italic></tbx:note>
+                        <!-- note - can now have italics and subscript at the same time -->
+                        <tbx:definition>radius <italic>w</italic><sub>u</sub> of the beam at the
+                            location of the beam waist</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a213.3121-1">beam waist radius</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a213.3121-2"><italic>w<sub>0,u</sub></italic></tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="admittedTerm"/>
+                            <tbx:termType value="symbol"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:subjectField>puissance (énergie) circulaire</tbx:subjectField>
+                        <!-- note - can now have italics and subscript at the same time -->
+                        <tbx:definition>rayon <italic>w<sub>u</sub></italic> du faisceau au niveau
+                            du col (de la taille)</tbx:definition>
+                        <tbx:note>Pour clarifier la définition, le terme «rayon du col du faisceau»
+                            est toujours utilisé en combinaison avec le symbole et son indice
+                            approprié: <italic>w <sub>0,u</sub></italic> ou <italic>w <sub>σ
+                                0</sub>.</italic></tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a213.3121-3">rayon du col du faisceau</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a213.3121-4"><italic>w</italic><sub>0,u</sub></tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="admittedTerm"/>
+                            <tbx:termType value="symbol"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a213.3122">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:subjectField>second moment of power (energy) density distribution
+                            function</tbx:subjectField>
+                        <tbx:note>For clarity, the term “beam waist radius” is always used in
+                            combination with the symbol and its appropriate subscripts: <italic>w
+                                    <sub>0,u</sub></italic> or <italic>w <sub>σ
+                            0</sub>.</italic></tbx:note>
+                        <!-- note - can now have italics and subscript at the same time -->
+                        <tbx:definition>radius <italic>w<sub>u</sub></italic> of the beam at the
+                            location of the beam waist</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a213.3122-1">beam waist radius</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a213.3122-2">
+                                <italic>w<sub>σ0</sub></italic>
+                            </tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="admittedTerm"/>
+                            <tbx:termType value="symbol"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:subjectField>moment de second ordre de la fonction de distribution de
+                            la densité de puissance (d'énergie)> </tbx:subjectField>
+                        <tbx:note>Pour clarifier la définition, le terme «rayon du col du faisceau»
+                            est toujours utilisé en combinaison avec le symbole et son indice
+                            approprié: <italic>w <sub>0,u</sub></italic> or <italic>w <sub>σ
+                                0</sub>.</italic></tbx:note>
+                        <!-- note - can now have italics and subscript at the same time -->
+                        <tbx:definition>rayon <italic>w<sub>u</sub></italic> du faisceau au niveau
+                            du col (de la taille)</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a213.3122-3">rayon du col du faisceau</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a213.3122-4"><italic>w<sub>σ 0</sub></italic></tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="admittedTerm"/>
+                            <tbx:termType value="symbol"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a213.313">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:subjectField>linear actuator</tbx:subjectField>
+                        <tbx:definition>condition where the valve drifts from the set
+                            position</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a213.313-1">backdriving</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a213.314">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:subjectField>rotary actuator</tbx:subjectField>
+                        <tbx:definition>condition where the valve continues to change position
+                            subsequent to the completion of a positional movement</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a213.314-1">backdriving</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a214.93">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>consumed flow rate for <!-- list formatting is using the ISOSTS markup -->
+                            <list list-type="bullet">
+                                <list-item>
+                                    <label>—</label>
+                                    <p>pilot flow rate,</p>
+                                </list-item>
+                                <list-item>
+                                    <label>—</label>
+                                    <p>internal leakage flow rate,</p>
+                                </list-item>
+                                <list-item>
+                                    <label>—</label>
+                                    <p>output flow rate</p>
+                                </list-item>
+                            </list>
+                        </tbx:definition>
+                        <tbx:tig>
+                            <tbx:term>total flow rate</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:definition>débit de fluide dépensé comprenant <list list-type="bullet">
+                                <list-item>
+                                    <label>—</label>
+                                    <p>le débit de pilotage,</p>
+                                </list-item>
+                                <list-item>
+                                    <label>—</label>
+                                    <p>le débit des fuites internes,</p>
+                                </list-item>
+                                <list-item>
+                                    <label>—</label>
+                                    <p>le débit de sortie</p>
+                                </list-item>
+                            </list>
+                        </tbx:definition>
+                        <tbx:tig>
+                            <tbx:term>débit total</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:grammaticalGender value="masculine"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="de">
+                        <tbx:definition>verbrauchter Volumenstrom, bestehend aus <list
+                                list-type="bullet">
+                                <list-item>
+                                    <label>—</label>
+                                    <p>Steuervolumenstrom,</p>
+                                </list-item>
+                                <list-item>
+                                    <label>—</label>
+                                    <p>innerer Leckvolumenstrom,</p>
+                                </list-item>
+                                <list-item>
+                                    <label>—</label>
+                                    <p>Ausgangsvolumenstrom</p>
+                                </list-item>
+                            </list>
+                        </tbx:definition>
+                        <tbx:tig>
+                            <tbx:term>Gesamtvolumenstrom</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:grammaticalGender value="masculine"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a215.37">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>centrally held collection of data that is accessible to
+                            users</tbx:definition>
+                        <tbx:source>ISO 20252:2006, 2.18.</tbx:source>
+                        <tbx:tig>
+                            <tbx:term id="a215.37-1">database</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a215.31">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>surroundings in which an
+                                <tbx:entailedTerm>organization (3.4)</tbx:entailedTerm> operates,
+                            in¬cluding air, water, land, natural resources, flora, fauna, humans,
+                            and their interrelation</tbx:definition>
+                        <tbx:source>ISO 14001:2004, 3.5.</tbx:source>
+                        <tbx:note>Surroundings in this context extend from within an organization to
+                            the global system.</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a215.31-1">environment</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:definition>milieu dans lequel un
+                                <tbx:entailedTerm>organisme (3.4)</tbx:entailedTerm> fonctionne,
+                            incluant l'air, l'eau, le sol, les ressources naturelles, la flore, la
+                            faune, les êtres humains et leurs interrelations</tbx:definition>
+                        <tbx:source>ISO 14001:2004, 3.5.</tbx:source>
+                        <tbx:note>Dans ce contexte, le milieu s'étend de l'intérieur de l'organisme
+                            au système global.</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a215.31-2">environnement</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="ru">
+                        <tbx:definition>окружение, в котором функционирует
+                                <tbx:entailedTerm>организация (3.4)</tbx:entailedTerm>, включая
+                            воздух, воду, землю, природные ресурсы, флору, фауну, людей и их
+                            взаимодействие</tbx:definition>
+                        <tbx:source>ИСО 14001:2004, 3.5.</tbx:source>
+                        <tbx:note>Примечание 1 к терминологической записи: В данном контексте
+                            понятие “окружение” распространяется на среду в пределах организации и
+                            до глобальной системы.</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a215.31-3" script="Cyrl">окружающая среда</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:geographicalUsage>ru RU</tbx:geographicalUsage>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a216.311">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>standard that is concerned with
+                                <tbx:entailedTerm>terms (3.4.1.2)</tbx:entailedTerm> accompanied by
+                            their <tbx:entailedTerm>definitions (3.4.2.1)</tbx:entailedTerm>, and
+                            sometimes by explanatory notes, illustrations, examples,
+                            etc.</tbx:definition>
+                        <tbx:source>ISO/IEC Guide 2:2004, 5.2</tbx:source>
+                        <tbx:note>Modified — By omitting “usually” in front of “accompanied by their
+                            definitions”, this terminological entry is made consistent with the
+                            other terms and definitions in this part of ISO 10241.</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a216.311-1">terminology standard</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a216.319">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>expectation of the mean time to dangerous
+                            failure</tbx:definition>
+                        <tbx:source>ISO 13849-1:2006, 3.1.25</tbx:source>
+                        <tbx:tig>
+                            <tbx:term id="a216.319-1">mean time to dangerous failure</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a216.319-2">MTTF<sub>d</sub></tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                            <tbx:termType value="symbol"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <!-- the following entry shows two notes, one for the language section, and one for the definition -->
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:note>Le terme abrégé «MTTFd» est dérivé de l'anglais <tbx:entailedTerm
+                                xml:lang="en">mean time to dangerous
+                            failure</tbx:entailedTerm>.</tbx:note>
+                        <tbx:definition>espérance de la durée moyenne de fonctionnement avant une
+                            défaillance dangereuse</tbx:definition>
+                        <tbx:source>ISO 13849-1:2006, 3.1.25</tbx:source>
+                        <tbx:note>Modifié — Dans le terme, «temps moyen» est devenu “durée moyenne”.
+                            La définition était «valeur probable de la durée moyenne avant
+                            défaillance dangereuse».]</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a216.319-3">durée moyenne avant défaillance
+                                dangereuse</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a216.319-4">MTTF<sub>d</sub></tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                            <tbx:termType value="symbol"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a217.374">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition><tbx:entailedTerm target="databank">data
+                                bank (ISO 1087-2:2000, 6.7)</tbx:entailedTerm> containing
+                                <!-- inserted xtarget just for testing purposes --><tbx:entailedTerm
+                                xtarget="xyz">terminological data</tbx:entailedTerm>
+                            (3.8.1)</tbx:definition>
+                        <tbx:source>ISO 1087-2:2000, 6.8</tbx:source>
+                        <tbx:tig>
+                            <tbx:term id="a217.374-1">term bank</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a217.374-2">terminological data bank</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="admittedTerm"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <!-- entry inserted merely to test the target attribute on an entailed term in the above entry -->
+            <term-sec>
+                <tbx:termEntry id="databank">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:tig>
+                            <tbx:term>data bank</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a218.37">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>language where a word form may consist of more than one
+                            morph but the boundaries between morphs are always
+                            clear-cut</tbx:definition>
+                        <tbx:source>ISBN 0-226-11433-3(1989)&lt;43>(1.0)</tbx:source>
+                        <tbx:note>Modified — In this part of ISO 10241, “word form” has been used
+                            instead of “word” and “morph” has been used instead of “morpheme”. The
+                            example has been added.</tbx:note>
+                        <tbx:note>This note is just showing how you must use an XML entity to
+                            represent the ampersand sign: &amp;</tbx:note>
+                        <tbx:example>Korean, Japanese, Hungarian and Turkish are agglutinating
+                            languages.</tbx:example>
+                        <tbx:tig>
+                            <tbx:term id="a218.37-1">agglutinating language</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <!-- example A.2.18, 3.27 is not necessary, all datcats already shown in other entries -->
+            <!-- examples A.2.19 to A.2.20, not done because examples with MathML have already been shown above, see ISO10241-1.a213.498-->
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a221.322">
+                    <!-- example showing a reference to another document part -->
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>pressure using absolute vacuum as a
+                            reference</tbx:definition>
+                        <tbx:see>Figures 1 and 2.</tbx:see>
+                        <tbx:tig>
+                            <tbx:term id="a221.322-1">absolute pressure</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:definition>pression utilisant le vide absolu comme
+                            référence</tbx:definition>
+                        <tbx:see>Figures 1 et 2.</tbx:see>
+                        <tbx:tig>
+                            <tbx:term id="a221.322-2">pression absolue</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:grammaticalGender value="feminine"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="de">
+                        <tbx:definition>Druck bezogen auf das absolute Vakuum</tbx:definition>
+                        <tbx:see>Bilder 1 und 2.</tbx:see>
+                        <tbx:tig>
+                            <tbx:term id="a221.322-3">Absolutdruck</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:grammaticalGender value="masculine"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a222.45">
+                    <!-- example showing a graphic at entry level, shared for all languages, and language-specific subject fields -->
+                    <tbx:xGraphic xtarget="http://example.com/graphic/ctr-open-exh.png"/>
+                    <tbx:langSet xml:lang="en">
+                        <tbx:subjectField>pneumatic</tbx:subjectField>
+                        <tbx:definition>valve centre position in which the inlet supply is not
+                            connected to an outlet, but outlets are connected to
+                            exhaust</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a222.45-1">centre open to exhaust position</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a222.45-2">negative position</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="admittedTerm"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:subjectField>pneumatique</tbx:subjectField>
+                        <tbx:definition>position centrale d’un distributeur dans laquelle
+                            l’alimentation à l’entrée n’est pas reliée à une sortie, mais où les
+                            sorties communiquent avec l’échappement</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a222.45-3">position centre ouvert à
+                                l’échappement</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:grammaticalGender value="feminine"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a222.45-4">position négative</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:grammaticalGender value="feminine"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="de">
+                        <tbx:subjectField>Pneumatik</tbx:subjectField>
+                        <tbx:definition>mittlere Stellung des Ventils, in der der
+                            Versorgungs-anschluss gesperrt ist und die Arbeitsanschlüsse mit den
+                            Entlüftungsanschlüssen verbunden sind</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a222.45-5">entlüftete Mittelstellung</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:grammaticalGender value="feminine"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a222.3121">
+                    <!-- entry showing an xref at termEntry level, shared across all languages -->
+                    <tbx:xGraphic xtarget="location-of-graphic-file2"/>
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>hydraulic tool with percussive mechanism for light
+                            demolition work, primarily for use in the horizontal
+                            plane</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a222.3121-1">pick hammer</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:definition>machine portative hydraulique avec mécanisme de percussion
+                            utilisée pour des travaux légers de démolition, principalement pour
+                            l'utilisation sur un plan horizontal</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a222.3121-2">marteau-piqueur</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a222.1112">
+                    <tbx:xGraphic xtarget="location-of-graphic-file3"/>
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>crane with the bridge girders supported on the rail tracks
+                            by legs</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a222.1112-1">gantry crane</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a222.1112-2">portal bridge crane</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="preferredTerm"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:definition>appareil de levage à charge suspendue dont les éléments
+                            porteurs s'appuient sur une voie de roulement par l'intermédiaire de
+                            palées d'appui</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a222.1112-3">pont portique</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="ru">
+                        <tbx:definition>кран, несущие элементы конструкции которого опираются на
+                            подкрановый путь при помощи опорных стоек</tbx:definition>
+                        <tbx:tig>
+                            <tbx:term id="a222.1112-4">кран козловой</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a223.251">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>glowing produced without combustion or other chemical
+                            reaction</tbx:definition>
+                        <tbx:example>Glowing produced by electrical heating of a tungsten
+                            filament.</tbx:example>
+                        <tbx:source>ISO 472:1999</tbx:source>
+                        <tbx:tig>
+                            <tbx:term id="a223.251-1">incandescence</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <!-- example A.2.24 not necessary, all datcats already shown -->
+            <term-sec>
+                <!-- notes with table -->
+                <tbx:termEntry id="ISO10241-1.a225.911">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>error of indication within which the range of radii of a
+                            test sphere (8.4) can be determined by a CMM (2.1), the measurements
+                            being taken by scanning (2.9) using one stylus (4.1) </tbx:definition>
+                        <tbx:note>There are four scanning probing errors based on different
+                            combinations of high point density (7.8) or low point density (7.9) and
+                            predefined path scanning (7.5) or non-predefined path scanning (7.6).
+                            These combinations are designated as follows: <table-wrap>
+                                <table border="1">
+                                    <col width="100"/>
+                                    <col width="100"/>
+                                    <col width="100"/>
+                                    <thead>
+                                        <tr>
+                                            <th>Point density</th>
+                                            <th>Predefined path<break/><italic>(j = p)</italic></th>
+                                            <th>Non-predefined path<break/><italic>(j =
+                                                N)</italic></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>High <italic>(i = H)</italic></td>
+                                            <td><italic>T<sub>HP</sub></italic></td>
+                                            <td><italic>T<sub>HN</sub></italic></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Low <italic>(i = L)</italic></td>
+                                            <td><italic>T<sub>LP</sub></italic></td>
+                                            <td><italic>T<sub>LN</sub></italic></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </table-wrap>
+                        </tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a225.911-1">scanning probing error</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a225.911-2"><italic>T<sub>ij</sub></italic></tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="admittedTerm"/>
+                            <tbx:termType value="symbol"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:definition>erreur d’indication à l’intérieur de laquelle l’étendue des
+                            rayons d’une sphère d’essai (8.4) peut être déterminée par une MMT
+                            (2.1), les mesurages étant effectués par scanning (2.9) avec un seul
+                            stylet (4.1) </tbx:definition>
+                        <tbx:note>Il y a quatre erreurs de palpage en mode scanning selon les
+                            différentes combinaisons de haute densité de points (7.8) ou basse
+                            densité de points (7.9) et de trajectoire de scanning prédéfinie (7.5)
+                            ou trajectoire de scanning non prédéfinie (7.6). Ces combinaisons sont
+                            désignées comme suit: <table-wrap>
+                                <table border="1">
+                                    <col width="100"/>
+                                    <col width="100"/>
+                                    <col width="100"/>
+                                    <thead>
+                                        <tr>
+                                            <th>Densité de points</th>
+                                            <th>Trajectoire prédéfinie<break/><italic>(j =
+                                                  p)</italic></th>
+                                            <th>Trajectoire non prédéfinie<break/><italic>(j =
+                                                  N)</italic></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Haute <italic>(i = H)</italic></td>
+                                            <td><italic>T<sub>HP</sub></italic></td>
+                                            <td><italic>T<sub>HN</sub></italic></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Basse <italic>(i = L)</italic></td>
+                                            <td><italic>T<sub>LP</sub></italic></td>
+                                            <td><italic>T<sub>LN</sub></italic></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </table-wrap>
+                        </tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a225.911-1.fr">erreur de palpage en mode
+                                scanning</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:grammaticalGender value="feminine"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a225.911-2.fr"><italic>T<sub>ij</sub></italic></tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:normativeAuthorization value="admittedTerm"/>
+                            <tbx:termType value="symbol"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <!-- examples A.2.26 not necessary, all datcats already shown -->
+            <term-sec>
+                <!-- entry with an example -->
+                <tbx:termEntry id="ISO10241-1.a227.2263">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>means of connecting two or more components</tbx:definition>
+                        <tbx:example>Plain pipe to a fitting, or plain pipe to plain
+                            pipe.</tbx:example>
+                        <tbx:tig>
+                            <tbx:term id="a227.2263-1">joint</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <!-- two notes -->
+                <tbx:termEntry id="ISO10241-1.a227.114">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition><tbx:entailedTerm>scale</tbx:entailedTerm> with a continuum
+                            of possible values</tbx:definition>
+                        <tbx:example><tbx:entailedTerm>Interval scale</tbx:entailedTerm> and
+                                <tbx:entailedTerm>ratio scale</tbx:entailedTerm>.</tbx:example>
+                        <tbx:note>A continuous scale can be transformed into a
+                                <tbx:entailedTerm>discrete scale</tbx:entailedTerm>, by grouping
+                            “values”. This inevitably leads to some loss of information. Often the
+                            resulting discrete scale will be ordinal.</tbx:note>
+                        <tbx:note>Scale resolution can be adversely affected by measurement system
+                            limitations. Such measurement limitations can, sometimes, give rise to
+                            measurements being represented on a discrete, ordinal scale.</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a227.114-1">continuous scale</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:definition><tbx:entailedTerm>échelle</tbx:entailedTerm> présentant une
+                            série de valeurs possibles</tbx:definition>
+                        <tbx:example><tbx:entailedTerm>Échelle d'intervalle </tbx:entailedTerm> et
+                                <tbx:entailedTerm>échelle de
+                            rapport</tbx:entailedTerm>.</tbx:example>
+                        <tbx:note>Une échelle continue peut être transformée en
+                                <tbx:entailedTerm>échelle discrète</tbx:entailedTerm> en groupant
+                            les «valeurs». Cela entraîne des pertes d'informations inévitables.
+                            Souvent, l'échelle discrète en résultant sera ordinale.</tbx:note>
+                        <tbx:note>La résolution d'échelle peut être affectée par les limites du
+                            système de mesure. De telles limitations de mesures peuvent parfois
+                            donner lieu à des mesures représentées par une échelle discrète,
+                            ordinale.</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a227.114-2">continuous scale</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <!-- entry showing a cross reference to another term internal to the term section. Not shown is the target attribute which must 
+                    point to the unique ID of the target term or entry. -->
+                <tbx:termEntry id="ISO10241-1.a228.14">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>part capable of conducting electric current</tbx:definition>
+                        <tbx:note>Although not necessarily electrically energized in normal
+                            operating conditions, it may become electrically energized under fault
+                            conditions of the <tbx:entailedTerm>basic insulation
+                            (4)</tbx:entailedTerm>. </tbx:note>
+                        <tbx:crossReference>exposed conductive part</tbx:crossReference>
+                        <!--For rendering, the reference to the entry number should be automatically generated in parentheses after the term, 
+                            using the label of the term section. The reference
+                        should be prepended with "Related term: -->
+                        <tbx:tig>
+                            <tbx:term id="a228.14-1">conductive part</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:definition>pièce à même de conduire le courant
+                            électrique</tbx:definition>
+                        <tbx:note>Bien que non nécessairement sous tension dans les conditions
+                            normales de service, elle peut devenir sous tension en cas de
+                            défaillance de l'<tbx:entailedTerm>isolation de base
+                            (4)</tbx:entailedTerm>.</tbx:note>
+                        <tbx:crossReference>pièce conductrice apparente</tbx:crossReference>
+                        <tbx:tig>
+                            <tbx:term id="a228.14-2">pièce conductrice</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="ISO10241-1.a229.131">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>grain of <italic>Avena sativa</italic> L.</tbx:definition>
+                        <tbx:source>ISO 11520-2:2001, 3.10.</tbx:source>
+                        <tbx:tig>
+                            <tbx:term id="a229.131-1">oats</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:grammaticalNumber value="singular"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <!-- entry with multiple definitions and multiple sources -->
+                <tbx:termEntry id="ISO10241-1.a229.131b">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>grain of <italic>Avena sativa</italic> L.</tbx:definition>
+                        <tbx:source>ISO 11520-2:2001, 3.10.</tbx:source>
+                        <tbx:definition>another definition</tbx:definition>
+                        <tbx:source>another source</tbx:source>
+                        <tbx:tig>
+                            <tbx:term id="a229.131-1b">oats</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:grammaticalNumber value="singular"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <!-- entry from 10360-1:2000, number 2.16, showing a symbol as a term -->
+                <tbx:termEntry id="ISO10360-1.a216">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>vector used to translate an <tbx:entailedTerm>indicated
+                                measured point (2.12)</tbx:entailedTerm> to a
+                                <tbx:entailedTerm>corrected measured point
+                            (2.13)</tbx:entailedTerm></tbx:definition>
+                        <tbx:see>Figures 3 and 4</tbx:see>
+                        <!-- the following note includes symbols. It may require NLM or other
+                            markup to handle additional formatting-->
+                        <!-- it illustrates that both MathML and TeX/LaTeX math representations are available -->
+                        <tbx:note>The tip correction vector normally includes the physical size of
+                            the tip (e.g. radius) and a correction for the systematic errors of the
+                                <tbx:entailedTerm> probing system (2.6)</tbx:entailedTerm>. The
+                            translation from an <tbx:entailedTerm> indicated measured point
+                            (2.12)</tbx:entailedTerm> ot a <tbx:entailedTerm>corrected measured
+                                point (2.13)</tbx:entailedTerm> is expressed by the equation: <mml:math>
+                                <mml:mrow><!--MathML markup of the equation--></mml:mrow>
+                            </mml:math> where <mml:math>
+                                <mml:mrow><!--MathML markup of the symbol--></mml:mrow>
+                            </mml:math> is the vector of the corrected measured point; <mml:math>
+                                <mml:mrow><!--MathML markup of the symbol--></mml:mrow>
+                            </mml:math> is the vector of the indicated measured point; <mml:math>
+                                <mml:mrow><!--MathML markup of the symbol--></mml:mrow>
+                            </mml:math> is the tip correction vector. </tbx:note>
+                        <tbx:note>The conventional practice is normally to use an approximate
+                                <tbx:entailedTerm>stylus tip (4.2)</tbx:entailedTerm> radius to
+                            establish the magnitude of this vector and an estimated surface normal
+                            to establish the direction. The tip diameter can include correction
+                            effects such as stylus staft bending and is usually referred to as
+                            "effective tip diameter".</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a216-1">tip correction vector</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a216-2"><mml:math>
+                                    <mml:mrow><!--MathML markup of the symbol--></mml:mrow>
+                                </mml:math></tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:termType value="symbol"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                    <tbx:langSet xml:lang="fr">
+                        <tbx:definition>vecteur utilisé pour la translation d'un
+                                <tbx:entailedTerm>point de mesure indiqué (2.12)</tbx:entailedTerm>
+                            vers un <tbx:entailedTerm>point de mesure corrigé
+                            (2.13)</tbx:entailedTerm></tbx:definition>
+                        <tbx:see>Figures 3 et 4</tbx:see>
+                        <!-- the following note includes symbols. It may require NLM or other
+                            markup to handle additional formatting-->
+                        <tbx:note>Le vecteur de correction de touche inclut normalement la taille de
+                            la touche (par exemple le rayon) et une correction de l'erreur
+                            systématique du <tbx:entailedTerm>système de palpage
+                            (2.6)</tbx:entailedTerm>. La translation d'unf <tbx:entailedTerm>point de mesure
+                                indiqué (2.12)</tbx:entailedTerm> vers un <tbx:entailedTerm>point de
+                                    mesure corrigé (2.13)</tbx:entailedTerm> est exprimé par l'équation: <mml:math>
+                                <mml:mrow><!--MathML markup of the equation--></mml:mrow>
+                            </mml:math> où <mml:math>
+                                <mml:mrow><!--MathML markup of the symbol--></mml:mrow>
+                            </mml:math> est le vecteur du point de mesure corrigé; <mml:math>
+                                <mml:mrow><!--MathML markup of the symbol--></mml:mrow>
+                            </mml:math> est le vecteur du point de mesure indiqué; <mml:math>
+                                <mml:mrow><!--MathML markup of the symbol--></mml:mrow>
+                            </mml:math> est le vecteur de correction de touche. </tbx:note>
+                        <tbx:note>La pratique conventionnelle utilise couramment un rayon approché
+                            de <tbx:entailedTerm>touche du stylet (4.2)</tbx:entailedTerm> pour
+                            établir l’amplitude de ce vecteur et une normale à la surface estimée
+                            pour établir la direction. Le diamètre de la touche peut inclure des
+                            éléments de correction tels que la flexion de l’arbre du stylet, et il
+                            est couramment appelé «diamètre effectif de touche».</tbx:note>
+                        <tbx:tig>
+                            <tbx:term id="a216-3">vecteur de correction de touche</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:grammaticalGender value="masculine"/>
+                        </tbx:tig>
+                        <tbx:tig>
+                            <tbx:term id="a216-4"><mml:math>
+                                    <mml:mrow><!--MathML markup of the symbol--></mml:mrow>
+                                </mml:math></tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                            <tbx:termType value="symbol"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <!-- use <term-display> as an alternative to TBX markup. This should only be used as a last option
+                     when the termEntry contains content which cannot be capture with TBX. 
+                     When term-display is used then at least the term and its definition must be capture with tbx:term and tbx:definition -->
+                <tbx:termEntry id="iso_std_iso_3951-2_ed-1_en_term_3.10">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>non-fulfilment of a requirement</tbx:definition>
+                        <tbx:source>ISO 9000</tbx:source>
+                        <tbx:note> Nonconformity will generally be classified by its degree of
+                            seriousness, such as: <list list-type="bullet">
+                                <list-item>
+                                    <label>—</label>
+                                    <p><bold>Class A.</bold> Nonconformity of a type considered to
+                                        be of the highest concern for the product or service. Such
+                                        types of nonconformity will typically be assigned very small
+                                        AQL values.</p>
+                                </list-item>
+                                <list-item>
+                                    <label>—</label>
+                                    <p><bold>Class B.</bold> Nonconformity of a type considered to
+                                        have the next lower degree of concern; this is typically
+                                        assigned a larger AQL value than that in Class A and smaller
+                                        than that in Class C if a third class exists, and so on.</p>
+                                </list-item>
+                            </list> The number of classes and the assignment into a class should be
+                            appropriate to the quality requirements of the specific situation. </tbx:note>
+                        <tbx:tig id="iso_std_iso_3951_-2_ed-1_en_term_3.10·1">
+                            <tbx:term>nonconformity</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+                <term-display>
+                    <p><bold>nonconformity</bold></p>
+                    <p>non-fulfilment of a requirement</p>
+                    <p>[ISO 9000]</p>
+                    <non-normative-note>
+                        <label>NOTE</label>
+                        <p>Nonconformity will generally be classified by its degree of seriousness,
+                            such as: <list list-type="bullet">
+                                <list-item>
+                                    <label>—</label>
+                                    <p><bold>Class A.</bold> Nonconformity of a type considered to
+                                        be of the highest concern for the product or service. Such
+                                        types of nonconformity will typically be assigned very small
+                                        AQL values.</p>
+                                </list-item>
+                                <list-item>
+                                    <label>—</label>
+                                    <p><bold>Class B.</bold> Nonconformity of a type considered to
+                                        have the next lower degree of concern; this is typically
+                                        assigned a larger AQL value than that in Class A and smaller
+                                        than that in Class C if a third class exists, and so on.</p>
+                                </list-item>
+                            </list> The number of classes and the assignment into a class should be
+                            appropriate to the quality requirements of the specific situation.</p>
+                    </non-normative-note>
+                </term-display>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry>
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>care provided in an institution</tbx:definition>
+                        <!-- entry exists only to demonstrate table formatting -->
+                        <!-- table adapted from JATS version 0.4 documentation: http://jats.nlm.nih.gov/articleauthoring/tag-library/0.4/n-t7s0.html -->
+                        <tbx:note>
+                            <table-wrap id="TN0.170">
+                                <caption>
+                                    <p>Numbers of patients receiving institutional care ...</p>
+                                </caption>
+                                <table>
+                                    <tbody>
+
+                                        <tr>
+                                            <th/>
+                                            <th colspan="3" align="center" rowspan="1">Institutional
+                                                care</th>
+                                            <th/>
+                                            <th colspan="2" align="center" rowspan="1">&#x2003;Bed
+                                                use (days)</th>
+                                        </tr>
+                                        <tr>
+                                            <td>Total</td>
+                                            <td align="center">208/1224</td>
+                                            <td align="center">244/1214</td>
+                                            <td align="center">0.77 (0.52 to 1.13)</td>
+                                            <td/>
+                                            <td align="center">15.0</td>
+                                            <td align="center">16.4</td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                                <table-wrap-foot>
+                                    <fn-group>
+                                        <fn id="TF1-150">
+                                            <p>Data not available for 1 trial.</p>
+                                        </fn>
+                                        <fn id="TF1-151">
+                                            <p>P&#x003C;0.05 (random effects model).</p>
+                                        </fn>
+                                    </fn-group>
+                                </table-wrap-foot>
+                            </table-wrap>
+                        </tbx:note>
+                        <tbx:tig>
+                            <tbx:term>Institutional care</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="iso_14155_2011_en_term_3.28">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>any instrument, apparatus, implement, machine, appliance,
+                            implant, software, material, or other similar or related article <list>
+                                <list-item>
+                                    <label>a)</label>
+                                    <p>intended by the manufacturer to be used, alone or in
+                                        combination, for human beings for one or more of the
+                                        specific purpose(s) of <list>
+                                            <list-item>
+                                                <label>1)</label>
+                                                <p>diagnosis, prevention, monitoring, treatment or
+                                                  alleviation of disease,</p>
+                                            </list-item>
+                                            <list-item>
+                                                <label>2)</label>
+                                                <p>diagnosis, monitoring, treatment, alleviation of,
+                                                  or compensation for, an injury,</p>
+                                            </list-item>
+                                            <list-item>
+                                                <label>3)</label>
+                                                <p>investigation, replacement, modification, or
+                                                  support of the anatomy or of a physiological
+                                                  process,</p>
+                                            </list-item>
+                                            <list-item>
+                                                <label>4)</label>
+                                                <p>supporting or sustaining life,</p>
+                                            </list-item>
+                                            <list-item>
+                                                <label>5)</label>
+                                                <p>control of conception,</p>
+                                            </list-item>
+                                            <list-item>
+                                                <label>6)</label>
+                                                <p>disinfection of medical devices, and</p>
+                                            </list-item>
+                                        </list></p>
+                                </list-item>
+                                <list-item>
+                                    <label>b)</label>
+                                    <p>which does not achieve its primary intended action in or on
+                                        the human body by pharmacological, immunological or
+                                        metabolic means, but which may be assisted in its intended
+                                        function by such means</p>
+                                </list-item>
+                            </list></tbx:definition>
+                        <tbx:note>The term “medical device” is usually defined by national
+                            regulations. For the purposes of this International Standard, this
+                            definition does not list “in vitro diagnostic medical devices” 
+                            (see <std type="dated" std-id="urn:iso:std:iso:13485:ed-1:term:3.7"><std-ref>ISO 13485:2003</std-ref>, definition 3.7</std><sup><xref ref-type="bibr" rid="biblref_1">[1]</xref></sup>).</tbx:note>
+                        <tbx:tig>
+                            <tbx:term>medical device</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="iso_9000_2005_en_term_3.1.6">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>demonstrated ability to apply knowledge and
+                            skills</tbx:definition>
+                        <tbx:note>The concept of competence is defined in a generic sense in this
+                            International Standard. The word usage can be more specific in other ISO
+                            documents.</tbx:note>
+                        <tbx:tig>
+                            <tbx:term>competence</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+            <term-sec>
+                <tbx:termEntry id="iso_9000_2005_en_term_3.9.9">
+                    <tbx:langSet xml:lang="en">
+                        <tbx:definition>person with the demonstrated personal attributes and
+                                <tbx:entailedTerm target="iso_9000_2005_en_term_3.1.6"
+                                    >competence (3.1.6 and 3.9.14)</tbx:entailedTerm> to conduct an
+                                <tbx:entailedTerm>audit (3.9.1)</tbx:entailedTerm></tbx:definition>
+                        <tbx:note>The relevant personal attributes for an auditor are described in
+                            ISO 19011.</tbx:note>
+                        <tbx:tig>
+                            <tbx:term>auditor</tbx:term>
+                            <tbx:partOfSpeech value="noun"/>
+                        </tbx:tig>
+                    </tbx:langSet>
+                </tbx:termEntry>
+            </term-sec>
+        </sec>
+    </body>
+    <back>
+        <ref-list content-type="bibl" id="sec_bibl">
+            <title>Bibliography</title>
+            <ref content-type="standard" id="biblref_1">
+                <label>[1]</label>
+                <std type="undated" std-id="iso:std:iso:9999"><std-ref>ISO 9999</std-ref>,
+                        <title>Sample entry referenced in note</title></std>
+            </ref>
+        </ref-list>
+    </back>
+</standard>

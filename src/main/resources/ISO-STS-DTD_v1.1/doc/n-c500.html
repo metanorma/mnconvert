@@ -1,0 +1,397 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--Tag library software copyright Mulberry Technologies, Inc., 2002-2008-->
+      <link rel="stylesheet" href="ISOSTS-style.css" type="text/css">
+      <title>Introduction to the ISO Standards Tag Library</title>
+   </head>
+   <body class="main">
+      <div class="pageheader">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="sponsor">International Organization for Standardization (ISO)</h4>
+      </div>
+      <div class="intro">
+         <h1 class="header">Introduction to the ISO Standards Tag Library</h1>
+         <p class="para">This document describes ISOSTS (ISO Standards Tag Set), a
+            tag set developed for the International Standards Organization
+            based on the Journal Publishing Tag Set of the current draft of
+            NISO Z39.96 - JATS: Journal Article Tag Suite. The tag set has
+            been created from the DTDs provided in the JATS supporting
+            documentation provided by the National Library Medicine and all
+            changes have been implemented using the procedures recommended
+            in the JATS version 0.4 Tag Library.
+         </p>
+         <p class="para">The metadata structures needed to describe standards are
+            significantly different from those needed for journal articles,
+            so the metadata in this tag set has been designed for ISO. Since
+            the body of standards is very similar to that for most other
+            technical materials, the body structures of the JATS have been
+            adopted with very little change.
+         </p>
+         <p class="para">See <a href="n-c500.html#ISOSTS-mods">below</a> for lists of
+            elements added to the JATS base tag set, or modified from it, as
+            part of the ISOSTS customization.
+         </p>
+         <div class="section"><a name=""></a><h3 class="header">Structure of this Tag Library</h3>
+            <p class="para">This Tag Library contains the following sections:</p>
+            <div class="deflist">
+               <table class="deflisttable">
+                  <tr class="row1">
+                     <td class="dterm">
+                        <p>Introduction</p>
+                     </td>
+                     <td class="ddef">
+                        <p class="para">This introduction to the Tag Library contents.</p>
+                     </td>
+                  </tr>
+                  <tr class="row0">
+                     <td class="dterm">
+                        <p>Elements</p>
+                     </td>
+                     <td class="ddef">
+                        <p class="para"> Descriptions of all of the elements used in the tag set. Elements are nouns,
+                           	      like “Standard” and “International Classification for Standards”, that represent 
+                           	      components of ISO Standards documents. 
+                        </p>
+                        <p class="para"> The element descriptions are listed in alphabetical order by tag name.
+                           	      (Note: Each element has two names: a “tag name” (sometimes called an
+                           	      element-type name) that is used in the DTDs and by the software, and an
+                           	      “element name” (usually longer) that provides a fuller name for the benefit of
+                           	      readers. For example, a tag name might be <a href="n-bz80.html" target="main" title="International Classification for Standards"><span class="elementtag">&lt;ics&gt;</span></a>
+                           	      with the corresponding element name <a href="n-bz80.html" target="main" title="<ics&gt;"><span class="elementname">International Classification for Standards</span></a> or a
+                           	      tag name might be <a href="n-iix0.html" target="main" title="ISO Project Identifier"><span class="elementtag">&lt;proj-id&gt;</span></a> with the corresponding
+                           	      element name <a href="n-iix0.html" target="main" title="<proj-id&gt;"><span class="elementname">ISO Project Identifier</span></a>.) 
+                        </p>
+                     </td>
+                  </tr>
+                  <tr class="row1">
+                     <td class="dterm">
+                        <p>Attributes</p>
+                     </td>
+                     <td class="ddef">
+                        <p class="para"> Descriptions of all of the attributes in the DTDs. Attributes are facts
+                           	      about an element, such as what type of information 
+                           	      (e.g., forward, symbols, or
+                           	      tests) is contained in a <a href="n-5240.html" target="main" title="Section"><span class="elementtag">&lt;sec&gt;</span></a> tag. Like elements, attributes also have two names: the shorter
+                           	      machine-readable one and a (usually longer) human-readable one. Attributes are
+                           	      listed in order by the shorter machine-readable names, for example, the
+                           	      attribute short name “<a href="n-cj60.html" target="main" title="Vertical Alignment (XHTML table model)"><span class="attrtag">@valign</span></a>” instead of the
+                           	      “<a href="n-cj60.html" target="main" title="@valign"><span class="attrname">Vertical Alignment (XHTML table model)</span></a>”. 
+                        </p>
+                     </td>
+                  </tr>
+                  <tr class="row0">
+                     <td class="dterm">
+                        <p>Context Table</p>
+                     </td>
+                     <td class="ddef">
+                        <p class="para"> Listing of where an element may occur. The Context Table is formatted in
+                           	      two columns. The first column lists an element, showing its tag name
+                           	      (its descriptive element name is available by hovering over the tag name). The 
+                           	      second column lists the
+                           	      tags of all the elements which may contain the listed
+                           	      element (with element names available by hovering over the tag names). 
+                        </p>
+                        <p class="para"> For example, if the first column contains: “&lt;doc-ident&gt;”, and the
+                           	      second column contains “&lt;iso-meta&gt;”, this means that the
+                           	      <a href="n-d750.html" target="main" title="<doc-ident&gt;"><span class="elementname">Document Identification Section</span></a> element may only be used inside a
+                           	      <a href="n-vta0.html" target="main" title="<iso-meta&gt;"><span class="elementname">ISO Metadata</span></a> element. Many elements may be used
+                           	      inside more than one other element. For example, the <a href="n-3gx0.html" target="main" title="Prefix"><span class="elementtag">&lt;prefix&gt;</span></a> element may be used inside the <a href="n-k3w0.html" target="main" title="Name of Person (Structured)"><span class="elementtag">&lt;name&gt;</span></a>, <a href="n-8n40.html" target="main" title="Speaker"><span class="elementtag">&lt;speaker&gt;</span></a>, and <a href="n-83s0.html" target="main" title="Name of Person (Unstructured)"><span class="elementtag">&lt;string-name&gt;</span></a> elements. 
+                        </p>
+                        <p class="para"> Note: This Context Table (which lists where an element may be used) is the
+                           	      <em>reverse</em> of the Contents section that is within each
+                           	      element description (which lists the content of an element, that is, what can
+                           	      be inside the named element). 
+                        </p>
+                     </td>
+                  </tr>
+                  <tr class="row1">
+                     <td class="dterm">
+                        <p>Document Hierarchy Diagrams</p>
+                     </td>
+                     <td class="ddef">
+                        <p class="para"> Graphical representations of portions of the hierarchies defined in the
+                           	      DTDs. 
+                        </p>
+                     </td>
+                  </tr>
+                  <tr class="row0">
+                     <td class="dterm">
+                        <p>Index</p>
+                     </td>
+                     <td class="ddef">
+                        <p class="para">Where to find elements, tags, and terms used in this Tag Library. 
+                           	      Includes synonyms (terms not used in this Tag Set) that direct the 
+                           	      reader to elements used in this Tag Library, for example, “technical page count” 
+                           	      is paired with <a href="n-pux0.html" target="main" title="Page Count"><span class="elementtag">&lt;page-count&gt;</span></a>. 
+                        </p>
+                     </td>
+                  </tr>
+               </table>
+            </div>
+         </div>
+         <div class="section"><a name=""></a><h3 class="header">Typographic Conventions</h3>
+            <table xmlns:mtl="http://www.mulberrytech.com/taglib" frame="hsides">
+               <colgroup span="1">
+                  <col width="10%" span="1">
+                  <col width="90%" span="1">
+               </colgroup>
+               <tbody>
+                  <tr>
+                     <td rowspan="1" colspan="1">
+                        	      <a href="n-t4w0.html" target="main" title="National-body Metadata"><span class="elementtag">&lt;nat-meta&gt;</span></a>
+                        	    
+                     </td>
+                     <td rowspan="1" colspan="1">The tag name of an element. Almost always written in lower case with the
+                        	      entire name surrounded by “&lt; &gt;”. 
+                     </td>
+                  </tr>
+                  <tr>
+                     <td rowspan="1" colspan="1">
+                        	      <a href="n-t4w0.html" target="main" title="<nat-meta&gt;"><span class="elementname">National-body Metadata</span></a>
+                        	    
+                     </td>
+                     <td rowspan="1" colspan="1">Descriptive name of an element or an attribute. Written in title case
+                        	      (important words capitalized) in italics with the words separated by spaces.
+                        	    
+                     </td>
+                  </tr>
+                  <tr>
+                     <td rowspan="1" colspan="1">
+                        	      <em>must not</em>
+                        	    
+                     </td>
+                     <td rowspan="1" colspan="1">Emphasis added to stress a point</td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+         <div class="section"><a name="design"></a><h3 class="header">Origin and design principles</h3>
+            <p class="para">This tag set, ISOSTS, was originally developed in 2011 by
+               	the ISO Central Secretariat for use by ISO and other standards
+               	bodies, both in internal processes and for the exchange of
+               	standards documents among standards organizations. ISOSTS is
+               	based on the current draft of NISO Z39.96 - JATS: Journal
+               	Article Tag Suite (which in turn is based on the tag set
+               	developed at the U.S. National Library of Medicine).
+            </p>
+            <p class="para">The ISOSTS tag set has wherever possible been closely
+               	aligned with JATS and changes to the inventory of tags and to
+               	their definitions have been kept at a minimum, in order to
+               	simplify development, make maintenance of the tag set easier,
+               	and enable the straightforward reuse of tools set up to work
+               	with JATS.  In consequence, the vocabulary includes some tags
+               	for textual structures which are rare, or perhaps even
+               	non-existent, in standards documents; the effort required to
+               	remove them entirely from the tag set was deemed out of
+               	proportion to the benefit of doing so, especially in view of
+               	the small but not negligeable likelihood that some of the text
+               	structures in question might in fact occur in some few
+               	documents that may need over time to be encoded using this tag
+               	set.
+               
+            </p>
+            <p class="para">Specific goals of the development project include making
+               	possible the straightforward production of typeset output and
+               	the production of XML that can usefully be shared with ISO
+               	member bodies and reused.
+               
+            </p>
+            <p class="para">
+               	The metadata fields in the <a href="n-vta0.html" target="main" title="ISO Metadata"><span class="elementtag">&lt;iso-meta&gt;</span></a> element include all the information
+               	needed to produce typeset versions of the document.
+               
+            </p>
+            <p class="para">Among the several tag sets defined in the suite, the
+               	Journal Publishing Tag Set was chosen as the base of ISOSTS
+               	largely because it has better support for multilingual
+               	documents than the most plausible alternatives.  In ISOSTS,
+               	multilingual documents are handled by having structures in the
+               	XML which can repeat and which bear language information
+               	(typically the <a href="n-cvd0.html" target="main" title="Language"><span class="attrtag">@xml:lang</span></a>
+               	attribute).  Multi-lingual documents will typically be encoded
+               	with the text of a section or paragraph given first in one
+               	language and then in the other; ISOSTS does not prescribe
+               	whether to interleave the different languages section by
+               	section or paragraph by paragraph.  For the special case of
+               	terminological data, the <a href="n-z7t0.html" target="main" title="Term Entry (TBX Tag Set)"><span class="elementtag">&lt;tbx:termEntry&gt;</span></a> can contain information about
+               	synonymous terms in several languages; see the 
+               	<a href="tbx/index.html" target="_new" class="external">accompanying
+                  	documentation on the TBX tag set</a>.
+               
+            </p>
+            <p class="para">The metadata section of the JATS Journal Publishing Tag
+               	Set has been completely suppressed and replaced with three
+               	distinct metadata blocks designed to hold ISO metadata
+               	(<a href="n-vta0.html" target="main" title="ISO Metadata"><span class="elementtag">&lt;iso-meta&gt;</span></a>), regional-body metadata
+               	(<a href="el_reg-meta.html" target="main" title="Regional-body Metadata"><span class="elementtag">&lt;reg-meta&gt;</span></a>), or
+               	national-body metadata (<a href="n-t4w0.html" target="main" title="National-body Metadata"><span class="elementtag">&lt;nat-meta&gt;</span></a>).  
+                When <a href="el_reg-meta.html" target="main" title="Regional-body Metadata"><span class="elementtag">&lt;reg-meta&gt;</span></a> or
+               	<a href="n-t4w0.html" target="main" title="National-body Metadata"><span class="elementtag">&lt;nat-meta&gt;</span></a> are used the attribute
+                originator must be used to identify the concrete regional or national body for which the metadata apply.
+            </p>
+            <p class="para">Like the JATS Journal Publishing Tag Set, ISOSTS contains
+               	a number of rendering-oriented elements (e.g. <a href="n-7na0.html" target="main" title="Italic"><span class="elementtag">&lt;italic&gt;</span></a>, <a href="n-w5c0.html" target="main" title="Bold"><span class="elementtag">&lt;bold&gt;</span></a>, or <a href="n-4iv0.html" target="main" title="Sans Serif"><span class="elementtag">&lt;sans-serif&gt;</span></a>).  When the
+               	specific rendering of the text in a document has a specific
+               	meaning, and it is possible to mark the document up using
+               	semantically richer elements to capture that meaning, then it
+               	is wise to use the semantically richer markup and avoid the
+               	rendering-oriented tags.  Doing so will tend to produce
+               	documents which are more easily reused.  The rendering
+               	elements in the tag set are provided for use in cases where
+               	semantically richer markup is not feasible or where the
+               	vocabulary lacks elements with the appropriate
+               	semantics.
+            </p>
+            <p class="para">Like the JATS Journal Publishing Tag Set, ISOSTS contains
+               	standard definitions for a large number of special characters.
+               	The entities included are those in standard predefined entity
+               	sets; in practice the standard entity sets are constructed to
+               	cover the special characters most frequently needed, but no
+               	claim is made that they are complete in any particularly
+               	demanding sense. It should be noted there is no requirement
+               	that entity references be used instead of native Unicode
+               	characters or numeric character references, nor is there a
+               	requirement that standard entity references be used instead of
+               	entities defined in the document itself.  If native Unicode is
+               	more convenient for users of a document production system
+               	using this tag set, the users should by all means employ
+               	native Unicode encoding. The entity declarations are provided
+               	as a convenience, especially for people creating XML documents
+               	using older systems, not as a suggestion that all users of
+               	ISOSTS should use entity references in preference to native
+               	Unicode characters.
+               
+            </p>
+         </div>
+         <div class="section"><a name="ISOSTS-mods"></a><h3 class="header">Relation of this tag set to JATS</h3>
+            <div class="section"><a name=""></a><h4 class="header">New elements</h4>
+               <p class="para">A number of elements have been added to the JATS tag set
+                  	  as part of the ISOSTS customization.
+               </p>
+               <p class="para">The <a href="n-qd40.html" target="main" title="Standard or Standards-Related Document"><span class="elementtag">&lt;standard&gt;</span></a> element
+                  	  is the root element for documents encoded using the ISOSTS
+                  	  tag set.
+                  	
+               </p>
+               <p class="para">Three new elements are intended for markup of 
+                  	  terminological information. The
+                  	  <a href="n-z7t0.html" target="main" title="Term Entry (TBX Tag Set)"><span class="elementtag">&lt;tbx:termEntry&gt;</span></a> and 
+                  	  <a href="n-jpt0.html" target="main" title="Display Form of Term Entry"><span class="elementtag">&lt;term-display&gt;</span></a> elements are used to
+                  	  encode terminology defined in standards:  
+                  	  <a href="n-z7t0.html" target="main" title="Term Entry (TBX Tag Set)"><span class="elementtag">&lt;tbx:termEntry&gt;</span></a> uses a 
+                  	  namespace-qualified version of the 
+                  	  TermBase eXchange vocabulary (TBX) defined by
+                  	  ISO 30042, while <a href="n-jpt0.html" target="main" title="Display Form of Term Entry"><span class="elementtag">&lt;term-display&gt;</span></a>
+                  	  is used to provide a simple visually oriented encoding of
+                  	  the term entry, for cases where the correct formatted
+                  	  representation is difficult to generate from the TBX
+                  	  entry (or for cases where the TBX entry is difficult to
+                  	  generate from the form of the document provided by the
+                  	  authors).  The <a href="n-qc70.html" target="main" title="Terminology Section"><span class="elementtag">&lt;term-sec&gt;</span></a>
+                  	  element is a specialized form of 
+                  	  <a href="n-5240.html" target="main" title="Section"><span class="elementtag">&lt;sec&gt;</span></a> which is modified
+                  	  to allow terminological data.
+               </p>
+               <p class="para">
+                  	  The <a href="n-gk20.html" target="main" title="Type of Annex"><span class="elementtag">&lt;annex-type&gt;</span></a> is used
+                  	  in <a href="n-3320.html" target="main" title="Appendix"><span class="elementtag">&lt;app&gt;</span></a> elements to
+                  	  distinguish normative from non-normative annexes.
+                  	
+               </p>
+               <p class="para">
+                  	  The <a href="n-6ew0.html" target="main" title="Non-normative Note"><span class="elementtag">&lt;non-normative-note&gt;</span></a> and
+                  	  <a href="n-asw0.html" target="main" title="Non-normative Example"><span class="elementtag">&lt;non-normative-example&gt;</span></a> elements
+                  	  are used to tag non-normative material integrated into the
+                  	  text of the standard.
+                  	
+               </p>
+               <p class="para">Three new elements are metadata containers for metadata
+                  	  relevant for the purposes of ISO, regional, or national bodies:
+                  	  <a href="n-vta0.html" target="main" title="ISO Metadata"><span class="elementtag">&lt;iso-meta&gt;</span></a>,
+                  	  <a href="n-t4w0.html" target="main" title="National-body Metadata"><span class="elementtag">&lt;nat-meta&gt;</span></a>,
+                      <a href="el_reg-meta.html" target="main" title="Regional-body Metadata"><span class="elementtag">&lt;reg-meta&gt;</span></a>.
+                  	
+               </p>
+               <p class="para">Most of the new elements are for specific pieces of
+                  	  metadata and are included in the <a href="n-vta0.html" target="main" title="ISO Metadata"><span class="elementtag">&lt;iso-meta&gt;</span></a> element:
+                  	  <a href="n-v530.html" target="main" title="Committee, Subcommittee, Working Group"><span class="elementtag">&lt;comm-ref&gt;</span></a>,
+                  	  <a href="n-2830.html" target="main" title="Complementary Title Element"><span class="elementtag">&lt;compl&gt;</span></a>,
+                  	  <a href="n-vs30.html" target="main" title="Document Language"><span class="elementtag">&lt;content-language&gt;</span></a>,
+                  	  <a href="n-d750.html" target="main" title="Document Identification Section"><span class="elementtag">&lt;doc-ident&gt;</span></a>,
+                  	  <a href="n-qe50.html" target="main" title="Document Number"><span class="elementtag">&lt;doc-number&gt;</span></a>,
+                  	  <a href="n-qf50.html" target="main" title="Document Reference"><span class="elementtag">&lt;doc-ref&gt;</span></a>,
+                  	  <a href="n-6g50.html" target="main" title="Document Type"><span class="elementtag">&lt;doc-type&gt;</span></a>,
+                  	  <a href="n-nt80.html" target="main" title="Full Title"><span class="elementtag">&lt;full&gt;</span></a>,
+                  	  <a href="n-bz80.html" target="main" title="International Classification for Standards"><span class="elementtag">&lt;ics&gt;</span></a>,
+                  	  <a href="n-tua0.html" target="main" title="Introductory Title Element"><span class="elementtag">&lt;intro&gt;</span></a>,
+                  	  <a href="n-fsa0.html" target="main" title="Is-Proof Flag"><span class="elementtag">&lt;is-proof&gt;</span></a>,
+                  	  <a href="n-upa0.html" target="main" title="Language"><span class="elementtag">&lt;language&gt;</span></a>,
+                  	  <a href="n-pau0.html" target="main" title="Main Title Element"><span class="elementtag">&lt;main&gt;</span></a>,
+                  	  <a href="n-kbw0.html" target="main" title="Originator of the Document"><span class="elementtag">&lt;originator&gt;</span></a>,
+                  	  <a href="n-gxx0.html" target="main" title="Part Number of Multi-part Document"><span class="elementtag">&lt;part-number&gt;</span></a>,
+                  	  <a href="n-iix0.html" target="main" title="ISO Project Identifier"><span class="elementtag">&lt;proj-id&gt;</span></a>,
+                  	  <a href="n-g7v0.html" target="main" title="Release Date"><span class="elementtag">&lt;release-date&gt;</span></a>,
+                  	  <a href="n-7ev0.html" target="main" title="Release Version"><span class="elementtag">&lt;release-version&gt;</span></a>,
+                  	  <a href="el_release-version-id.html" target="main" title="Release Version Id"><span class="elementtag">&lt;release-version-id&gt;</span></a>,
+                  	  <a href="n-dzv0.html" target="main" title="Standards Development Organization"><span class="elementtag">&lt;sdo&gt;</span></a>,
+                  	  <a href="n-9a40.html" target="main" title="Secretariat"><span class="elementtag">&lt;secretariat&gt;</span></a>,
+                  	  <a href="n-fp40.html" target="main" title="Standard Reference"><span class="elementtag">&lt;std-ident&gt;</span></a>,
+                  	  <a href="n-5b40.html" target="main" title="Standard Reference"><span class="elementtag">&lt;std-ref&gt;</span></a>,
+                  	  <a href="n-3zs0.html" target="main" title="Supplement Number"><span class="elementtag">&lt;suppl-number&gt;</span></a>,
+                  	  <a href="n-qzs0.html" target="main" title="Supplement Type"><span class="elementtag">&lt;suppl-type&gt;</span></a>,
+                  	  <a href="n-mkt0.html" target="main" title="Supplement Version Number"><span class="elementtag">&lt;suppl-version&gt;</span></a>,
+                  	  <a href="n-pr70.html" target="main" title="Title Wrapper"><span class="elementtag">&lt;title-wrap&gt;</span></a>,
+                  	  <a href="n-g3e0.html" target="main" title="Uniform Resource Name"><span class="elementtag">&lt;urn&gt;</span></a>, and 
+                  	  <a href="n-3xe0.html" target="main" title="Document Version Number"><span class="elementtag">&lt;version&gt;</span></a>.
+                  	
+               </p>
+            </div>
+            <div class="section"><a name=""></a><h4 class="header">Modifications to JATS elements</h4>
+               <p class="para">For a few elements in the JATS base vocabulary,
+                  	  changes have been made either to their formal definition
+                  	  or to their documentation, to make them serve the 
+                  	  purposes of ISOSTS better.  Those whose formal
+                  	  definitions have been modified include:
+                  	  
+                  <ul class="bullist">
+                     <li>
+                        		<a href="n-k480.html" target="main" title="Front Matter"><span class="elementtag">&lt;front&gt;</span></a> (to include
+                        		standards-document metadata),
+                        	      
+                     </li>
+                     <li><a href="n-5240.html" target="main" title="Section"><span class="elementtag">&lt;sec&gt;</span></a> (to include
+                        		<a href="n-qc70.html" target="main" title="Terminology Section"><span class="elementtag">&lt;term-sec&gt;</span></a> and omit
+                        		section-level metadata)
+                        	      
+                     </li>
+                     <li>
+                        		<a href="n-3320.html" target="main" title="Appendix"><span class="elementtag">&lt;app&gt;</span></a>
+                        		(to include <a href="n-gk20.html" target="main" title="Type of Annex"><span class="elementtag">&lt;annex-type&gt;</span></a>)
+                        	      
+                     </li>
+                     <li>
+                        		<a href="n-twc0.html" target="main" title="Boxed Text"><span class="elementtag">&lt;boxed-text&gt;</span></a>
+                        		(to remove section-level metadata)
+                     </li>
+                     <li>
+                        		<a href="n-syx0.html" target="main" title="Publication Date"><span class="elementtag">&lt;pub-date&gt;</span></a>
+                        		(to specify ISO 8601-style content)
+                     </li>
+                     <li>
+                        		<a href="n-hqx0.html" target="main" title="Reference Item"><span class="elementtag">&lt;ref&gt;</span></a>
+                        		(to exclude notes from the citation content)
+                        	      
+                     </li>
+                  </ul>
+                  	
+               </p>
+            </div>
+         </div>
+      </div>
+      <div class="pagefooter">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="pubdate">Version of July 2013</h4>
+      </div>
+   </body>
+</html>

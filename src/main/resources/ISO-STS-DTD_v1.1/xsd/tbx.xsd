@@ -1,0 +1,790 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tbx="urn:iso:std:iso:30042:ed-1" xmlns:xlink="http://www.w3.org/1999/xlink" elementFormDefault="qualified" targetNamespace="urn:iso:std:iso:30042:ed-1">
+  <xs:import schemaLocation="ISOSTS.xsd"/>
+  <xs:import namespace="http://www.w3.org/1998/Math/MathML" schemaLocation="ncbi-mathml2/mathml2.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="xlink.xsd"/>
+  <!-- XSD import of namespace http://www.w3.org/2001/XMLSchema-instance suppressed (not necessary) -->
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+  <xs:element name="entailedTerm">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="disp-formula"/>
+        <xs:element ref="disp-formula-group"/>
+        <xs:element ref="chem-struct"/>
+        <xs:element ref="inline-formula"/>
+        <xs:element ref="mml:math"/>
+        <xs:element ref="bold"/>
+        <xs:element ref="italic"/>
+        <xs:element ref="monospace"/>
+        <xs:element ref="num"/>
+        <xs:element ref="overline"/>
+        <xs:element ref="roman"/>
+        <xs:element ref="sans-serif"/>
+        <xs:element ref="sc"/>
+        <xs:element ref="strike"/>
+        <xs:element ref="underline"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="def-list"/>
+        <xs:element ref="list"/>
+        <xs:element ref="fn"/>
+        <xs:element ref="target"/>
+        <xs:element ref="xref"/>
+        <xs:element ref="element-citation"/>
+        <xs:element ref="mixed-citation"/>
+        <xs:element ref="std"/>
+        <xs:element ref="break"/>
+        <xs:element ref="named-content"/>
+        <xs:element ref="styled-content"/>
+        <xs:element ref="address"/>
+        <xs:element ref="alternatives"/>
+        <xs:element ref="array"/>
+        <xs:element ref="boxed-text"/>
+        <xs:element ref="chem-struct-wrap"/>
+        <xs:element ref="fig"/>
+        <xs:element ref="fig-group"/>
+        <xs:element ref="graphic"/>
+        <xs:element ref="media"/>
+        <xs:element ref="non-normative-note"/>
+        <xs:element ref="non-normative-example"/>
+        <xs:element ref="preformat"/>
+        <xs:element ref="supplementary-material"/>
+        <xs:element ref="table-wrap"/>
+        <xs:element ref="table-wrap-group"/>
+        <xs:element ref="email"/>
+        <xs:element ref="ext-link"/>
+        <xs:element ref="uri"/>
+        <xs:element ref="inline-graphic"/>
+        <xs:element ref="private-char"/>
+      </xs:choice>
+      <xs:attribute name="script"/>
+      <xs:attribute name="target" type="xs:IDREF"/>
+      <xs:attribute ref="xml:lang"/>
+      <xs:attribute name="xtarget"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="crossReference">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="disp-formula"/>
+        <xs:element ref="disp-formula-group"/>
+        <xs:element ref="chem-struct"/>
+        <xs:element ref="inline-formula"/>
+        <xs:element ref="mml:math"/>
+        <xs:element ref="bold"/>
+        <xs:element ref="italic"/>
+        <xs:element ref="monospace"/>
+        <xs:element ref="num"/>
+        <xs:element ref="overline"/>
+        <xs:element ref="roman"/>
+        <xs:element ref="sans-serif"/>
+        <xs:element ref="sc"/>
+        <xs:element ref="strike"/>
+        <xs:element ref="underline"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="def-list"/>
+        <xs:element ref="list"/>
+        <xs:element ref="fn"/>
+        <xs:element ref="target"/>
+        <xs:element ref="xref"/>
+        <xs:element ref="element-citation"/>
+        <xs:element ref="mixed-citation"/>
+        <xs:element ref="std"/>
+        <xs:element ref="break"/>
+        <xs:element ref="named-content"/>
+        <xs:element ref="styled-content"/>
+        <xs:element ref="address"/>
+        <xs:element ref="alternatives"/>
+        <xs:element ref="array"/>
+        <xs:element ref="boxed-text"/>
+        <xs:element ref="chem-struct-wrap"/>
+        <xs:element ref="fig"/>
+        <xs:element ref="fig-group"/>
+        <xs:element ref="graphic"/>
+        <xs:element ref="media"/>
+        <xs:element ref="non-normative-note"/>
+        <xs:element ref="non-normative-example"/>
+        <xs:element ref="preformat"/>
+        <xs:element ref="supplementary-material"/>
+        <xs:element ref="table-wrap"/>
+        <xs:element ref="table-wrap-group"/>
+        <xs:element ref="email"/>
+        <xs:element ref="ext-link"/>
+        <xs:element ref="uri"/>
+        <xs:element ref="inline-graphic"/>
+        <xs:element ref="private-char"/>
+      </xs:choice>
+      <xs:attribute ref="xml:lang"/>
+      <xs:attribute name="target" type="xs:IDREF"/>
+      <xs:attribute name="script"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="definition">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="disp-formula"/>
+        <xs:element ref="disp-formula-group"/>
+        <xs:element ref="chem-struct"/>
+        <xs:element ref="inline-formula"/>
+        <xs:element ref="mml:math"/>
+        <xs:element ref="bold"/>
+        <xs:element ref="italic"/>
+        <xs:element ref="monospace"/>
+        <xs:element ref="num"/>
+        <xs:element ref="overline"/>
+        <xs:element ref="roman"/>
+        <xs:element ref="sans-serif"/>
+        <xs:element ref="sc"/>
+        <xs:element ref="strike"/>
+        <xs:element ref="underline"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="def-list"/>
+        <xs:element ref="list"/>
+        <xs:element ref="fn"/>
+        <xs:element ref="target"/>
+        <xs:element ref="xref"/>
+        <xs:element ref="element-citation"/>
+        <xs:element ref="mixed-citation"/>
+        <xs:element ref="std"/>
+        <xs:element ref="break"/>
+        <xs:element ref="named-content"/>
+        <xs:element ref="styled-content"/>
+        <xs:element ref="address"/>
+        <xs:element ref="alternatives"/>
+        <xs:element ref="array"/>
+        <xs:element ref="boxed-text"/>
+        <xs:element ref="chem-struct-wrap"/>
+        <xs:element ref="fig"/>
+        <xs:element ref="fig-group"/>
+        <xs:element ref="graphic"/>
+        <xs:element ref="media"/>
+        <xs:element ref="non-normative-note"/>
+        <xs:element ref="non-normative-example"/>
+        <xs:element ref="preformat"/>
+        <xs:element ref="supplementary-material"/>
+        <xs:element ref="table-wrap"/>
+        <xs:element ref="table-wrap-group"/>
+        <xs:element ref="email"/>
+        <xs:element ref="ext-link"/>
+        <xs:element ref="uri"/>
+        <xs:element ref="inline-graphic"/>
+        <xs:element ref="private-char"/>
+        <xs:element ref="tbx:entailedTerm"/>
+      </xs:choice>
+      <xs:attribute name="id" type="xs:ID"/>
+      <xs:attribute ref="xml:lang"/>
+      <xs:attribute name="script"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="example">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="disp-formula"/>
+        <xs:element ref="disp-formula-group"/>
+        <xs:element ref="chem-struct"/>
+        <xs:element ref="inline-formula"/>
+        <xs:element ref="mml:math"/>
+        <xs:element ref="bold"/>
+        <xs:element ref="italic"/>
+        <xs:element ref="monospace"/>
+        <xs:element ref="num"/>
+        <xs:element ref="overline"/>
+        <xs:element ref="roman"/>
+        <xs:element ref="sans-serif"/>
+        <xs:element ref="sc"/>
+        <xs:element ref="strike"/>
+        <xs:element ref="underline"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="def-list"/>
+        <xs:element ref="list"/>
+        <xs:element ref="fn"/>
+        <xs:element ref="target"/>
+        <xs:element ref="xref"/>
+        <xs:element ref="element-citation"/>
+        <xs:element ref="mixed-citation"/>
+        <xs:element ref="std"/>
+        <xs:element ref="break"/>
+        <xs:element ref="named-content"/>
+        <xs:element ref="styled-content"/>
+        <xs:element ref="address"/>
+        <xs:element ref="alternatives"/>
+        <xs:element ref="array"/>
+        <xs:element ref="boxed-text"/>
+        <xs:element ref="chem-struct-wrap"/>
+        <xs:element ref="fig"/>
+        <xs:element ref="fig-group"/>
+        <xs:element ref="graphic"/>
+        <xs:element ref="media"/>
+        <xs:element ref="non-normative-note"/>
+        <xs:element ref="non-normative-example"/>
+        <xs:element ref="preformat"/>
+        <xs:element ref="supplementary-material"/>
+        <xs:element ref="table-wrap"/>
+        <xs:element ref="table-wrap-group"/>
+        <xs:element ref="email"/>
+        <xs:element ref="ext-link"/>
+        <xs:element ref="uri"/>
+        <xs:element ref="inline-graphic"/>
+        <xs:element ref="private-char"/>
+        <xs:element ref="tbx:entailedTerm"/>
+      </xs:choice>
+      <xs:attribute name="id" type="xs:ID"/>
+      <xs:attribute ref="xml:lang"/>
+      <xs:attribute name="script"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="externalCrossReference">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="disp-formula"/>
+        <xs:element ref="disp-formula-group"/>
+        <xs:element ref="chem-struct"/>
+        <xs:element ref="inline-formula"/>
+        <xs:element ref="mml:math"/>
+        <xs:element ref="bold"/>
+        <xs:element ref="italic"/>
+        <xs:element ref="monospace"/>
+        <xs:element ref="num"/>
+        <xs:element ref="overline"/>
+        <xs:element ref="roman"/>
+        <xs:element ref="sans-serif"/>
+        <xs:element ref="sc"/>
+        <xs:element ref="strike"/>
+        <xs:element ref="underline"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="def-list"/>
+        <xs:element ref="list"/>
+        <xs:element ref="fn"/>
+        <xs:element ref="target"/>
+        <xs:element ref="xref"/>
+        <xs:element ref="element-citation"/>
+        <xs:element ref="mixed-citation"/>
+        <xs:element ref="std"/>
+        <xs:element ref="break"/>
+        <xs:element ref="named-content"/>
+        <xs:element ref="styled-content"/>
+        <xs:element ref="address"/>
+        <xs:element ref="alternatives"/>
+        <xs:element ref="array"/>
+        <xs:element ref="boxed-text"/>
+        <xs:element ref="chem-struct-wrap"/>
+        <xs:element ref="fig"/>
+        <xs:element ref="fig-group"/>
+        <xs:element ref="graphic"/>
+        <xs:element ref="media"/>
+        <xs:element ref="non-normative-note"/>
+        <xs:element ref="non-normative-example"/>
+        <xs:element ref="preformat"/>
+        <xs:element ref="supplementary-material"/>
+        <xs:element ref="table-wrap"/>
+        <xs:element ref="table-wrap-group"/>
+        <xs:element ref="email"/>
+        <xs:element ref="ext-link"/>
+        <xs:element ref="uri"/>
+        <xs:element ref="inline-graphic"/>
+        <xs:element ref="private-char"/>
+      </xs:choice>
+      <xs:attribute ref="xml:lang"/>
+      <xs:attribute name="xtarget" use="required"/>
+      <xs:attribute name="script"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="geographicalUsage">
+    <xs:complexType mixed="true">
+      <xs:attribute ref="xml:lang"/>
+      <xs:attribute name="script"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="grammaticalGender">
+    <xs:complexType>
+      <xs:attribute name="value" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="masculine"/>
+            <xs:enumeration value="feminine"/>
+            <xs:enumeration value="neuter"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="grammaticalNumber">
+    <xs:complexType>
+      <xs:attribute name="value" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="singular"/>
+            <xs:enumeration value="plural"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="langSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="tbx:crossReference"/>
+          <xs:element ref="tbx:definition"/>
+          <xs:element ref="tbx:example"/>
+          <xs:element ref="tbx:externalCrossReference"/>
+          <xs:element ref="tbx:note"/>
+          <xs:element ref="tbx:see"/>
+          <xs:element ref="tbx:source"/>
+          <xs:element ref="tbx:subjectField"/>
+          <xs:element ref="tbx:xGraphic"/>
+          <xs:element ref="tbx:xMathML"/>
+          <xs:element ref="tbx:xSource"/>
+        </xs:choice>
+        <xs:element maxOccurs="unbounded" ref="tbx:tig"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:ID"/>
+      <xs:attribute name="script"/>
+      <xs:attribute ref="xml:lang" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="normativeAuthorization">
+    <xs:complexType>
+      <xs:attribute name="value" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="preferredTerm"/>
+            <xs:enumeration value="admittedTerm"/>
+            <xs:enumeration value="deprecatedTerm"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="note">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="disp-formula"/>
+        <xs:element ref="disp-formula-group"/>
+        <xs:element ref="chem-struct"/>
+        <xs:element ref="inline-formula"/>
+        <xs:element ref="mml:math"/>
+        <xs:element ref="bold"/>
+        <xs:element ref="italic"/>
+        <xs:element ref="monospace"/>
+        <xs:element ref="num"/>
+        <xs:element ref="overline"/>
+        <xs:element ref="roman"/>
+        <xs:element ref="sans-serif"/>
+        <xs:element ref="sc"/>
+        <xs:element ref="strike"/>
+        <xs:element ref="underline"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="def-list"/>
+        <xs:element ref="list"/>
+        <xs:element ref="fn"/>
+        <xs:element ref="target"/>
+        <xs:element ref="xref"/>
+        <xs:element ref="element-citation"/>
+        <xs:element ref="mixed-citation"/>
+        <xs:element ref="std"/>
+        <xs:element ref="break"/>
+        <xs:element ref="named-content"/>
+        <xs:element ref="styled-content"/>
+        <xs:element ref="address"/>
+        <xs:element ref="alternatives"/>
+        <xs:element ref="array"/>
+        <xs:element ref="boxed-text"/>
+        <xs:element ref="chem-struct-wrap"/>
+        <xs:element ref="fig"/>
+        <xs:element ref="fig-group"/>
+        <xs:element ref="graphic"/>
+        <xs:element ref="media"/>
+        <xs:element ref="non-normative-note"/>
+        <xs:element ref="non-normative-example"/>
+        <xs:element ref="preformat"/>
+        <xs:element ref="supplementary-material"/>
+        <xs:element ref="table-wrap"/>
+        <xs:element ref="table-wrap-group"/>
+        <xs:element ref="email"/>
+        <xs:element ref="ext-link"/>
+        <xs:element ref="uri"/>
+        <xs:element ref="inline-graphic"/>
+        <xs:element ref="private-char"/>
+        <xs:element ref="tbx:entailedTerm"/>
+      </xs:choice>
+      <xs:attribute name="id" type="xs:ID"/>
+      <xs:attribute ref="xml:lang"/>
+      <xs:attribute name="script"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="partOfSpeech">
+    <xs:complexType>
+      <xs:attribute name="value" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="noun"/>
+            <xs:enumeration value="verb"/>
+            <xs:enumeration value="adj"/>
+            <xs:enumeration value="adv"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="pronunciation">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="disp-formula"/>
+        <xs:element ref="disp-formula-group"/>
+        <xs:element ref="chem-struct"/>
+        <xs:element ref="inline-formula"/>
+        <xs:element ref="mml:math"/>
+        <xs:element ref="bold"/>
+        <xs:element ref="italic"/>
+        <xs:element ref="monospace"/>
+        <xs:element ref="num"/>
+        <xs:element ref="overline"/>
+        <xs:element ref="roman"/>
+        <xs:element ref="sans-serif"/>
+        <xs:element ref="sc"/>
+        <xs:element ref="strike"/>
+        <xs:element ref="underline"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="def-list"/>
+        <xs:element ref="list"/>
+        <xs:element ref="fn"/>
+        <xs:element ref="target"/>
+        <xs:element ref="xref"/>
+        <xs:element ref="element-citation"/>
+        <xs:element ref="mixed-citation"/>
+        <xs:element ref="std"/>
+        <xs:element ref="break"/>
+        <xs:element ref="named-content"/>
+        <xs:element ref="styled-content"/>
+        <xs:element ref="address"/>
+        <xs:element ref="alternatives"/>
+        <xs:element ref="array"/>
+        <xs:element ref="boxed-text"/>
+        <xs:element ref="chem-struct-wrap"/>
+        <xs:element ref="fig"/>
+        <xs:element ref="fig-group"/>
+        <xs:element ref="graphic"/>
+        <xs:element ref="media"/>
+        <xs:element ref="non-normative-note"/>
+        <xs:element ref="non-normative-example"/>
+        <xs:element ref="preformat"/>
+        <xs:element ref="supplementary-material"/>
+        <xs:element ref="table-wrap"/>
+        <xs:element ref="table-wrap-group"/>
+        <xs:element ref="email"/>
+        <xs:element ref="ext-link"/>
+        <xs:element ref="uri"/>
+        <xs:element ref="inline-graphic"/>
+        <xs:element ref="private-char"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="see">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="disp-formula"/>
+        <xs:element ref="disp-formula-group"/>
+        <xs:element ref="chem-struct"/>
+        <xs:element ref="inline-formula"/>
+        <xs:element ref="mml:math"/>
+        <xs:element ref="bold"/>
+        <xs:element ref="italic"/>
+        <xs:element ref="monospace"/>
+        <xs:element ref="num"/>
+        <xs:element ref="overline"/>
+        <xs:element ref="roman"/>
+        <xs:element ref="sans-serif"/>
+        <xs:element ref="sc"/>
+        <xs:element ref="strike"/>
+        <xs:element ref="underline"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="def-list"/>
+        <xs:element ref="list"/>
+        <xs:element ref="fn"/>
+        <xs:element ref="target"/>
+        <xs:element ref="xref"/>
+        <xs:element ref="element-citation"/>
+        <xs:element ref="mixed-citation"/>
+        <xs:element ref="std"/>
+        <xs:element ref="break"/>
+        <xs:element ref="named-content"/>
+        <xs:element ref="styled-content"/>
+        <xs:element ref="address"/>
+        <xs:element ref="alternatives"/>
+        <xs:element ref="array"/>
+        <xs:element ref="boxed-text"/>
+        <xs:element ref="chem-struct-wrap"/>
+        <xs:element ref="fig"/>
+        <xs:element ref="fig-group"/>
+        <xs:element ref="graphic"/>
+        <xs:element ref="media"/>
+        <xs:element ref="non-normative-note"/>
+        <xs:element ref="non-normative-example"/>
+        <xs:element ref="preformat"/>
+        <xs:element ref="supplementary-material"/>
+        <xs:element ref="table-wrap"/>
+        <xs:element ref="table-wrap-group"/>
+        <xs:element ref="email"/>
+        <xs:element ref="ext-link"/>
+        <xs:element ref="uri"/>
+        <xs:element ref="inline-graphic"/>
+        <xs:element ref="private-char"/>
+      </xs:choice>
+      <xs:attribute ref="xml:lang"/>
+      <xs:attribute name="target" type="xs:IDREF"/>
+      <xs:attribute name="script"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="source">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="disp-formula"/>
+        <xs:element ref="disp-formula-group"/>
+        <xs:element ref="chem-struct"/>
+        <xs:element ref="inline-formula"/>
+        <xs:element ref="mml:math"/>
+        <xs:element ref="bold"/>
+        <xs:element ref="italic"/>
+        <xs:element ref="monospace"/>
+        <xs:element ref="num"/>
+        <xs:element ref="overline"/>
+        <xs:element ref="roman"/>
+        <xs:element ref="sans-serif"/>
+        <xs:element ref="sc"/>
+        <xs:element ref="strike"/>
+        <xs:element ref="underline"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="def-list"/>
+        <xs:element ref="list"/>
+        <xs:element ref="fn"/>
+        <xs:element ref="target"/>
+        <xs:element ref="xref"/>
+        <xs:element ref="element-citation"/>
+        <xs:element ref="mixed-citation"/>
+        <xs:element ref="std"/>
+        <xs:element ref="break"/>
+        <xs:element ref="named-content"/>
+        <xs:element ref="styled-content"/>
+        <xs:element ref="address"/>
+        <xs:element ref="alternatives"/>
+        <xs:element ref="array"/>
+        <xs:element ref="boxed-text"/>
+        <xs:element ref="chem-struct-wrap"/>
+        <xs:element ref="fig"/>
+        <xs:element ref="fig-group"/>
+        <xs:element ref="graphic"/>
+        <xs:element ref="media"/>
+        <xs:element ref="non-normative-note"/>
+        <xs:element ref="non-normative-example"/>
+        <xs:element ref="preformat"/>
+        <xs:element ref="supplementary-material"/>
+        <xs:element ref="table-wrap"/>
+        <xs:element ref="table-wrap-group"/>
+        <xs:element ref="email"/>
+        <xs:element ref="ext-link"/>
+        <xs:element ref="uri"/>
+        <xs:element ref="inline-graphic"/>
+        <xs:element ref="private-char"/>
+      </xs:choice>
+      <xs:attribute name="id" type="xs:ID"/>
+      <xs:attribute ref="xml:lang"/>
+      <xs:attribute name="script"/>
+      <xs:attribute name="xtarget"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="subjectField">
+    <xs:complexType mixed="true">
+      <xs:attribute name="id" type="xs:ID"/>
+      <xs:attribute ref="xml:lang"/>
+      <xs:attribute name="script"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="term">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="disp-formula"/>
+        <xs:element ref="disp-formula-group"/>
+        <xs:element ref="chem-struct"/>
+        <xs:element ref="inline-formula"/>
+        <xs:element ref="mml:math"/>
+        <xs:element ref="bold"/>
+        <xs:element ref="italic"/>
+        <xs:element ref="monospace"/>
+        <xs:element ref="num"/>
+        <xs:element ref="overline"/>
+        <xs:element ref="roman"/>
+        <xs:element ref="sans-serif"/>
+        <xs:element ref="sc"/>
+        <xs:element ref="strike"/>
+        <xs:element ref="underline"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="def-list"/>
+        <xs:element ref="list"/>
+        <xs:element ref="fn"/>
+        <xs:element ref="target"/>
+        <xs:element ref="xref"/>
+        <xs:element ref="element-citation"/>
+        <xs:element ref="mixed-citation"/>
+        <xs:element ref="std"/>
+        <xs:element ref="break"/>
+        <xs:element ref="named-content"/>
+        <xs:element ref="styled-content"/>
+        <xs:element ref="address"/>
+        <xs:element ref="alternatives"/>
+        <xs:element ref="array"/>
+        <xs:element ref="boxed-text"/>
+        <xs:element ref="chem-struct-wrap"/>
+        <xs:element ref="fig"/>
+        <xs:element ref="fig-group"/>
+        <xs:element ref="graphic"/>
+        <xs:element ref="media"/>
+        <xs:element ref="non-normative-note"/>
+        <xs:element ref="non-normative-example"/>
+        <xs:element ref="preformat"/>
+        <xs:element ref="supplementary-material"/>
+        <xs:element ref="table-wrap"/>
+        <xs:element ref="table-wrap-group"/>
+        <xs:element ref="email"/>
+        <xs:element ref="ext-link"/>
+        <xs:element ref="uri"/>
+        <xs:element ref="inline-graphic"/>
+        <xs:element ref="private-char"/>
+      </xs:choice>
+      <xs:attribute name="id" type="xs:ID"/>
+      <xs:attribute name="script"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="termEntry">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="tbx:externalCrossReference"/>
+          <xs:element ref="tbx:xGraphic"/>
+          <xs:element ref="tbx:xMathML"/>
+          <xs:element ref="tbx:xSource"/>
+        </xs:choice>
+        <xs:element maxOccurs="unbounded" ref="tbx:langSet"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="termType">
+    <xs:complexType>
+      <xs:attribute name="value" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="acronym"/>
+            <xs:enumeration value="abbreviation"/>
+            <xs:enumeration value="fullForm"/>
+            <xs:enumeration value="symbol"/>
+            <xs:enumeration value="variant"/>
+            <xs:enumeration value="formula"/>
+            <xs:enumeration value="equation"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="tig">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="tbx:term"/>
+        <xs:element ref="tbx:partOfSpeech"/>
+        <xs:element minOccurs="0" ref="tbx:geographicalUsage"/>
+        <xs:element minOccurs="0" ref="tbx:grammaticalGender"/>
+        <xs:element minOccurs="0" ref="tbx:grammaticalNumber"/>
+        <xs:element minOccurs="0" ref="tbx:normativeAuthorization"/>
+        <xs:element minOccurs="0" ref="tbx:pronunciation"/>
+        <xs:element minOccurs="0" ref="tbx:termType"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="tbx:usageNote"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="usageNote">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="disp-formula"/>
+        <xs:element ref="disp-formula-group"/>
+        <xs:element ref="chem-struct"/>
+        <xs:element ref="inline-formula"/>
+        <xs:element ref="mml:math"/>
+        <xs:element ref="bold"/>
+        <xs:element ref="italic"/>
+        <xs:element ref="monospace"/>
+        <xs:element ref="num"/>
+        <xs:element ref="overline"/>
+        <xs:element ref="roman"/>
+        <xs:element ref="sans-serif"/>
+        <xs:element ref="sc"/>
+        <xs:element ref="strike"/>
+        <xs:element ref="underline"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="def-list"/>
+        <xs:element ref="list"/>
+        <xs:element ref="fn"/>
+        <xs:element ref="target"/>
+        <xs:element ref="xref"/>
+        <xs:element ref="element-citation"/>
+        <xs:element ref="mixed-citation"/>
+        <xs:element ref="std"/>
+        <xs:element ref="break"/>
+        <xs:element ref="named-content"/>
+        <xs:element ref="styled-content"/>
+        <xs:element ref="address"/>
+        <xs:element ref="alternatives"/>
+        <xs:element ref="array"/>
+        <xs:element ref="boxed-text"/>
+        <xs:element ref="chem-struct-wrap"/>
+        <xs:element ref="fig"/>
+        <xs:element ref="fig-group"/>
+        <xs:element ref="graphic"/>
+        <xs:element ref="media"/>
+        <xs:element ref="non-normative-note"/>
+        <xs:element ref="non-normative-example"/>
+        <xs:element ref="preformat"/>
+        <xs:element ref="supplementary-material"/>
+        <xs:element ref="table-wrap"/>
+        <xs:element ref="table-wrap-group"/>
+        <xs:element ref="email"/>
+        <xs:element ref="ext-link"/>
+        <xs:element ref="uri"/>
+        <xs:element ref="inline-graphic"/>
+        <xs:element ref="private-char"/>
+        <xs:element ref="tbx:entailedTerm"/>
+      </xs:choice>
+      <xs:attribute name="id" type="xs:ID"/>
+      <xs:attribute ref="xml:lang"/>
+      <xs:attribute name="script"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="xGraphic">
+    <xs:complexType mixed="true">
+      <xs:attribute name="id" type="xs:ID"/>
+      <xs:attribute name="xtarget" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="xMathML">
+    <xs:complexType mixed="true">
+      <xs:attribute name="id" type="xs:ID"/>
+      <xs:attribute name="xtarget" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="xSource">
+    <xs:complexType mixed="true">
+      <xs:attribute name="id" type="xs:ID"/>
+      <xs:attribute name="xtarget" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,164 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--Tag library software copyright Mulberry Technologies, Inc., 2002-2008-->
+      <link rel="stylesheet" href="ISOSTS-style.css" type="text/css">
+      <title>Element: Math (MathML 2.0 Tag Set)</title>
+   </head>
+   <body class="main">
+      <div class="pageheader">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="sponsor">International Organization for Standardization (ISO)</h4>
+      </div>
+      <div class="header">
+         <h1 class="elementtag">&lt;mml:math&gt;</h1>
+         <h1 class="elementname">Math (MathML 2.0 Tag Set)</h1>
+      </div>
+      <div class="definition">
+         <p class="para">Use documentation for the Mathematical Markup Language (MathML) 2.0 Tag Set.
+            (<a href="http://www.w3.org/TR/MathML2/" target="_new" class="external">http://www.w3.org/TR/MathML2/</a>)
+         </p>
+      </div>
+      <div class="remarks">
+         <h2 class="header">Remarks</h2>
+         <p class="para">The top-level element for math tagged according to the MathML Tag Set.</p>
+         <p class="para">With one exception, the various elements and attributes of MathML used inside
+            <span class="elementtag">&lt;mml:math&gt;</span> are not documented here,
+            and the reader should refer to online documentation from the W3C and Design Science.
+            The one exception is the <tt>&lt;mml_annotation-xml&gt;</tt> element. The content
+            model for the <tt>&lt;mml_annotation-xml&gt;</tt> is normally “
+            <tt>ANY</tt>
+            ”, but this causes difficulties in many editing tools, so this Tag Set has
+            reduced the content model to one or more paragraphs: <tt>(p+)</tt>.
+         </p>
+         <p class="para">The vast majority of users of this Tag Set use the DTDs as their primary (or only)
+            model, so this Tag Set is maintained to ensure that users of DTDs and DTD-based tools
+            will work well. Because DTDs do not “play well” with namespaces, and
+            most DTD-based tools are not namespace aware, the MathML namespace has been hardcoded
+            to the prefix “
+            <tt>mml</tt>
+            ” in the DTDs. This means that the element name, in the DTDs, really is
+            <span class="elementtag">&lt;mml:math&gt;</span>. While this was the usual
+            prefix when this Tag Set was originally established, the more frequently seen prefix
+            is now “
+            <tt>m</tt>
+            ”. Since XSD and RNG use “real” namespaces, this makes no
+            difference to them, as to a namespace-aware processor a namespace prefix is only a
+            placeholder. For DTD users, the element names in the MathML will need to be “
+            <tt>mml</tt>
+            ” (for example, <tt>&lt;mml:mfrac&gt;</tt>), but tools can be set to
+            provide that prefix and the essence of namespaces is that prefixes do not matter, so
+            no harm is done. 
+         </p>
+      </div>
+      <div class="attrlist">
+         <h2 class="header">Attributes</h2>
+         <h5 class="header"><a href="n-ide0.html" target="main"><span class="attrtag">altimg</span></a> <a href="n-ide0.html" target="main"><span class="attrname">Alternate Image (MathML 2.0 Tag Set)</span></a></h5>
+         <h5 class="header"><a href="n-tre0.html" target="main"><span class="attrtag">alttext</span></a> <a href="n-tre0.html" target="main"><span class="attrname">Alternate Text (MathML 2.0 Tag Set)</span></a></h5>
+         <h5 class="header"><a href="n-bie0.html" target="main"><span class="attrtag">baseline</span></a> <a href="n-bie0.html" target="main"><span class="attrname">Baseline (MathML 2.0 Tag Set)</span></a></h5>
+         <h5 class="header"><a href="n-kkf0.html" target="main"><span class="attrtag">class</span></a> <a href="n-kkf0.html" target="main"><span class="attrname">Class (MathML 2.0 Tag Set)</span></a></h5>
+         <h5 class="header"><a href="n-4gf0.html" target="main"><span class="attrtag">display</span></a> <a href="n-4gf0.html" target="main"><span class="attrname">Display (MathML 2.0 Tag Set)</span></a></h5>
+         <h5 class="header"><a href="n-e8g0.html" target="main"><span class="attrtag">height</span></a> <a href="n-e8g0.html" target="main"><span class="attrname">Height (MathML 2.0 Tag Set)</span></a></h5>
+         <h5 class="header"><a href="n-8ag0.html" target="main"><span class="attrtag">id</span></a> <a href="n-8ag0.html" target="main"><span class="attrname">Identifier</span></a></h5>
+         <h5 class="header"><a href="n-j6g0.html" target="main"><span class="attrtag">macros</span></a> <a href="n-j6g0.html" target="main"><span class="attrname">Macros (MathML 2.0 Tag Set)</span></a></h5>
+         <h5 class="header"><a href="n-ghg0.html" target="main"><span class="attrtag">mode</span></a> <a href="n-ghg0.html" target="main"><span class="attrname">Mode (MathML 2.0 Tag Set)</span></a></h5>
+         <h5 class="header"><a href="n-uig0.html" target="main"><span class="attrtag">name</span></a> <a href="n-uig0.html" target="main"><span class="attrname">Name</span></a></h5>
+         <h5 class="header"><a href="n-pzg0.html" target="main"><span class="attrtag">other</span></a> <a href="n-pzg0.html" target="main"><span class="attrname">Other (MathML 2.0 Tag Set)</span></a></h5>
+         <h5 class="header"><a href="n-fkn0.html" target="main"><span class="attrtag">overflow</span></a> <a href="n-fkn0.html" target="main"><span class="attrname">Overflow (MathML 2.0 Tag Set)</span></a></h5>
+         <h5 class="header"><a href="n-3e60.html" target="main"><span class="attrtag">style</span></a> <a href="n-3e60.html" target="main"><span class="attrname">Style (XHTML table model; MathML 2.0 Tag Set)</span></a></h5>
+         <h5 class="header"><a href="n-tr60.html" target="main"><span class="attrtag">type</span></a> <a href="n-tr60.html" target="main"><span class="attrname">Type </span></a></h5>
+         <h5 class="header"><a href="n-xq60.html" target="main"><span class="attrtag">width</span></a> <a href="n-xq60.html" target="main"><span class="attrname">Width (XHTML table model; MathML 2.0 Tag Set)</span></a></h5>
+         <h5 class="header"><a href="n-2m60.html" target="main"><span class="attrtag">xlink:href</span></a> <a href="n-2m60.html" target="main"><span class="attrname">Href (Linking Mechanism)</span></a></h5>
+         <h5 class="header"><a href="n-a5d0.html" target="main"><span class="attrtag">xlink:type</span></a> <a href="n-a5d0.html" target="main"><span class="attrname">Type of Link</span></a></h5>
+         <h5 class="header"><a href="n-vad0.html" target="main"><span class="attrtag">xmlns:mml</span></a> <a href="n-vad0.html" target="main"><span class="attrname">MathML Namespace Declaration</span></a></h5>
+         <h5 class="header"><a href="n-snd0.html" target="main"><span class="attrtag">xref</span></a> <a href="n-snd0.html" target="main"><span class="attrname">Cross-Reference (MathML 2.0 Tag Set)</span></a></h5>
+         <h5 class="header"><a href="n-j6d0.html" target="main"><span class="attrtag">xsi:schemaLocation</span></a> <a href="n-j6d0.html" target="main"><span class="attrname">Schema Location (MathML 2.0 Tag Set)</span></a></h5>
+      </div>
+      <div class="modeldesc">
+         <h2 class="header">Model Description</h2>
+         <p class="para">Use MathML 2.0 documentation.</p>
+      </div>
+      <div class="elementcontext">
+         <h3 class="header">This element may be contained in:</h3>
+         <p class="para"><a href="n-nf00.html" target="main" title="Acknowledgments"><span class="elementtag">&lt;ack&gt;</span></a>, <a href="n-f900.html" target="main" title="Alternatives for Processing"><span class="elementtag">&lt;alternatives&gt;</span></a>, <a href="n-3320.html" target="main" title="Appendix"><span class="elementtag">&lt;app&gt;</span></a>, <a href="n-bu20.html" target="main" title="Appendix Group"><span class="elementtag">&lt;app-group&gt;</span></a>, <a href="n-yt20.html" target="main" title="Article Title"><span class="elementtag">&lt;article-title&gt;</span></a>, <a href="n-dg20.html" target="main" title="Attribution"><span class="elementtag">&lt;attrib&gt;</span></a>, <a href="n-sq20.html" target="main" title="Biography"><span class="elementtag">&lt;bio&gt;</span></a>, <a href="n-pz20.html" target="main" title="Body of the Document"><span class="elementtag">&lt;body&gt;</span></a>, <a href="n-w5c0.html" target="main" title="Bold"><span class="elementtag">&lt;bold&gt;</span></a>, <a href="n-twc0.html" target="main" title="Boxed Text"><span class="elementtag">&lt;boxed-text&gt;</span></a>, <a href="n-p6c0.html" target="main" title="Chemical Structure (Display)"><span class="elementtag">&lt;chem-struct&gt;</span></a>, <a href="n-gk30.html" target="main" title="Comment in a Citation"><span class="elementtag">&lt;comment&gt;</span></a>, <a href="n-2830.html" target="main" title="Complementary Title Element"><span class="elementtag">&lt;compl&gt;</span></a>, <a href="n-5930.html" target="main" title="Definition List: Definition Head"><span class="elementtag">&lt;def-head&gt;</span></a>, <a href="n-k850.html" target="main" title="Formula, Display"><span class="elementtag">&lt;disp-formula&gt;</span></a>, <a href="n-pv50.html" target="main" title="Quote, Displayed"><span class="elementtag">&lt;disp-quote&gt;</span></a>, <a href="n-nt80.html" target="main" title="Full Title"><span class="elementtag">&lt;full&gt;</span></a>, <a href="n-5h80.html" target="main" title="Glossary Elements List"><span class="elementtag">&lt;glossary&gt;</span></a>, <a href="n-hka0.html" target="main" title="Formula, Inline"><span class="elementtag">&lt;inline-formula&gt;</span></a>, <a href="n-tua0.html" target="main" title="Introductory Title Element"><span class="elementtag">&lt;intro&gt;</span></a>, <a href="n-7na0.html" target="main" title="Italic"><span class="elementtag">&lt;italic&gt;</span></a>, <a href="n-9ba0.html" target="main" title="License Paragraph"><span class="elementtag">&lt;license-p&gt;</span></a>, <a href="n-pau0.html" target="main" title="Main Title Element"><span class="elementtag">&lt;main&gt;</span></a>, <a href="n-g7u0.html" target="main" title="Metadata Data Value for Custom Metadata"><span class="elementtag">&lt;meta-value&gt;</span></a>, <a href="n-amu0.html" target="main" title="Monospace Text (Typewriter Text)"><span class="elementtag">&lt;monospace&gt;</span></a>, <a href="n-g8w0.html" target="main" title="Named Special (Subject) Content"><span class="elementtag">&lt;named-content&gt;</span></a>, <a href="n-asw0.html" target="main" title="Non-normative Example"><span class="elementtag">&lt;non-normative-example&gt;</span></a>, <a href="n-6ew0.html" target="main" title="Non-normative Note"><span class="elementtag">&lt;non-normative-note&gt;</span></a>, <a href="n-56w0.html" target="main" title="Notes"><span class="elementtag">&lt;notes&gt;</span></a>, <a href="n-s9w0.html" target="main" title="Overline"><span class="elementtag">&lt;overline&gt;</span></a>, <a href="n-t2x0.html" target="main" title="Paragraph"><span class="elementtag">&lt;p&gt;</span></a>, <a href="n-c9x0.html" target="main" title="Reference List (Bibliographic)"><span class="elementtag">&lt;ref-list&gt;</span></a>, <a href="n-c6v0.html" target="main" title="Roman"><span class="elementtag">&lt;roman&gt;</span></a>, <a href="n-4iv0.html" target="main" title="Sans Serif"><span class="elementtag">&lt;sans-serif&gt;</span></a>, <a href="n-eqv0.html" target="main" title="Small Caps"><span class="elementtag">&lt;sc&gt;</span></a>, <a href="n-5240.html" target="main" title="Section"><span class="elementtag">&lt;sec&gt;</span></a>, <a href="n-5z40.html" target="main" title="Strike Through"><span class="elementtag">&lt;strike&gt;</span></a>, <a href="n-t5s0.html" target="main" title="Styled Special (Subject) Content"><span class="elementtag">&lt;styled-content&gt;</span></a>, <a href="n-wvs0.html" target="main" title="Subscript"><span class="elementtag">&lt;sub&gt;</span></a>, <a href="n-des0.html" target="main" title="Document Subtitle"><span class="elementtag">&lt;subtitle&gt;</span></a>, <a href="n-kds0.html" target="main" title="Superscript"><span class="elementtag">&lt;sup&gt;</span></a>, <a href="n-kft0.html" target="main" title="Table Data Cell (XHTML table model)"><span class="elementtag">&lt;td&gt;</span></a>, <a href="n-aht0.html" target="main" title="Definition List: Term"><span class="elementtag">&lt;term&gt;</span></a>, <a href="n-jpt0.html" target="main" title="Display Form of Term Entry"><span class="elementtag">&lt;term-display&gt;</span></a>, <a href="n-nmt0.html" target="main" title="Definition List: Term Head"><span class="elementtag">&lt;term-head&gt;</span></a>, <a href="n-qc70.html" target="main" title="Terminology Section"><span class="elementtag">&lt;term-sec&gt;</span></a>, <a href="n-8u70.html" target="main" title="Textual Form"><span class="elementtag">&lt;textual-form&gt;</span></a>, <a href="n-pv70.html" target="main" title="Table Header Cell (XHTML table model)"><span class="elementtag">&lt;th&gt;</span></a>, <a href="n-6g70.html" target="main" title="Title"><span class="elementtag">&lt;title&gt;</span></a>, <a href="n-yp70.html" target="main" title="Translated Title"><span class="elementtag">&lt;trans-title&gt;</span></a>, <a href="n-ym70.html" target="main" title="Underline"><span class="elementtag">&lt;underline&gt;</span></a></p>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example</h3>
+         <p class="para">In the following example, the <a href="n-f900.html" target="main" title="Alternatives for Processing"><span class="elementtag">&lt;alternatives&gt;</span></a> element is used to wrap a
+            mathematical expression encoded in MathML with a graphic
+            image of the same expression for use in environments where
+            MathML is not supported.
+         </p>
+         <div class="taggedexamp"><pre class="taggedtext">
+...
+    &lt;p&gt;The following discussion makes use of
+      some properties of the three-by-three identity matrix:&lt;/p&gt;
+    &lt;disp-formula&gt;
+    &lt;alternatives&gt;
+    <strong><span class="focus">&lt;mml:math&gt;
+      &lt;mml:mrow&gt;
+	&lt;mml:mo&gt; ( &lt;/mml:mo&gt;
+	&lt;mml:mtable&gt;
+	  &lt;mml:mtr&gt;
+	    &lt;mml:mtd&gt; &lt;mml:mn&gt;1&lt;/mml:mn&gt; &lt;/mml:mtd&gt;
+	    &lt;mml:mtd&gt; &lt;mml:mn&gt;0&lt;/mml:mn&gt; &lt;/mml:mtd&gt;
+	    &lt;mml:mtd&gt; &lt;mml:mn&gt;0&lt;/mml:mn&gt; &lt;/mml:mtd&gt;
+	  &lt;/mml:mtr&gt;
+	  &lt;mml:mtr&gt;
+	    &lt;mml:mtd&gt; &lt;mml:mn&gt;0&lt;/mml:mn&gt; &lt;/mml:mtd&gt;
+	    &lt;mml:mtd&gt; &lt;mml:mn&gt;1&lt;/mml:mn&gt; &lt;/mml:mtd&gt;
+	    &lt;mml:mtd&gt; &lt;mml:mn&gt;0&lt;/mml:mn&gt; &lt;/mml:mtd&gt;
+	  &lt;/mml:mtr&gt;
+	  &lt;mml:mtr&gt;
+	    &lt;mml:mtd&gt; &lt;mml:mn&gt;0&lt;/mml:mn&gt; &lt;/mml:mtd&gt;
+	    &lt;mml:mtd&gt; &lt;mml:mn&gt;0&lt;/mml:mn&gt; &lt;/mml:mtd&gt;
+	    &lt;mml:mtd&gt; &lt;mml:mn&gt;1&lt;/mml:mn&gt; &lt;/mml:mtd&gt;
+	  &lt;/mml:mtr&gt;
+	&lt;/mml:mtable&gt;
+	&lt;mml:mo&gt; ) &lt;/mml:mo&gt;
+      &lt;/mml:mrow&gt;
+    &lt;/mml:math&gt;</span></strong>
+      &lt;graphic xlink:href="images/identity-matrix"&gt;
+	&lt;alt-text&gt;A three-by-three identity matrix.&lt;/alt-text&gt;
+	&lt;permissions&gt;
+	  &lt;copyright-statement&gt;&amp;copy; 1998-2003 W3C &amp;reg; (MIT, ERCIM,
+	  Keio); used by permission&lt;/copyright-statement&gt;
+	  &lt;copyright-year&gt;1998-2003&lt;/copyright-year&gt;
+	  &lt;copyright-holder&gt;W3C &amp;reg; (MIT, ERCIM,
+	  Keio)&lt;/copyright-holder&gt;
+	&lt;/permissions&gt;
+      &lt;/graphic&gt;
+    &lt;/alternatives&gt;
+    &lt;/disp-formula&gt;
+    &lt;p&gt;
+      Analogous observations hold for identity matrices of different sizes.
+    &lt;/p&gt;
+   ...
+
+</pre></div>
+         <p class="para">The graphic rendering of the mathematical expression
+            	is:
+         </p>
+         <div class="formatexamp"><img class="image.desc" src="graphics/identity-matrix.gif"></div>
+         <p class="para">(MathML example and graphic from 
+            	  <a href="http://www.w3.org/TR/MathML2/" target="_new" class="external">Mathematical Markup
+               Language (MathML) Version 2.0 (Second
+               Edition)</a>, W3C Recommendation 21 October
+            2003,
+            	  ed. David Carlisle et al.,
+            	  © 1998-2003 W3C® (MIT, ERCIM, Keio), all rights
+            reserved.
+            	  Used by <a href="http://www.w3.org/Consortium/Legal/2002/copyright-documents-20021231" target="_new" class="external">permission</a>.)
+            	
+         </p>
+      </div>
+      <div class="moduledefined">
+         <h2 class="header">Module</h2>
+         <p class="moduledefined">mathml2.dtd</p>
+      </div>
+      <div class="pagefooter">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="pubdate">Version of July 2013</h4>
+      </div>
+   </body>
+</html>

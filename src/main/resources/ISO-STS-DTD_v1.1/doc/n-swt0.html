@@ -1,0 +1,115 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--Tag library software copyright Mulberry Technologies, Inc., 2002-2008-->
+      <link rel="stylesheet" href="ISOSTS-style.css" type="text/css">
+      <title>Element: Table Wrapper Footer</title>
+   </head>
+   <body class="main">
+      <div class="pageheader">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="sponsor">International Organization for Standardization (ISO)</h4>
+      </div>
+      <div class="header">
+         <h1 class="elementtag">&lt;table-wrap-foot&gt;</h1>
+         <h1 class="elementname">Table Wrapper Footer</h1>
+      </div>
+      <div class="definition">
+         <p class="para">Container element to hold the footnotes, general notes, or other paragraphs at the
+            end of a table. This element does not contain tabular data.
+         </p>
+      </div>
+      <div class="modeldesc">
+         <h2 class="header">Model Description</h2>
+         <p class="para">The following, in order:
+            <ul class="bullist">
+               <li>
+                  <a href="n-6g70.html" target="main" title="Title"><span class="elementtag">&lt;title&gt;</span></a> <a href="n-6g70.html" target="main" title="<title&gt;"><span class="elementname">Title</span></a>, zero or one
+               </li>
+               <li>One or more of any of:
+                  <ul class="bullist">
+                     <li>
+                        <a href="n-t2x0.html" target="main" title="Paragraph"><span class="elementtag">&lt;p&gt;</span></a> <a href="n-t2x0.html" target="main" title="<p&gt;"><span class="elementname">Paragraph</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-6ew0.html" target="main" title="Non-normative Note"><span class="elementtag">&lt;non-normative-note&gt;</span></a> <a href="n-6ew0.html" target="main" title="<non-normative-note&gt;"><span class="elementname">Non-normative Note</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-asw0.html" target="main" title="Non-normative Example"><span class="elementtag">&lt;non-normative-example&gt;</span></a> <a href="n-asw0.html" target="main" title="<non-normative-example&gt;"><span class="elementname">Non-normative Example</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-nx80.html" target="main" title="Footnote Group"><span class="elementtag">&lt;fn-group&gt;</span></a> <a href="n-nx80.html" target="main" title="<fn-group&gt;"><span class="elementname">Footnote Group</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-fw80.html" target="main" title="Footnote"><span class="elementtag">&lt;fn&gt;</span></a> <a href="n-fw80.html" target="main" title="<fn&gt;"><span class="elementname">Footnote</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-dg20.html" target="main" title="Attribution"><span class="elementtag">&lt;attrib&gt;</span></a> <a href="n-dg20.html" target="main" title="<attrib&gt;"><span class="elementname">Attribution</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-itx0.html" target="main" title="Permissions"><span class="elementtag">&lt;permissions&gt;</span></a> <a href="n-itx0.html" target="main" title="<permissions&gt;"><span class="elementname">Permissions</span></a>
+                        
+                     </li>
+                  </ul>
+                  
+               </li>
+            </ul>
+            
+         </p>
+      </div>
+      <div class="elementcontext">
+         <h3 class="header">This element may be contained in:</h3>
+         <p class="para"><a href="n-j5t0.html" target="main" title="Table Wrapper"><span class="elementtag">&lt;table-wrap&gt;</span></a></p>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example</h3>
+         <div class="taggedexamp"><pre class="taggedtext">
+...
+     &lt;table-wrap&gt;
+       &lt;label&gt;Table A.1&lt;/label&gt;
+       &lt;caption&gt;&lt;p&gt;Sample size code letters and inspection levels&lt;/p&gt;&lt;/caption&gt;
+       &lt;table&gt;
+         &lt;thead&gt;
+         &lt;tr&gt;
+           &lt;th&gt;Lot or batch size&lt;/th&gt;
+           &lt;th&gt;Special inspection levels&lt;/th&gt;
+         &lt;/tr&gt;
+         &lt;tr&gt;
+           &lt;th&gt;S-1&lt;/th&gt;
+           &lt;th&gt;S-2&lt;/th&gt;
+         &lt;/tr&gt;
+       &lt;/thead&gt;
+         &lt;tbody&gt;
+      &lt;tr&gt;...&lt;/tr&gt;
+      &lt;tr&gt;...&lt;/tr&gt;
+      &lt;tr&gt;...&lt;/tr&gt;
+      &lt;/tbody&gt;
+       &lt;/table&gt;
+       <strong><span class="focus">&lt;table-wrap-foot&gt;
+         &lt;fn&gt;&lt;label&gt;NOTE&lt;/label&gt;
+           &lt;p&gt;The sample size code letters and inspection levels in
+		this part of ISO 3951 correspond to those given in ISO
+		2859 1 and ISO 3951-1.&lt;/p&gt;
+         &lt;/fn&gt;
+       &lt;/table-wrap-foot&gt;</span></strong>
+&lt;/table-wrap&gt;
+ ...
+
+</pre></div>
+      </div>
+      <div class="moduledefined">
+         <h2 class="header">Module</h2>
+         <p class="moduledefined">JATS-display0.ent</p>
+      </div>
+      <div class="pagefooter">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="pubdate">Version of July 2013</h4>
+      </div>
+   </body>
+</html>

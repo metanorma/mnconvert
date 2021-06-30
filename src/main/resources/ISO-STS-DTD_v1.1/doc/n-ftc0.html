@@ -1,0 +1,136 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--Tag library software copyright Mulberry Technologies, Inc., 2002-2008-->
+      <link rel="stylesheet" href="ISOSTS-style.css" type="text/css">
+      <title>Element: Caption of a Figure, Table, etc.</title>
+   </head>
+   <body class="main">
+      <div class="pageheader">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="sponsor">International Organization for Standardization (ISO)</h4>
+      </div>
+      <div class="header">
+         <h1 class="elementtag">&lt;caption&gt;</h1>
+         <h1 class="elementname">Caption of a Figure, Table, etc.</h1>
+      </div>
+      <div class="definition">
+         <p class="para">Container element for the textual description that is associated with an object
+            (for example, with a <a href="n-wc80.html" target="main" title="Figure"><span class="elementtag">&lt;fig&gt;</span></a> or <a href="n-wct0.html" target="main" title="Table (XHTML table model)"><span class="elementtag">&lt;table&gt;</span></a>).
+         </p>
+      </div>
+      <div class="attrlist">
+         <h2 class="header">Attributes</h2>
+         <h5 class="header"><a href="n-x3f0.html" target="main"><span class="attrtag">content-type</span></a> <a href="n-x3f0.html" target="main"><span class="attrname">Type of Content</span></a></h5>
+         <h5 class="header"><a href="n-8ag0.html" target="main"><span class="attrtag">id</span></a> <a href="n-8ag0.html" target="main"><span class="attrname">Identifier</span></a></h5>
+         <h5 class="header"><a href="n-du60.html" target="main"><span class="attrtag">specific-use</span></a> <a href="n-du60.html" target="main"><span class="attrname">Specific Use</span></a></h5>
+         <h5 class="header"><a href="n-3e60.html" target="main"><span class="attrtag">style</span></a> <a href="n-3e60.html" target="main"><span class="attrname">Style (XHTML table model; MathML 2.0 Tag Set)</span></a></h5>
+         <h5 class="header"><a href="n-cvd0.html" target="main"><span class="attrtag">xml:lang</span></a> <a href="n-cvd0.html" target="main"><span class="attrname">Language</span></a></h5>
+      </div>
+      <div class="modeldesc">
+         <h2 class="header">Model Description</h2>
+         <p class="para">The following, in order:
+            <ul class="bullist">
+               <li>
+                  <a href="n-6g70.html" target="main" title="Title"><span class="elementtag">&lt;title&gt;</span></a> <a href="n-6g70.html" target="main" title="<title&gt;"><span class="elementname">Title</span></a>, zero or one
+               </li>
+               <li>Any combination of:
+                  <ul class="bullist">
+                     <li>
+                        <a href="n-t2x0.html" target="main" title="Paragraph"><span class="elementtag">&lt;p&gt;</span></a> <a href="n-t2x0.html" target="main" title="<p&gt;"><span class="elementname">Paragraph</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-6ew0.html" target="main" title="Non-normative Note"><span class="elementtag">&lt;non-normative-note&gt;</span></a> <a href="n-6ew0.html" target="main" title="<non-normative-note&gt;"><span class="elementname">Non-normative Note</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-asw0.html" target="main" title="Non-normative Example"><span class="elementtag">&lt;non-normative-example&gt;</span></a> <a href="n-asw0.html" target="main" title="<non-normative-example&gt;"><span class="elementname">Non-normative Example</span></a>
+                        
+                     </li>
+                  </ul>
+                  
+               </li>
+            </ul>
+            
+         </p>
+      </div>
+      <div class="elementcontext">
+         <h3 class="header">This element may be contained in:</h3>
+         <p class="para"><a href="n-twc0.html" target="main" title="Boxed Text"><span class="elementtag">&lt;boxed-text&gt;</span></a>, <a href="n-iic0.html" target="main" title="Chemical Structure Wrapper"><span class="elementtag">&lt;chem-struct-wrap&gt;</span></a>, <a href="n-ax50.html" target="main" title="Formula, Display Group"><span class="elementtag">&lt;disp-formula-group&gt;</span></a>, <a href="n-wc80.html" target="main" title="Figure"><span class="elementtag">&lt;fig&gt;</span></a>, <a href="n-xa80.html" target="main" title="Figure Group"><span class="elementtag">&lt;fig-group&gt;</span></a>, <a href="n-f980.html" target="main" title="Graphic"><span class="elementtag">&lt;graphic&gt;</span></a>, <a href="n-x4u0.html" target="main" title="Media Object"><span class="elementtag">&lt;media&gt;</span></a>, <a href="n-tqs0.html" target="main" title="Supplementary Material"><span class="elementtag">&lt;supplementary-material&gt;</span></a>, <a href="n-j5t0.html" target="main" title="Table Wrapper"><span class="elementtag">&lt;table-wrap&gt;</span></a>, <a href="n-pxt0.html" target="main" title="Table Wrapper Group"><span class="elementtag">&lt;table-wrap-group&gt;</span></a></p>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example 1</h3>
+         <p class="para">In a table:</p>
+         <div class="taggedexamp"><pre class="taggedtext">
+...
+     &lt;table-wrap&gt;
+       &lt;label&gt;Table A.1&lt;/label&gt;
+       <strong><span class="focus">&lt;caption&gt;&lt;p&gt;Sample size code letters and inspection levels&lt;/p&gt;&lt;/caption&gt;</span></strong>
+       &lt;table&gt;
+         &lt;thead&gt;
+         &lt;tr&gt;
+           &lt;th&gt;Lot or batch size&lt;/th&gt;
+           &lt;th&gt;Special inspection levels&lt;/th&gt;
+         &lt;/tr&gt;
+         &lt;tr&gt;
+           &lt;th&gt;S-1&lt;/th&gt;
+           &lt;th&gt;S-2&lt;/th&gt;
+         &lt;/tr&gt;
+       &lt;/thead&gt;
+         &lt;tbody&gt;
+      &lt;tr&gt;...&lt;/tr&gt;
+      &lt;tr&gt;...&lt;/tr&gt;
+      &lt;tr&gt;...&lt;/tr&gt;
+      &lt;/tbody&gt;
+       &lt;/table&gt;
+       &lt;table-wrap-foot&gt;
+         &lt;fn&gt;&lt;label&gt;NOTE&lt;/label&gt;
+           &lt;p&gt;The sample size code letters and inspection levels in
+		this part of ISO 3951 correspond to those given in ISO
+		2859 1 and ISO 3951-1.&lt;/p&gt;
+         &lt;/fn&gt;
+       &lt;/table-wrap-foot&gt;
+&lt;/table-wrap&gt;
+ ...
+
+</pre></div>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example 2</h3>
+         <p class="para">In a figure:</p>
+         <div class="taggedexamp"><pre class="taggedtext">
+...
+&lt;sec&gt;
+&lt;title&gt;Results&lt;/title&gt;
+&lt;p&gt;We identified ... Details of randomization procedures,
+treatment schedules, and numbers of patients followed up
+are given on the &lt;italic&gt;BMJ&lt;/italic&gt; website.&lt;/p&gt;
+&lt;fig id="F1"&gt;
+&lt;label&gt;Figure 1&lt;/label&gt;
+<strong><span class="focus">&lt;caption&gt;
+&lt;title&gt;Deaths Among Patients Receiving Day Hospital
+Care or Alternative Services.&lt;/title&gt;
+&lt;p&gt;Odds ratios of death by end of follow up were calculated
+by fixed effects model. Heterogeneity between trials is
+presented as &amp;amp;#x03C7;&lt;sup&gt;2&lt;/sup&gt;&lt;/p&gt;
+&lt;/caption&gt;</span></strong>
+&lt;graphic xmlns:xlink="http://www.w3.org/1999/xlink"
+xlink:href="fors2662.f1"&gt;&lt;/graphic&gt;
+&lt;/fig&gt;
+&lt;p&gt;...&lt;/p&gt;
+&lt;/sec&gt;
+...
+
+</pre></div>
+      </div>
+      <div class="moduledefined">
+         <h2 class="header">Module</h2>
+         <p class="moduledefined">JATS-display0.ent</p>
+      </div>
+      <div class="pagefooter">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="pubdate">Version of July 2013</h4>
+      </div>
+   </body>
+</html>

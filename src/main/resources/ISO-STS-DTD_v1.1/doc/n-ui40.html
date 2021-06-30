@@ -1,0 +1,231 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--Tag library software copyright Mulberry Technologies, Inc., 2002-2008-->
+      <link rel="stylesheet" href="ISOSTS-style.css" type="text/css">
+      <title>Element: Standard, Cited</title>
+   </head>
+   <body class="main">
+      <div class="pageheader">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="sponsor">International Organization for Standardization (ISO)</h4>
+      </div>
+      <div class="header">
+         <h1 class="elementtag">&lt;std&gt;</h1>
+         <h1 class="elementname">Standard, Cited</h1>
+      </div>
+      <div class="definition">
+         <p class="para">Identification information (typically the standard number, organization name, and
+            	  title of the standard) for a cited standard, where standard is defined as a document
+            	  produced by a recognized standards body such as NISO, IEEE, ISO, OASIS, ANSI, etc.
+            	
+         </p>
+         <p class="para">This element is allowed to appear within a <a href="n-i6u0.html" target="main" title="Mixed Citation"><span class="elementtag">&lt;mixed-citation&gt;</span></a> element, but in normal usage
+            	of ISOSTS, it should appear on its own, not wrapped in <a href="n-i6u0.html" target="main" title="Mixed Citation"><span class="elementtag">&lt;mixed-citation&gt;</span></a>.
+         </p>
+      </div>
+      <div class="attrlist">
+         <h2 class="header">Attributes</h2>
+         <h5 class="header"><a href="n-x3f0.html" target="main"><span class="attrtag">content-type</span></a> <a href="n-x3f0.html" target="main"><span class="attrname">Type of Content</span></a></h5>
+         <h5 class="header"><a href="n-du60.html" target="main"><span class="attrtag">specific-use</span></a> <a href="n-du60.html" target="main"><span class="attrname">Specific Use</span></a></h5>
+         <h5 class="header"><a href="n-7760.html" target="main"><span class="attrtag">std-id</span></a> <a href="n-7760.html" target="main"><span class="attrname">Standard Identifier</span></a></h5>
+         <h5 class="header"><a href="n-tr60.html" target="main"><span class="attrtag">type</span></a> <a href="n-tr60.html" target="main"><span class="attrname">Type </span></a></h5>
+         <h5 class="header"><a href="n-cvd0.html" target="main"><span class="attrtag">xml:lang</span></a> <a href="n-cvd0.html" target="main"><span class="attrname">Language</span></a></h5>
+      </div>
+      <div class="relatedelem">
+         <h2 class="header">Related Elements</h2>
+         <p class="para">This <span class="elementtag">&lt;std&gt;</span> element
+            	  contains the bibliographic description of a standard; it may
+            	  be used both in running prose and in lists of normative or
+            	  non-normative references.
+         </p>
+         <p class="para">Standards documents sometimes contain references to
+            	  documents which are not themselves standards; these should
+            	  not be marked up using <a href="n-ui40.html" target="main" title="Standard, Cited"><span class="elementtag">&lt;std&gt;</span></a>
+            	  but using one or the other of the more general elements for
+            	  citations:
+            <ul class="bullist">
+               <li>The element <span class="elementtag">&lt;element-citation&gt;</span>, which has element-only content, no interior punctuation or spacing, and
+                  		allows the components of the citation to be in any order. 
+               </li>
+               <li>The element <a href="n-i6u0.html" target="main" title="Mixed Citation"><span class="elementtag">&lt;mixed-citation&gt;</span></a>, which has textual content, with all interior punctuation and spacing
+                  		preserved, and allows the components of the citation to be in any order.
+                  	      
+               </li>
+            </ul>
+            	  Neither of these elements should be used to mark up a
+            	  reference to a national or international standard.
+            	
+         </p>
+      </div>
+      <div class="modeldesc">
+         <h2 class="header">Model Description</h2>
+         <p class="para">Any combination of:
+            <ul class="bullist">
+               <li>Text, numbers, or special characters</li>
+               <li>
+                  <a href="n-5b40.html" target="main" title="Standard Reference"><span class="elementtag">&lt;std-ref&gt;</span></a> <a href="n-5b40.html" target="main" title="<std-ref&gt;"><span class="elementname">Standard Reference</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-6g70.html" target="main" title="Title"><span class="elementtag">&lt;title&gt;</span></a> <a href="n-6g70.html" target="main" title="<title&gt;"><span class="elementname">Title</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-fw80.html" target="main" title="Footnote"><span class="elementtag">&lt;fn&gt;</span></a> <a href="n-fw80.html" target="main" title="<fn&gt;"><span class="elementname">Footnote</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-kse0.html" target="main" title="X(cross) Reference"><span class="elementtag">&lt;xref&gt;</span></a> <a href="n-kse0.html" target="main" title="<xref&gt;"><span class="elementname">X(cross) Reference</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-w5c0.html" target="main" title="Bold"><span class="elementtag">&lt;bold&gt;</span></a> <a href="n-w5c0.html" target="main" title="<bold&gt;"><span class="elementname">Bold</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-7na0.html" target="main" title="Italic"><span class="elementtag">&lt;italic&gt;</span></a> <a href="n-7na0.html" target="main" title="<italic&gt;"><span class="elementname">Italic</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-amu0.html" target="main" title="Monospace Text (Typewriter Text)"><span class="elementtag">&lt;monospace&gt;</span></a> <a href="n-amu0.html" target="main" title="<monospace&gt;"><span class="elementname">Monospace Text (Typewriter Text)</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-riw0.html" target="main" title="Number"><span class="elementtag">&lt;num&gt;</span></a> <a href="n-riw0.html" target="main" title="<num&gt;"><span class="elementname">Number</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-s9w0.html" target="main" title="Overline"><span class="elementtag">&lt;overline&gt;</span></a> <a href="n-s9w0.html" target="main" title="<overline&gt;"><span class="elementname">Overline</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-c6v0.html" target="main" title="Roman"><span class="elementtag">&lt;roman&gt;</span></a> <a href="n-c6v0.html" target="main" title="<roman&gt;"><span class="elementname">Roman</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-4iv0.html" target="main" title="Sans Serif"><span class="elementtag">&lt;sans-serif&gt;</span></a> <a href="n-4iv0.html" target="main" title="<sans-serif&gt;"><span class="elementname">Sans Serif</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-eqv0.html" target="main" title="Small Caps"><span class="elementtag">&lt;sc&gt;</span></a> <a href="n-eqv0.html" target="main" title="<sc&gt;"><span class="elementname">Small Caps</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-5z40.html" target="main" title="Strike Through"><span class="elementtag">&lt;strike&gt;</span></a> <a href="n-5z40.html" target="main" title="<strike&gt;"><span class="elementname">Strike Through</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-ym70.html" target="main" title="Underline"><span class="elementtag">&lt;underline&gt;</span></a> <a href="n-ym70.html" target="main" title="<underline&gt;"><span class="elementname">Underline</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-wvs0.html" target="main" title="Subscript"><span class="elementtag">&lt;sub&gt;</span></a> <a href="n-wvs0.html" target="main" title="<sub&gt;"><span class="elementname">Subscript</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-kds0.html" target="main" title="Superscript"><span class="elementtag">&lt;sup&gt;</span></a> <a href="n-kds0.html" target="main" title="<sup&gt;"><span class="elementname">Superscript</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-g8w0.html" target="main" title="Named Special (Subject) Content"><span class="elementtag">&lt;named-content&gt;</span></a> <a href="n-g8w0.html" target="main" title="<named-content&gt;"><span class="elementname">Named Special (Subject) Content</span></a>
+                  
+               </li>
+               <li>
+                  <a href="n-t5s0.html" target="main" title="Styled Special (Subject) Content"><span class="elementtag">&lt;styled-content&gt;</span></a> <a href="n-t5s0.html" target="main" title="<styled-content&gt;"><span class="elementname">Styled Special (Subject) Content</span></a>
+                  
+               </li>
+            </ul>
+            
+         </p>
+      </div>
+      <div class="elementcontext">
+         <h3 class="header">This element may be contained in:</h3>
+         <p class="para"><a href="n-dg20.html" target="main" title="Attribution"><span class="elementtag">&lt;attrib&gt;</span></a>, <a href="n-w5c0.html" target="main" title="Bold"><span class="elementtag">&lt;bold&gt;</span></a>, <a href="n-2830.html" target="main" title="Complementary Title Element"><span class="elementtag">&lt;compl&gt;</span></a>, <a href="n-rd50.html" target="main" title="Element Citation"><span class="elementtag">&lt;element-citation&gt;</span></a>, <a href="n-nt80.html" target="main" title="Full Title"><span class="elementtag">&lt;full&gt;</span></a>, <a href="n-tua0.html" target="main" title="Introductory Title Element"><span class="elementtag">&lt;intro&gt;</span></a>, <a href="n-7na0.html" target="main" title="Italic"><span class="elementtag">&lt;italic&gt;</span></a>, <a href="n-9ba0.html" target="main" title="License Paragraph"><span class="elementtag">&lt;license-p&gt;</span></a>, <a href="n-pau0.html" target="main" title="Main Title Element"><span class="elementtag">&lt;main&gt;</span></a>, <a href="n-i6u0.html" target="main" title="Mixed Citation"><span class="elementtag">&lt;mixed-citation&gt;</span></a>, <a href="n-amu0.html" target="main" title="Monospace Text (Typewriter Text)"><span class="elementtag">&lt;monospace&gt;</span></a>, <a href="n-s9w0.html" target="main" title="Overline"><span class="elementtag">&lt;overline&gt;</span></a>, <a href="n-t2x0.html" target="main" title="Paragraph"><span class="elementtag">&lt;p&gt;</span></a>, <a href="n-ngx0.html" target="main" title="Preformatted Text"><span class="elementtag">&lt;preformat&gt;</span></a>, <a href="n-hqx0.html" target="main" title="Reference Item"><span class="elementtag">&lt;ref&gt;</span></a>, <a href="n-rkv0.html" target="main" title="Related Article Information"><span class="elementtag">&lt;related-article&gt;</span></a>, <a href="n-6uv0.html" target="main" title="Related Object Information"><span class="elementtag">&lt;related-object&gt;</span></a>, <a href="n-c6v0.html" target="main" title="Roman"><span class="elementtag">&lt;roman&gt;</span></a>, <a href="n-4iv0.html" target="main" title="Sans Serif"><span class="elementtag">&lt;sans-serif&gt;</span></a>, <a href="n-eqv0.html" target="main" title="Small Caps"><span class="elementtag">&lt;sc&gt;</span></a>, <a href="n-5z40.html" target="main" title="Strike Through"><span class="elementtag">&lt;strike&gt;</span></a>, <a href="n-wvs0.html" target="main" title="Subscript"><span class="elementtag">&lt;sub&gt;</span></a>, <a href="n-kds0.html" target="main" title="Superscript"><span class="elementtag">&lt;sup&gt;</span></a>, <a href="n-kft0.html" target="main" title="Table Data Cell (XHTML table model)"><span class="elementtag">&lt;td&gt;</span></a>, <a href="n-pv70.html" target="main" title="Table Header Cell (XHTML table model)"><span class="elementtag">&lt;th&gt;</span></a>, <a href="n-6g70.html" target="main" title="Title"><span class="elementtag">&lt;title&gt;</span></a>, <a href="n-ym70.html" target="main" title="Underline"><span class="elementtag">&lt;underline&gt;</span></a></p>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example 1</h3>
+         <p class="para">A cited standard within running text:</p>
+         <div class="taggedexamp"><pre class="taggedtext">
+...
+&lt;p&gt;The thermal transmittance, U, of the specimen is measured by 
+means of the calibrated or guarded hot-box method in accordance with 
+<strong><span class="focus">&lt;std type="undated" std-id="iso:std:iso:8990"&gt;
+&lt;std-ref type="undated"&gt;
+&lt;originator&gt;ISO&lt;/originator&gt;
+&lt;doc-number&gt;8990&lt;/doc-number&gt;
+&lt;/std-ref&gt;&lt;/std&gt;</span></strong>.&lt;/p&gt;
+...
+
+</pre></div>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example 2</h3>
+         <p class="para">A cited standard within running text refering to a specific section:</p>
+         <div class="taggedexamp"><pre class="taggedtext">
+...
+&lt;p&gt;see <strong><span class="focus">&lt;std type="dated" std-id="iso:std:iso:9002:ed-2:clause:1"&gt;
+&lt;std-ref type="dated"&gt;ISO 9002:1994&lt;/std-ref&gt;, Clause 1&lt;/std&gt;</span></strong>&lt;/p&gt;
+...
+
+</pre></div>
+         <p class="para">or:</p>
+         <div class="taggedexamp"><pre class="taggedtext">
+...
+&lt;p&gt;see <strong><span class="focus">&lt;std std-id="iso:std:iso:9002:ed-2:clause:1"&gt;ISO 9002:1994, 
+Clause 1&lt;/std&gt;</span></strong>&lt;/p&gt;
+...
+
+</pre></div>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example 3</h3>
+         <p class="para">Cited standards within a normative reference section, including references to “foreign” standards</p>
+         <div class="taggedexamp"><pre class="taggedtext">
+...
+&lt;sec sec-type="norm-refs"&gt;
+&lt;label&gt;2&lt;/label&gt;
+&lt;title&gt;Normative references&lt;/title&gt;
+&lt;p&gt;The following referenced documents are indispensable for the application 
+of this document. For dated references, only the edition cited applies. For undated
+references, the latest edition of the referenced document (including any amendments)
+applies.&lt;/p&gt;
+&lt;ref-list&gt;
+&lt;ref&gt;
+<strong><span class="focus">&lt;std type="dated" std-id="iso:std:iso:8990:ed-1"&gt;
+&lt;std-ref type="dated"&gt;&lt;originator&gt;ISO&lt;/originator&gt;
+&lt;doc-number&gt;8990&lt;/doc-number&gt;:&lt;year&gt;1994&lt;/year&gt;&lt;/std-ref&gt;,
+&lt;title&gt;Thermal insulation — Determination of steady-state thermal
+transmission properties — Calibrated and guarded hot box&lt;/title&gt;
+&lt;/std&gt;</span></strong>
+&lt;/ref&gt;
+&lt;ref&gt;
+<strong><span class="focus">&lt;std type="multipart" std-id="iso:std:iso:tr:3834"&gt;
+&lt;std-ref type="undated"&gt;&lt;originator&gt;ISO&lt;/originator&gt;/&lt;doc-type&gt;TR&lt;/doc-type&gt;
+&lt;doc-number&gt;3834&lt;/doc-number&gt; &lt;part-number&gt;(all parts)&lt;/part-number&gt;&lt;/std-ref&gt;, 
+&lt;title&gt;Quality requirements for fusion welding of metallic materials&lt;/title&gt;
+&lt;/std&gt;</span></strong>
+&lt;/ref&gt;
+&lt;ref&gt;
+<strong><span class="focus">&lt;std&gt;
+&lt;std-ref type="undated"&gt;ASTM C 1199-09e1&lt;/std-ref&gt;, &lt;title&gt;Standard 
+Test Method for Measuring the Steady-State Thermal Transmittance 
+of Fenestration Systems Using Hot Box Methods&lt;/title&gt;
+&lt;/std&gt;</span></strong>
+&lt;/ref&gt;
+&lt;/ref-list&gt;
+&lt;/sec&gt;
+...
+
+</pre></div>
+      </div>
+      <div class="moduledefined">
+         <h2 class="header">Module</h2>
+         <p class="moduledefined">JATS-references0.ent</p>
+      </div>
+      <div class="pagefooter">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="pubdate">Version of July 2013</h4>
+      </div>
+   </body>
+</html>

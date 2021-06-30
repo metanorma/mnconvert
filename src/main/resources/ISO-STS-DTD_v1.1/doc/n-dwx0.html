@@ -1,0 +1,91 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--Tag library software copyright Mulberry Technologies, Inc., 2002-2008-->
+      <link rel="stylesheet" href="ISOSTS-style.css" type="text/css">
+      <title>Element: Page Ranges</title>
+   </head>
+   <body class="main">
+      <div class="pageheader">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="sponsor">International Organization for Standardization (ISO)</h4>
+      </div>
+      <div class="header">
+         <h1 class="elementtag">&lt;page-range&gt;</h1>
+         <h1 class="elementname">Page Ranges</h1>
+      </div>
+      <div class="definition">
+         <p class="para">Text describing discontinuous pagination (for example, 8-11, 14-19, 40).</p>
+      </div>
+      <div class="remarks">
+         <h2 class="header">Remarks</h2>
+         <p class="para">The discontinuous pages range “8-11, 14-19, 40” would be read as
+            “a document begins on page 8, runs through 11, skips to pages 14 through
+            19, and concludes on page 40”.
+         </p>
+         <p class="para">The <a href="n-dwx0.html" target="main" title="Page Ranges"><span class="elementtag">&lt;page-range&gt;</span></a> element only supplements other page
+            elements and DOES NOT replace <a href="n-7v80.html" target="main" title="First Page"><span class="elementtag">&lt;fpage&gt;</span></a> and <a href="n-wau0.html" target="main" title="Last Page"><span class="elementtag">&lt;lpage&gt;</span></a>. The <a href="n-7v80.html" target="main" title="First Page"><span class="elementtag">&lt;fpage&gt;</span></a> element and the
+            <a href="n-wau0.html" target="main" title="Last Page"><span class="elementtag">&lt;lpage&gt;</span></a> element (where available) should always be
+            tagged; infrastructures for linking references across publishers (such as that of
+            CrossRef) use first and last page information for a document as part of their
+            identification process. Accordingly, material with a page range should be tagged: 
+         </p>
+         <div class="codeblock"><pre>
+   &lt;fpage&gt;8&lt;/fpage&gt;
+   &lt;lpage&gt;40&lt;/lpage&gt;
+   &lt;page-range&gt;8-11, 14-19, 40&lt;/page-range&gt;
+   </pre></div>
+      </div>
+      <div class="attrlist">
+         <h2 class="header">Attributes</h2>
+         <h5 class="header"><a href="n-x3f0.html" target="main"><span class="attrtag">content-type</span></a> <a href="n-x3f0.html" target="main"><span class="attrname">Type of Content</span></a></h5>
+         <h5 class="header"><a href="n-du60.html" target="main"><span class="attrtag">specific-use</span></a> <a href="n-du60.html" target="main"><span class="attrname">Specific Use</span></a></h5>
+         <h5 class="header"><a href="n-cvd0.html" target="main"><span class="attrtag">xml:lang</span></a> <a href="n-cvd0.html" target="main"><span class="attrname">Language</span></a></h5>
+      </div>
+      <div class="modeldesc">
+         <h2 class="header">Model Description</h2>
+         <p class="para">Text, numbers, or special characters</p>
+      </div>
+      <div class="elementcontext">
+         <h3 class="header">This element may be contained in:</h3>
+         <p class="para"><a href="n-rd50.html" target="main" title="Element Citation"><span class="elementtag">&lt;element-citation&gt;</span></a>, <a href="n-i6u0.html" target="main" title="Mixed Citation"><span class="elementtag">&lt;mixed-citation&gt;</span></a>, <a href="n-rkv0.html" target="main" title="Related Article Information"><span class="elementtag">&lt;related-article&gt;</span></a>, <a href="n-6uv0.html" target="main" title="Related Object Information"><span class="elementtag">&lt;related-object&gt;</span></a></p>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example</h3>
+         <div class="taggedexamp"><pre class="taggedtext">
+...
+&lt;ref id="B84"&gt;
+&lt;label&gt;84&lt;/label&gt;
+&lt;element-citation&gt;
+&lt;person-group person-group-type="author"&gt;
+&lt;name&gt;&lt;surname&gt;Gaylord&lt;/surname&gt;
+&lt;given-names&gt;TR&lt;/given-names&gt;&lt;/name&gt;
+&lt;name&gt;&lt;surname&gt;Usdin&lt;/surname&gt;
+&lt;given-names&gt;BT&lt;/given-names&gt;&lt;/name&gt;
+&lt;name&gt;&lt;surname&gt;Lapeyre&lt;/surname&gt;
+&lt;given-names&gt;DA&lt;/given-names&gt;&lt;/name&gt;
+&lt;/person-group&gt;
+&lt;article-title&gt;Fostering Patient and Family
+Involvement in Hospital Care&lt;/article-title&gt;
+&lt;source&gt;Nursing&lt;/source&gt;
+&lt;year&gt;2008&lt;/year&gt;
+&lt;volume&gt;112&lt;/volume&gt;
+&lt;fpage&gt;115&lt;/fpage&gt;
+&lt;lpage&gt;124&lt;/lpage&gt;
+<strong><span class="focus">&lt;page-range&gt;115-117, 121, 123-124&lt;/page-range&gt;</span></strong>
+&lt;/element-citation&gt;
+&lt;/ref&gt;
+...
+
+</pre></div>
+      </div>
+      <div class="moduledefined">
+         <h2 class="header">Module</h2>
+         <p class="moduledefined">JATS-common0.ent</p>
+      </div>
+      <div class="pagefooter">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="pubdate">Version of July 2013</h4>
+      </div>
+   </body>
+</html>

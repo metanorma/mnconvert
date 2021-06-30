@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?><html>
+   <head>
+      <title>Test cases to convert table CSS to cals settings</title>
+   </head>
+   <body>
+      <h2>Test cases to convert table CSS to cals settings</h2>
+      <table cellspacing="10">
+         <thead>
+            <tr>
+               <th>CSS definition</th>
+               <th>Border right defined</th>
+               <th>Border right displayed</th>
+               <th>Border bottom defined</th>
+               <th>Border bottom displayed</th>
+               <th>CALS entry colsep</th>
+               <th>CALS entry rowsep</th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr>
+               <td style="border: solid 1px #123456">border: solid 1px #123456</td>
+               <td>true</td>
+               <td>true</td>
+               <td>true</td>
+               <td>true</td>
+               <td>
+                  yes
+                  
+               </td>
+               <td>
+                  yes
+                  
+               </td>
+            </tr>
+            <tr>
+               <td style="border-right: solid 1.0px">border-right: solid 1.0px</td>
+               <td>true</td>
+               <td>true</td>
+               <td>false</td>
+               <td>false</td>
+               <td>
+                  yes
+                  
+               </td>
+               <td>table default</td>
+            </tr>
+            <tr>
+               <td style="border-right-style: solid; border-right-width: 1.0px">border-right-style: solid; border-right-width: 1.0px</td>
+               <td>true</td>
+               <td>true</td>
+               <td>false</td>
+               <td>false</td>
+               <td>
+                  yes
+                  
+               </td>
+               <td>table default</td>
+            </tr>
+            <tr>
+               <td style="border: solid 1px; border-right-width: 0">border: solid 1px; border-right-width: 0</td>
+               <td>true</td>
+               <td>false</td>
+               <td>true</td>
+               <td>true</td>
+               <td>
+                  no
+                  
+               </td>
+               <td>
+                  yes
+                  
+               </td>
+            </tr>
+            <tr>
+               <td style="border: solid 1px; border-right-style: none">border: solid 1px; border-right-style: none</td>
+               <td>true</td>
+               <td>false</td>
+               <td>true</td>
+               <td>true</td>
+               <td>
+                  no
+                  
+               </td>
+               <td>
+                  yes
+                  
+               </td>
+            </tr>
+            <tr>
+               <td style="border-bottom: solid 1.0px">border-bottom: solid 1.0px</td>
+               <td>false</td>
+               <td>false</td>
+               <td>true</td>
+               <td>true</td>
+               <td>table default</td>
+               <td>
+                  yes
+                  
+               </td>
+            </tr>
+            <tr>
+               <td style="border-bottom-style: solid; border-bottom-width: 1.0px">border-bottom-style: solid; border-bottom-width: 1.0px</td>
+               <td>false</td>
+               <td>false</td>
+               <td>true</td>
+               <td>true</td>
+               <td>table default</td>
+               <td>
+                  yes
+                  
+               </td>
+            </tr>
+            <tr>
+               <td style="border-right: solid 1px; border-bottom: solid 2px">border-right: solid 1px; border-bottom: solid 2px</td>
+               <td>true</td>
+               <td>true</td>
+               <td>true</td>
+               <td>true</td>
+               <td>
+                  yes
+                  
+               </td>
+               <td>
+                  yes
+                  
+               </td>
+            </tr>
+            <tr>
+               <td style="border: solid 1;border-right: 0px; border-bottom: 0px">border: solid 1;border-right: 0px; border-bottom: 0px</td>
+               <td>true</td>
+               <td>false</td>
+               <td>true</td>
+               <td>false</td>
+               <td>
+                  no
+                  
+               </td>
+               <td>
+                  no
+                  
+               </td>
+            </tr>
+            <tr>
+               <td style="border: 0">border: 0</td>
+               <td>true</td>
+               <td>false</td>
+               <td>true</td>
+               <td>false</td>
+               <td>
+                  no
+                  
+               </td>
+               <td>
+                  no
+                  
+               </td>
+            </tr>
+         </tbody>
+      </table>
+   </body>
+</html>

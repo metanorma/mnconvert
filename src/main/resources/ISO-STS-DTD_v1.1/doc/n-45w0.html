@@ -1,0 +1,140 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--Tag library software copyright Mulberry Technologies, Inc., 2002-2008-->
+      <link rel="stylesheet" href="ISOSTS-style.css" type="text/css">
+      <title>Element: Name Alternatives</title>
+   </head>
+   <body class="main">
+      <div class="pageheader">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="sponsor">International Organization for Standardization (ISO)</h4>
+      </div>
+      <div class="header">
+         <h1 class="elementtag">&lt;name-alternatives&gt;</h1>
+         <h1 class="elementname">Name Alternatives</h1>
+      </div>
+      <div class="definition">
+         <p class="para">Container element for more than one version of a personal name, the element
+            <a href="n-k3w0.html" target="main" title="Name of Person (Structured)"><span class="elementtag">&lt;name&gt;</span></a> (for example, the name written in both
+            Japanese Kana characters and the Latin alphabet).
+         </p>
+      </div>
+      <div class="modeldesc">
+         <h2 class="header">Model Description</h2>
+         <p class="para">Any one of:
+            <ul class="bullist">
+               <li>One or more of any of:
+                  <ul class="bullist">
+                     <li>
+                        <a href="n-k3w0.html" target="main" title="Name of Person (Structured)"><span class="elementtag">&lt;name&gt;</span></a> <a href="n-k3w0.html" target="main" title="<name&gt;"><span class="elementname">Name of Person (Structured)</span></a>
+                        
+                     </li>
+                     <li>
+                        <a href="n-83s0.html" target="main" title="Name of Person (Unstructured)"><span class="elementtag">&lt;string-name&gt;</span></a> <a href="n-83s0.html" target="main" title="<string-name&gt;"><span class="elementname">Name of Person (Unstructured)</span></a>
+                        
+                     </li>
+                  </ul>
+                  
+               </li>
+            </ul>
+            
+         </p>
+      </div>
+      <div class="elementcontext">
+         <h3 class="header">This element may be contained in:</h3>
+         <p class="para"><a href="n-ft30.html" target="main" title="Contributor"><span class="elementtag">&lt;contrib&gt;</span></a>, <a href="n-rd50.html" target="main" title="Element Citation"><span class="elementtag">&lt;element-citation&gt;</span></a>, <a href="n-i6u0.html" target="main" title="Mixed Citation"><span class="elementtag">&lt;mixed-citation&gt;</span></a>, <a href="n-2ex0.html" target="main" title="Person Group for a Cited Publication"><span class="elementtag">&lt;person-group&gt;</span></a>, <a href="n-rkv0.html" target="main" title="Related Article Information"><span class="elementtag">&lt;related-article&gt;</span></a>, <a href="n-6uv0.html" target="main" title="Related Object Information"><span class="elementtag">&lt;related-object&gt;</span></a></p>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example 1</h3>
+         <p class="para">The name of a contributor given in two languages:</p>
+         <div class="taggedexamp"><pre class="taggedtext">
+...
+&lt;contrib-group&gt;
+&lt;contrib contrib-type="author"&gt;
+<strong><span class="focus">&lt;name-alternatives&gt;
+&lt;name name-style="eastern" xml:lang="ja-Jpan"&gt;
+&lt;surname&gt;中西&lt;/surname&gt;
+&lt;given-names&gt;秀彦&lt;/given-names&gt;
+&lt;/name&gt;
+&lt;name name-style="western" xml:lang="en"&gt;
+&lt;surname&gt;Nakanishi&lt;/surname&gt;
+&lt;given-names&gt;Hidehiko&lt;/given-names&gt;
+&lt;/name&gt;
+&lt;name name-style="eastern" xml:lang="ja-Kana"&gt;
+&lt;surname&gt;ナカニシ&lt;/surname&gt;
+&lt;given-names&gt;ヒデヒコ&lt;/given-names&gt;
+&lt;/name&gt;
+&lt;/name-alternatives&gt;</span></strong>
+&lt;xref ref-type="aff" rid="aff2"&gt;&amp;ast;&amp;ast;&lt;/xref&gt;
+&lt;/contrib&gt;
+&lt;aff-alternatives id="aff2"&gt;
+&lt;aff id="aff-ja"&gt;
+&lt;institution xml:lang="ja-Jpan"&gt;国立言語学博物館&lt;/institution&gt;
+&lt;/aff&gt;
+&lt;aff id="aff-en"&gt;
+&lt;institution xml:lang="en"&gt;National Museum of 
+Linguistics&lt;/institution&gt;
+&lt;/aff&gt;
+&lt;/aff-alternatives&gt;
+&lt;/contrib-group&gt;
+...
+
+</pre></div>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example 2</h3>
+         <p class="para">The correct name given with an sz ligature, with an alternate name for indexing:</p>
+         <div class="taggedexamp"><pre class="taggedtext">
+...
+&lt;contrib-group&gt;
+&lt;contrib contrib-type="author"&gt;
+<strong><span class="focus">&lt;name-alternatives&gt;
+&lt;name specific-use="primary" name-style="western"&gt;
+&lt;surname&gt;Stoe&amp;szlig;el&lt;/surname&gt;
+&lt;given-names&gt;Jan&lt;/given-names&gt;&lt;/name&gt;
+&lt;name specific-use="index" name-style="western"&gt;
+&lt;surname&gt;Stoessel&lt;/surname&gt;
+&lt;given-names&gt;Helen&lt;/given-names&gt;
+&lt;/name&gt;
+&lt;/name-alternatives&gt;</span></strong> 
+&lt;/contrib&gt;
+...
+&lt;/contrib-group&gt;
+...
+
+</pre></div>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example 3</h3>
+         <p class="para">Preserving both incorrect (as delivered) and as-corrected names:</p>
+         <div class="taggedexamp"><pre class="taggedtext">
+...
+&lt;contrib-group&gt;
+&lt;contrib contrib-type="author"&gt;
+<strong><span class="focus">&lt;name-alternatives&gt;
+&lt;name&gt;&lt;surname&gt;Smyth&lt;/surname&gt;
+&lt;given-names&gt;John&lt;/given-names&gt;
+&lt;/name&gt;
+&lt;name specific-use="invalid"&gt;
+&lt;surname&gt;Smith&lt;/surname&gt;
+&lt;given-names&gt;John&lt;/given-names&gt;
+&lt;/name&gt;
+&lt;/name-alternatives&gt;</span></strong> 
+&lt;/contrib&gt;
+...
+&lt;/contrib-group&gt;
+...
+
+</pre></div>
+      </div>
+      <div class="moduledefined">
+         <h2 class="header">Module</h2>
+         <p class="moduledefined">JATS-common0.ent</p>
+      </div>
+      <div class="pagefooter">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="pubdate">Version of July 2013</h4>
+      </div>
+   </body>
+</html>

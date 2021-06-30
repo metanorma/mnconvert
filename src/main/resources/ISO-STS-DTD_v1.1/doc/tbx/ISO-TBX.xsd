@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!-- MODULE:    ISOSTS TBX Terminology Module -->
+<!-- VERSION:   Language Automation/LTAC draft 0.4 -->
+<!-- DATE:      Sept 2011 -->
+<!---->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!-- PUBLIC DOCUMENT TYPE DEFINITION -->
+<!-- TYPICAL INVOCATION -->
+<!--
+  "-//ISO//DTD ISOSTS TBX Terminology Module v0.4 20110909//EN"
+       Delivered as file "ISOSTS-tbx-namespace.ent"                    >
+       Available at: 
+       [tbd]
+-->
+<!-- ============================================================= -->
+<!-- SYSTEM:     ISO customization of NISO Z39.96 Journal -->
+<!-- Publishing DTD of the Journal Archiving and -->
+<!-- Interchange DTD Suite (JATS) -->
+<!---->
+<!-- PURPOSE:    This module defines a namespace-qualified, -->
+<!-- TBX (TermBase eXchange) compatible vocabulary -->
+<!-- derived from ISO 30042. -->
+<!---->
+<!-- CONTAINS:   1) Parameter entities for the TBX namespace -->
+<!-- prefix -->
+<!-- 2) Parameter entities for element names -->
+<!-- 3) Standard content models and content-model -->
+<!-- fragments -->
+<!-- 4) Standard attribute sets -->
+<!-- 5) Elements used for text markup -->
+<!-- 6) Elements needed for terminological entries -->
+<!-- (in alphabetical order) -->
+<!---->
+<!-- TAG SET SPONSOR -->
+<!-- International Organization for Standardization -->
+<!-- (ISO) -->
+<!---->
+<!-- CREATED FOR: -->
+<!-- ISO and similar bodies -->
+<!---->
+<!-- [IPR INFORMATION ... to be supplied] -->
+<!---->
+<!---->
+<!-- ORIGINAL CREATION DATE: -->
+<!-- July 2011 -->
+<!---->
+<!-- CREATED BY: C. M. Sperberg-McQueen -->
+<!-- B. Tommie Usdin -->
+<!-- (Mulberry Technologies, Inc.) -->
+<!-- Kara Warburton -->
+<!-- (The Language Automation Company) -->
+<!-- Nathan E. Rasmussen -->
+<!-- (LTAC Global) -->
+<!---->
+<!-- Address any enquiries to kara@languageautomation.com -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!-- DTD VERSION/CHANGE HISTORY -->
+<!-- ============================================================= -->
+<!--
+  
+  Version  Reason/Occasion                   (who) vx.x (yyyy-mm-dd)
+  
+       =============================================================
+       Version 0.4                        (KW/NER) v0.2 (2011-09-09)
+  
+    2. Namespace qualification adopted from previous version.  Other
+       modifications from ISO 30042 Annex A as follows:
+  
+       a) Elements enclosing termEntry have been omitted as superfluous.
+  
+       b) Content definitions for termEntry and its children have
+          been subsetted, omitting structures and data categories
+          not necessary in this application.
+  
+       c) A particular set of data categories has been imposed. 
+  
+       d) Meta data elements such as descrip have been replaced by
+          elements that represent a single data category. Where the
+          value of the data category must be drawn from a picklist, 
+          it has been moved from element content to an attribute. 
+          These changes allow a DTD to validate data category usage.
+  
+       e) The partOfSpeech element has been made mandatory in every
+          tig (Term Information Group). Most other term-level data
+          categories have been constrained to occur once at most. 
+          As a side effect, they now must occur in a fixed order.
+  
+       f) A script attribute has been added to most elements. An 
+          xtarget (external target) attribute has been added to
+          highlighting elements. The type attribute has been made
+          mandatory on xref, correcting an oversight in ISO 30042. 
+  
+       g) MathML and JATS formatting elements have been added to 
+          the basicText and noteText content models, supplying
+          lists, tables, and inline formatting, and superseding 
+          TBX-based highlighting elements other than entailedTerm.
+  
+       =============================================================
+       Version 0.3                       (MSM/BTU) v0.1 (2011-05-12)
+  
+    1. First version of this namespace-qualified TBX.  The material
+       here is based on ISO 30042 Annex A, but has been modified
+       in the following ways:
+  
+       a) The definitions of the parameter entities TBX.prefix, 
+          TBX.xmlns, and TBX.xmlns.attrib have been added.
+  
+       b) Parameter entities have been defined for the names of
+          all elements in the TBX vocabulary.
+  
+       c) All references to elements in the TBX vocabulary have
+          been changed to use these parameter entities.
+  
+       d) The declarations have been reformatted for legibility.
+  
+       e) Annex A of ISO 30042 says of its content "When reformatted
+          as a separate file, it should be named TBXcoreStructV02.dtd
+          (TBX Core DTD Version 02)."  This DTD module is NOT called
+          TBXcoreStructV02.dtd, because it is NOT textually
+          identical with the content of ISO 30042 Annex A.
+  
+-->
+<!--
+  The following material was derived from Annex A of ISO 30042,
+  with the changes listed above in the change log.
+-->
+<!-- ============================================================= -->
+<!-- PARAMETER ENTITIES FOR THE -->
+<!-- TBX NAMESPACE PREFIX -->
+<!-- ============================================================= -->
+<!-- MAKE PREFIX EQUAL "tbx" -->
+<!-- SET UP NAMESPACE FOR TBX -->
+<!--
+  ISO 30042 defines the TBX vocabulary, but
+  does not specify a namespace name for 
+  the vocabulary.  We use the ISO URN for 
+  ISO 30042 itself as the namespace name.
+-->
+<!-- DEFINE TBX namespace declaration -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:iso:std:iso:30042:ed-1" xmlns:tbx="urn:iso:std:iso:30042:ed-1">
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+  <!-- ============================================================= -->
+  <!-- TBX ELEMENT NAMES -->
+  <!-- (in alphabetical order) -->
+  <!-- ============================================================= -->
+  <!-- ============================================================= -->
+  <!-- SOME USEFUL ENTITIES THAT ARE REFERENCED BELOW: -->
+  <!-- STANDARD CONTENT MODELS AND CONTENT-MODEL FRAGMENTS -->
+  <!-- ============================================================= -->
+  <!-- removed math.class and emphasis.class and subsup.class and just-table.class 
+    and just-list.class to 
+    allow conversion to XSD -->
+  <!--
+    
+    <!ENTITY % highlight-elements
+                           "| %TBX.entailedTerm; | %math.class; | 
+                            %emphasis.class; | %subsup.class; | 
+                            %just-list.class; | %just-table.class;"      >
+  -->
+  <xs:element name="highlight-elements" abstract="true">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="tbx:basicText-model">
+          <xs:attributeGroup ref="tbx:tbx.entailedTerm-attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="basicText-model" mixed="true">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="tbx:highlight-elements"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="encapsulating-elements" abstract="true"/>
+  <xs:complexType name="noteText-model" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="tbx:highlight-elements"/>
+      <xs:element ref="tbx:encapsulating-elements"/>
+    </xs:choice>
+  </xs:complexType>
+  <!-- ============================================================= -->
+  <!-- ENTITIES THAT DEFINE COMMON SETS OF ATTRIBUTES -->
+  <!-- ============================================================= -->
+  <xs:attributeGroup name="impIDLangTgtDtypScrpt-atts">
+    <xs:attribute name="id" type="xs:ID"/>
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute name="target" type="xs:IDREF"/>
+    <xs:attribute name="datatype"/>
+    <xs:attribute name="script"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="xref-atts">
+    <xs:attribute name="id" type="xs:ID"/>
+    <xs:attribute name="target" use="required"/>
+  </xs:attributeGroup>
+  <!-- ============================================================= -->
+  <!-- ELEMENTS USED FOR TEXT MARKUP: HIGHLIGHT-BASED ELEMENTS -->
+  <!-- ============================================================= -->
+  <!-- ENTAILED TERM -->
+  <xs:element name="entailedTerm" substitutionGroup="tbx:highlight-elements"/>
+  <xs:attributeGroup name="tbx.entailedTerm-attlist">
+    <xs:attribute name="script"/>
+    <xs:attribute name="target" type="xs:IDREF"/>
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute name="xtarget"/>
+  </xs:attributeGroup>
+  <!-- ============================================================= -->
+  <!-- ELEMENTS USED FOR TEXT MARKUP: ENCAPSULATING NON-TBX MARKUP -->
+  <!-- ============================================================= -->
+  <!-- BPT -->
+  <xs:element name="bpt" substitutionGroup="tbx:encapsulating-elements">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="tbx:tbx.bpt-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.bpt-attlist">
+    <xs:attribute name="i"/>
+    <xs:attribute name="type"/>
+  </xs:attributeGroup>
+  <!-- EPT -->
+  <xs:element name="ept" substitutionGroup="tbx:encapsulating-elements">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="tbx:tbx.ept-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.ept-attlist">
+    <xs:attribute name="i"/>
+  </xs:attributeGroup>
+  <!-- PH -->
+  <xs:element name="ph" substitutionGroup="tbx:encapsulating-elements">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="tbx:tbx.ph-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.ph-attlist">
+    <xs:attribute name="type"/>
+  </xs:attributeGroup>
+  <!-- ============================================================= -->
+  <!-- ELEMENTS NEEDED FOR TERMINOLOGICAL ENTRIES -->
+  <!-- (in alphabetical order) -->
+  <!-- ============================================================= -->
+  <!-- CROSS REFERENCE -->
+  <xs:element name="crossReference">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="tbx:tbx.crossReference-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.crossReference-attlist">
+    <xs:attributeGroup ref="tbx:impIDLangTgtDtypScrpt-atts"/>
+  </xs:attributeGroup>
+  <!-- DEFINITION -->
+  <xs:element name="definition">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="tbx:noteText-model">
+          <xs:attributeGroup ref="tbx:tbx.definition-attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.definition-attlist">
+    <xs:attributeGroup ref="tbx:impIDLangTgtDtypScrpt-atts"/>
+    <xs:attribute name="xtarget"/>
+  </xs:attributeGroup>
+  <!-- EXAMPLE -->
+  <xs:element name="example">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="tbx:noteText-model">
+          <xs:attributeGroup ref="tbx:tbx.example-attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.example-attlist">
+    <xs:attributeGroup ref="tbx:impIDLangTgtDtypScrpt-atts"/>
+  </xs:attributeGroup>
+  <!-- EXTERNAL CROSS REFERENCE -->
+  <xs:element name="externalCrossReference">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="tbx:tbx.externalCrossReference-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.externalCrossReference-attlist">
+    <xs:attributeGroup ref="tbx:xref-atts"/>
+  </xs:attributeGroup>
+  <!-- GEOGRAPHICAL USAGE -->
+  <xs:element name="geographicalUsage">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="tbx:tbx.geographicalUsage-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.geographicalUsage-attlist">
+    <xs:attributeGroup ref="tbx:impIDLangTgtDtypScrpt-atts"/>
+  </xs:attributeGroup>
+  <!-- GRAMMATICAL GENDER -->
+  <xs:element name="grammaticalGender">
+    <xs:complexType>
+      <xs:attributeGroup ref="tbx:tbx.grammaticalGender-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.grammaticalGender-attlist">
+    <xs:attributeGroup ref="tbx:impIDLangTgtDtypScrpt-atts"/>
+    <xs:attribute name="value" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="masculine"/>
+          <xs:enumeration value="feminine"/>
+          <xs:enumeration value="neuter"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <!-- GRAMMATICAL NUMBER -->
+  <xs:element name="grammaticalNumber">
+    <xs:complexType>
+      <xs:attributeGroup ref="tbx:tbx.grammaticalNumber-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.grammaticalNumber-attlist">
+    <xs:attributeGroup ref="tbx:impIDLangTgtDtypScrpt-atts"/>
+    <xs:attribute name="value" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="singular"/>
+          <xs:enumeration value="plural"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <!-- LANGUAGE SET -->
+  <xs:element name="langSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="tbx:crossReference"/>
+          <xs:element ref="tbx:definition"/>
+          <xs:element ref="tbx:example"/>
+          <xs:element ref="tbx:externalCrossReference"/>
+          <xs:element ref="tbx:note"/>
+          <xs:element ref="tbx:see"/>
+          <xs:element ref="tbx:source"/>
+          <xs:element ref="tbx:subjectField"/>
+          <xs:element ref="tbx:xGraphic"/>
+          <xs:element ref="tbx:xMathML"/>
+          <xs:element ref="tbx:xSource"/>
+        </xs:choice>
+        <xs:element maxOccurs="unbounded" ref="tbx:tig"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="tbx:tbx.langSet-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.langSet-attlist">
+    <xs:attribute name="id" type="xs:ID"/>
+    <xs:attribute name="script"/>
+    <xs:attribute ref="xml:lang" use="required"/>
+  </xs:attributeGroup>
+  <!-- NORMATIVE AUTHORIZATION -->
+  <xs:element name="normativeAuthorization">
+    <xs:complexType>
+      <xs:attributeGroup ref="tbx:tbx.normativeAuthorization-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.normativeAuthorization-attlist">
+    <xs:attributeGroup ref="tbx:impIDLangTgtDtypScrpt-atts"/>
+    <xs:attribute name="value" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="preferredTerm"/>
+          <xs:enumeration value="admittedTerm"/>
+          <xs:enumeration value="deprecatedTerm"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <!-- NOTE -->
+  <xs:element name="note">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="tbx:noteText-model">
+          <xs:attributeGroup ref="tbx:tbx.note-attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.note-attlist">
+    <xs:attribute name="id" type="xs:ID"/>
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute name="script"/>
+  </xs:attributeGroup>
+  <!-- PART OF SPEECH -->
+  <xs:element name="partOfSpeech">
+    <xs:complexType>
+      <xs:attributeGroup ref="tbx:tbx.partOfSpeech-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.partOfSpeech-attlist">
+    <xs:attributeGroup ref="tbx:impIDLangTgtDtypScrpt-atts"/>
+    <xs:attribute name="value" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="noun"/>
+          <xs:enumeration value="verb"/>
+          <xs:enumeration value="adj"/>
+          <xs:enumeration value="adv"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <!-- PRONUNCIATION -->
+  <xs:element name="pronunciation">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="tbx:basicText-model">
+          <xs:attributeGroup ref="tbx:tbx.pronunciation-attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.pronunciation-attlist">
+    <xs:attributeGroup ref="tbx:impIDLangTgtDtypScrpt-atts"/>
+  </xs:attributeGroup>
+  <!-- SEE -->
+  <xs:element name="see">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="tbx:tbx.see-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.see-attlist">
+    <xs:attributeGroup ref="tbx:impIDLangTgtDtypScrpt-atts"/>
+  </xs:attributeGroup>
+  <!-- SOURCE -->
+  <xs:element name="source">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="tbx:noteText-model">
+          <xs:attributeGroup ref="tbx:tbx.source-attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.source-attlist">
+    <xs:attributeGroup ref="tbx:impIDLangTgtDtypScrpt-atts"/>
+  </xs:attributeGroup>
+  <!-- SUBJECT FIELD -->
+  <xs:element name="subjectField">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="tbx:tbx.subjectField-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.subjectField-attlist">
+    <xs:attributeGroup ref="tbx:impIDLangTgtDtypScrpt-atts"/>
+  </xs:attributeGroup>
+  <!-- TERM -->
+  <xs:element name="term">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="tbx:basicText-model">
+          <xs:attributeGroup ref="tbx:tbx.term-attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.term-attlist">
+    <xs:attribute name="id" type="xs:ID"/>
+    <xs:attribute name="script"/>
+  </xs:attributeGroup>
+  <!-- TERM ENTRY (CONCEPT ENTRY) -->
+  <xs:element name="termEntry">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="tbx:externalCrossReference"/>
+          <xs:element ref="tbx:xGraphic"/>
+          <xs:element ref="tbx:xMathML"/>
+          <xs:element ref="tbx:xSource"/>
+        </xs:choice>
+        <xs:element maxOccurs="unbounded" ref="tbx:langSet"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="tbx:tbx.termEntry-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.termEntry-attlist">
+    <xs:attribute name="id" type="xs:ID"/>
+  </xs:attributeGroup>
+  <!-- TERM TYPE -->
+  <xs:element name="termType">
+    <xs:complexType>
+      <xs:attributeGroup ref="tbx:tbx.termType-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.termType-attlist">
+    <xs:attributeGroup ref="tbx:impIDLangTgtDtypScrpt-atts"/>
+    <xs:attribute name="value" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="acronym"/>
+          <xs:enumeration value="abbreviation"/>
+          <xs:enumeration value="fullForm"/>
+          <xs:enumeration value="symbol"/>
+          <xs:enumeration value="variant"/>
+          <xs:enumeration value="formula"/>
+          <xs:enumeration value="equation"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <!-- TIG (TERM INFORMATION GROUP) -->
+  <xs:element name="tig">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="tbx:term"/>
+        <xs:element ref="tbx:partOfSpeech"/>
+        <xs:element minOccurs="0" ref="tbx:geographicalUsage"/>
+        <xs:element minOccurs="0" ref="tbx:grammaticalGender"/>
+        <xs:element minOccurs="0" ref="tbx:grammaticalNumber"/>
+        <xs:element minOccurs="0" ref="tbx:normativeAuthorization"/>
+        <xs:element minOccurs="0" ref="tbx:pronunciation"/>
+        <xs:element minOccurs="0" ref="tbx:termType"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="tbx:usageNote"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="tbx:tbx.tig-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.tig-attlist">
+    <xs:attribute name="id" type="xs:ID"/>
+  </xs:attributeGroup>
+  <!-- USAGE NOTE -->
+  <xs:element name="usageNote">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="tbx:noteText-model">
+          <xs:attributeGroup ref="tbx:tbx.usageNote-attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.usageNote-attlist">
+    <xs:attributeGroup ref="tbx:impIDLangTgtDtypScrpt-atts"/>
+  </xs:attributeGroup>
+  <!-- EXTERNAL GRAPHIC -->
+  <xs:element name="xGraphic">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="tbx:tbx.xGraphic-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.xGraphic-attlist">
+    <xs:attributeGroup ref="tbx:xref-atts"/>
+  </xs:attributeGroup>
+  <!-- EXTERNAL MATHML -->
+  <xs:element name="xMathML">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="tbx:tbx.xMathML-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.xMathML-attlist">
+    <xs:attributeGroup ref="tbx:xref-atts"/>
+  </xs:attributeGroup>
+  <!-- EXTERNAL SOURCE -->
+  <xs:element name="xSource">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="tbx:tbx.xSource-attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbx.xSource-attlist">
+    <xs:attributeGroup ref="tbx:xref-atts"/>
+  </xs:attributeGroup>
+</xs:schema>
+<!-- ================== End ISOSTS TBX Terminology Module ======== -->

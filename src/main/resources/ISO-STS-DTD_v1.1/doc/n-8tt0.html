@@ -1,0 +1,142 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--Tag library software copyright Mulberry Technologies, Inc., 2002-2008-->
+      <link rel="stylesheet" href="ISOSTS-style.css" type="text/css">
+      <title>Element: Table Body (XHTML table model)</title>
+   </head>
+   <body class="main">
+      <div class="pageheader">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="sponsor">International Organization for Standardization (ISO)</h4>
+      </div>
+      <div class="header">
+         <h1 class="elementtag">&lt;tbody&gt;</h1>
+         <h1 class="elementname">Table Body (XHTML table model)</h1>
+      </div>
+      <div class="definition">
+         <p class="para">Use W3C documentation for the XHTML1.1 table model. (<a href="http://www.w3.org/TR/xhtml-modularization/abstract_modules.html#s_tablemodule" target="_new" class="external">http://www.w3.org/TR/xhtml-modularization/abstract_modules.html#s_tablemodule</a>)
+         </p>
+      </div>
+      <div class="remarks">
+         <h2 class="header">Remarks</h2>
+         <p class="para">Container element that holds the rows and columns in one of the body (as opposed
+            to header) portions of a table 
+         </p>
+      </div>
+      <div class="attrlist">
+         <h2 class="header">Attributes</h2>
+         <h5 class="header"><a href="n-vge0.html" target="main"><span class="attrtag">align</span></a> <a href="n-vge0.html" target="main"><span class="attrname">Horizontal Alignment (XHTML table model)</span></a></h5>
+         <h5 class="header"><a href="n-zbe0.html" target="main"><span class="attrtag">char</span></a> <a href="n-zbe0.html" target="main"><span class="attrname">Table Cell Alignment Character (XHTML table model)</span></a></h5>
+         <h5 class="header"><a href="n-eme0.html" target="main"><span class="attrtag">charoff</span></a> <a href="n-eme0.html" target="main"><span class="attrname">Table Character Offset (XHTML table model)</span></a></h5>
+         <h5 class="header"><a href="n-x3f0.html" target="main"><span class="attrtag">content-type</span></a> <a href="n-x3f0.html" target="main"><span class="attrname">Type of Content</span></a></h5>
+         <h5 class="header"><a href="n-8ag0.html" target="main"><span class="attrtag">id</span></a> <a href="n-8ag0.html" target="main"><span class="attrname">Identifier</span></a></h5>
+         <h5 class="header"><a href="n-3e60.html" target="main"><span class="attrtag">style</span></a> <a href="n-3e60.html" target="main"><span class="attrname">Style (XHTML table model; MathML 2.0 Tag Set)</span></a></h5>
+         <h5 class="header"><a href="n-cj60.html" target="main"><span class="attrtag">valign</span></a> <a href="n-cj60.html" target="main"><span class="attrname">Vertical Alignment (XHTML table model)</span></a></h5>
+      </div>
+      <div class="relatedelem">
+         <h2 class="header">Related Elements</h2>
+         <p class="para">A table may be divided into header elements <a href="n-rf70.html" target="main" title="Table Header (XHTML table model)"><span class="elementtag">&lt;thead&gt;</span></a>
+            and table body elements <a href="n-8tt0.html" target="main" title="Table Body (XHTML table model)"><span class="elementtag">&lt;tbody&gt;</span></a>. 
+         </p>
+      </div>
+      <div class="modeldesc">
+         <h2 class="header">Model Description</h2>
+         <p class="para">
+            <a href="n-8i70.html" target="main" title="Table Row (XHTML table model)"><span class="elementtag">&lt;tr&gt;</span></a> <a href="n-8i70.html" target="main" title="<tr&gt;"><span class="elementname">Table Row (XHTML table model)</span></a>, one or more
+         </p>
+      </div>
+      <div class="elementcontext">
+         <h3 class="header">This element may be contained in:</h3>
+         <p class="para"><a href="n-wct0.html" target="main" title="Table (XHTML table model)"><span class="elementtag">&lt;table&gt;</span></a></p>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example</h3>
+         <p class="para">In the following example, the table is wrapped in an
+            	  <a href="n-f900.html" target="main" title="Alternatives for Processing"><span class="elementtag">&lt;alternatives&gt;</span></a> element
+            	  together with a graphic showing the formatted
+            	  table:
+         </p>
+         <div class="taggedexamp"><pre class="taggedtext">
+...
+
+    &lt;table-wrap&gt;
+      &lt;alternatives&gt;
+	&lt;table rules="rows"&gt;
+	  &lt;thead&gt;
+	    &lt;tr&gt;
+	      &lt;th&gt;Color&lt;/th&gt;
+	      &lt;th&gt;Size&lt;/th&gt;
+	      &lt;th&gt;Price&lt;/th&gt;
+	    &lt;/tr&gt;
+	  &lt;/thead&gt;
+	  
+	  <strong><span class="focus">&lt;tbody&gt;
+	    &lt;tr&gt;
+	      &lt;td rowspan="3"&gt;Green&lt;/td&gt;
+	      &lt;td&gt;small&lt;/td&gt;
+	      &lt;td&gt;$3.25&lt;/td&gt;
+	    &lt;/tr&gt;
+	    &lt;tr&gt;
+	      &lt;td&gt;medium&lt;/td&gt;
+	      &lt;td&gt;$2.25&lt;/td&gt;
+	    &lt;/tr&gt;
+	    
+	    &lt;tr&gt;
+	      &lt;td&gt;large&lt;/td&gt;
+	      &lt;td&gt;$1.15&lt;/td&gt;
+	    &lt;/tr&gt;
+	    
+	    &lt;tr&gt;
+	      &lt;td rowspan="3"&gt;Red&lt;/td&gt;
+	      &lt;td&gt;small&lt;/td&gt;
+	      &lt;td&gt;$3.25&lt;/td&gt;
+	    &lt;/tr&gt;
+	    
+	    &lt;tr&gt;
+	      &lt;td&gt;medium&lt;/td&gt;
+	      &lt;td&gt;$5.25&lt;/td&gt;
+	    &lt;/tr&gt;
+	    
+	    &lt;tr&gt;
+	      &lt;td&gt;large&lt;/td&gt;
+	      &lt;td&gt;$9.95&lt;/td&gt;
+	    &lt;/tr&gt;
+	  &lt;/tbody&gt;</span></strong>
+	&lt;/table&gt;
+	&lt;graphic xlink:href="images/tablesample1"&gt;
+	  &lt;alt-text&gt;A table with columns for color, size, and price.&lt;/alt-text&gt;
+	  &lt;long-desc&gt;The table has three columns, labeled "Color",
+	    "Size", and "Price".
+	    It has six rows; reading across, they are:
+	    Green, small, $3.25,
+	    Green, medium, $2.25,
+	    Green, large, $1.15;
+	    Red, small, $3.25,
+	    Red, medium, $5.25,
+	    Red, large, $9.95.
+	    (Tbe words "Green" and "Red" occur only once each, in an area
+	    three rows in height.)
+	  &lt;/long-desc&gt;
+	&lt;/graphic&gt;
+      &lt;/alternatives&gt;
+    &lt;/table-wrap&gt;
+
+   ...
+
+</pre></div>
+         <p class="para">The graphic rendering of the table
+            	is:
+         </p>
+         <div class="formatexamp"><img class="image.desc" src="graphics/tablesample1.jpg"></div>
+      </div>
+      <div class="moduledefined">
+         <h2 class="header">Module</h2>
+         <p class="moduledefined">xhtml-table-1.mod</p>
+      </div>
+      <div class="pagefooter">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="pubdate">Version of July 2013</h4>
+      </div>
+   </body>
+</html>

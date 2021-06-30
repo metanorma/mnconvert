@@ -1,0 +1,114 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--Tag library software copyright Mulberry Technologies, Inc., 2002-2008-->
+      <link rel="stylesheet" href="ISOSTS-style.css" type="text/css">
+      <title>Element: Name of Person (Structured)</title>
+   </head>
+   <body class="main">
+      <div class="pageheader">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="sponsor">International Organization for Standardization (ISO)</h4>
+      </div>
+      <div class="header">
+         <h1 class="elementtag">&lt;name&gt;</h1>
+         <h1 class="elementname">Name of Person (Structured)</h1>
+      </div>
+      <div class="definition">
+         <p class="para">Container element for the component elements of personal names, such as a
+            <a href="n-d2t0.html" target="main" title="Surname"><span class="elementtag">&lt;surname&gt;</span></a>. 
+         </p>
+      </div>
+      <div class="attrlist">
+         <h2 class="header">Attributes</h2>
+         <h5 class="header"><a href="n-x3f0.html" target="main"><span class="attrtag">content-type</span></a> <a href="n-x3f0.html" target="main"><span class="attrname">Type of Content</span></a></h5>
+         <h5 class="header"><a href="n-uyg0.html" target="main"><span class="attrtag">name-style</span></a> <a href="n-uyg0.html" target="main"><span class="attrname">Name Style</span></a></h5>
+         <h5 class="header"><a href="n-du60.html" target="main"><span class="attrtag">specific-use</span></a> <a href="n-du60.html" target="main"><span class="attrname">Specific Use</span></a></h5>
+         <h5 class="header"><a href="n-cvd0.html" target="main"><span class="attrtag">xml:lang</span></a> <a href="n-cvd0.html" target="main"><span class="attrname">Language</span></a></h5>
+      </div>
+      <div class="modeldesc">
+         <h2 class="header">Model Description</h2>
+         <p class="para">The following, in order:
+            <ul class="bullist">
+               <li>Any one of:
+                  <ul class="bullist">
+                     <li>The following, in order:
+                        <ul class="bullist">
+                           <li>
+                              <a href="n-d2t0.html" target="main" title="Surname"><span class="elementtag">&lt;surname&gt;</span></a> <a href="n-d2t0.html" target="main" title="<surname&gt;"><span class="elementname">Surname</span></a>
+                              
+                           </li>
+                           <li>
+                              <a href="n-pd80.html" target="main" title="Given (First) Names"><span class="elementtag">&lt;given-names&gt;</span></a> <a href="n-pd80.html" target="main" title="<given-names&gt;"><span class="elementname">Given (First) Names</span></a>, zero or one
+                           </li>
+                        </ul>
+                        
+                     </li>
+                     <li>
+                        <a href="n-pd80.html" target="main" title="Given (First) Names"><span class="elementtag">&lt;given-names&gt;</span></a> <a href="n-pd80.html" target="main" title="<given-names&gt;"><span class="elementname">Given (First) Names</span></a>
+                        
+                     </li>
+                  </ul>
+                  
+               </li>
+               <li>
+                  <a href="n-3gx0.html" target="main" title="Prefix"><span class="elementtag">&lt;prefix&gt;</span></a> <a href="n-3gx0.html" target="main" title="<prefix&gt;"><span class="elementname">Prefix</span></a>, zero or one
+               </li>
+               <li>
+                  <a href="n-76s0.html" target="main" title="Suffix"><span class="elementtag">&lt;suffix&gt;</span></a> <a href="n-76s0.html" target="main" title="<suffix&gt;"><span class="elementname">Suffix</span></a>, zero or one
+               </li>
+            </ul>
+            
+         </p>
+      </div>
+      <div class="elementcontext">
+         <h3 class="header">This element may be contained in:</h3>
+         <p class="para"><a href="n-ft30.html" target="main" title="Contributor"><span class="elementtag">&lt;contrib&gt;</span></a>, <a href="n-rd50.html" target="main" title="Element Citation"><span class="elementtag">&lt;element-citation&gt;</span></a>, <a href="n-i6u0.html" target="main" title="Mixed Citation"><span class="elementtag">&lt;mixed-citation&gt;</span></a>, <a href="n-45w0.html" target="main" title="Name Alternatives"><span class="elementtag">&lt;name-alternatives&gt;</span></a>, <a href="n-2ex0.html" target="main" title="Person Group for a Cited Publication"><span class="elementtag">&lt;person-group&gt;</span></a>, <a href="n-rkv0.html" target="main" title="Related Article Information"><span class="elementtag">&lt;related-article&gt;</span></a>, <a href="n-6uv0.html" target="main" title="Related Object Information"><span class="elementtag">&lt;related-object&gt;</span></a></p>
+      </div>
+      <div class="examp.group">
+         <h3 class="header">Example</h3>
+         <div class="taggedexamp"><pre class="taggedtext">
+...    
+&lt;ref id="B27"&gt;
+&lt;label&gt;27&lt;/label&gt;
+&lt;element-citation&gt;
+&lt;person-group person-group-type="author"&gt;
+<strong><span class="focus">&lt;name&gt;&lt;surname&gt;Hughes&lt;/surname&gt;
+&lt;given-names&gt;TR&lt;/given-names&gt;&lt;/name&gt;</span></strong>
+<strong><span class="focus">&lt;name&gt;&lt;surname&gt;Marton&lt;/surname&gt;
+&lt;given-names&gt;MJ&lt;/given-names&gt;&lt;/name&gt;</span></strong>
+<strong><span class="focus">&lt;name&gt;&lt;surname&gt;Jones&lt;/surname&gt;
+&lt;given-names&gt;AC&lt;/given-names&gt;&lt;/name&gt;</span></strong>
+&lt;etal/&gt;
+&lt;/person-group&gt;
+&lt;article-title&gt;Functional discovery via a compendium
+of expression profiles&lt;/article-title&gt;
+&lt;source&gt;Cell&lt;/source&gt;
+&lt;year&gt;2000&lt;/year&gt;
+&lt;volume&gt;102&lt;/volume&gt;
+&lt;fpage&gt;109&lt;/fpage&gt;
+&lt;lpage&gt;126&lt;/lpage&gt;
+&lt;annotation&gt;
+&lt;p&gt;This report is the most extensive DNA expression
+profile of yeast genes. It examines the expression
+pattern of the whole yeast genome in 300 mutant
+strains. It infers the function of many unknown
+genes comparing profiles among the different
+mutants.&lt;/p&gt;
+&lt;/annotation&gt;
+&lt;/element-citation&gt;
+&lt;/ref&gt;    
+...
+
+</pre></div>
+      </div>
+      <div class="moduledefined">
+         <h2 class="header">Module</h2>
+         <p class="moduledefined">JATS-common0.ent</p>
+      </div>
+      <div class="pagefooter">
+         <h2 class="headname">ISO Standards Tag Set (ISOSTS) version 1.1:  A customization of NISO JATS version 0.4</h2>
+         <h4 class="pubdate">Version of July 2013</h4>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,941 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>TBX-ISO-TML</title>
+        <link rel="stylesheet" href="docHtml.css" type="text/css" />
+        <script type="text/javascript">
+         <!--
+                var button_prefix = 'button_';
+                
+                /**
+                * Returns an element in the current HTML document.
+                *
+                * @param elementID Identifier of HTML element
+                * @return               HTML element object
+                */
+                function getElementObject(elementID) {
+                    var elemObj = null;
+                    if (document.getElementById) {
+                        elemObj = document.getElementById(elementID);
+                    }
+                    return elemObj;
+                }
+                
+                /**
+                * Switches the state of a collapseable box, e.g.
+                * if it's opened, it'll be closed, and vice versa.
+                *
+                * @param boxID Identifier of box
+                */
+                function switchState(boxID) {
+                    var boxObj = getElementObject(boxID);
+                    var buttonObj = getElementObject(button_prefix + boxID);
+                    if (boxObj == null || buttonObj == null) {
+                        // Box or button not found
+                    } else if (boxObj.style.display == "none") {
+                        // Box is closed, so open it
+                        openBox(boxObj, buttonObj);
+                    } else if (boxObj.style.display == "block") {
+                        // Box is opened, so close it
+                        closeBox(boxObj, buttonObj);
+                    }
+                }
+                
+                /**
+                * Opens a collapseable box.
+                *
+                * @param boxObj       Collapseable box
+                * @param buttonObj Button controlling box
+                */
+                function openBox(boxObj, buttonObj) {
+                    if (boxObj == null || buttonObj == null) {
+                        // Box or button not found
+                    } else {
+                        // Change 'display' CSS property of box
+                        boxObj.style.display = "block";
+                        
+                        // Change text of button
+                        if (boxObj.style.display == "block") {
+                            buttonObj.src = "img/btM.gif";
+                        }
+                    }
+                }
+                
+                /**
+                * Closes a collapseable box.
+                *
+                * @param boxObj       Collapseable box
+                * @param buttonObj Button controlling box
+                */
+                function closeBox(boxObj, buttonObj) {
+                    if (boxObj == null || buttonObj == null) {
+                        // Box or button not found
+                    } else {
+                        // Change 'display' CSS property of box
+                        boxObj.style.display = "none";
+                        
+                        // Change text of button
+                        if (boxObj.style.display == "none") {
+                            buttonObj.src = "img/btP.gif";
+                        }
+                    }
+                }
+                
+                function switchStateForAll(buttonObj, boxList) {
+                    if (buttonObj == null) {
+                        // button not found
+                    } else if (buttonObj.value == "+") {
+                        // Expand all
+                        expandAll(boxList);
+                        buttonObj.value = "-";
+                    } else if (buttonObj.value == "-") {
+                        // Collapse all
+                        collapseAll(boxList);
+                        buttonObj.value = "+";
+                    }
+                }
+                
+                /**
+                * Closes all boxes in a given list.
+                *
+                * @param boxList Array of box IDs
+                */
+                function collapseAll(boxList) {
+                    var idx;
+                    for (idx = 0; idx < boxList.length; idx++) {
+                        var boxObj = getElementObject(boxList[idx]);
+                        var buttonObj = getElementObject(button_prefix + boxList[idx]);
+                        closeBox(boxObj, buttonObj);
+                    }
+                }
+                
+                /**
+                * Open all boxes in a given list.
+                *
+                * @param boxList Array of box IDs
+                */
+                function expandAll(boxList) {
+                    var idx;
+                    for (idx = 0; idx < boxList.length; idx++) {
+                        var boxObj = getElementObject(boxList[idx]);
+                        var buttonObj = getElementObject(button_prefix + boxList[idx]);
+                        openBox(boxObj, buttonObj);
+                    }
+                }
+                
+                /**
+                * Update the message presented in the title of the html page.
+                * - If the documentation was splited by namespace we present something like: "Documentation for namespace 'ns'"
+                * - If the documentation was splited by location we present somehing like: "Documentation for 'Schema.xsd'"
+                * - If no split we always present: "Documentation for 'MainSchema.xsd'"
+                */
+                function updatePageTitle(message) {
+                    top.document.title = message;
+                }
+                
+                
+                
+                /**
+                * Finds an HTML element by its ID and makes it floatable over the normal content.
+                *
+                * @param x_displacement The difference in pixels to the right side of the window from
+                *           the left side of the element.
+                * @param y_displacement The difference in pixels to the right side of the window from
+                *           the top of the element.
+                */
+                function findAndFloat(id, x_displacement, y_displacement) {
+                    
+                    var element = getElementObject(id);
+                    
+                    window[id + "_obj"] = element;
+                    
+                    if (document.layers) {
+                        element.style = element;
+                    }
+                    
+                    element.current_y = y_displacement;
+                    element.first_time = true;
+                    
+                    element.floatElement = function () {
+                        // It may be closed by an user action.
+                        
+                        // Target X and Y coordinates.
+                        var x, y;
+                        
+                        var myWidth = 0, myHeight = 0;
+                        if (typeof (window.innerWidth) == 'number') {
+                            //Non-IE
+                            myWidth = window.innerWidth;
+                            myHeight = window.innerHeight;
+                        } else if (document.documentElement && (document.documentElement.clientWidth || document.documentElement.clientHeight)) {
+                            //IE 6+ in 'standards compliant mode'
+                            myWidth = document.documentElement.clientWidth;
+                            myHeight = document.documentElement.clientHeight;
+                        } else if (document.body && (document.body.clientWidth || document.body.clientHeight)) {
+                            //IE 4 compatible
+                            myWidth = document.body.clientWidth;
+                            myHeight = document.body.clientHeight;
+                        }
+                        
+                        
+                        x = myWidth - x_displacement;
+                        
+                        var ns = (navigator.appName.indexOf("Netscape") != - 1);
+                        y = ns? pageYOffset: document.documentElement && document.documentElement.scrollTop?
+                        document.documentElement.scrollTop: document.body.scrollTop;
+                        y = y + y_displacement;
+                        
+                        // The current y is the current coordinate of the floating element.
+                        // This should be at the limit the y target coordinate.
+                        this.current_y += (y - this.current_y) / 1.25;
+                        
+                        // Add the pixels constant after the values
+                        // and move the element.
+                        var px = document.layers? "": "px";
+                        this.style.left = x + px;
+                        this.style.top = this.current_y + px;
+                        
+                        setTimeout(this.id + "_obj.floatElement()", 100);
+                    }
+                    
+                    element.floatElement();
+                    return element;
+                }
+                
+                /**
+                * Finds an HTML element by its ID and makes it floatable over the normal content.
+                *
+                * @param x_displacement The difference in pixels to the right side of the window from
+                *           the left side of the element.
+                * @param y_displacement The difference in pixels to the right side of the window from
+                *           the top of the element.
+                */
+                function selectTOCGroupBy(id, isChunked, indexFileLocation, indexFileNamespace, indexFileComponent) {
+                    
+                    if (! isChunked) {
+                        var selectIds = new Array('toc_group_by_namespace', 'toc_group_by_location', 'toc_group_by_component_type');
+                        // Make all the tabs invisible.
+                        for (i = 0; i < 3; i++) {
+                            var tab = getElementObject(selectIds[i]);
+                            tab.style.display = 'none';
+                        }
+                        var selTab = getElementObject(id);
+                        selTab.style.display = 'block';
+                    } else {
+                        if (id == 'toc_group_by_namespace') {
+                            parent.indexFrame.location = indexFileNamespace;
+                        } else if (id == 'toc_group_by_location') {
+                            parent.indexFrame.location = indexFileLocation;
+                        } else if (id == 'toc_group_by_component_type') {
+                            parent.indexFrame.location = indexFileComponent;
+                        }
+                    }
+                }//--></script>
+    </head>
+    <body>
+        <h2><a id="INDEX">Table of Contents</a></h2>
+        <!--<p><a href="ISO-TBX.indexList.html">Components</a><span> | </span><a href="schHierarchy.html">Resource Hierarchy</a></p>
+      <hr />
+-->
+        <div class="toc">
+            <!--  
+<form action="none">
+            <div><span> Group by: <select id="selectTOC"
+                          onchange="selectTOCGroupBy(this.options[this.selectedIndex].value, true, 'ISO-TBX.indexList.html', 'ISO-TBX.indexListns.html', 'ISO-TBX.indexListcomp.html');">
+                     <option value="toc_group_by_namespace">Namespace</option>
+                     <option value="toc_group_by_location">Location</option>
+                     <option value="toc_group_by_component_type" selected="selected">Component Type</option></select></span></div>
+         </form>
+-->
+            <div class="level1" id="toc_group_by_component_type" style="display:block">
+                <div>
+                    <div class="horizontalLayout">
+                        <table class="rt">
+                            <tr>
+                                <td class="rt_cornerTopLeft"></td>
+                                <td class="rt_lineTop"></td>
+                                <td class="rt_cornerTopRight"></td>
+                            </tr>
+                            <tr>
+                                <td class="rt_lineLeft"></td>
+                                <td class="rt_content">
+                                    <div class="componentGroupTitle">About TBX-ISO-TML </div>
+                                    <!-- new content added for background information -->
+                                    <div id="Background" style="display:block">
+                                        <div><b><a href="ISO-TBX_xsd_Main_schema_ISO-TBX_xsd.html"
+                                                  target="mainFrame" title="TBX-ISO-TML"
+                                                  onclick="updatePageTitle('TBX-ISO-TML - Home')"
+                                                  >Home</a></b></div>
+                                        <div><b><a href="ISO-TBX_xsd_Introduction.html"
+                                                  target="mainFrame" title="Introduction"
+                                                  onclick="updatePageTitle('TBX-ISO-TML - Introduction')"
+                                                  >Introduction</a></b></div>
+                                        <div><b><a href="ISO-TBX_xsd_ChangeHistory.html"
+                                                  target="mainFrame" title="Change history"
+                                                  onclick="updatePageTitle('TBX-ISO-TML - Change history')"
+                                                  >Change history</a></b></div>
+                                        <div><b><a href="ISO-TBX_xsd_DCT-format.html"
+                                                  target="mainFrame" title="DCT Format"
+                                                  onclick="updatePageTitle('TBX-ISO-TML - DCT format')"
+                                                  >DCT format</a></b></div>
+                                        <div><b><a href="ISO-TBX_xsd_Guidelines.html"
+                                                  target="mainFrame" title="Guidelines"
+                                                  onclick="updatePageTitle('TBX-ISO-TML - Guidelines')"
+                                                  >Guidelines</a></b></div>
+                                        <div><b><a href="ISO-TBX_xsd_contentTypes.html#contentTypes"
+                                                  target="mainFrame" title="Content Types"
+                                                  onclick="updatePageTitle('TBX-ISO-TML - Content Types')"
+                                                  >Content Types</a></b></div>
+                                        <div><b><a href="ISO-TBX_Glossary.html" target="mainFrame"
+                                                  title="Glossary"
+                                                  onclick="updatePageTitle('TBX-ISO-TML - Glossary')"
+                                                  >Glossary</a></b></div>
+                                    </div>
+                                    <hr />
+                                    <!-- end of new content -->
+                                    <div class="componentGroupTitle">Elements </div>
+                                    <div id="Element" style="display:block">
+                                        <!--<div><b><a href="ISO-TBX_xsd_Element_tbx_bpt.html#bpt"
+                                                  target="mainFrame"
+                                                  
+                                                  onclick="updatePageTitle('bpt')">bpt</a></b></div>-->
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_crossReference.html#crossReference"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('crossReference')"
+                                                  >crossReference</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_definition.html#definition"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('definition')"
+                                                  >definition</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_entailedTerm.html#entailedTerm"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('entailedTerm')"
+                                                  >entailedTerm</a></b></div>
+                                        <!-- <div><b><a href="ISO-TBX_xsd_Element_tbx_ept.html#ept"
+                                                  target="mainFrame"
+                                                  
+                                                  onclick="updatePageTitle('ept')">ept</a></b></div>-->
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_example.html#example"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('example')"
+                                                >example</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_externalCrossReference.html#externalCrossReference"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('externalCrossReference')"
+                                                  >externalCrossReference</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_geographicalUsage.html#geographicalUsage"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('geographicalUsage')"
+                                                  >geographicalUsage</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_grammaticalGender.html#grammaticalGender"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('grammaticalGender')"
+                                                  >grammaticalGender</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_grammaticalNumber.html#grammaticalNumber"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('grammaticalNumber')"
+                                                  >grammaticalNumber</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_langSet.html#langSet"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('langSet')"
+                                                >langSet</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_normativeAuthorization.html#normativeAuthorization"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('normativeAuthorization')"
+                                                  >normativeAuthorization</a></b></div>
+                                        <div><b><a href="ISO-TBX_xsd_Element_tbx_note.html#note"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('note')"
+                                            >note</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_partOfSpeech.html#partOfSpeech"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('partOfSpeech')"
+                                                  >partOfSpeech</a></b></div>
+                                        <!--<div><b><a href="ISO-TBX_xsd_Element_tbx_ph.html#ph"
+                                                  target="mainFrame"
+                                                  
+                                                  onclick="updatePageTitle('ph')">ph</a></b></div>-->
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_pronunciation.html#pronunciation"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('pronunciation')"
+                                                  >pronunciation</a></b></div>
+                                        <div><b><a href="ISO-TBX_xsd_Element_tbx_see.html#see"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('see')">see</a></b></div>
+                                        <div><b><a href="ISO-TBX_xsd_Element_tbx_source.html#source"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('source')"
+                                            >source</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_subjectField.html#subjectField"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('subjectField')"
+                                                  >subjectField</a></b></div>
+                                        <div><b><a href="ISO-TBX_xsd_Element_tbx_term.html#term"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('term')"
+                                            >term</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_termEntry.html#termEntry"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('termEntry')"
+                                                  >termEntry</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_termType.html#termType"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('termType')"
+                                                >termType</a></b></div>
+                                        <div><b><a href="ISO-TBX_xsd_Element_tbx_tig.html#tig"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('tig')">tig</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_usageNote.html#usageNote"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('usageNote')"
+                                                  >usageNote</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_xGraphic.html#xGraphic"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('xGraphic')"
+                                                >xGraphic</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_xMathML.html#xMathML"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('xMathML')"
+                                                >xMathML</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_xSource.html#xSource"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('xSource')"
+                                                >xSource</a></b></div>
+                                    </div>
+                                </td>
+                                <td class="rt_lineRight"></td>
+                            </tr>
+                            <tr>
+                                <td class="rt_cornerBottomLeft"></td>
+                                <td class="rt_lineBottom"></td>
+                                <td class="rt_cornerBottomRight"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="horizontalLayout">
+                        <table class="rt">
+                            <tr>
+                                <td class="rt_cornerTopLeft"></td>
+                                <td class="rt_lineTop"></td>
+                                <td class="rt_cornerTopRight"></td>
+                            </tr>
+                            <tr>
+                                <td class="rt_lineLeft"></td>
+                                <td class="rt_content">
+                                    <div class="componentGroupTitle">Entities </div>
+                                    <div id="Complex_Type" style="display:block">
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Complex_Type_tbx_basicText-model.html#basicText-model"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('basicText')"
+                                                  >basicText</a></b></div>
+                                        <!-- <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_encapsulating-elements.html#encapsulating-elements"
+                                                  target="mainFrame"
+                                                  
+                                                  onclick="updatePageTitle('encapsulating-elements')"
+                                                  >encapsulating-elements</a></b></div>-->
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Element_tbx_highlight-elements.html#highlight-elements"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('highlight-elements')"
+                                                  >highlight-elements</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Complex_Type_tbx_simpleText-model.html#simpleText-model"
+                                                  target="mainFrame"
+                                                  title="urn:iso:std:iso:30042:ed-1:v1:en"
+                                                  onclick="updatePageTitle('simpleText')"
+                                                  >simpleText</a></b></div>
+                                        <!-- <div><b><a
+                                                  href="ISO-TBX_xsd_Complex_Type_tbx_noteText-model.html#noteText-model"
+                                                  target="mainFrame"
+                                                  
+                                                  onclick="updatePageTitle('noteText')"
+                                                  >noteText-model</a></b></div>-->
+                                    </div>
+                                </td>
+                                <td class="rt_lineRight"></td>
+                            </tr>
+                            <tr>
+                                <td class="rt_cornerBottomLeft"></td>
+                                <td class="rt_lineBottom"></td>
+                                <td class="rt_cornerBottomRight"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="horizontalLayout">
+                        <table class="rt">
+                            <tr>
+                                <td class="rt_cornerTopLeft"></td>
+                                <td class="rt_lineTop"></td>
+                                <td class="rt_cornerTopRight"></td>
+                            </tr>
+                            <tr>
+                                <td class="rt_lineLeft"></td>
+                                <td class="rt_content">
+                                    <div class="componentGroupTitle">Attributes </div>
+                                    <div id="Attribute-id" style="display:block">
+                                        <div><b><a href="ISO-TBX_xsd_Attribute_id.html#id"
+                                                  target="mainFrame"
+                                                  title="http://www.w3.org/XML/1998/namespace"
+                                                  onclick="updatePageTitle('id')">id</a></b></div>
+                                    </div>
+                                    <div id="Attribute-script" style="display:block">
+                                        <div><b><a href="ISO-TBX_xsd_Attribute_script.html#script"
+                                                  target="mainFrame"
+                                                  title="http://www.w3.org/XML/1998/namespace"
+                                                  onclick="updatePageTitle('script')"
+                                            >script</a></b></div>
+                                        <div id="Attribute-target" style="display:block">
+                                            <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_target.html#target"
+                                                  target="mainFrame"
+                                                  title="http://www.w3.org/XML/1998/namespace"
+                                                  onclick="updatePageTitle('target')"
+                                                >target</a></b></div>
+                                        </div>
+                                        <div id="Attribute-value" style="display:block">
+                                            <div><b><a href="ISO-TBX_xsd_Attribute_value.html#value"
+                                                  target="mainFrame"
+                                                  title="http://www.w3.org/XML/1998/namespace"
+                                                  onclick="updatePageTitle('value')"
+                                                >value</a></b></div>
+                                        </div>
+                                        <div id="Attribute-xmllang" style="display:block">
+                                            <div><b><a href="xml_xsd_Attribute_xml_lang.html#lang"
+                                                  target="mainFrame"
+                                                  title="http://www.w3.org/XML/1998/namespace"
+                                                  onclick="updatePageTitle('xml:lang')"
+                                                  >xml:lang</a></b></div>
+                                        </div>
+                                        <div id="Attribute-xtarget" style="display:block">
+                                            <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_xtarget.html#xtarget"
+                                                  target="mainFrame"
+                                                  title="http://www.w3.org/XML/1998/namespace"
+                                                  onclick="updatePageTitle('xtarget')"
+                                                  >xtarget</a></b></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="rt_lineRight"></td>
+                            </tr>
+                            <tr>
+                                <td class="rt_lineRight"></td>
+                            </tr>
+                            <tr>
+                                <td class="rt_cornerBottomLeft"></td>
+                                <td class="rt_lineBottom"></td>
+                                <td class="rt_cornerBottomRight"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="horizontalLayout">
+                        <table class="rt">
+                            <tr>
+                                <td class="rt_cornerTopLeft"></td>
+                                <td class="rt_lineTop"></td>
+                                <td class="rt_cornerTopRight"></td>
+                            </tr>
+                            <tr>
+                                <td class="rt_lineLeft"></td>
+                                <td class="rt_content">
+                                    <div class="componentGroupTitle">Picklist values </div>
+                                    <div id="picklist-GG" style="display:block"
+                                            ><b>grammaticalGender</b>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_grammaticalGender-attlist.html#tbx.grammaticalGender-attlist_value"
+                                                  target="mainFrame"
+                                                  title="http://www.w3.org/XML/1998/namespace"
+                                                  onclick="updatePageTitle('grammaticalGender attributes')"
+                                                  >masculine</a></b></div>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_grammaticalGender-attlist.html#tbx.grammaticalGender-attlist_value"
+                                                  target="mainFrame"
+                                                  title="http://www.w3.org/XML/1998/namespace"
+                                                  onclick="updatePageTitle('grammaticalGender attributes')"
+                                                  >feminine</a></b></div>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_grammaticalGender-attlist.html#tbx.grammaticalGender-attlist_value"
+                                                  target="mainFrame"
+                                                  title="http://www.w3.org/XML/1998/namespace"
+                                                  onclick="updatePageTitle('grammaticalGender attributes')"
+                                                  >neuter</a></b></div>
+                                    </div>
+                                    <div id="picklist-GN" style="display:block"
+                                            ><b>grammaticalNumber</b>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_grammaticalNumber-attlist.html#tbx.grammaticalNumber-attlist_value"
+                                                  target="mainFrame"
+                                                  title="http://www.w3.org/XML/1998/namespace"
+                                                  onclick="updatePageTitle('grammaticalNumber attributes')"
+                                                  >singular</a></b></div>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_grammaticalNumber-attlist.html#tbx.grammaticalNumber-attlist_value"
+                                                  target="mainFrame"
+                                                  title="http://www.w3.org/XML/1998/namespace"
+                                                  onclick="updatePageTitle('grammaticalNumber attributes')"
+                                                  >plural</a></b></div>
+                                    </div>
+                                    <div id="picklist-NA" style="display:block"
+                                            ><b>normativeAuthorization</b>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_normativeAuthorization-attlist.html#tbx.normativeAuthorization-attlist_value"
+                                                  target="mainFrame"
+                                                  title="http://www.w3.org/XML/1998/namespace"
+                                                  onclick="updatePageTitle('normativeAuthorization attributes')"
+                                                  >preferredTerm</a></b></div>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_normativeAuthorization-attlist.html#tbx.normativeAuthorization-attlist_value"
+                                                  target="mainFrame"
+                                                  title="http://www.w3.org/XML/1998/namespace"
+                                                  onclick="updatePageTitle('normativeAuthorization attributes')"
+                                                  >admittedTerm</a></b></div>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_normativeAuthorization-attlist.html#tbx.normativeAuthorization-attlist_value"
+                                                  target="mainFrame"
+                                                  title="http://www.w3.org/XML/1998/namespace"
+                                                  onclick="updatePageTitle('normativeAuthorization attributes')"
+                                                  >deprecatedTerm</a></b></div>
+                                    </div>
+                                    <div id="picklist-pos" style="display:block"><b>partOfSpeech</b>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_partOfSpeech-attlist.html#
+                                            tbx.partOfSpeech-attlist_value"
+                                                  target="mainFrame"
+                                                  title="http://www.w3.org/XML/1998/namespace"
+                                                  onclick="updatePageTitle('partOfSpeech attributes')"
+                                                  >noun</a></b></div>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_partOfSpeech-attlist.html#
+                                            tbx.partOfSpeech-attlist_value"
+                                                  target="mainFrame"
+                                                  title="http://www.w3.org/XML/1998/namespace"
+                                                  onclick="updatePageTitle('partOfSpeech attributes')"
+                                                  >verb</a></b></div>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_partOfSpeech-attlist.html#
+                                            tbx.partOfSpeech-attlist_value"
+                                                  target="mainFrame"
+                                                  title="http://www.w3.org/XML/1998/namespace"
+                                                  onclick="updatePageTitle('partOfSpeech attributes')"
+                                                  >adj</a></b></div>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_partOfSpeech-attlist.html#
+                                            tbx.partOfSpeech-attlist_value"
+                                                  target="mainFrame"
+                                                  title="http://www.w3.org/XML/1998/namespace"
+                                                  onclick="updatePageTitle('partOfSpeech attributes')"
+                                                  >adv</a></b></div>
+                                    </div>
+                                    <div id="picklist-termType" style="display:block"
+                                            ><b>termType</b>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_termType-attlist.html#tbx.termType-attlist_value"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('termType attributes')"
+                                                  >acronym</a></b></div>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_termType-attlist.html#tbx.termType-attlist_value"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('termType attributes')"
+                                                  >abbreviation</a></b></div>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_termType-attlist.html#tbx.termType-attlist_value"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('termType attributes')"
+                                                  >equation</a></b></div>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_termType-attlist.html#tbx.termType-attlist_value"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('termType attributes')"
+                                                  >formula</a></b></div>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_termType-attlist.html#tbx.termType-attlist_value"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('termType attributes')"
+                                                  >fullForm</a></b></div>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_termType-attlist.html#tbx.termType-attlist_value"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('termType attributes')"
+                                                  >symbol</a></b></div>
+                                        <div>- <b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_termType-attlist.html#tbx.termType-attlist_value"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('termType attributes')"
+                                                  >variant</a></b></div>
+                                    </div>
+                                </td>
+                                <td class="rt_lineRight"></td>
+                            </tr>
+                            <tr>
+                                <td class="rt_lineRight"></td>
+                            </tr>
+                            <tr>
+                                <td class="rt_cornerBottomLeft"></td>
+                                <td class="rt_lineBottom"></td>
+                                <td class="rt_cornerBottomRight"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <!-- <div class="horizontalLayout">
+                        <table class="rt">
+                            <tr>
+                                <td class="rt_cornerTopLeft"></td>
+                                <td class="rt_lineTop"></td>
+                                <td class="rt_cornerTopRight"></td>
+                            </tr>
+                          <tr>
+                                <td class="rt_lineLeft"></td>
+                                <td class="rt_content">
+                                    <div class="componentGroupTitle">Attribute Classes</div>
+                                    <div><b><a
+                                                href="ISO-TBX_xsd_Attribute_Group_tbx_impIDLangTgtDtypScrpt-atts.html#impIDLangTgtDtypScrpt-atts"
+                                                target="mainFrame"
+                                                
+                                                onclick="updatePageTitle('impIDLangScrpt-atts')"
+                                                >impIDLangScrpt</a></b></div>
+                                    <div><b><a
+                                                href="ISO-TBX_xsd_Attribute_Group_tbx_xref-atts.html#xref-atts"
+                                                target="mainFrame"
+                                                
+                                                onclick="updatePageTitle('xref-atts')"
+                                        >xref</a></b></div>
+                                </td>
+                                <td class="rt_lineRight"></td>
+                            </tr>
+                            <tr>
+                                <td class="rt_lineRight"></td>
+                            </tr>
+                            <tr>
+                                <td class="rt_cornerBottomLeft"></td>
+                                <td class="rt_lineBottom"></td>
+                                <td class="rt_cornerBottomRight"></td>
+                            </tr>
+                            </table>
+                            </div>-->
+                    <div class="horizontalLayout">
+                        <table class="rt">
+                            <tr>
+                                <td class="rt_cornerTopLeft"></td>
+                                <td class="rt_lineTop"></td>
+                                <td class="rt_cornerTopRight"></td>
+                            </tr>
+                            <tr>
+                                <td class="rt_lineLeft"></td>
+                                <td class="rt_content">
+                                    <div class="componentGroupTitle">Attributes by Element </div>
+                                    <div id="Attribute_Group" style="display:block">
+                                        <!-- <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_bpt-attlist.html#tbx.bpt-attlist"
+                                                  target="mainFrame"
+                                                  
+                                                  onclick="updatePageTitle('bpt-attlist')"
+                                                >bpt</a></b></div>-->
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_crossReference-attlist.html#tbx.crossReference-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('crossReference attributes')"
+                                                  >crossReference</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_definition-attlist.html#tbx.definition-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('definition attributes')"
+                                                  >definition</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_entailedTerm-attlist.html#tbx.entailedTerm-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('entailedTerm attributes')"
+                                                  >entailedTerm</a></b></div>
+                                        <!--<div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_ept-attlist.html#tbx.ept-attlist"
+                                                  target="mainFrame"
+                                                  
+                                                  onclick="updatePageTitle('ept-attlist')"
+                                                >ept</a></b></div>-->
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_example-attlist.html#tbx.example-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('example attributes')"
+                                                  >example</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_externalCrossReference-attlist.html#tbx.externalCrossReference-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('externalCrossReference attributes')"
+                                                  >externalCrossReference</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_geographicalUsage-attlist.html#tbx.geographicalUsage-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('geographicalUsage attributes')"
+                                                  >geographicalUsage</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_grammaticalGender-attlist.html#tbx.grammaticalGender-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('grammaticalGender attributes')"
+                                                  >grammaticalGender</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_grammaticalNumber-attlist.html#tbx.grammaticalNumber-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('grammaticalNumber attributes')"
+                                                  >grammaticalNumber</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_langSet-attlist.html#tbx.langSet-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('langSet attributes')"
+                                                  >langSet</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_normativeAuthorization-attlist.html#tbx.normativeAuthorization-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('normativeAuthorization attributes')"
+                                                  >normativeAuthorization</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_note-attlist.html#tbx.note-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('note attributes')"
+                                                  >note</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_partOfSpeech-attlist.html#tbx.partOfSpeech-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('partOfSpeech attributes')"
+                                                  >partOfSpeech</a></b></div>
+                                        <!--<div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_ph-attlist.html#tbx.ph-attlist"
+                                                  target="mainFrame"
+                                                  
+                                                  onclick="updatePageTitle('ph-attlist')"
+                                            >ph</a></b></div>-->
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_pronunciation-attlist.html#tbx.pronunciation-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('pronunciation attributes')"
+                                                  >pronunciation</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_see-attlist.html#tbx.see-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('see attributes')"
+                                                  >see</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_source-attlist.html#tbx.source-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('source attributes')"
+                                                  >source</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_subjectField-attlist.html#tbx.subjectField-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('subjectField attributes')"
+                                                  >subjectField</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_term-attlist.html#tbx.term-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('term attributes')"
+                                                  >term</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_termEntry-attlist.html#tbx.termEntry-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('termEntry attributes')"
+                                                  >termEntry</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_termType-attlist.html#tbx.termType-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('termType attributes')"
+                                                  >termType</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_tig-attlist.html#tbx.tig-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('tig attributes')"
+                                                  >tig</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_usageNote-attlist.html#tbx.usageNote-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('usageNote attributes')"
+                                                  >usageNote</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_xGraphic-attlist.html#tbx.xGraphic-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('xGraphic attributes')"
+                                                  >xGraphic</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_xMathML-attlist.html#tbx.xMathML-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('xMathML attributes')"
+                                                  >xMathML</a></b></div>
+                                        <div><b><a
+                                                  href="ISO-TBX_xsd_Attribute_Group_tbx_tbx_xSource-attlist.html#tbx.xSource-attlist"
+                                                  target="mainFrame"
+                                                  onclick="updatePageTitle('xSource attributes')"
+                                                  >xSource</a></b></div>
+                                    </div>
+                                </td>
+                                <td class="rt_lineRight"></td>
+                            </tr>
+                            <tr>
+                                <td class="rt_cornerBottomLeft"></td>
+                                <td class="rt_lineBottom"></td>
+                                <td class="rt_cornerBottomRight"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="clear:left"></div>
+                </div>
+            </div>
+        </div>
+        <div class="horizontalLayout">
+            <table class="rt">
+                <tr>
+                    <td class="rt_cornerTopLeft"></td>
+                    <td class="rt_lineTop"></td>
+                    <td class="rt_cornerTopRight"></td>
+                </tr>
+                <tr>
+                    <td class="rt_lineLeft"></td>
+                    <td class="rt_content">
+                        <div class="componentGroupTitle"><b>Examples</b>
+                        </div>
+                        <div id="nav-examples" style="display:block">
+                            <div><b><a
+                                        href="examples/tbx-examples.html"
+                                        target="_blank"
+                                        onclick="updatePageTitle('Examples of TBX-ISO-TML')"
+                                        >TBX-ISO-TML markup</a></b></div>
+                        </div>
+                    </td>
+                    <td class="rt_lineRight"></td>
+                </tr>
+                <tr>
+                    <td class="rt_cornerBottomLeft"></td>
+                    <td class="rt_lineBottom"></td>
+                    <td class="rt_cornerBottomRight"></td>
+                </tr>
+            </table>
+            <!--<div class="footer">
+            <hr />
+            <div align="center">XML Schema documentation generated by <a
+                    href="http://www.oxygenxml.com" target="_parent"><span class="oXygenLogo"><span
+                            class="redX">&lt;</span>o<span class="redX">X</span>ygen<span
+                            class="redX">/&gt;</span></span></a><sup>®</sup> XML Editor. </div>
+        </div>-->
+        </div>
+    </body>
+</html>
