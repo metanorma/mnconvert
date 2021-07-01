@@ -334,6 +334,7 @@
 			<xsl:for-each select="ancestor::front/iso-meta">
 				<!-- https://github.com/metanorma/sts2mn/issues/31 -->
 				<!-- <xsl:call-template name="xxx-meta"/> --> <!-- process iso-meta -->
+				<xsl:apply-templates select="std-ident" mode="adopted-from"/>
 			</xsl:for-each>
 		</xsl:if>
 		
@@ -341,6 +342,15 @@
 			<xsl:for-each select="ancestor::front/reg-meta">
 				<!-- https://github.com/metanorma/sts2mn/issues/31 -->
 				<!-- <xsl:call-template name="xxx-meta"> --> <!-- process reg-meta -->
+				<xsl:apply-templates select="std-ident" mode="adopted-from"/>
+			</xsl:for-each>
+		</xsl:if>
+		
+		<xsl:if test="$include_std_meta = 'true'">
+			<xsl:for-each select="ancestor::front/std-meta">
+				<!-- https://github.com/metanorma/sts2mn/issues/31 -->
+				<!-- <xsl:call-template name="xxx-meta"> --> <!-- process reg-meta -->
+				<xsl:apply-templates select="std-ident" mode="adopted-from"/>
 			</xsl:for-each>
 		</xsl:if>
 		
@@ -401,6 +411,18 @@
 	
 	<xsl:template match="std-ident[ancestor::front or ancestor::adoption-front]/edition[normalize-space(.) != '']">
 		<xsl:text>:edition: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="std-ident" mode="adopted-from">
+		<xsl:text>:adopted-from: </xsl:text>
+		<xsl:value-of select="originator"/>
+		<xsl:text> </xsl:text>
+		<xsl:value-of select="doc-number"/>
+		<xsl:if test="part-number != ''">
+			<xsl:text>-</xsl:text>
+			<xsl:value-of select="part-number"/>
+		</xsl:if>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
