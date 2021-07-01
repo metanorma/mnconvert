@@ -156,6 +156,9 @@
 		
 		<xsl:variable name="next_node" select="local-name(following-sibling::node()[1])"/>
 		
+		<xsl:variable name="prev_node_is_formatting" select="local-name($prev_text) != '' and contains('bold | italic | sub | sup | monospace', local-name($prev_text))"/>
+		<xsl:variable name="next_node_is_formatting" select="local-name($next_text) != '' and contains('bold | italic | sub | sup | monospace', local-name($next_text))"/>
+
 		<xsl:variable name="text" select="."/>
 		<xsl:variable name="first_char" select="substring($text, 1, 1)"/>
 		<xsl:variable name="last_char" select="substring($text, string-length($text))"/>
@@ -170,6 +173,9 @@
 													
 			<!-- text does not start or end with a word character -->
 			<xsl:when test="(java_char:isLetter($first_char) != 'true' and java_char:isDigit($first_char) != 'true') or (java_char:isLetter($last_char) != 'true' and java_char:isDigit($last_char) != 'true')">true</xsl:when>
+			
+			<!-- previous or next node is formatting -->
+			<xsl:when test="$prev_node_is_formatting = 'true' or $next_node_is_formatting = 'true'">true</xsl:when>
 			
 			<xsl:otherwise>false</xsl:otherwise>
 		</xsl:choose>
