@@ -2208,6 +2208,20 @@
 		<xsl:value-of select="."/>
 		<xsl:text>]</xsl:text>
 	</xsl:template>
+	
+	<xsl:template match="fig/array[count(table/col) + count(table/colgroup/col) = 1 and .//graphic]" priority="2">
+		<xsl:apply-templates mode="ignore_array"/>
+	</xsl:template>
+	
+	<xsl:template match="@*|node()" mode="ignore_array">
+		<xsl:apply-templates select="@*|node()" mode="ignore_array"/>
+	</xsl:template>
+	
+	<xsl:template match="td|th" mode="ignore_array">
+		<xsl:apply-templates/>
+	</xsl:template>
+	
+	
 	<!-- ============================ -->
 	<!-- END Figure -->
 	<!-- ============================ -->
