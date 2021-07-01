@@ -1,8 +1,8 @@
-package com.metanorma.validator;
+package org.metanorma.validator;
 
-import com.metanorma.utils.ResourcesUtils;
-import com.metanorma.utils.Util;
-import com.metanorma.utils.LoggerHelper;
+import org.metanorma.utils.ResourcesUtils;
+import org.metanorma.utils.Util;
+import org.metanorma.utils.LoggerHelper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;

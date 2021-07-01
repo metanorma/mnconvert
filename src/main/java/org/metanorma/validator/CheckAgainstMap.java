@@ -1,4 +1,4 @@
-package com.metanorma.validator;
+package org.metanorma.validator;
 
 import java.io.File;
 import java.util.EnumMap;

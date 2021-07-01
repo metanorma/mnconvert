@@ -5,7 +5,7 @@
 			xmlns:xlink="http://www.w3.org/1999/xlink" 
 			xmlns:xalan="http://xml.apache.org/xalan" 
 			xmlns:java="http://xml.apache.org/xalan/java" 
-			xmlns:metanorma-class="xalan://com.metanorma.RegExHelper"
+			xmlns:metanorma-class="xalan://org.metanorma.utils.RegExHelper"
 			exclude-result-prefixes="xalan java metanorma-class" 
 			version="1.0">
 
@@ -2679,7 +2679,7 @@
 		<xsl:param name="value"/>
 		<xsl:choose>
 			<xsl:when test="substring($value, string-length($value) - 4, 1) = ':' and translate(substring($value, string-length($value) - 3), '0123456789', '') = ''">dated</xsl:when>
-			<xsl:when test="java:com.metanorma.RegExHelper.matches('^.*:\d{4}\D.*$', $value) = 'true'">dated</xsl:when>
+			<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^.*:\d{4}\D.*$', $value) = 'true'">dated</xsl:when>
 			<xsl:otherwise>undated</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>

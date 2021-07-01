@@ -3,18 +3,18 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.metanorma</groupId>
+	<groupId>org.metanorma</groupId>
 	<artifactId>mnconvert</artifactId>
 	<version>1.0</version>
 	<name>Metanorma XML to NISO STS XML two-directional converter</name>
 	<packaging>jar</packaging>
-	<url>https://www.metanorma.com</url>
+	<url>https://www.metanorma.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<jarname>${project.artifactId}-${project.version}.jar</jarname>
-		<exec.mainClass>com.metanorma.mnconvert</exec.mainClass>
+		<exec.mainClass>org.metanorma.mnconvert</exec.mainClass>
             	<junit.version>5.4.2</junit.version>
 	</properties>
 	<distributionManagement>
@@ -55,7 +55,7 @@
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<manifestEntries>
-										<Main-Class>com.metanorma.mnconvert</Main-Class>
+										<Main-Class>org.metanorma.mnconvert</Main-Class>
 										<Implementation-Version>${project.version}</Implementation-Version>
 									</manifestEntries>
 								</transformer>

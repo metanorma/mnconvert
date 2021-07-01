@@ -1,11 +1,11 @@
-package com.metanorma;
+package org.metanorma;
 
-import static com.metanorma.Constants.*;
-import com.metanorma.utils.LoggerHelper;
-import com.metanorma.validator.CheckAgainstEnum;
-import com.metanorma.validator.CheckAgainstMap;
-import com.metanorma.validator.DTDValidator;
-import com.metanorma.validator.XSDValidator;
+import static org.metanorma.Constants.*;
+import org.metanorma.utils.LoggerHelper;
+import org.metanorma.validator.CheckAgainstEnum;
+import org.metanorma.validator.CheckAgainstMap;
+import org.metanorma.validator.DTDValidator;
+import org.metanorma.validator.XSDValidator;
 
 import java.io.File;
 import java.util.List;

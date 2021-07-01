@@ -84,7 +84,7 @@ Update version in `pom.xml`, e.g.:
 
 [source,xml]
 ----
-<groupId>com.metanorma</groupId>
+<groupId>org.metanorma</groupId>
 <artifactId>mnconvert</artifactId>
 <version>1.0</version>
 <name>Metanorma XML to NISO STS XML two-directional converter</name>

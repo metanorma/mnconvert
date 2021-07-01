@@ -1,4 +1,4 @@
-package com.metanorma;
+package org.metanorma.utils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

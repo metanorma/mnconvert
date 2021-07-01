@@ -6,7 +6,7 @@
 					xmlns:xalan="http://xml.apache.org/xalan" 
 					xmlns:java="http://xml.apache.org/xalan/java" 
 					xmlns:redirect="http://xml.apache.org/xalan/redirect"
-					xmlns:metanorma-class-util="xalan://com.metanorma.Util"
+					xmlns:metanorma-class-util="xalan://org.metanorma.utils.Util"
 					exclude-result-prefixes="xalan mml tbx xlink java metanorma-class-util"
 					extension-element-prefixes="redirect"
 					version="1.0">
@@ -1395,7 +1395,7 @@
 						($type = 'roman_upper' and $first_label != 'I') or 
 						($type = 'alphabet' and $first_label != 'a') or
 						($type = 'alphabet_upper' and $first_label != 'A'))">
-						<xsl:value-of select="java:com.metanorma.Util.getListStartValue($type, $first_label)"/>
+						<xsl:value-of select="java:org.metanorma.utils.Util.getListStartValue($type, $first_label)"/>
 				</xsl:when>
 			</xsl:choose>
 		

@@ -1,7 +1,7 @@
-package com.metanorma.utils;
+package org.metanorma.utils;
 
-import static com.metanorma.Constants.*;
-import com.metanorma.mnconvert;
+import static org.metanorma.Constants.*;
+import org.metanorma.mnconvert;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class Util {
                 // check that this is your manifest and do what you need or get the next one
                 Attributes attr = manifest.getMainAttributes();
                 String mainClass = attr.getValue("Main-Class");
-                if(mainClass != null && mainClass.contains("com.metanorma.mnconvert")) {
+                if(mainClass != null && mainClass.contains("org.metanorma.mnconvert")) {
                     version = manifest.getMainAttributes().getValue("Implementation-Version");
                 }
             }

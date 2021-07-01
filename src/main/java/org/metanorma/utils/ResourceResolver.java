@@ -1,4 +1,4 @@
-package com.metanorma.utils;
+package org.metanorma.utils;
 
 // https://stackoverflow.com/questions/2342808/how-to-validate-an-xml-file-using-java-with-an-xsd-having-an-include
 

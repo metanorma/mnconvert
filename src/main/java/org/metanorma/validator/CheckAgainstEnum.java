@@ -1,4 +1,4 @@
-package com.metanorma.validator;
+package org.metanorma.validator;
 
 
 public enum CheckAgainstEnum {

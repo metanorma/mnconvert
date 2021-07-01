@@ -1,9 +1,9 @@
-package com.metanorma;
+package org.metanorma;
 
-import com.metanorma.utils.Task;
-import com.metanorma.utils.Util;
-import static com.metanorma.Constants.*;
-import com.metanorma.utils.LoggerHelper;
+import org.metanorma.utils.Task;
+import org.metanorma.utils.Util;
+import static org.metanorma.Constants.*;
+import org.metanorma.utils.LoggerHelper;
 
 import java.io.BufferedWriter;
 import java.io.File;

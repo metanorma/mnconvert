@@ -1,6 +1,6 @@
-package com.metanorma.utils;
+package org.metanorma.utils;
 
-import com.metanorma.utils.LoggerHelper;
+import org.metanorma.utils.LoggerHelper;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;

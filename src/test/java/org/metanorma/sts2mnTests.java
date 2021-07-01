@@ -1,6 +1,7 @@
-package com.metanorma;
+package org.metanorma;
 
-import com.metanorma.utils.LoggerHelper;
+import org.metanorma.mnconvert;
+import org.metanorma.utils.LoggerHelper;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -1,4 +1,4 @@
-package com.metanorma;
+package org.metanorma;
 
 /**
  *

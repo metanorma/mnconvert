@@ -1,4 +1,4 @@
-package com.metanorma.utils;
+package org.metanorma.utils;
 
 import java.io.File;
 import java.io.IOException;

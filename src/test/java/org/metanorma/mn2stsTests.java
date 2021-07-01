@@ -1,7 +1,9 @@
-package com.metanorma;
+package org.metanorma;
 
-import static com.metanorma.sts2mnTests.XMLFILE_MN;
-import com.metanorma.utils.LoggerHelper;
+import org.metanorma.mnconvert;
+import org.metanorma.utils.RegExHelper;
+import static org.metanorma.sts2mnTests.XMLFILE_MN;
+import org.metanorma.utils.LoggerHelper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;

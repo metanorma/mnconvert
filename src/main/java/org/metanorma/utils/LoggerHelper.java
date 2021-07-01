@@ -1,6 +1,6 @@
-package com.metanorma.utils;
+package org.metanorma.utils;
 
-import com.metanorma.mnconvert;
+import org.metanorma.mnconvert;
 
 /**
  *
