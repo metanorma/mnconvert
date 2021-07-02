@@ -270,9 +270,9 @@ public class STS2MN_XsltConverter {
             src = new SAXSource(rdr, new InputSource(new FileInputStream(fXMLin)));
 
             // linearize XML
-            String xmlLinearized = linearizeXML(src);
+            //String xmlLinearized = linearizeXML(src);
 
-            src = new StreamSource(new StringReader(xmlLinearized));
+            //src = new StreamSource(new StringReader(xmlLinearized));
             
             Source srcXSL;
             if (fileXSL != null) { //external xsl
@@ -329,7 +329,7 @@ public class STS2MN_XsltConverter {
         Task.copyImages(inputFolder, imagesDir, outputFolder);
     }
     
-    private String linearizeXML(Source src) throws TransformerConfigurationException, IOException, TransformerException {
+    /*private String linearizeXML(Source src) throws TransformerConfigurationException, IOException, TransformerException {
         TransformerFactory factory = TransformerFactory.newInstance();
         Source srcXSLlinearize = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), "linearize.xsl"));
         Transformer transformer = factory.newTransformer(srcXSLlinearize);
@@ -338,7 +338,7 @@ public class STS2MN_XsltConverter {
         StreamResult sridentity = new StreamResult(resultWriteridentity);
         transformer.transform(src, sridentity);
         return resultWriteridentity.toString();
-    }
+    }*/
     
     private void writeBuffer(StringBuilder sbBuffer, String outputFile) throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(outputFile))) {
