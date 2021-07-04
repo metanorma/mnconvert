@@ -28,6 +28,8 @@ jobs:
 
       - run: sudo snap install yq
 
+      - run: sudo gem install bundler metanorma-cli
+
       - run: make testMN2STS
 
       - run: make testSTS2MN
