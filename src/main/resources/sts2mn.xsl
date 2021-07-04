@@ -945,6 +945,9 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<!-- ======================== -->
+	<!-- Terms, definitions -->
+	<!-- ======================== -->
 	<xsl:template match="body//sec[./term-sec]" priority="2">
 		<terms id="{@id}">
 			<xsl:apply-templates />
@@ -1031,6 +1034,10 @@
 	
 	<xsl:template match="tbx:partOfSpeech"/>
 	
+	<!-- ======================== -->
+	<!-- END Terms, definitions -->
+	<!-- ======================== -->
+	
 	<xsl:template match="tbx:example">
 		<termexample>
 			<xsl:apply-templates />
@@ -1067,7 +1074,7 @@
 	<!-- =============== -->
 	<xsl:template match="array">
 		<xsl:choose>
-			<xsl:when test="count(table/col) + count(table/colgroup/col)  = 2">
+			<xsl:when test="count(table/col) + count(table/colgroup/col)  = 2 and $organization != 'BSI'">
 				<dl>
 					<xsl:copy-of select="@id"/>
 					<xsl:if test="label = 'Key'">
@@ -1327,6 +1334,7 @@
 		<xsl:apply-templates />
 	</xsl:template>
 	
+	<!-- move italic, bold formatting outside std -->
 	<xsl:template match="std[italic]" priority="2">
 		<em>
 			<eref type="inline" citeas="{italic/std-ref}">
@@ -1347,7 +1355,6 @@
 	<xsl:template match="std/italic/std-ref | std/bold/std-ref"> <!--  priority="2"/> -->
 		<xsl:apply-templates />
 	</xsl:template>
-	
 	
 	<xsl:template match="list">
 		<xsl:choose>
@@ -1585,6 +1592,9 @@
 		</xsl:element>
 	</xsl:template>
 	
+	<!-- ========================== -->
+	<!-- Figures, images, graphic -->
+	<!-- ========================== -->
 	<xsl:template match="fig">
 		<figure id="{@id}">
 			<xsl:apply-templates />
@@ -1684,6 +1694,10 @@
 			<xsl:apply-templates />
 		</figure>
 	</xsl:template>
+	<!-- ========================== -->
+	<!-- END Figures, images, graphic -->
+	<!-- ========================== -->
+	
 	
 	<xsl:template match="disp-quote">
 		<quote>
