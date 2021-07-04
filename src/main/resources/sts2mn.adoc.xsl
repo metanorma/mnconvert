@@ -29,7 +29,7 @@
 	<xsl:variable name="language" select="//standard/front/*/doc-ident/language"/>
 	
 	<xsl:variable name="organization">
-	<xsl:choose>
+		<xsl:choose>
 			<xsl:when test="/standard/front/nat-meta/@originator = 'BSI' or /standard/front/nat-meta/@originator = 'PAS' or /standard/front/iso-meta/secretariat = 'BSI'">BSI</xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="/standard/front/*/doc-ident/sdo"/>
@@ -2927,7 +2927,7 @@
 	
 	
 	<!-- ========================================= -->
-	<!-- unconstrained formatting (https://docs.asciidoctor.org/asciidoc/latest/text/) -->
+	<!-- unconstrained formatting (https://docs.asciidoctor.org/asciidoc/latest/text/#unconstrained) -->
 	<!-- ========================================= -->
 	<xsl:template match="@*|node()" mode="unconstrained_formatting">
 		<xsl:copy>
