@@ -1524,7 +1524,7 @@
 				<xsl:when test="std/std-ref and preceding-sibling::ref[std/std-ref = current()/std/std-ref]">false</xsl:when>
 			</xsl:choose>
 		</xsl:variable>
-		unique='<xsl:value-of select="$unique"/>'
+		<!-- unique='<xsl:value-of select="$unique"/>' -->
 		<!-- comment repeated references -->
 		<xsl:if test="normalize-space($unique) = 'false'"><xsl:text disable-output-escaping="yes">&lt;!--STS: </xsl:text></xsl:if>
 		
@@ -1554,6 +1554,9 @@
 		</title>
 	</xsl:template>
 	
+	<!-- ============================= -->
+	<!-- Math formula, equation, etc. -->
+	<!-- ============================= -->
 	<xsl:template match="disp-formula">
 		<formula id="{mml:math/@id}">
 			<stem type="MathML">
@@ -1566,14 +1569,6 @@
 		<stem type="MathML">
 			<xsl:apply-templates />
 		</stem>
-	</xsl:template>
-	
-	
-	<xsl:template match="sec[@sec-type = 'index'] | back/sec[@id = 'ind']" priority="2"/>
-	<xsl:template match="sec[@sec-type = 'index'] | back/sec[@id = 'ind']" mode="index">
-		<indexsect id="{@id}">
-			<xsl:apply-templates />
-		</indexsect>
 	</xsl:template>
 	
 	<xsl:template match="mml:math">
@@ -1590,6 +1585,16 @@
 			<xsl:copy-of select="@*"/>
 			<xsl:apply-templates />
 		</xsl:element>
+	</xsl:template>
+	<!-- ============================= -->
+	<!-- END Math formula, equation, etc. -->
+	<!-- ============================= -->
+	
+	<xsl:template match="sec[@sec-type = 'index'] | back/sec[@id = 'ind']" priority="2"/>
+	<xsl:template match="sec[@sec-type = 'index'] | back/sec[@id = 'ind']" mode="index">
+		<indexsect id="{@id}">
+			<xsl:apply-templates />
+		</indexsect>
 	</xsl:template>
 	
 	<!-- ========================== -->
@@ -1858,6 +1863,10 @@
 			<xsl:copy-of select="@*"/>
 			<xsl:apply-templates mode="setNamespace"/>
 		</xsl:element>
+	</xsl:template>
+	
+	<xsl:template match="*[namespace-uri()!='']" mode="setNamespace">
+		<xsl:copy-of select="."/>
 	</xsl:template>
 	
 	<xsl:template match="processing-instruction()" mode="setNamespace">
