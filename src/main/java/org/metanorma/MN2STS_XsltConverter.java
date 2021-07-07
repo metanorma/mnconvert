@@ -34,7 +34,7 @@ import org.xml.sax.SAXParseException;
 /**
  * This class for the conversion of an Metanorma XML to NISO/ISO XML file
  */
-public class MN2STS_XsltConverter {
+public class MN2STS_XsltConverter implements XsltConverter {
 
     private static final Logger logger = Logger.getLogger(LoggerHelper.LOGGER_NAME);
     
@@ -57,21 +57,25 @@ public class MN2STS_XsltConverter {
         
     }
 
+    @Override
     public void setInputFilePath(String inputFilePath) {
         this.inputFilePath = inputFilePath;
     }
 
 
+    @Override
     public void setInputXslPath(String inputXslPath) {
         this.inputXslPath = inputXslPath;
     }
 
+    @Override
     public void setOutputFilePath(String outputFilePath) {
         if (outputFilePath != null) {
             this.outputFilePath = outputFilePath;
         }
     }
     
+    @Override
     public void setDebugMode(boolean isDebugMode) {
         this.isDebugMode = isDebugMode;
     }
@@ -83,6 +87,7 @@ public class MN2STS_XsltConverter {
         }
     }
 
+    @Override
     public void setOutputFormat(String outputFormat) {
         if (outputFormat != null) {
             this.outputFormat = outputFormat;
@@ -99,6 +104,7 @@ public class MN2STS_XsltConverter {
         }
     }
     
+    @Override
     public boolean process() {
         try {
             
