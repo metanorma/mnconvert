@@ -39,7 +39,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 /**
  * This class for the conversion of an NISO/ISO XML file to Metanorma XML or AsciiDoc
  */
-public class STS2MN_XsltConverter {
+public class STS2MN_XsltConverter implements XsltConverter {
 
     private static final Logger logger = Logger.getLogger(LoggerHelper.LOGGER_NAME);
     
@@ -70,21 +70,25 @@ public class STS2MN_XsltConverter {
         
     }
 
+    @Override
     public void setInputFilePath(String inputFilePath) {
         this.inputFilePath = inputFilePath;
         
     }
 
+    @Override
     public void setInputXslPath(String inputXslPath) {
         this.inputXslPath = inputXslPath;
     }
-    
+
+    @Override
     public void setOutputFilePath(String outputFilePath) {
         if (outputFilePath != null) {
             this.outputFilePath = outputFilePath;
         }
     }
 
+    @Override
     public void setOutputFormat(String outputFormat) {
         if (outputFormat != null) {
             this.outputFormat = outputFormat.toLowerCase();
@@ -101,6 +105,7 @@ public class STS2MN_XsltConverter {
         this.isSplitBibdata = isSplitBibdata;
     }
 
+    @Override
     public void setDebugMode(boolean isDebugMode) {
         this.isDebugMode = isDebugMode;
     }
@@ -131,7 +136,8 @@ public class STS2MN_XsltConverter {
             
         }
     }
-    
+
+    @Override
     public boolean process() {
         
         try {

@@ -210,42 +210,39 @@ public class mnconvert {
                     // determine input xml file format
                     inputFormat = Util.getXMLFormat(argXmlIn);
                 }
-                
-                boolean result = false;
-                
+
+                XsltConverter converter = null;
+                String defaultOutputFormat = null;
                 switch (inputFormat) {
                     case "sts":
                         {
-                            STS2MN_XsltConverter converter = new STS2MN_XsltConverter();
-                            converter.setInputFilePath(argXmlIn);
-                            converter.setInputXslPath(cmdMain.getOptionValue("xsl-file"));
-                            converter.setOutputFilePath(cmdMain.getOptionValue("output"));
-                            converter.setOutputFormat(cmdMain.getOptionValue("output-format"));
-                            converter.setImagesDir(cmdMain.getOptionValue("imagesdir"));
-                            converter.setIsSplitBibdata(cmdMain.hasOption("split-bibdata"));
-                            converter.setDebugMode(cmdMain.hasOption("debug"));
-                            converter.setTypeStandard(cmdMain.getOptionValue("type"));
-                            result = converter.process();
+                            STS2MN_XsltConverter sts2mn = new STS2MN_XsltConverter();
+                            sts2mn.setImagesDir(cmdMain.getOptionValue("imagesdir"));
+                            sts2mn.setIsSplitBibdata(cmdMain.hasOption("split-bibdata"));
+                            sts2mn.setTypeStandard(cmdMain.getOptionValue("type"));
+                            defaultOutputFormat = "adoc";
+                            converter = sts2mn;
                             break;
                         }
                     case "metanorma":
                         {
-                            MN2STS_XsltConverter converter = new MN2STS_XsltConverter();
-                            converter.setInputFilePath(argXmlIn);
-                            converter.setInputXslPath(cmdMain.getOptionValue("xsl-file"));
-                            converter.setOutputFilePath(cmdMain.getOptionValue("output"));
-                            converter.setOutputFormat(cmdMain.getOptionValue("output-format"));
-                            converter.setDebugMode(cmdMain.hasOption("debug"));
-                            converter.setCheckType(cmdMain.getOptionValue("check-type"));
-                            result = converter.process();
+                            MN2STS_XsltConverter mn2sts = new MN2STS_XsltConverter();
+                            mn2sts.setCheckType(cmdMain.getOptionValue("check-type"));
+                            defaultOutputFormat = "niso";
+                            converter = mn2sts;
                             break;
                         }
                     default:
                         logger.log(Level.SEVERE, "Unknown input file format ''{0}''", inputFormat);
                         System.exit(ERROR_EXIT_CODE);
                 }
-                
-                if (!result) {
+
+                converter.setInputFilePath(argXmlIn);
+                converter.setOutputFormat(cmdMain.getOptionValue("output-format", defaultOutputFormat));
+                converter.setInputXslPath(cmdMain.getOptionValue("xsl-file"));
+                converter.setOutputFilePath(cmdMain.getOptionValue("output"));
+
+                if (!converter.process()) {
                     System.exit(ERROR_EXIT_CODE);
                 }
                 cmdFail = false;
