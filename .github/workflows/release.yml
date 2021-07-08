@@ -79,10 +79,10 @@ jobs:
           asset_name: mnconvert-${{ steps.get_version.outputs.VERSION }}.jar
           asset_content_type: application/java-archive
 
-#      - name: Notify mnconvert-ruby
-#        uses: peter-evans/repository-dispatch@v1
-#        with:
-#          token: ${{ secrets.METANORMA_CI_PAT_TOKEN }}
-#          repository: metanorma/mnconvert-ruby
-#          event-type: metanorma/mnconvert
-#          client-payload: '{ "ref": "${{ github.ref }}" }'
+      - name: Notify mnconvert-ruby
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.METANORMA_CI_PAT_TOKEN }}
+          repository: metanorma/mnconvert-ruby
+          event-type: metanorma/mnconvert
+          client-payload: '{ "ref": "${{ github.ref }}" }'
