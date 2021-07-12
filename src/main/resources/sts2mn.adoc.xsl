@@ -75,8 +75,12 @@
 			<xsl:apply-templates select="." mode="linearize"/>
 		</xsl:variable>
 	
+		<xsl:variable name="remove_word_clause_xml">
+			<xsl:apply-templates select="xalan:nodeset($linearized_xml)" mode="remove_word_clause"/>
+		</xsl:variable>
+	
 		<xsl:variable name="unconstrained_formatting_xml">
-			<xsl:apply-templates select="xalan:nodeset($linearized_xml)" mode="unconstrained_formatting"/>
+			<xsl:apply-templates select="xalan:nodeset($remove_word_clause_xml)" mode="unconstrained_formatting"/>
 		</xsl:variable>
 	
 		<xsl:variable name="ref_fix">
@@ -2921,10 +2925,38 @@
 			</xsl:otherwise>
 		</xsl:choose>		
 	</xsl:template>
+	
+	
 	<!-- ========================================= -->
 	<!-- END XML Linearization -->
 	<!-- ========================================= -->
 	
+	<!-- ========================================= -->
+	<!-- Remove Clause before xref pointed to 1st level clause  -->
+	<!-- ========================================= -->
+	<xsl:template match="@*|node()" mode="remove_word_clause">
+		<xsl:copy>
+				<xsl:apply-templates select="@*|node()" mode="remove_word_clause"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="text()[following-sibling::*[1][self::xref]]" mode="remove_word_clause">
+		<xsl:variable name="xref_rid" select="following-sibling::*[1][self::xref]/@rid"/>
+		<xsl:variable name="is_clause_1stlevel_depth" select="count(//*[@id = $xref_rid]/parent::*[self::body or self::back]) &gt; 0"/>
+		<xsl:variable name="clause_text_regex">Clause $</xsl:variable><!-- string ends on 'Clause ' -->
+		<xsl:choose>
+			<xsl:when test="$is_clause_1stlevel_depth = 'true'">
+				<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$clause_text_regex,'')"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="."/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<!-- ========================================= -->
+	<!-- END Remove Clause before xref pointed to 1st level clause -->
+	<!-- ========================================= -->
 	
 	<!-- ========================================= -->
 	<!-- unconstrained formatting (https://docs.asciidoctor.org/asciidoc/latest/text/#unconstrained) -->
