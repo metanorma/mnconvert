@@ -1366,23 +1366,23 @@
 		<xsl:text>~</xsl:text><xsl:apply-templates /><xsl:text>~</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="sub2">
+	<!-- <xsl:template match="sub2">
 		<xsl:text>~~</xsl:text><xsl:apply-templates /><xsl:text>~~</xsl:text>
-	</xsl:template>
+	</xsl:template> -->
 	
 	<xsl:template match="sup">
 		<xsl:text>^</xsl:text><xsl:apply-templates /><xsl:text>^</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="sup">
+	<!-- <xsl:template match="sup2">
 		<xsl:text>^^</xsl:text><xsl:apply-templates /><xsl:text>^^</xsl:text>
-	</xsl:template>
+	</xsl:template> -->
 	
 	<xsl:template match="monospace">
 		<xsl:text>`</xsl:text><xsl:apply-templates /><xsl:text>`</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="monospace">
+	<xsl:template match="monospace2">
 		<xsl:text>``</xsl:text><xsl:apply-templates /><xsl:text>``</xsl:text>
 	</xsl:template>
 	
@@ -2970,25 +2970,17 @@
 		</xsl:copy>
 	</xsl:template>
 	
-	<xsl:template match="bold | italic | sub | sup | monospace" mode="unconstrained_formatting">
-		<xsl:call-template name="processUnconstrainedFormatting"/>
-	</xsl:template>
+	<!-- https://github.com/asciidoctor/asciidoctor/issues/2010#issuecomment-276583709 -->
+	<!-- disabled for sub | sup | -->
 	
-	<xsl:template name="processUnconstrainedFormatting">
+	<xsl:template match="bold | italic | monospace" mode="unconstrained_formatting">
 		<xsl:variable name="unconstrained_formatting"><xsl:call-template name="is_unconstrained_formatting"/></xsl:variable>
-		<xsl:choose>
-			<xsl:when test="$unconstrained_formatting = 'true'">
-				<!-- create element bold2, italic2, sup2, etc. -->
-				<xsl:element name="{local-name()}2">
-					<xsl:apply-templates select="@*" mode="unconstrained_formatting"/>
-					<xsl:apply-templates mode="unconstrained_formatting"/>
-				</xsl:element>
-			</xsl:when>
-			<xsl:otherwise>
-				<!-- copy 'as is' -->
-				<xsl:copy-of select="."/>
-			</xsl:otherwise>
-		</xsl:choose>
+		<xsl:variable name="element_name_addon"><xsl:if test="$unconstrained_formatting = 'true'">2</xsl:if></xsl:variable>
+		
+		<xsl:element name="{local-name()}{$element_name_addon}">
+			<xsl:apply-templates select="@*" mode="unconstrained_formatting"/>
+			<xsl:apply-templates mode="unconstrained_formatting"/>
+		</xsl:element>
 	</xsl:template>
 	
 	<!-- Unconstrained formatting pair -->
