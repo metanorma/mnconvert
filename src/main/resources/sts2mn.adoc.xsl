@@ -1019,13 +1019,13 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-		<xsl:variable name="term_real" select="normalize-space(//*[@id = current()/@target]//tbx:term)"/>
+		<xsl:variable name="term_real" select="normalize-space(//*[@id = current()/@target]//tbx:term[1])"/>
 		<!-- term:[objectives] -->
 		<!-- term:[objectives,objective] -->
 		<xsl:text>term:[</xsl:text>
-		<xsl:value-of select="$term"/>
+		<xsl:value-of select="$term_real"/>
 		<xsl:if test="$term != $term_real">
-			<xsl:text>,</xsl:text><xsl:value-of select="$term_real"/>
+			<xsl:text>,</xsl:text><xsl:value-of select="$term"/>
 		</xsl:if>
 		<xsl:text>]</xsl:text>
 		
@@ -2372,13 +2372,16 @@
 		</xsl:variable>
 		<xsl:choose>
 			<xsl:when test="@content-type = 'term' and (local-name(//*[@id = $target]) = 'term-sec' or local-name(//*[@id = $target]) = 'termEntry')">
-				<xsl:variable name="term_name" select="//*[@id = $target]//tbx:term[1]"/>
+				<xsl:variable name="term_real" select="//*[@id = $target]//tbx:term[1]"/>
 				<!-- <xsl:variable name="term_name" select="java:toLowerCase(java:java.lang.String.new(translate($term_name_, ' ', '-')))"/> -->
 				<!-- <xsl:text>term-</xsl:text><xsl:value-of select="$term_name"/>,<xsl:value-of select="."/> -->
 				
 				<xsl:variable name="value" select="."/>
-				<xsl:if test="$value != $term_name"><xsl:value-of select="$value"/><xsl:text>,</xsl:text></xsl:if>
-				<xsl:value-of select="$term_name"/>
+				
+				<xsl:value-of select="$term_real"/>
+				
+				<xsl:if test="$value != $term_real"><xsl:text>,</xsl:text><xsl:value-of select="$value"/></xsl:if>
+				
 
 			</xsl:when>
 			<xsl:otherwise>
