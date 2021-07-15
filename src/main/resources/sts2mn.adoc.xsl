@@ -2028,6 +2028,16 @@
 				
 				<xsl:text>]]]</xsl:text>
 			</xsl:if>
+			
+			<!-- Bibliography items without id -->
+			<!-- Example: Further Reading -->
+			<xsl:if test="not(@id or std/@std-id or std/std-ref)">
+				<xsl:variable name="preceding_title" select="java:toLowerCase(java:java.lang.String.new(translate(preceding-sibling::title[1]/text(), ' ', '_')))"/>
+				<xsl:text>[[[</xsl:text>
+				<xsl:value-of select="$preceding_title"/>_<xsl:number/>
+				<xsl:text>]]]</xsl:text>
+			</xsl:if>
+			
 			<xsl:apply-templates/>
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
