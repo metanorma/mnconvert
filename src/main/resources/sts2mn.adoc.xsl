@@ -1660,7 +1660,7 @@
 			<xsl:if test="thead">
 				<option>header</option>
 			</xsl:if>
-			<xsl:if test="ancestor::table-wrap/table-wrap-foot[count(*[local-name() != 'fn-group']) != 0]">
+			<xsl:if test="ancestor::table-wrap/table-wrap-foot[count(*[local-name() != 'fn-group' and local-name() != 'non-normative-note']) != 0]">
 				<option>footer</option>
 			</xsl:if>
 			<xsl:if test="ancestor::table-wrap/@content-type = 'ace-table'">
@@ -1696,6 +1696,8 @@
 		<xsl:text>|===</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
+		<!-- move notes outside table -->
+		<xsl:apply-templates select="../table-wrap-foot/non-normative-note" />
 		
 	</xsl:template>
 	
@@ -1830,7 +1832,7 @@
 		<xsl:param name="cols-count"/>
 		
 		<xsl:variable name="table_footer">
-			<xsl:apply-templates mode="footer"/>
+			<xsl:apply-templates select="*[not(self::fn[@id] or self::non-normative-note)]"/> <!-- except fn[@id] and non-normative-note -->
 		</xsl:variable>
 		
 		<xsl:if test="normalize-space($table_footer) != ''">
