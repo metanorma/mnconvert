@@ -2728,7 +2728,14 @@
 		<xsl:text>]]</xsl:text>
 		<xsl:if test="not(title) and label">
 			<xsl:text>&#xa;</xsl:text>
-			<xsl:text>==== {blank}</xsl:text>
+			<xsl:choose>
+				<xsl:when test="label = 'Foreword' or label = 'Introduction'">
+				<xsl:text>== </xsl:text><xsl:value-of select="label"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:text>==== {blank}</xsl:text>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:if>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
@@ -2810,6 +2817,8 @@
 	
 	<xsl:template match="standard/body/sub-part/body/sub-part" mode="sub-part-front"/>
 	<xsl:template match="standard/body/sub-part/label[normalize-space() = ''] | standard/body/sub-part/title[normalize-space() = '']" mode="sub-part-front"/>
+	
+	<xsl:template match="body/graphic" priority="2" mode="sub-part-front"/>
 	
 	<xsl:template match="front/sec" mode="sub-part">
 		<xsl:param name="doc-number"/>
