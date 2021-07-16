@@ -1004,18 +1004,23 @@
 	</xsl:template>
 		
 	<xsl:template match="tbx:entailedTerm">
+	
+		<xsl:variable name="space_before"><xsl:if test="local-name(preceding-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
+		<xsl:variable name="space_after"><xsl:if test="local-name(following-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
+		<xsl:value-of select="$space_before"/>
+	
 		<xsl:variable name="target" select="substring-after(@target, 'term_')"/>
 		<xsl:variable name="term">
 			<xsl:choose>
-				<xsl:when test="contains(., concat('(', $target, ')'))">
-					<!-- <xsl:text>_</xsl:text> -->
+				<xsl:when test="contains(., concat('(', $target, ')'))"> <!-- example: concept entry (3.5) -->
 					<xsl:value-of select="normalize-space(substring-before(., concat('(', $target, ')')))"/>
-					<!-- <xsl:text>_</xsl:text> -->
 				</xsl:when>
+				<xsl:when test="contains(., concat(' ', $target, ')'))"> <!-- example: vocational competence (see 3.26) -->
+					<xsl:value-of select="normalize-space(substring-before(., '('))"/>
+				</xsl:when>
+				<xsl:when test="translate(., '01234567890.', '') = ''"></xsl:when><!-- if digits and dot only, example 3.13 -->
 				<xsl:otherwise>
-					<!-- <xsl:text>_</xsl:text> -->
 					<xsl:value-of select="."/>
-					<!-- <xsl:text>_</xsl:text> -->
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -1024,11 +1029,12 @@
 		<!-- term:[objectives,objective] -->
 		<xsl:text>term:[</xsl:text>
 		<xsl:value-of select="$term_real"/>
-		<xsl:if test="$term != $term_real">
+		<xsl:if test="$term != $term_real and $term != ''">
 			<xsl:text>,</xsl:text><xsl:value-of select="$term"/>
 		</xsl:if>
 		<xsl:text>]</xsl:text>
 		
+		<xsl:value-of select="$space_after"/>
 		<!-- <xsl:text> (</xsl:text>
 		<xsl:text>&lt;&lt;</xsl:text><xsl:value-of select="@target"/><xsl:text>&gt;&gt;</xsl:text>
 		<xsl:text>)</xsl:text>		 -->
@@ -2368,6 +2374,10 @@
 	
 	<xsl:template match="named-content">
 		<!-- <xsl:text>&lt;&lt;</xsl:text> -->
+		<xsl:variable name="space_before"><xsl:if test="local-name(preceding-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
+		<xsl:variable name="space_after"><xsl:if test="local-name(following-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
+		<xsl:value-of select="$space_before"/>
+		
 		<xsl:text>term:[</xsl:text>
 		<xsl:variable name="target">
 			<xsl:choose>
@@ -2405,6 +2415,7 @@
 		</xsl:choose>
 		<!-- <xsl:text>&gt;&gt;</xsl:text> -->
 		<xsl:text>]</xsl:text>
+		<xsl:value-of select="$space_after"/>
 	</xsl:template>
 	
 	<xsl:template name="split">
