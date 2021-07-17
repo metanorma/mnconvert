@@ -2744,7 +2744,13 @@
 				<xsl:text>== </xsl:text><xsl:value-of select="label"/>
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:text>==== {blank}</xsl:text>
+					<xsl:variable name="level">
+						<xsl:call-template name="getLevel">
+							<xsl:with-param name="addon">1</xsl:with-param>
+						</xsl:call-template>
+					</xsl:variable>
+					<xsl:value-of select="$level"/>
+					<xsl:text> {blank}</xsl:text>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:if>
