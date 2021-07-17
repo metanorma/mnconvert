@@ -1048,7 +1048,9 @@
 	</xsl:template>
 	
 	<xsl:template match="non-normative-note[ancestor::list-item]" priority="3">
-		<xsl:text>+</xsl:text>
+		<xsl:if test="not(preceding-sibling::*[1][self::list or self::non-normative-note])">
+			<xsl:text>+</xsl:text>
+		</xsl:if>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>--</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
@@ -1298,20 +1300,20 @@
 				<xsl:otherwise></xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-		<xsl:if test="$listtype != ''">		
+		<!-- <xsl:if test="$listtype != ''">		
 			<xsl:text>[</xsl:text>
 			<xsl:value-of select="$listtype"/>
 			<xsl:text>]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
-		</xsl:if>
+		</xsl:if> -->
 	</xsl:template>
 	
 	<xsl:template match="list/list-item">
 		<xsl:variable name="list_item_label">
 			<xsl:choose>
-				<xsl:when test="ancestor::list/@list-type = 'bullet' or 
-								ancestor::list/@list-type = 'dash' or
-								ancestor::list/@list-type = 'simple'">				
+				<xsl:when test="ancestor::list[1]/@list-type = 'bullet' or 
+								ancestor::list[1]/@list-type = 'dash' or
+								ancestor::list[1]/@list-type = 'simple'">				
 					<xsl:call-template name="getLevelListItem">
 						<xsl:with-param name="list-label">*</xsl:with-param>
 					</xsl:call-template>
@@ -2952,6 +2954,9 @@
 			<xsl:when test="parent::standard or parent::body or parent::sec or parent::term-sec or parent::tbx:termEntry or parent::back or parent::app-group or parent::app or parent::ref-list or parent::fig or parent::caption or parent::table-wrap or parent::tr or parent::thead or parent::colgroup or parent::table or parent::tbody or parent::fn or parent::non-normative-note or parent::array">
 				<xsl:value-of select="normalize-space()"/>
 			</xsl:when>
+			<xsl:when test="parent::td and preceding-sibling::*[1][self::p or self::non-normative-note or self::list] and 
+			following-sibling::*[1][self::p or self::non-normative-note or self::list] and 
+			normalize-space() = ''"></xsl:when>
 			<xsl:when test="contains(., '&#xa;')">
 				<!-- replace line breaks to space -->
 				<xsl:variable name="text_" select="translate(., '&#xa;', ' ')"/>
