@@ -243,7 +243,9 @@ public class mnconvert {
                         }
                     case "rfc":
                         {
-                            
+                            RFC2MN_XsltConverter rfc2mn = new RFC2MN_XsltConverter();
+                            converter = rfc2mn;
+                            break;
                         }
                     default:
                         logger.log(Level.SEVERE, "Unknown input file format ''{0}''", inputFormat);

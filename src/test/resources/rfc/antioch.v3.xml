@@ -1,0 +1,849 @@
+<?xml version= "1.0" encoding= "US-ASCII"?>
+<?xml-stylesheet type= "text/xsl" href= "rfc2629.xslt"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<?rfc comments= "yes"?>
+<?rfc notedraftinprogress= "yes"?>
+<?rfc strict= "yes"?>
+<?rfc compact= "yes"?>
+<?rfc subcompact= "no"?>
+<?rfc toc= "yes"?>
+<?rfc tocdepth= "4"?>
+<?rfc symrefs= "yes"?>
+<?rfc sortrefs= "true"?>
+<rfc xmlns:xi= "http://www.w3.org/2001/XInclude" ipr= "trust200902"
+updates="8140" sortRefs="true" tocInclude="true"
+submissionType="independent" prepTime="2018-04-18T03:35:33Z"
+version="3">
+<front>
+<title abbrev= "Hand Grenade of Antioch">The Holy Hand Grenade of
+Antioch</title>
+<seriesInfo name= "Internet-Draft" status= "informational"
+stream="independent" value="draft-camelot-holy-grenade-01"/>
+<author fullname= "Arthur son of Uther Pendragon" surname= "Pendragon"
+initials="A.">
+<organization>Camelot</organization>
+<address>
+<postal>
+<street>Palace</street>
+<street>Camel Lot 1</street>
+<city>Camelot</city>
+<region>England</region>
+<country>United Kingdom</country>
+</postal>
+<email>arthur.pendragon@ribose.com</email>
+<uri>http://camelot.gov.example</uri>
+</address>
+</author>
+<date day= "15" month= "April" year="2018"/>
+<area>General</area>
+<area>Operations and Management</area>
+<keyword>rabbits</keyword>
+<keyword>grenades</keyword>
+<keyword>antioch</keyword>
+<keyword>camelot</keyword>
+
+<abstract>
+
+<!-- tag::preamble1[] -->
+
+
+<t>The menagerie of beasts and artefacts depicted in RFC8140
+may be usefully supplemented by other renowned figures of
+Internet and more general lore. This document extends the
+menagerie to the seminal fable of the
+"Holy Hand Grenade of Antioch", as depicted in the
+Monty Python film "Monty Python and the Holy Grail",
+as well as "Spamalot", the musical inspired by the
+movie.</t></abstract><note removeInRFC= "false">
+<name>Spamalot</name>
+<t>The relevance of the musical "Spamalot" to Internet lore should be
+obvious to the reader; but in case of doubt, see also
+Section 1 ("What is Spam*?") of RFC2635.</t>
+</note>
+
+
+<!-- end::preamble1[] -->
+
+
+
+
+<!-- tag::sectnums1[] -->
+
+
+</front><middle>
+<section anchor= "_terminology" toc= "exclude" numbered="false">
+<name>Terminology</name>
+<t>The key words "<bcp14>MUST</bcp14>", "<bcp14>MUST NOT</bcp14>",
+"<bcp14>REQUIRED</bcp14>", "<bcp14>SHALL</bcp14>",
+"<bcp14>SHALL NOT</bcp14>", "<bcp14>SHOULD</bcp14>", "<bcp14>SHOULD
+NOT</bcp14>", "<bcp14>RECOMMENDED</bcp14>",
+"<strong>NOT RECOMMENDED</strong>", "<bcp14>MAY</bcp14>", and
+"<bcp14>OPTIONAL</bcp14>" in this document
+are to be interpreted as described in BCP 14 <xref target= "RFC2119"/>
+<xref target="RFC8174"/>
+when, and only when, they appear in all capitals, as shown here.</t>
+</section>
+<section anchor= "_introduction" numbered=
+"true"><name>Introduction</name><t><xref target= "RFC8140"/> refers to
+the intended move of RFC formatting to
+XML2RFC v3 <xref target= "RFC7990"/>, in the following terms:</t>
+
+
+<!-- end::sectnums1[] -->
+
+
+
+
+<!-- tag::quote1[] -->
+
+
+<blockquote quotedFrom= "A. Farrel">
+<t>Although the RFC Editor has recently dragged the IETF kicking and
+screaming into the twentieth century [RFC7990] [RFC7996], there is a
+yearning among all right-thinking Internet architects to "keep it
+simple" and to return to the olden days when pigs could be given
+thrust without anyone taking undue offence.</t>
+</blockquote>
+
+
+<!-- end::quote1[] -->
+
+
+<t>While no pigs, flying or otherwise, are involved in the transition
+to RFC XML v3, it is opportune to enhance the <xref target= "RFC8140"/>
+legendarium in the service of RFC XML v3, by illustrating its
+functionality through references to the mythology of Camelot, and
+particularly the incidents at the Cave of Caerbannog.</t>
+
+
+<!-- tag::escaped_hyperlink1[] -->
+
+
+<t>The screaming move into the twenty-<strong>first</strong> century is
+accompanied by
+a move back to the late twentieth century, with ASCII stylings more
+wonted in haunts like ftp://ftp.wwa.com/pub/Scarecrow (known to be
+accessible in 1996.)</t>
+
+
+<!-- end::escaped_hyperlink1[] -->
+
+
+<t>There are two references to rabbits in
+<em>Monty Python and the Holy Grail</em> which are expounded on
+herewith:</t>
+
+
+<!-- tag::listcontinuation1[] -->
+
+
+<dl>
+<dt>Trojan Rabbit</dt>
+<dd>
+<t>In their siege of the French-occupied castle which may already
+contain an instance of the Grail, Sir Bedevere the Wise proposes to
+use a Trojan Rabbit to infiltrate the castle, with a raiding party
+to take the French "not only by surprise, but totally unarmed."</t>
+<t>The proposal, unsurprisingly, proved abortive. The more so as the
+raiding party forgot to hide within the Trojan Rabbit, before the
+French soldiers took the Trojan Rabbit inside the castle.</t>
+</dd>
+<dt>Killer Rabbit of Caerbannog</dt>
+<dd>Guarding the entrance to the Cave of Caerbannog; see <xref target=
+"caerbannog"/>.</dd>
+</dl>
+
+
+<!-- end::listcontinuation1[] -->
+
+</section>
+<section anchor= "_the_french_occupied_castle" numbered=
+"true"><name>The French-occupied castle</name>
+
+<!-- tag::inline_formatting1[] -->
+
+
+<t>The participants of that renowned exercise in cross-cultural
+communication, to wit the exchange between the
+<em>Knights of the Round Table</em>
+and the taunting French soldiers serving under <strong>Guy de
+Lombard</strong> are,
+properly speaking, outside the scope of this <tt>menagerie</tt>, being
+more
+or less human. Notwithstanding, several<sup>ish</sup> beasts both
+animate<sub>d</sub>
+and wooden played a significant part in this encounter; most
+notably:</t>
+<ul>
+<li>The Projectile Cow, see <xref target= "projectile-cow"/></li>
+<li>The Trojan Rabbit, see <xref target= "trojan-rabbit"/></li>
+</ul>
+
+
+<!-- end::inline_formatting1[] -->
+
+
+<figure anchor= "projectile-cow">
+<name>The Projectile Cow with an accompanying cannon</name>
+<artwork type= "ascii-art" alt= "The Projectile Cow with an
+accompanying cannon in ASCII"><![CDATA[
+.-.-.-.-.-.-.-.-.-.-.-.--.-.-.-.-.-.-.--.-.-.-.-.-.-.-.--.-.
+_-_---__--__--___-___-__-____---___-________---____-____-__-
+._.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.--..-.-.-.-.-.-..--.-
+,..,.,.,.,.,..,.,,..,.,.,.,.,.,,  ^^  .,,.,.,  ^^   .,.,.,.=
+_>-.-.-.-._>_>_>_.-.-.-.-.-.-.-.  \\\  .,.,.  ///  .-.-.-.-.
+.,.,.,.,..,.,..,.,.,..,.,.,,..,.,  \ \_______/ /    .,.,.,.,
+.,.,.,.,..,.,.,.,..,,..,,.,.,.,.,.  <[ {o} . ]>  #   .,.,.,.
+.-.-.--.-.-.-.-.-.--.-.-.-.--.-.-.   [ ______]       .-.-.-.
+.-.--.-.-.-.--.-.-.-.--.-.-.,.,.,  / [ !  ` `]   .,.,..,.,.-
+.,.,.,.-.-,l,-,l.-,.,.,.,-.,*.    /  {_!MOO!_}    . ., . . ,
+.-.-.-.-.-.-.-.-.-.-.-.-.-.-    /M      /    -.-<>.,.,..-.-,
+.-.-.--.-.-.-.-.-.-.-.-.--..   /MI    LK\____    .-.-.-.-.-.
+.-.-.-.--.-.-.-.-.-.-.-.-.-   /MILK   mil_____k   ,.,.,..-,-
+.-,-.-,-.,-.-,-.`-.-/-..     //    -`  //       .-.p . .-.-.
+.-.--.-.-.-.-.-.-.-.        //   .,   //    .-.-.-.-.-.-.-.-
+.-.-.--.-.-.-.-.-.-.  %____============    .-.-.--.-.-.-.-.-
+-.-.-.-.--.-.-.-.-.-.      !  !           .,-.-.-,-,--,-.-,-
+,--.-.-,--.--.-.,--,        \ \      .-,-,--.-,--,-.---,-.-,
+,-.-.-,-,-.-,-,-.--,         +  >    .-,--,-.--,-,-.-.-,--,-
+,--.-,--,-,--.---,-               .-,-,--.--,--,-.---,-,-.-.
+.,.,.,.,..,.,.,.{A\      .,.,.,.,..,.,.,.,.,.,..,.,.,.,..,.,
+.,.,.,.,.,.,.{GLASS\   .,..,.,.,.,.,..,.,.,.,.,.,.,..,.,.,.,
+,..,.,,.,,.,{OF|MILK\..,.,.,.,.,..,.,.,.,.,.,..,.,.,.,.,.,.,
+,.,..,.,,.,{ISWORTH},.,.,..,.,.,.,.,..,..,.,.,..,.,.,.,.,.,.
+.,.,.,.,.{EVERYTNG}.-.-.--..-.-.-.-.--..--.-.-.-.-.--.-.-.-.
+-.-.-.-{FORINFANTS}___--___-_-__-___--*(0~`~.,.,.,.,><><.><>
+_-__-_{BUTBETTER}-.-,-,-,-,-,-,-,-,.-^^^^.-.-.-.-.^^^7>>>,..
+.._...{WITH_HONEY}-.-.-.-.-.-.-.-.-.-.RANDOM(BUSH)SHRUBS>_..
+GRASS_GRASS_GRASS_GRASS_GRASS_SOMEROCKS>GRASS>GRASS<GRASS>PC
+SOIL_ROOTS_SOIL_SOIL_ROCKS_SOIL_GRASS_GRASS_GRASS_ROCKS_SOIL
+CLAY_ROCKS_PEBBLES_CLAY_CLAY_CLAY_CLAY_GOLD_CLAY_CLAY><_WORM
+ROOTS_CLAY_SKELETON_MORESOIL_CLAY_CLAY_CLAY_CLAY_<MUSHROOMS>
+]]></artwork>
+</figure>
+<figure anchor= "trojan-rabbit">
+<name>The Trojan Rabbit with an automatic sliding door</name>
+<artwork type= "ascii-art" alt= "The Trojan Rabbit with an automatic
+sliding door"><![CDATA[
+                           ___  ____
+                          //_ \//\__\
+                            || ||  |
+                         -__||_||__|
+                       //         \--_
+                      //     ____     --___
+                     //     //   \         \-_
+                    //      \\  @/        o ||
+                   //        ----      _____||
+                  //                   //
+             //\_//__                 //
+           //--  --- \____           //
+          //          --- \______   //
+         //   , .          ----- \_//_
+        //       ,.               --- \____
+       //              .,v             --- \___
+      //                                 __ -- \_
+     ||  ,         _______________       //||     |-_
+     ||           |   |''''''''''|     // ||     |  |
+     ||     '     |   |          |        ||     |  |
+     ||           |   |          |        ||     |  |
+     ||      "    |   | 0        |     ___||___  |  |
+     ||           |   |          |     --------  |  |
+     ||___        |   |          |        ______ |  |-
+    //     \      |   |          |       //     \| _| \
+   //       \ ____|---|__________|______//       \/    |
+  ||    X    |      /                  ||    X    |   /
+   \\       /\\____/                    \\       /___/
+    \\_____/ -----                       \\_____/---
+     -----                                -----
+]]></artwork>
+</figure>
+
+
+<!-- tag::aside1[] -->
+
+
+<aside><t>While the exchange at the French-occupied castle is one of
+the more memorable scenes of <em>Monty Python and the Holy Grail</em>,
+the Trojan Rabbit has not reached the same level of cultural
+resonance as its more murderous counterpart. Reasons for this
+may include:</t>
+<ul>
+<li>Less overall screen-time dedicated to the Trojan Rabbit.</li>
+<li>The Trojan Rabbit as projectile has already been anticipated
+by the Cow as projectile.</li>
+</ul></aside>
+
+
+<!-- end::aside1[] -->
+
+
+
+
+<!-- tag::note1[] -->
+
+
+<t><cref display= "true" source= "Author">Image courtesy of
+<eref target=
+"https://camelot.gov.example/creatures-in-ascii/"/></cref></t>
+
+
+<!-- end::note1[] -->
+
+
+
+
+<!-- tag::comment1[] -->
+
+
+<t>The exchange of projectile animals was the beginning of a
+long-running fruitful relationship between the British and the
+French peoples,
+
+
+<!-- TODO: Will need to verify that claim. -->
+
+which
+arguably predates the traditional English enmity with the
+French.
+
+<!-- Strictly speaking, the Knights are Welsh. -->
+
+</t>
+
+
+<!-- This document, as it turns out, has a profusion of XML comments.
+
+As expected, they are ignored in any rendering of the document.
+-->
+
+
+
+
+<!-- end::comment1[] -->
+
+</section>
+<section anchor= "caerbannog" numbered= "true"><name>The Mythos of
+Caerbannog</name>
+
+<!-- tag::xref1[] -->
+
+
+<t>The <em>Cave of Caerbannog</em> has been well-established in the
+mythology
+of Camelot (as recounted by Monty Python) as the lair of the
+Legendary Black Beast of Arrrghhh, more commonly known today as the
+<strong>Killer Rabbit of Caerbannog</strong> <xref target=
+"killer_rabbit_caerbannog"/>.
+It is the encounter between the Killer Rabbit of Caerbannog and the
+Knights of the Round Table, armed with the Holy Hand Grenade of
+Antioch (see the <xref target= "holy_hand_grenade">following
+section</xref>), that we
+recount here through monospace font and multiple spaces.</t>
+<section anchor= "killer_rabbit_caerbannog" numbered= "true"><name>The
+Killer Rabbit of Caerbannog</name>
+
+<!-- end::xref1[] -->
+
+
+
+
+<!-- tag::relref1[] -->
+
+
+<t>The <strong>Killer Rabbit of Caerbannog</strong>, that most
+formidable foe of
+the Knights and of all that is holy or carrot-like, has been
+depicted diversely in lay and in song. We venture to say,
+<em>contra</em> the claim made in <relref section= "4.1" displayFormat=
+"of" target="RFC8140">Ze Vompyre</relref>,
+that the Killer Rabbit of Caerbannog truly is the most afeared
+of all the creatures. Short of sanctified ordnance such as
+<xref format= "title" target= "holy_hand_grenade"/>, there are few
+remedies
+known against its awful lapine powers.</t>
+
+
+<!-- end::relref1[] -->
+
+
+
+
+<!-- tag::hyperlink1[] -->
+
+
+<t><xref target= "killer-bunny">The following depiction</xref> of the
+fearsome beast
+has been sourced from
+<eref target=
+"http://camelot.gov.example/avatars/rabbit">Rabbit-SCII</eref>,
+<xref target= "killer-source">accompanied</xref>
+by C code that was used in this accurate depiction of the
+Killer Rabbit:</t>
+
+
+<!-- end::hyperlink1[] -->
+
+
+
+
+<!-- tag::figure1[] -->
+
+
+<figure anchor= "killer-bunny">
+<name>A Photo Of The Killer Rabbit of Caerbannog Taken In
+Secret</name>
+<artwork type= "ascii-art" alt= "The Killer Bunny"><![CDATA[
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\\\\\\\\\\\\\\\\\\\\\^^^^^^^^^^^^^^^^^^^^^^\\\\\\\\\\\\\\\\\
+\\\\\\\\\\\\\\\\\\\<<#MWSHARPMWMWMWTEETHWMWWM>>>\\\\\\\\\\\\
+\\\\\\\\\\\\\\\<<<#WMMWMWDEEPMDARKWCAVEMWWMMWM##>>>>\\\\\\\\
+\\\\\\\\\\\\\<<#WMWMWMWMWWM/^MWMWMWMWMWMW^WMWMWMMW#>>>\\\\\\
+\\\\\\\\\\\\<<#WMWMBEASTMW// \MWABBITWMW/ \MWMWMWMW##\\\\\\\
+\\\\\\\\\\##MWMWMMWMWMWMWM\\  \MWMWMWMW/  /MWMWMWMWM##\\\\\\
+\\\\\\\\##WMWMWMWMMWMWMWMWM\\  \MWMWMW/  /MWMWMWMMWMWMWM##\\
+\\\\\\\##MWMMRAVENOUSMWMWMWM\\  \====/  /MWMRABBITMWMWMWMW##
+\\\\\\##MWMWMWMWMMWMWMWMWMW[[            ]WMWMWMMWMWMWMWMWMW
+\\\\\##MWMWMWMWCARNIVOROUSW[[   3    3   ]MWMWTOOMDARKWMWMMW
+\\\\##MWMWDARKMWMWMWMWMWMWM//\     o    /MWMWMWMMWMWMWMMWMWM
+\\##MWMWMMKILLERABBITWMWMM//| \___vv___/ \WMPITCHWBLACKWMWMW
+\##MWMWMWMMWMWMWMWMWMMWMW// |   \-^^-/   |MWMWMWMMWMWMWMWMWM
+MWMWMWMMWMWVERYMDARKWMMW//  |            |MWMCAERBANNOGWMWMW
+MWMWMWMMWMWMWMWMWMWMWMM{{  /             /MWMWMMWMWMWMWMWMWM
+MULTRADARKWMWMHELPMWMWMW\\ \  |      |  |MWMCANMMWMWMWMMWMWW
+MWMWMWMWMMWMWMWMWMMWMWMWM\\ | |_     |  |_WMWMMYOUMWMMWWMWMW
+MWMMWMWMWMWMBLACKWMWMWMWWM\_|__-\-----\__-\MWMWMWMREADMWMWWM
+MWMWMWMMWMWMWMWMMWMWMWWMWMWMWMMWMWMWMWMWMWMWMWMWMWMWMMTHISWW
+MWVERYMMSCARYMWMWWMWMMWMWMWMWMWMWMWMWMWMWMWMWWMWMMWMWIWM'.',
+MWMWMMWMW======MWMMCANTWSEEMAMTHINGMMWMWMWMWMWMWMBETMMW` . `
+MWMWMWM// SKULL \MWMWMWMMWSCREAMMMWMWMWMMWMNOTMWMWMWW  ` . \
+MWMWMW|| |X||X| |MWMWCALLMMEWMMWMWMMWMWMWMWWM - ` ~ . , '
+MWMWMW||___ O __|MWMWMWMMWMWMWMWMMW'   ___________//   -_^_-
+MWMWMW \\||_|_||MWMW      '   . .     <_|_|_||_|__|     \O/
+MW   \\/\||v v||  -\\-------___     .   .,         \     |
+    \\|  \_CHIN/  ==-(|CARROT/)\>     \\/||//         v\/||/
+       )          /--------^-^            ,.            \|//
+ #  \(/ .\\|x//                              " ' '
+  . ,                \\||//        \||\\\//   \\
+]]></artwork>
+</figure>
+<figure anchor= "killer-source">
+<name>C Code To Lure Killer Rabbit Back To Cave</name>
+<sourcecode type= "c"><![CDATA[
+<CODE BEGINS>
+/* Locate the Killer Rabbit */
+int type;
+unsigned char *killerRabbit =
+LocateCreature(&caerbannog, "killer rabbit");
+if( killerRabbit == 0 ){
+puts("The Killer Rabbit of Caerbannog is out of town.");
+return LOST_CREATURE;
+}
+
+/* Load Cave */
+unsigned char *cave = LoadPlace(&caerbannog,
+"The Cave Of Caerbannog");
+if( cave == 0 ){
+puts("The Cave of Caerbannog must have moved.");
+return LOST_PLACE;
+}
+
+/* Lure the Killer Rabbit back into the Cave */
+unsigned char *carrot = allocateObjectInPlace(
+carrot("fresh"), cave);
+if( carrot == 0 ){
+puts("No carrot, no rabbit.");
+return LOST_LURE;
+}
+
+/* Finally, notify the Killer Rabbit to act */
+return notifyCreature(killerRabbit, &carrot);
+<CODE ENDS>
+]]></sourcecode>
+</figure>
+
+
+<!-- end::figure1[] -->
+
+
+<t>On the beast's encounter with the Knights of the Round Table,
+the following personnel engaged with it in combat:</t>
+
+
+<!-- tag::ul1[] -->
+
+
+<ul>
+<li>
+<t>Killed</t>
+<ul>
+<li>Sir Bors</li>
+<li>Sir Gawain</li>
+<li>Sir Ector</li>
+</ul>
+</li>
+<li>
+<t>Soiled Himself</t>
+<ul>
+<li>Sir Robin</li>
+</ul>
+</li>
+<li>
+<t>Panicked</t>
+<ul>
+<li>King Arthur</li>
+</ul>
+</li>
+<li>
+<t>Employed Ordnance</t>
+<ul>
+<li>The Lector</li>
+<li>Brother Maynard</li>
+</ul>
+</li>
+<li>
+<t>Scoffed</t>
+<ul>
+<li>Tim the Enchanter</li>
+</ul>
+</li>
+</ul>
+
+
+<!-- end::ul1[] -->
+
+</section>
+<section anchor= "holy_hand_grenade" numbered= "true"><name>Holy Hand
+Grenade of Antioch</name>
+
+<!-- tag::figure2[] -->
+
+
+<figure anchor= "hand-grenade-figure">
+<name>The Holy Hand Grenade of Antioch (don't pull the pin)</name>
+<artwork type= "ascii-art" alt= "Holy Hand Grenade of
+Antioch"><![CDATA[
+                        ______
+                       \\/  \/
+                      __\\  /__
+                     ||  //\   |
+                     ||__\\/ __|
+                        ||  |    ,---,
+                        ||  |====`\  |
+                        ||  |    '---'
+                      ,--'*`--,
+                    _||#|***|#|
+                 _,/.-'#|* *|#`-._
+               ,,-'#####|   |#####`-.
+             ,,'########|   |########`,
+            //##########| o |##########\
+           ||###########|   |###########|
+          ||############| o |############|
+          ||------------'   '------------|
+          ||o  o  o  o  o   o  o  o  o  o|
+           |-----------------------------|
+           ||###########################|
+            \\#########################/
+             `..#####################,'
+               ``..###############_,'
+                  ``--.._____..--'
+                     `''-----''`
+]]></artwork>
+</figure>
+
+
+<!-- end::figure2[] -->
+
+
+<figure anchor= "sovereign-orb">
+<name>The Sovereign's Orb made invisible</name>
+<artwork align= "right" alt= "Orb" height="135" name="Outlines of the
+Sovereign's Orb" src="https://camelot.gov.example/sovereigns_orb.jpg"
+type="binary-art" width="124"/>
+</figure>
+
+
+<!-- tag::index1[] -->
+
+
+<t>The solution to the impasse at the Cave of Caerbannog<iref item=
+"Cave of Caerbannog"/> was
+provided by the successful deployment of the
+<strong>Holy Hand Grenade of Antioch</strong> (see <xref target=
+"hand-grenade-figure"/>)
+<iref item= "Holy Hand Grenade of Antioch"/>.
+Any similarity between the Holy Hand Grenade of Antioch and the
+mythical <em>Holy Spear of Antioch</em> is purely intentional;
+<iref item= "relics" subitem= "Christian"/> any similarity between the
+Holy Hand Grenade
+of Antioch and the <em>Sovereign's Orb of the United Kingdom</em>
+(see <xref target= "sovereign-orb"/>) is putatively fortuitous.
+<iref item= "relics" subitem= "monarchic"/></t>
+
+
+<!-- end::index1[] -->
+
+
+
+
+<!-- tag::dl1[] -->
+
+
+<dl>
+<dt>Holy Hand Grenade of Antioch</dt>
+<dd>Ordnance deployed by Brother Maynard under the incantation of a
+lector, in order to dispense with the Foes of the Virtuous.
+See <xref target= "hand-grenade-figure"/>.</dd>
+<dt>Holy Spear of Antioch</dt>
+<dd>A supposed relic of the crucifixion of Jesus Christ, this is one
+of at least four claimed instances of the lance that pierced
+Christ's side. Its historical significance lies in inspiring
+crusaders to continue their siege of Antioch in 1098.</dd>
+<dt>Sovereign's Orb of the United Kingdom</dt>
+<dd>Part of the Crown Jewels of the United Kingdom, the Sovereign's
+Orb is a hollow gold sphere set with jewels and topped with a
+cross.  It was made for Charles II in 1661. See <xref target=
+"sovereign-orb"/>.</dd>
+</dl>
+
+
+<!-- end::dl1[] -->
+
+
+
+
+<!-- tag::bcp14_1[] -->
+
+
+<t>The instructions in the <em>Book of Armaments</em> on the proper
+deployment
+of the Holy Hand Grenade of Antioch <bcp14>MAY</bcp14> be summarized as
+follows, although this summary <bcp14>SHALL NOT</bcp14> be used as a
+substitute
+for a reading from the Book of Armaments:</t>
+
+
+<!-- end::bcp14_1[] -->
+
+
+
+
+<!-- tag::ol1[] -->
+
+
+<ol type= "1">
+<li>Preamble: St Attila Benediction</li>
+<li>
+<t>Feast of the People on Sundry Foods</t>
+<ul>
+<li>Lambs</li>
+<li>Sloths</li>
+<li>Carp</li>
+<li>Anchovies</li>
+<li>Orangutangs</li>
+<li>Breakfast Cereals</li>
+<li>Fruit Bats</li>
+<li>
+<em>et hoc genus omne</em>
+</li>
+</ul>
+</li>
+<li>Take out the Holy Pin</li>
+<li>
+<t>The Count</t>
+<ol type= "A">
+<li>Count is to Three: no more, no less</li>
+<li>Not Four</li>
+<li>Nor Two, except if the count then proceeds to Three</li>
+<li>Five is Right Out</li>
+</ol>
+</li>
+<li>Lob the Holy Hand Grenade of Antioch towards the Foe</li>
+<li>The Foe, being naughty in the <strong>LORD's</strong> sight,
+<bcp14>SHALL</bcp14> snuff it</li>
+</ol>
+
+
+<!-- end::ol1[] -->
+
+
+<t>This could also be represented in pseudocode as follows:</t>
+
+
+<!-- tag::listcontinuationblock1[] -->
+
+
+<ol type= "1">
+<li>Take out the Holy Pin</li>
+<li>
+<t>The Count</t>
+<figure>
+<sourcecode><![CDATA[
+integer count;
+for count := 1 step 1 until 3 do
+say(count)
+comment Five is Right Out
+]]></sourcecode>
+</figure>
+</li>
+<li>Lob the Holy Hand Grenade of Antioch towards the Foe</li>
+<li>Foe snuffs it</li>
+</ol>
+
+
+<!-- end::listcontinuationblock1[] -->
+
+</section></section>
+<section anchor= "_dramatis_personae" numbered= "true"><name>Dramatis
+Personae</name><t>The following human (more-or-less) protagonists were
+involved
+in the two incidents recounted as lore of the Knights of the
+Round Table:</t>
+
+
+<!-- tag::table1[] -->
+
+
+<table>
+<thead>
+<tr>
+<th align= "left">French Castle</th>
+<th align= "left">Cave of Caerbannog</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan= "2" align= "left">King Arthur</td>
+</tr>
+<tr>
+<td colspan= "2" align= "left">Patsy</td>
+</tr>
+<tr>
+<td colspan= "2" align= "left">Sir Bedevere the Wise</td>
+</tr>
+<tr>
+<td colspan= "2" align= "left">Sir Galahad the Pure</td>
+</tr>
+<tr>
+<td colspan= "2" align= "left">Sir Lancelot the Brave</td>
+</tr>
+<tr>
+<td colspan= "2" align= "left">Sir Robin the
+Not-quite-so-brave-as-Sir-Lancelot</td>
+</tr>
+<tr>
+<td align= "left">French Guard with Outrageous Accent</td>
+<td align= "left">Tim the Enchanter</td>
+</tr>
+<tr>
+<td align= "left">Other French Guards</td>
+<td align= "left">Brother Maynard</td>
+</tr>
+<tr>
+<td align= "left"/>
+<td align= "left">The Lector</td>
+</tr>
+<tr>
+<td rowspan= "3" align= "center">not yet recruited</td>
+<td align= "right">Sir Bors</td>
+</tr>
+<tr>
+<td align= "right">Sir Gawain</td>
+</tr>
+<tr>
+<td align= "right">Sir Ector</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td align= "left">Retinue of sundry knights</td>
+<td align= "left">Retinue of sundry more knights than at the
+French Castle</td>
+</tr>
+</tfoot>
+</table>
+
+
+<!-- end::table1[] -->
+
+
+<section anchor= "_past_the_killer_rabbit" numbered= "true"><name>Past
+the Killer Rabbit</name><t>Once the Killer Rabbit of Caerbannog (<xref
+target= "killer-bunny"/>) had been
+dispatched, the Knights of the Round Table uncovered the last
+words of Joseph of Arimathea, inscribed on the Cave of Caerbannog
+in Aramaic.  While the precise Aramaic wording has not survived,
+we trust the following Hebrew subtitles will serve as an
+acceptable substitute:</t>
+
+
+<!-- tag::hebrew1[] -->
+
+
+<blockquote><t>&#1499;&#1488;&#1503; &#1488;&#1493;&#1500;&#1497;
+&#1497;&#1502;&#1510;&#1488;&#1493;
+&#1492;&#1502;&#1497;&#1500;&#1497;&#1501;
+&#1492;&#1488;&#1495;&#1512;&#1493;&#1504;&#1493;&#1514; &#1513;&#1500;
+&#1497;&#1493;&#1505;&#1507;
+.&#1502;&#1488;&#1512;&#1502;&#1514;&#1497;&#1492;
+&#1502;&#1497; &#1488;&#1513;&#1512; &#1497;&#1492;&#1497;&#1492;
+&#1488;&#1502;&#1497;&#1509; &#1493;&#1489;&#1506;&#1500;
+&#1504;&#1508;&#1513; &#1496;&#1492;&#1493;&#1512;&#1492;
+&#1497;&#1493;&#1499;&#1500; &#1500;&#1502;&#1510;&#1493;&#1488;
+&#1488;&#1514; &#1492;&#1490;&#1489;&#1497;&#1506;
+&#1492;&#1511;&#1491;&#1493;&#1513; &#1489;&#1496;&#1497;&#1512;&#1514;
+.&#1488;&#1488;&#1488;&#1488;&#1488;&#1488;&#1488;&#1492;</t>
+<t>"Here may be found the last words of Joseph&#160;of Arimathea.
+He who is valiant and pure of spirit may find the Holy Grail
+in the castle of &#8212; Aaaargh."</t></blockquote>
+
+
+<!-- end::hebrew1[] -->
+
+</section></section>
+<section anchor= "_iana_considerations" numbered= "true">
+<name>IANA Considerations</name>
+<t>IANA might consider a registry to track the mythical, especially
+ravaging beasts, such as the Killer Rabbit, who haunt the Internet.</t>
+</section>
+<section anchor= "_security_considerations" numbered=
+"true"><name>Security Considerations</name><t>Do not let the Killer
+Rabbit out under any circumstance.</t>
+<t>I repeat. Do not let the Killer Rabbit (<xref target=
+"killer-bunny"/>) out.</t>
+
+
+<!-- tag::bibliography1[] -->
+
+</section>
+</middle><back>
+<references anchor= "_normative_references">
+<name>Normative References</name>
+<xi:include href=
+"https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"/>
+</references>
+<references anchor= "_informative_references">
+<name>Informative References</name>
+<reference anchor= "grail_film">
+<front>
+<title>Monty Python and the Holy Grail</title>
+<author initials= "G." surname= "Chapman"/>
+<author initials= "J." surname= "Cleese"/>
+<author initials= "E." surname= "Idle"/>
+<author initials= "T." surname= "Gilliam"/>
+<author initials= "T." surname= "Jones"/>
+<author initials= "M." surname= "Palin"/>
+<date year= "1975"/>
+</front>
+</reference>
+<xi:include href=
+"https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2635.xml" />
+<xi:include href=
+"https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7990.xml" />
+<xi:include href=
+"https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8140.xml" />
+<xi:include href=
+"https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml" />
+</references>
+</back>
+</rfc>

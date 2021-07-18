@@ -70,12 +70,12 @@ public class RELAXNGValidator {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.RELAXNG_NS_URI);
             if (rngFilename.toLowerCase().endsWith(".rng")) {
                 // associate the schema factory with the resource resolver, which is responsible for resolving the imported RNG's
-                factory.setResourceResolver(new ResourceResolver(""));
+                factory.setResourceResolver(new ResourceResolver("RFC/")); // path in resources
             }
             
             
             
-            Source srcRNG = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), rngFilename));
+            Source srcRNG = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), "RFC/" + rngFilename));
             Schema schema = factory.newSchema(srcRNG);
             Validator validator = schema.newValidator();
             
