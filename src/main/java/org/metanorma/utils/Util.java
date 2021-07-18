@@ -3,6 +3,7 @@ package org.metanorma.utils;
 import static org.metanorma.Constants.*;
 import org.metanorma.mnconvert;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -240,6 +241,8 @@ public class Util {
             String root = node.getNodeName();
             if (root.endsWith("-standard") || root.equals("metanorma-collection")) {
                 return "metanorma";
+            } else if (root.equals("rfc"))  {
+                return "rfc";
             } else {
                 return "sts";
             }
@@ -249,4 +252,10 @@ public class Util {
         return "";
     }
     
+    public static void writeBuffer(StringBuilder sbBuffer, String outputFile) throws IOException {
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(outputFile))) {
+            writer.write(sbBuffer.toString());
+        }
+        sbBuffer.setLength(0);
+    }
 }

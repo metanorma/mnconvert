@@ -5,8 +5,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.metanorma</groupId>
 	<artifactId>mnconvert</artifactId>
-	<version>1.8.0</version>
-	<name>Metanorma XML to NISO STS XML two-directional converter</name>
+	<version>1.9.0</version>
+	<name>Metanorma XML to NISO STS XML two-directional and XML2RFC to Metanorma Asciidoc IETF converter</name>
 	<packaging>jar</packaging>
 	<url>https://www.metanorma.org</url>
 	<properties>
@@ -104,6 +104,11 @@
 			 <groupId>commons-io</groupId>
 			 <artifactId>commons-io</artifactId>
 			 <version>2.6</version>
+		</dependency>
+		<dependency>
+			 <groupId>com.thaiopensource</groupId>
+			 <artifactId>jing</artifactId>
+			 <version>20091111</version>
 		</dependency>
 	</dependencies>
 </project>

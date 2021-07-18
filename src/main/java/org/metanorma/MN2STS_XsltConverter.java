@@ -1,7 +1,6 @@
 package org.metanorma;
 
 import static org.metanorma.Constants.*;
-import org.metanorma.utils.LoggerHelper;
 import org.metanorma.utils.Util;
 import org.metanorma.validator.CheckAgainstEnum;
 
@@ -14,7 +13,6 @@ import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.text.MessageFormat;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
@@ -34,72 +32,31 @@ import org.xml.sax.SAXParseException;
 /**
  * This class for the conversion of an Metanorma XML to NISO/ISO XML file
  */
-public class MN2STS_XsltConverter implements XsltConverter {
+public class MN2STS_XsltConverter extends XsltConverter {
 
-    private static final Logger logger = Logger.getLogger(LoggerHelper.LOGGER_NAME);
-    
-    private String inputFilePath = "document.xml"; // default input file name
-    
-    private String inputXslPath = null; // default xsl is null (will be used from jar)
-    private File fileXSL = null;
-    
-    private String outputFilePath = ""; // default output file name
     
     private String checkType = "xsd_niso";
     private CheckAgainstEnum checkTypeEnumValue = CheckAgainstEnum.XSD_NISO; 
     
-    private String outputFormat = "NISO";
     private OutputFormatEnum outputFormatEnumValue = OutputFormatEnum.NISO;
-    
-    private boolean isDebugMode = false; // default no debug
+
     
     public MN2STS_XsltConverter() {
-        
+        this.outputFormat = "NISO"; // redefine default output format to 'NISO'
     }
 
-    @Override
-    public void setInputFilePath(String inputFilePath) {
-        this.inputFilePath = inputFilePath;
-    }
-
-
-    @Override
-    public void setInputXslPath(String inputXslPath) {
-        this.inputXslPath = inputXslPath;
-    }
-
-    @Override
-    public void setOutputFilePath(String outputFilePath) {
-        if (outputFilePath != null) {
-            this.outputFilePath = outputFilePath;
-        }
-    }
-    
-    @Override
-    public void setDebugMode(boolean isDebugMode) {
-        this.isDebugMode = isDebugMode;
-    }
-
-    
     public void setCheckType(String checkType) {
         if (checkType != null) {
             this.checkType = checkType;
         }
     }
 
-    @Override
-    public void setOutputFormat(String outputFormat) {
-        if (outputFormat != null) {
-            this.outputFormat = outputFormat;
-        }
-    }
-
-   
+    
     private void setDefaultOutputFilePath() {
         if (outputFilePath.isEmpty()) {
-            File fInputFilePath = new File(inputFilePath);
-            outputFilePath = fInputFilePath.getAbsolutePath();
-            String outputFilePathWithoutExtension = outputFilePath.substring(0, outputFilePath.lastIndexOf('.') + 1);
+            
+            String outputFilePathWithoutExtension = super.getDefaultOutputFilePath();
+            
             outputFilePath = outputFilePathWithoutExtension + "sts." + outputFormat + ".xml";
         }
     }
