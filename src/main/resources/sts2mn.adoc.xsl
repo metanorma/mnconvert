@@ -2374,13 +2374,11 @@
 		<xsl:value-of select="$space_after"/>
 	</xsl:template>
 	
-	<xsl:template match="named-content">
-		<!-- <xsl:text>&lt;&lt;</xsl:text> -->
+	<xsl:template match="named-content[@content-type = 'abbrev']" priority="2">
 		<xsl:variable name="space_before"><xsl:if test="local-name(preceding-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		<xsl:variable name="space_after"><xsl:if test="local-name(following-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		<xsl:value-of select="$space_before"/>
 		
-		<xsl:text>term:[</xsl:text>
 		<xsl:variable name="target">
 			<xsl:choose>
 				<xsl:when test="translate(@xlink:href, '#', '') = ''"> <!-- empty xlink:href -->
@@ -2394,6 +2392,38 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
+		
+		<xsl:text>&lt;&lt;</xsl:text>
+		<xsl:value-of select="$target"/>
+		<xsl:if test="normalize-space() != ''">
+			<xsl:text>,</xsl:text><xsl:apply-templates/>
+		</xsl:if>
+		<xsl:text>&gt;&gt;</xsl:text>
+		
+		<xsl:value-of select="$space_after"/>
+	</xsl:template>
+	
+	<xsl:template match="named-content">
+		<!-- <xsl:text>&lt;&lt;</xsl:text> -->
+		<xsl:variable name="space_before"><xsl:if test="local-name(preceding-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
+		<xsl:variable name="space_after"><xsl:if test="local-name(following-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
+		<xsl:value-of select="$space_before"/>
+		
+		<xsl:variable name="target">
+			<xsl:choose>
+				<xsl:when test="translate(@xlink:href, '#', '') = ''"> <!-- empty xlink:href -->
+					<xsl:value-of select="translate(normalize-space(), ' ()', '---')"/>
+				</xsl:when>
+				<xsl:when test="starts-with(@xlink:href, '#')">
+					<xsl:value-of select="substring-after(@xlink:href, '#')"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="@xlink:href"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:text>term:[</xsl:text>
 		<xsl:choose>
 			<xsl:when test="@content-type = 'term' and (local-name(//*[@id = $target]) = 'term-sec' or local-name(//*[@id = $target]) = 'termEntry')">
 				<xsl:variable name="term_real" select="//*[@id = $target]//tbx:term[1]"/>
