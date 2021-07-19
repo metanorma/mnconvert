@@ -42,7 +42,7 @@ jobs:
           polling_interval_seconds: 5
           timeout_minutes: 5
           max_attempts: 3
-          command: choco install --no-progress make gnuwin32-coreutils.install curl yq
+          command: choco install --no-progress make gnuwin32-coreutils.install curl yq wget
 
       - if: matrix.os == 'macos-latest'
         run: brew install maven yq

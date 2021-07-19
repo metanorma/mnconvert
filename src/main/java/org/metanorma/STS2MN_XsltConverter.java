@@ -3,7 +3,6 @@ package org.metanorma;
 import org.metanorma.utils.Task;
 import org.metanorma.utils.Util;
 import static org.metanorma.Constants.*;
-import org.metanorma.utils.LoggerHelper;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,10 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
-import java.util.logging.Logger;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
@@ -39,28 +36,11 @@ import org.xml.sax.helpers.XMLReaderFactory;
 /**
  * This class for the conversion of an NISO/ISO XML file to Metanorma XML or AsciiDoc
  */
-public class STS2MN_XsltConverter implements XsltConverter {
+public class STS2MN_XsltConverter extends XsltConverter {
 
-    private static final Logger logger = Logger.getLogger(LoggerHelper.LOGGER_NAME);
-    
-    private final String TMPDIR = System.getProperty("java.io.tmpdir");
-    private final Path tmpfilepath  = Paths.get(TMPDIR, UUID.randomUUID().toString());
-    
-    private String inputFilePath = "document.xml"; // default input file name
-    private boolean isInputFileRemote = false; // true, if inputFilePath starts from http, https, www.
-    
-    private String inputXslPath = null; // default xsl is null (will be used from jar)
-    private File fileXSL = null;
-    
-    private String outputFilePath = ""; // default output file name
-    
-    private String outputFormat = "adoc"; // default output format is 'adoc'
-    
     private String imagesDir = "images"; // default image dir - 'images'
     
     private boolean isSplitBibdata = false;
-    
-    private boolean isDebugMode = false; // default no debug
     
     private String typeStandard = ""; // default value empty - allows to determine standard via xslt
     
@@ -68,31 +48,6 @@ public class STS2MN_XsltConverter implements XsltConverter {
     
     public STS2MN_XsltConverter() {
         
-    }
-
-    @Override
-    public void setInputFilePath(String inputFilePath) {
-        this.inputFilePath = inputFilePath;
-        
-    }
-
-    @Override
-    public void setInputXslPath(String inputXslPath) {
-        this.inputXslPath = inputXslPath;
-    }
-
-    @Override
-    public void setOutputFilePath(String outputFilePath) {
-        if (outputFilePath != null) {
-            this.outputFilePath = outputFilePath;
-        }
-    }
-
-    @Override
-    public void setOutputFormat(String outputFormat) {
-        if (outputFormat != null) {
-            this.outputFormat = outputFormat.toLowerCase();
-        }
     }
 
     public void setImagesDir(String imagesDir) {
@@ -105,11 +60,7 @@ public class STS2MN_XsltConverter implements XsltConverter {
         this.isSplitBibdata = isSplitBibdata;
     }
 
-    @Override
-    public void setDebugMode(boolean isDebugMode) {
-        this.isDebugMode = isDebugMode;
-    }
-
+    
     public void setTypeStandard(String typeStandard) {
         if (typeStandard != null) {
             this.typeStandard = typeStandard;
@@ -117,23 +68,16 @@ public class STS2MN_XsltConverter implements XsltConverter {
     }
     
     
-    
-    
     private void setDefaultOutputFilePath() {
         if (outputFilePath.isEmpty()) {
-            File fInputFilePath = new File(inputFilePath);
-            outputFilePath = fInputFilePath.getAbsolutePath();
-            if (isInputFileRemote) {
-                outputFilePath = Paths.get(System.getProperty("user.dir"), new File(outputFilePath).getName()).toString();
-            }
-            String outputFilePathWithoutExtension = outputFilePath.substring(0, outputFilePath.lastIndexOf('.') + 1);
+            
+            String outputFilePathWithoutExtension = super.getDefaultOutputFilePath();
             
             if (outputFormat.equals("xml")) {
                 outputFilePath = outputFilePathWithoutExtension + "mn." + outputFormat;                    
             } else { // adoc
                 outputFilePath = outputFilePathWithoutExtension + outputFormat;
             }
-            
         }
     }
 
@@ -142,7 +86,6 @@ public class STS2MN_XsltConverter implements XsltConverter {
         
         try {
             
-        
             if (inputFilePath.toLowerCase().startsWith("http") || inputFilePath.toLowerCase().startsWith("www.")) {
                 isInputFileRemote = true;
                 inputFilePath = Util.downloadFile(inputFilePath, tmpfilepath);
@@ -177,7 +120,7 @@ public class STS2MN_XsltConverter implements XsltConverter {
             if (fileXSL != null) {
                 logger.info(String.format(INPUT_LOG, XSL_INPUT, fileXSL));
             }
-            logger.info(String.format(OUTPUT_LOG_STS2mn, outputFormat.toUpperCase(), outputFilePath));
+            logger.info(String.format(OUTPUT_LOG_STS2MN, outputFormat.toUpperCase(), outputFilePath));
             logger.info("");
             
             convertsts2mn();
@@ -346,10 +289,4 @@ public class STS2MN_XsltConverter implements XsltConverter {
         return resultWriteridentity.toString();
     }*/
     
-    private void writeBuffer(StringBuilder sbBuffer, String outputFile) throws IOException {
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(outputFile))) {
-            writer.write(sbBuffer.toString());
-        }
-        sbBuffer.setLength(0);
-    }
 }

@@ -25,9 +25,9 @@ public class mnconvert {
 
     private static final Logger logger = Logger.getLogger(LoggerHelper.LOGGER_NAME);
     
-    static final String CMD_STSCheckOnly = "java -jar " + APP_NAME + ".jar <input_xml_file> [-check-type type...]";
+    static final String CMD_STSCheckOnly = "java -jar " + APP_NAME + ".jar <input_xml_file> [--check-type type...]";
     
-    static final String CMD_STStoMN = "java -jar " + APP_NAME + ".jar <input_xml_file> [options]";
+    static final String CMD_STSorRFCtoMN = "java -jar " + APP_NAME + ".jar <input_xml_file> [options]";
     
     static String VER = Util.getAppVersion();
     
@@ -59,14 +59,14 @@ public class mnconvert {
         }
     };
     
-    // Mode 2. STS to Metanorma conversion
+    // Mode 2. STS to Metanorma, or XML2RFC to Metanorma conversion
     static final Options optionsMain = new Options() {
         {
             addOption(Option.builder("if")
                     .longOpt("input-format")
                     .desc("input format")
                     .hasArg()
-                    .argName("metanorma|sts")
+                    .argName("metanorma|sts|rfc")
                     .required(false)
                     .build());
             addOption(Option.builder("s")
@@ -196,9 +196,18 @@ public class mnconvert {
                 }
                 
                 String argXmlIn = arglist.get(0);
-                
+
                 File fXMLin = new File(argXmlIn);
-                if (!fXMLin.exists()) {
+                
+                boolean isFileNotFound = false;
+                if (argXmlIn.toLowerCase().startsWith("http") || argXmlIn.toLowerCase().startsWith("www.")) {
+                    if (!Util.isUrlExists(argXmlIn)) {
+                        isFileNotFound = true;
+                    }
+                } else if (!fXMLin.exists()) {
+                    isFileNotFound = true;
+                }
+                if (isFileNotFound) {
                     logger.severe(String.format(INPUT_NOT_FOUND, XML_INPUT, fXMLin));
                     System.exit(ERROR_EXIT_CODE);
                 }
@@ -230,6 +239,12 @@ public class mnconvert {
                             mn2sts.setCheckType(cmdMain.getOptionValue("check-type"));
                             defaultOutputFormat = "niso";
                             converter = mn2sts;
+                            break;
+                        }
+                    case "rfc":
+                        {
+                            RFC2MN_XsltConverter rfc2mn = new RFC2MN_XsltConverter();
+                            converter = rfc2mn;
                             break;
                         }
                     default:
@@ -267,7 +282,7 @@ public class mnconvert {
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp(pw, 80, CMD_STSCheckOnly, "", optionsSTSCheckOnly, 0, 0, "");
         pw.write("\nOR\n\n");
-        formatter.printHelp(pw, 80, CMD_STStoMN, "", optionsMain, 0, 0, "");
+        formatter.printHelp(pw, 80, CMD_STSorRFCtoMN, "", optionsMain, 0, 0, "");
         pw.flush();
         return stringWriter.toString();
     }

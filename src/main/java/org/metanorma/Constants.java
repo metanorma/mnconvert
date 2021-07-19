@@ -13,6 +13,7 @@ public final class Constants {
     public static final String XSL_INPUT = "XSL";
     public static final String INPUT_LOG = "Input: %s (%s)";
     public static final String OUTPUT_LOG_MN2STS = "Output: %s (%s), format %s STS";
-    public static final String OUTPUT_LOG_STS2mn = "Output: %s (%s)";
+    public static final String OUTPUT_LOG_STS2MN = "Output: %s (%s)";
+    public static final String OUTPUT_LOG_RFC2MN = "Output: %s (%s)";
     public static final int ERROR_EXIT_CODE = -1;
 }

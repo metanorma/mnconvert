@@ -15,6 +15,9 @@ SRCFILE := $(SRCDIR)/iso-rice-en.cd.mn.xml $(SRCDIR)/iso-tc154-8601-1-en.mn.xml
 
 SRCFILESTS := $(SRCDIR)/rice-en.final.sts.xml
 
+SRCRFCDIR := rfcsources
+SRCRFCMASK := rfc865*.xml
+
 DESTDIR := documents
 DESTSTSXML := $(patsubst %.mn.xml,%.sts.xml,$(patsubst src/test/resources/%,documents/%,$(SRCFILE)))
 DESTSTSHTML := $(patsubst %.xml,%.html,$(DESTSTSXML))
@@ -84,6 +87,17 @@ mn2stsDTD_ISO: $(DESTSTSXML) target/$(JAR_FILE) | documents
 documents.adoc: target/$(JAR_FILE) documents
 	java -jar $< ${SRCFILESTS} --output ${DESTMNADOC}
 
+xml2rfc.adoc: target/$(JAR_FILE) rfcsources documents
+ifeq ($(OS),Windows_NT)
+	for /r %%f in ($(SRCRFCDIR)/*.xml) do java -jar target/$(JAR_FILE) $(SRCRFCDIR)/%%~nxf --output $(DESTDIR)/%%~nf.adoc
+else
+	for f in $(SRCRFCDIR)/*.xml; do fout=$${f##*/}; java -jar target/$(JAR_FILE) $$f --output $(DESTDIR)/$${fout%.*}.adoc  ; done
+endif
+
+rfcsources:
+	wget -r -l 1 -nd -A ${SRCRFCMASK} -R rfc-*.xml -P ${SRCRFCDIR} https://www.rfc-editor.org/rfc/
+
+
 saxon.jar:
 	curl -sSL $(SAXON_URL) -o $@
 
@@ -108,7 +122,7 @@ clean:
 	rm -rf documents
 
 publish: published
-published: documents.html documents.adoc
+published: documents.html documents.adoc xml2rfc.adoc
 	mkdir $@
 ifeq ($(OS),Windows_NT)
 	xcopy documents $@\ /E
