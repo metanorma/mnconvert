@@ -46,7 +46,7 @@ java -jar mnconvert-1.9.0.jar xml_file [options]
 - `--output-format`, -of - iso|niso(default), optional
 - `--check-type`, `-ct` - check against XSD NISO (value 'xsd-niso', default), DTD ISO (value 'dtd-iso'), DTD NISO (value 'dtd-niso')
 
-=== 4. Convert XML2RFC to Metanorma adoc.
+=== 4. Converting from RFC XML version 2 (and v3 later...) to Metanorma AsciiDoc.
 
 [source,sh]
 ----
