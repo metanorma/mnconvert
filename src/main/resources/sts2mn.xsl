@@ -991,15 +991,19 @@
 	<xsl:template match="tbx:entailedTerm">
 		<xsl:variable name="target" select="substring-after(@target, 'term_')"/>
 		<xsl:choose>
-			<xsl:when test="contains(., concat('(', $target, ')'))">
+			<xsl:when test="contains(., concat('(', $target, ')'))"> <!-- example: concept entry (3.5) -->
 				<em><xsl:value-of select="normalize-space(substring-before(., concat('(', $target, ')')))"/></em>
 			</xsl:when>
+			<xsl:when test="contains(., concat(' ', $target, ')'))"> <!-- example: vocational competence (see 3.26) -->
+				<em><xsl:value-of select="normalize-space(substring-before(., '('))"/></em>
+			</xsl:when>
+			<xsl:when test="translate(., '01234567890.', '') = ''"></xsl:when><!-- if digits and dot only, example 3.13 -->
 			<xsl:otherwise>
 				<em><xsl:value-of select="."/></em>
 			</xsl:otherwise>
 		</xsl:choose>
 		<xsl:text> (</xsl:text>
-		<xref target="{@target}"><xsl:if test="contains(., concat('(', $target, ')'))"><strong><xsl:value-of select="$target"/></strong></xsl:if></xref>
+		<xref target="{@target}"><xsl:if test="contains(., concat('(', $target, ')')) or contains(., concat(' ', $target, ')'))"><strong><xsl:value-of select="$target"/></strong></xsl:if></xref>
 		<xsl:text>)</xsl:text>
 	</xsl:template>
 	
@@ -1431,7 +1435,7 @@
 	
 	<xsl:template match="xref">
 		<xsl:choose>
-			<xsl:when test="@ref-type = 'fn' and following-sibling::*[1][self::fn]"/> <!-- if next element is fn, then no need to do here -->
+			<xsl:when test="@ref-type = 'fn' and following-sibling::*[self::fn][@id = current()/@rid]"/> <!-- if next element is fn, then no need to do here -->
 			<xsl:when test="@ref-type = 'fn'">
 				<fn>
 					<xsl:attribute name="reference">
@@ -1476,7 +1480,7 @@
 	<xsl:template match="fn">
 		<fn>
 			<xsl:attribute name="reference">
-				<xsl:value-of select="preceding-sibling::xref//text()"/>
+				<xsl:value-of select="preceding-sibling::xref[@rid = current()/@id]//text()"/>
 			</xsl:attribute>
 			<xsl:apply-templates />
 		</fn>
