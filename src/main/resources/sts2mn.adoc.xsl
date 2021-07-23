@@ -1275,9 +1275,20 @@
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:apply-templates select="@list-type"/>
+		<xsl:variable name="list-type">
+			<xsl:apply-templates select="@list-type"/>
+		</xsl:variable>
+		
+		<xsl:variable name="start">
+			<xsl:call-template name="getListStartValue"/>
+		</xsl:variable>
+		<xsl:if test="$start != '' and $start != '1'">
+			<xsl:text>[start=</xsl:text><xsl:value-of select="$start"/><xsl:text>]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 		
 		<xsl:apply-templates/>
+		
 		<xsl:if test="not(parent::list-item)">
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
@@ -1307,6 +1318,38 @@
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if> -->
 	</xsl:template>
+	
+	<xsl:template name="getListStartValue">
+		<xsl:variable name="first_label" select="translate(.//label[1], ').', '')"/>
+		<xsl:variable name="type">
+			<xsl:choose>
+				<xsl:when test="@list-type = 'alpha-lower'">alphabet</xsl:when>
+				<xsl:when test="@list-type = 'alpha-upper'">alphabet_upper</xsl:when>
+				<xsl:when test="@list-type = 'roman-lower'">roman</xsl:when>
+				<xsl:when test="@list-type = 'roman-upper'">roman_upper</xsl:when>
+				<xsl:when test="@list-type = 'arabic'">arabic</xsl:when>
+				<xsl:when test="$first_label != '' and translate($first_label, '1234567890', '') = ''">arabic</xsl:when>
+				<xsl:when test="$first_label != '' and translate($first_label, 'ixvcm', '') = ''">roman</xsl:when>
+				<xsl:when test="$first_label != '' and translate($first_label, 'IXVCM', '') = ''">roman_upper</xsl:when>
+				<xsl:when test="$first_label != '' and translate($first_label, 'abcdefghijklmnopqrstuvwxyz', '') = ''">alphabet</xsl:when>
+				<xsl:when test="$first_label != '' and translate($first_label, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''">alphabet_upper</xsl:when>
+				<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="start">
+			<xsl:choose>
+				<xsl:when test="$type = 'arabic' and $first_label != '1'"><xsl:value-of select="$first_label"/></xsl:when>
+				<xsl:when test="normalize-space($first_label) != '' and (($type = 'roman' and $first_label != 'i') or
+						($type = 'roman_upper' and $first_label != 'I') or 
+						($type = 'alphabet' and $first_label != 'a') or
+						($type = 'alphabet_upper' and $first_label != 'A'))">
+						<xsl:value-of select="java:org.metanorma.utils.Util.getListStartValue($type, $first_label)"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:value-of select="normalize-space($start)"/>
+	</xsl:template>
+	
 	
 	<xsl:template match="list/list-item">
 		<xsl:variable name="list_item_label">
