@@ -2094,7 +2094,7 @@
 	
 	
 	
-	<xsl:template match="*[local-name() = 'table']"> <!-- [*[local-name() = 'name']] -->
+	<xsl:template match="*[local-name() = 'table']" name="table"> <!-- [*[local-name() = 'name']] -->
 		<xsl:variable name="number"><xsl:number level="any"/></xsl:variable>
 		<xsl:variable name="current_id">
 			<xsl:call-template name="getId"/>
@@ -2136,19 +2136,21 @@
 			</xsl:if>
 			<xsl:apply-templates select="*[local-name() = 'name']" mode="table"/>				
 			<table>
-				<xsl:copy-of select="@*[not(local-name() = 'id')]"/>
-				<!-- <xsl:attribute name="width">
-					<xsl:choose>
-						<xsl:when test="@width"><xsl:value-of select="@width"/></xsl:when>
-						<xsl:otherwise>100%</xsl:otherwise>
-					</xsl:choose>
-				</xsl:attribute> -->
+				<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered')]"/>
+				<xsl:apply-templates select="@width"/>
+				
 				<xsl:apply-templates select="*[local-name() = 'colgroup']" mode="table"/>
 				<xsl:apply-templates select="*[local-name() = 'thead']" mode="table"/>
 				<xsl:apply-templates select="*[local-name() = 'tfoot']" mode="table"/>
 				<xsl:apply-templates select="*[local-name() = 'tbody']" mode="table"/>
 				<xsl:apply-templates />
 			</table>
+			
+			<!-- <table-wrap>
+			<table></table>
+			<table></table>
+			</table-wrap> -->
+			<xsl:apply-templates select="following-sibling::*[1][local-name() = 'table']" mode="table_wrap_multiple"/>
 			
 			<!-- move notes outside table -->
 			<xsl:if test="*[local-name() = 'note']">
@@ -2163,7 +2165,55 @@
 		
 	</xsl:template>
 
+
+	<!-- ========================================= -->
+	<!-- <table-wrap>
+	<table></table>
+	<table></table>
+	</table-wrap> -->
+	<!-- ========================================= -->
+	<xsl:template match="*[local-name() = 'table'][preceding-sibling::*[1][local-name() = 'table']]" priority="2">
+		<xsl:variable name="first_table_id" select="preceding-sibling::*[local-name() = 'table'][not(preceding-sibling::*[local-name() = 'table'])][1]/@id"/>
+		<xsl:if test="not(starts-with(@id, concat($first_table_id, '_')))">
+			<xsl:call-template name="table"/>
+		</xsl:if>
+	</xsl:template>
+
+	<xsl:template match="*[local-name() = 'table']" mode="table_wrap_multiple">
+		<xsl:variable name="first_table_id" select="preceding-sibling::*[local-name() = 'table'][not(preceding-sibling::*[local-name() = 'table'])][1]/@id"/>
+
+		<xsl:if test="starts-with(@id, concat($first_table_id, '_'))">
+			<table>
+				<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered')]"/>
+				<xsl:apply-templates select="@width"/>
+				
+				<xsl:apply-templates select="*[local-name() = 'colgroup']" mode="table"/>
+				<xsl:apply-templates select="*[local-name() = 'thead']" mode="table"/>
+				<xsl:apply-templates select="*[local-name() = 'tfoot']" mode="table"/>
+				<xsl:apply-templates select="*[local-name() = 'tbody']" mode="table"/>
+				<xsl:apply-templates />
+			</table>
+			<xsl:apply-templates select="following-sibling::*[1][local-name() = 'table']" mode="table_wrap_multiple"/>
+		</xsl:if>
+	</xsl:template>
+	<!-- ========================================= -->
+	<!-- END -->
+	<!-- <table-wrap>
+	<table></table>
+	<table></table>
+	</table-wrap> -->
+	<!-- ========================================= -->
 	
+	<xsl:template match="*[local-name() = 'table']/@width">
+		<xsl:attribute name="width">
+			<xsl:choose>
+				<xsl:when test="contains(., 'px')">
+					<xsl:value-of select="substring-before(., 'px')"/>
+				</xsl:when>
+				<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:attribute>
+	</xsl:template>
 	
 	<xsl:template match="*[local-name() = 'table']/*[local-name() = 'note']" priority="2"/>
 	

@@ -1166,6 +1166,16 @@
 					</xsl:choose>
 				</xsl:attribute>
 			</xsl:if>
+			
+			<xsl:if test="parent::table-wrap and preceding-sibling::table"> <!-- if there are a few table inside table-wrap -->
+				<xsl:variable name="id" select="parent::table-wrap/@id"/>
+				<xsl:variable name="counter" select="count(preceding-sibling::table) + 1"/>
+				<xsl:attribute name="id">
+					<xsl:value-of select="concat($id, '_', $counter)"/>
+				</xsl:attribute>
+				
+			</xsl:if>
+			
 			<xsl:apply-templates select="@width" mode="table_header"/>
 			<xsl:apply-templates select="parent::table-wrap/caption/title"/>
 			<xsl:apply-templates/>

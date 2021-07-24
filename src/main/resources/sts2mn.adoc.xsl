@@ -1676,6 +1676,14 @@
 			<xsl:text>[[array_</xsl:text><xsl:value-of select="parent::array/@id"/><xsl:text>]]&#xa;</xsl:text>
 			<xsl:text>[%unnumbered]&#xa;</xsl:text>
 		</xsl:if>
+		
+		<xsl:if test="parent::table-wrap and preceding-sibling::table"> <!-- if there are  few table inside table-wrap -->
+			<xsl:variable name="id" select="parent::table-wrap/@id"/>
+			<xsl:variable name="counter" select="count(preceding-sibling::table) + 1"/>
+			<xsl:text>[[</xsl:text><xsl:value-of select="concat($id, '_', $counter)"/><xsl:text>]]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>		
+		</xsl:if>
+		
 		<xsl:text>[</xsl:text>
 		<xsl:text>cols="</xsl:text>
 		<xsl:variable name="cols-count">
