@@ -1025,19 +1025,31 @@
 			</xsl:choose>
 		</xsl:variable>
 		<xsl:variable name="term_real" select="normalize-space(//*[@id = current()/@target]//tbx:term[1])"/>
-		<!-- term:[objectives] -->
-		<!-- term:[objectives,objective] -->
-		<xsl:text>term:[</xsl:text>
-		<xsl:value-of select="$term_real"/>
-		<xsl:if test="$term != $term_real and $term != ''">
-			<xsl:text>,</xsl:text><xsl:value-of select="$term"/>
-		</xsl:if>
-		<xsl:text>]</xsl:text>
 		
+		<xsl:call-template name="insertTermReference">
+			<xsl:with-param name="term" select="$term_real"/>
+			<xsl:with-param name="rendering" select="$term"/>
+		</xsl:call-template>
+
 		<xsl:value-of select="$space_after"/>
-		<!-- <xsl:text> (</xsl:text>
-		<xsl:text>&lt;&lt;</xsl:text><xsl:value-of select="@target"/><xsl:text>&gt;&gt;</xsl:text>
-		<xsl:text>)</xsl:text>		 -->
+		
+	</xsl:template>
+	
+	<!-- old: term:[term] -->
+	<!-- old: term:[term,rendering] -->
+	<!-- {{term}} -->
+	<!-- {{term,rendering}} -->
+	<xsl:template name="insertTermReference">
+		<xsl:param name="term"/>
+		<xsl:param name="rendering"/>
+		<!-- <xsl:text>term:[</xsl:text>
+		<xsl:text>]</xsl:text> -->
+		<xsl:text>{{</xsl:text>
+		<xsl:value-of select="$term"/>
+		<xsl:if test="$rendering != '' and $rendering != $term">
+			<xsl:text>,</xsl:text><xsl:value-of select="$rendering"/>
+		</xsl:if>
+		<xsl:text>}}</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="tbx:note" name="tbx_note">
@@ -1517,7 +1529,10 @@
 				
 				<!-- <xsl:variable name="term_name" select="java:toLowerCase(java:java.lang.String.new(translate($term_name_, ' ', '-')_))"/>				 -->
 				<!-- <xsl:text>&lt;&lt;</xsl:text>term-<xsl:value-of select="$term_name"/><xsl:text>&gt;&gt;</xsl:text> -->
-				<xsl:text>term:[</xsl:text><xsl:value-of select="$term_name"/><xsl:text>]</xsl:text>
+				<!-- <xsl:text>term:[</xsl:text><xsl:value-of select="$term_name"/><xsl:text>]</xsl:text> -->
+				<xsl:call-template name="insertTermReference">
+					<xsl:with-param name="term" select="$term_name"/>
+				</xsl:call-template>
 			</xsl:when>
 			<xsl:otherwise> <!-- example: ref-type="sec" "table" "app" -->
 				<xsl:text>&lt;&lt;</xsl:text><xsl:value-of select="$rid"/><xsl:text>&gt;&gt;</xsl:text>
@@ -2447,7 +2462,7 @@
 	</xsl:template>
 	
 	<xsl:template match="named-content">
-		<!-- <xsl:text>&lt;&lt;</xsl:text> -->
+
 		<xsl:variable name="space_before"><xsl:if test="local-name(preceding-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		<xsl:variable name="space_after"><xsl:if test="local-name(following-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		<xsl:value-of select="$space_before"/>
@@ -2466,7 +2481,6 @@
 			</xsl:choose>
 		</xsl:variable>
 		
-		<xsl:text>term:[</xsl:text>
 		<xsl:choose>
 			<xsl:when test="@content-type = 'term' and (local-name(//*[@id = $target]) = 'term-sec' or local-name(//*[@id = $target]) = 'termEntry')">
 				<xsl:variable name="term_real" select="//*[@id = $target]//tbx:term[1]"/>
@@ -2475,21 +2489,26 @@
 				
 				<xsl:variable name="value" select="."/>
 				
-				<xsl:value-of select="$term_real"/>
+				<xsl:call-template name="insertTermReference">
+					<xsl:with-param name="term" select="$term_real"/>
+					<xsl:with-param name="rendering" select="$value"/>
+				</xsl:call-template>
 				
-				<xsl:if test="$value != $term_real"><xsl:text>,</xsl:text><xsl:value-of select="$value"/></xsl:if>
-				
-
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:value-of select="$target"/>
-				<xsl:if test="normalize-space() != ''">
-					<xsl:text>,</xsl:text><xsl:apply-templates/>
-				</xsl:if>
+				
+				<xsl:variable name="value">
+					<xsl:apply-templates/>
+				</xsl:variable>
+				
+				<xsl:call-template name="insertTermReference">
+					<xsl:with-param name="term" select="$target"/>
+					<xsl:with-param name="rendering" select="$value"/>
+				</xsl:call-template>
+				
 			</xsl:otherwise>
 		</xsl:choose>
-		<!-- <xsl:text>&gt;&gt;</xsl:text> -->
-		<xsl:text>]</xsl:text>
+		
 		<xsl:value-of select="$space_after"/>
 	</xsl:template>
 	
