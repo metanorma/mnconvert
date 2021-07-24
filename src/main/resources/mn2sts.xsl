@@ -1321,7 +1321,7 @@
 		</xsl:variable>
 		<xsl:variable name="sfx">
 			<xsl:if test="ancestor::*[local-name() = 'table']"><xsl:value-of select="ancestor::*[local-name() = 'table'][1]/@id"/>_</xsl:if>
-			</xsl:variable>
+		</xsl:variable>
 		<xsl:variable name="xref_fn">
 			<xref ref-type="fn" rid="fn_{$number_id}"> <!-- {$sfx} rid="fn_{$number}" -->
 				<sup><xsl:value-of select="$number"/>)</sup>
@@ -1858,15 +1858,17 @@
 	</xsl:template>
 
 	<!-- <xsl:template match="*[local-name() = 'definition']//*[local-name() = 'em']" priority="2"> -->
+	
+	<!-- ===================== -->
+	<!-- tbx:entailedTerm -->
+	<!-- ===================== -->
+	<!-- Conversion from: -->
+	<!-- <em>objectives</em> (<xref target="term-objective"><strong>3.8</strong></xref>) -->
+	<!-- to: -->
+	<!-- <tbx:entailedTerm target="term_3.8">objectives (3.8)</tbx:entailedTerm> -->
 	<!-- for em, when next is xref -->
-	<xsl:template match="*[local-name() = 'em'][following-sibling::*[1][local-name() = 'xref']]" priority="2">
-		<tbx:entailedTerm>
-			<xsl:variable name="target" select="following-sibling::*[1]/@target"/>					
-			<!-- <xsl:variable name="section" select="$elements//element[@source_id = $target]/@section"/> -->
-			<xsl:attribute name="target">
-				<!-- <xsl:text>term_</xsl:text><xsl:value-of select="$section"/> -->
-				<!-- <xsl:text>term_</xsl:text> --><xsl:value-of select="$target"/>
-			</xsl:attribute>
+	<xsl:template match="*[local-name() = 'em'][following-sibling::node()[1][. = ' ('] and following-sibling::*[1][local-name() = 'xref']]" priority="2">
+		<tbx:entailedTerm target="{following-sibling::*[1]/@target}">
 			<xsl:apply-templates />
 			<xsl:apply-templates select="following-sibling::*[1]" mode="em_xref"/><!-- get xref -->
 		</tbx:entailedTerm>
@@ -1882,10 +1884,7 @@
 		<!-- following-sibling-text='<xsl:value-of select="following-sibling::node()[1]"/>' -->
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'xref'][preceding-sibling::*[1][local-name() = 'em']]" priority="2"/>
-	<!-- <xsl:template match="*[local-name() = 'xref'][preceding-sibling::*[1][local-name() = 'em']]" priority="2">
-		<xsl:value-of select="$elements//element[@source_id = current()/@target]/@section"/>	
-	</xsl:template> -->
+	<xsl:template match="*[local-name() = 'xref'][preceding-sibling::node()[1][. = ' ('] and preceding-sibling::*[1][local-name() = 'em']]" priority="2"/>
 	
 	<!-- remove '(' between em and xref -->
 	<xsl:template match="text()[normalize-space() = '('][preceding-sibling::*[1][local-name() = 'em'] and following-sibling::*[1][local-name() = 'xref']]"/>
@@ -1893,6 +1892,9 @@
 	<xsl:template match="text()[substring(normalize-space(),1,1) = ')'][preceding-sibling::*[1][local-name() = 'xref'] and preceding-sibling::*[2][local-name() = 'em']]">
 		<xsl:value-of select="substring-after(., ')')"/>
 	</xsl:template>
+	<!-- ===================== -->
+	<!-- END tbx:entailedTerm -->
+	<!-- ===================== -->
 	
 	<xsl:template match="*[local-name() = 'em']">
 		<italic><xsl:apply-templates /></italic>
