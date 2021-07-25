@@ -7,7 +7,7 @@
 		xmlns:java="http://xml.apache.org/xalan/java" 
 		xmlns:java_char="http://xml.apache.org/xalan/java/java.lang.Character" 
 		xmlns:redirect="http://xml.apache.org/xalan/redirect"
-		exclude-result-prefixes="mml tbx xlink xalan java" 
+		exclude-result-prefixes="mml tbx xlink xalan java java_char" 
 		extension-element-prefixes="redirect"
 		version="1.0">
 
@@ -2829,16 +2829,18 @@
 			<xsl:text>]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
-		<xsl:text>[[</xsl:text>
-			<xsl:choose>
-				<xsl:when test="normalize-space(@id) != ''">
-					<xsl:value-of select="@id"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="@sec-type"/>
-				</xsl:otherwise>
-			</xsl:choose>
-		<xsl:text>]]</xsl:text>
+		<xsl:if test="normalize-space(@id) != '' or @sec-type">
+			<xsl:text>[[</xsl:text>
+				<xsl:choose>
+					<xsl:when test="normalize-space(@id) != ''">
+						<xsl:value-of select="@id"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="@sec-type"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			<xsl:text>]]</xsl:text>
+		</xsl:if>
 		<xsl:if test="not(title) and label">
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:choose>
@@ -3041,7 +3043,7 @@
 	</xsl:template>
 
 	<!-- ========================================= -->
-	<!-- XML Linearization - remove redundant spaces -->
+	<!-- XML Linearization -->
 	<!-- ========================================= -->
 	<xsl:template match="@*|node()" mode="linearize">
 		<xsl:copy>
@@ -3049,6 +3051,7 @@
 		</xsl:copy>
 	</xsl:template>
 	
+	<!-- remove redundant spaces -->
 	<xsl:template match="text()[not(parent::code) and not(parent::preformat) and not(parent::mml:*)]" mode="linearize">
 		<xsl:choose>
 			<xsl:when test="parent::standard or parent::body or parent::sec or parent::term-sec or parent::tbx:termEntry or parent::back or parent::app-group or parent::app or parent::ref-list or parent::fig or parent::caption or parent::table-wrap or parent::tr or parent::thead or parent::colgroup or parent::table or parent::tbody or parent::fn or parent::non-normative-note or parent::array">
@@ -3070,6 +3073,62 @@
 				<xsl:value-of select="."/>
 			</xsl:otherwise>
 		</xsl:choose>		
+	</xsl:template>
+	
+	<!-- transform p with section number to sec and title -->
+	<xsl:template match="sec/p[java:org.metanorma.utils.RegExHelper.matches('^[0-9]+((\.[0-9]+)+(\s.*)?)?$', normalize-space(.)) = 'true'][local-name(node()[1]) != 'xref']" mode="linearize">
+	
+		<xsl:variable name="title_without_bold">
+			<xsl:apply-templates mode="title_without_bold"/>
+		</xsl:variable>
+	
+		<xsl:variable name="title_first_component" select="xalan:nodeset($title_without_bold)/node()[1]"/>
+		<xsl:variable name="label">
+			<xsl:choose>
+				<xsl:when test="contains($title_first_component, ' ')">
+					<xsl:value-of select="substring-before($title_first_component, ' ')"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$title_first_component"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+	
+		<xsl:variable name="title">
+			<xsl:for-each select="xalan:nodeset($title_without_bold)/node()">
+				<xsl:choose>
+					<xsl:when test="position() = 1">
+						<xsl:value-of select="substring-after(., ' ')"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:copy-of select="."/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:for-each>
+		</xsl:variable>
+	
+		<sec>
+			<label><xsl:value-of select="$label"/></label>
+			<xsl:if test="normalize-space(xalan:nodeset($title)) != ''">
+				<title>
+					<xsl:copy-of select="$title"/>
+				</title>	
+			</xsl:if>
+		</sec>
+	</xsl:template>
+	
+	<xsl:template match="@*|node()" mode="title_without_bold">
+		<xsl:copy>
+				<xsl:apply-templates select="@*|node()" mode="title_without_bold"/>
+		</xsl:copy>
+	</xsl:template>
+	<xsl:template match="bold" mode="title_without_bold">
+		<xsl:apply-templates mode="title_without_bold"/>
+	</xsl:template>
+	<xsl:template match="text()" mode="title_without_bold">
+		<xsl:call-template name="trimSpaces">
+			<xsl:with-param name="text" select="translate(., '&#xa0;&#x9;', '  ')"/> <!-- replace nbsp and tab to space -->
+		</xsl:call-template>
 	</xsl:template>
 	
 	
@@ -3264,5 +3323,34 @@
 	<!-- ========================================= -->
 	<!-- END References fixing -->
 	<!-- ========================================= -->
+	
+	<xsl:template name="trimSpaces">
+		<xsl:param name="text" select="."/>
+		
+		<xsl:variable name="text_lefttrim">
+			<xsl:choose>
+				<xsl:when test="not(preceding-sibling::*) and not(preceding-sibling::comment())">
+					<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),'^\s+','')"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$text"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		
+		<xsl:variable name="text_righttrim">
+			<xsl:choose>
+				<xsl:when test="not(following-sibling::*) and not(following-sibling::comment())">
+					<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text_lefttrim),'\s+$','')"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$text_lefttrim"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+
+		<xsl:value-of select="$text_righttrim"/>
+	</xsl:template>
 	
 </xsl:stylesheet>
