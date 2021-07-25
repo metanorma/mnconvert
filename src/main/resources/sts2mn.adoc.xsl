@@ -939,8 +939,16 @@
 				<xsl:text>&#xa;&#xa;</xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
+				<xsl:variable name="calculated_level">
+					<xsl:choose>
+						<xsl:when test="parent::sec/@sec_depth"><xsl:value-of select="parent::sec/@sec_depth"/></xsl:when>
+						<xsl:otherwise>0</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
 				<xsl:variable name="level">
-					<xsl:call-template name="getLevel"/>
+					<xsl:call-template name="getLevel">
+						<xsl:with-param name="calculated_level" select="$calculated_level"/>
+					</xsl:call-template>
 				</xsl:variable>				
 				<xsl:value-of select="$level"/>
 				<xsl:text> </xsl:text><xsl:apply-templates />
@@ -2537,12 +2545,17 @@
 	
 	<xsl:template name="getLevel">
 		<xsl:param name="addon">0</xsl:param>
+		<xsl:param name="calculated_level">0</xsl:param>
+		
 		<xsl:variable name="level_total" select="count(ancestor::*)"/>
 		
 		<xsl:variable name="level_standard" select="count(ancestor::standard/ancestor::*)"/>
 		
 		<xsl:variable name="level_">
 			<xsl:choose>
+				<xsl:when test="$calculated_level != 0">
+					<xsl:value-of select="$calculated_level"/>
+				</xsl:when>
 				<xsl:when test="ancestor::app-group">
 					<xsl:value-of select="$level_total - $level_standard - 2"/>
 				</xsl:when>
@@ -3076,7 +3089,7 @@
 	</xsl:template>
 	
 	<!-- transform p with section number to sec and title -->
-	<xsl:template match="sec/p[java:org.metanorma.utils.RegExHelper.matches('^[0-9]+((\.[0-9]+)+(\s.*)?)?$', normalize-space(.)) = 'true'][local-name(node()[1]) != 'xref']" mode="linearize">
+	<xsl:template match="sec/p[java:org.metanorma.utils.RegExHelper.matches('^[0-9]+((\.[0-9]+)+((\s|\h).*)?)?$', normalize-space(.)) = 'true'][local-name(node()[1]) != 'xref']" mode="linearize">
 	
 		<xsl:variable name="title_without_bold">
 			<xsl:apply-templates mode="title_without_bold"/>
@@ -3089,7 +3102,7 @@
 					<xsl:value-of select="substring-before($title_first_component, ' ')"/>
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:value-of select="$title_first_component"/>
+					<xsl:value-of select="normalize-space($title_first_component)"/>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -3108,7 +3121,16 @@
 		</xsl:variable>
 	
 		<sec>
-			<label><xsl:value-of select="$label"/></label>
+			<xsl:attribute name="sec_depth">
+				<xsl:value-of select="string-length($label) - string-length(translate($label, '.', '')) + 2"/>
+			</xsl:attribute>
+			<label>
+				<!-- to process these cases:
+				*0.3   Common principles of relationship management*
+				*0.3.1   The life cycle framework*
+				-->
+				<xsl:value-of select="$label"/>
+			</label>
 			<xsl:if test="normalize-space(xalan:nodeset($title)) != ''">
 				<title>
 					<xsl:copy-of select="$title"/>
@@ -3349,8 +3371,11 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-
-		<xsl:value-of select="$text_righttrim"/>
+		
+		<!-- replace two or more spaces into one space -->
+		<xsl:variable name="text" select="java:replaceAll(java:java.lang.String.new($text_righttrim),'\s{2,}',' ')"/>
+		
+		<xsl:value-of select="$text"/>
 	</xsl:template>
 	
 </xsl:stylesheet>
