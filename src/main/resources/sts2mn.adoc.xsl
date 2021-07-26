@@ -1565,10 +1565,18 @@
 	</xsl:template>
 
 	<!-- process as Note -->
+	<!-- Example:
+	<table-wrap-foot>
+		<fn><p>NOTE   ...</p></fn>
+	</table-wrap-foot>
+	-->
 	<xsl:template match="fn[not(@reference) and not(@id)]" priority="2">
 		<xsl:call-template name="tbx_note"/>
 	</xsl:template>
 
+	<xsl:template match="fn[not(@reference) and not(@id)]/p/text()" priority="2">
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.), '^NOTE(\s|\h)+', '')"/>
+	</xsl:template>
 	
 	<xsl:template match="uri">
 		<xsl:apply-templates />
@@ -1918,7 +1926,7 @@
 		</xsl:variable>
 		
 		<xsl:if test="normalize-space($table_footer) != ''">
-			<xsl:value-of select="$cols-count"/><xsl:text>+|</xsl:text>		
+			<xsl:value-of select="$cols-count"/><xsl:text>+a|</xsl:text>		
 			<xsl:value-of select="$table_footer"/>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
