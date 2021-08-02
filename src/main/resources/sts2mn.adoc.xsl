@@ -3075,7 +3075,7 @@
 	<!-- remove redundant spaces -->
 	<xsl:template match="text()[not(parent::code) and not(parent::preformat) and not(parent::mml:*)]" mode="linearize">
 		<xsl:choose>
-			<xsl:when test="parent::standard or parent::body or parent::sec or parent::term-sec or parent::tbx:termEntry or parent::back or parent::app-group or parent::app or parent::ref-list or parent::fig or parent::caption or parent::table-wrap or parent::tr or parent::thead or parent::colgroup or parent::table or parent::tbody or parent::fn or parent::non-normative-note or parent::array">
+			<xsl:when test="parent::standard or parent::body or parent::sec or parent::term-sec or parent::tbx:termEntry or parent::back or parent::app-group or parent::app or parent::ref-list or parent::ref or parent::fig or parent::caption or parent::table-wrap or parent::tr or parent::thead or parent::colgroup or parent::table or parent::tbody or parent::fn or parent::non-normative-note or parent::array">
 				<xsl:value-of select="normalize-space()"/>
 			</xsl:when>
 			<xsl:when test="parent::td and preceding-sibling::*[1][self::p or self::non-normative-note or self::list] and 
