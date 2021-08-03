@@ -2094,8 +2094,12 @@
 				<xsl:variable name="referenceTitle">
 				
 					<xsl:variable name="std-ref">
-						<xsl:apply-templates select="std/std-ref" mode="references"/>
+						<xsl:variable name="std-ref_">
+							<xsl:apply-templates select="std/std-ref" mode="references"/>
+						</xsl:variable>
+						<xsl:if test="starts-with($std-ref_, 'EN ')">BS </xsl:if><xsl:value-of select="$std-ref_"/>
 					</xsl:variable>
+					
 					<xsl:variable name="mixed-citation">
 						<xsl:apply-templates select="mixed-citation/std" mode="references"/>
 					</xsl:variable>
