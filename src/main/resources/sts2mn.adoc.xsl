@@ -2106,12 +2106,13 @@
 					<xsl:if test="(normalize-space($std-ref) != '' or normalize-space($mixed-citation) != '') and normalize-space($label) != ''">
 						<xsl:text>(</xsl:text>
 					</xsl:if>
-					<xsl:value-of select="$std-ref"/>
-					<xsl:value-of select="$mixed-citation"/>
+					<xsl:value-of select="$label"/>
 					<xsl:if test="(normalize-space($std-ref) != '' or normalize-space($mixed-citation) != '') and normalize-space($label) != ''">
 						<xsl:text>)</xsl:text>
 					</xsl:if>
-					<xsl:value-of select="$label"/>
+					<xsl:value-of select="$std-ref"/>
+					<xsl:value-of select="$mixed-citation"/>
+					
 				</xsl:variable>
 				
 				<xsl:value-of select="translate($referenceTitle, '&#x2011;', '-')"/> <!-- non-breaking hyphen minus -->
