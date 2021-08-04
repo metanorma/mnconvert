@@ -3080,24 +3080,37 @@
 	<!-- remove redundant spaces -->
 	<xsl:template match="text()[not(parent::code) and not(parent::preformat) and not(parent::mml:*)]" mode="linearize">
 		<xsl:choose>
+		
 			<xsl:when test="parent::standard or parent::body or parent::sec or parent::term-sec or parent::tbx:termEntry or parent::back or parent::app-group or parent::app or parent::ref-list or parent::ref or parent::fig or parent::caption or parent::table-wrap or parent::tr or parent::thead or parent::colgroup or parent::table or parent::tbody or parent::fn or parent::non-normative-note or parent::array">
 				<xsl:value-of select="normalize-space()"/>
 			</xsl:when>
+			
 			<xsl:when test="parent::td and preceding-sibling::*[1][self::p or self::non-normative-note or self::list] and 
 			following-sibling::*[1][self::p or self::non-normative-note or self::list] and 
 			normalize-space() = ''"></xsl:when>
-			<xsl:when test="contains(., '&#xa;')">
-				<!-- replace line breaks to space -->
-				<xsl:variable name="text_" select="translate(., '&#xa;', ' ')"/>
-				<!-- replace space sequence to one space -->
-				<xsl:variable name="text" select="java:replaceAll(java:java.lang.String.new($text_),' +',' ')"/>
-				<xsl:if test="normalize-space($text) != ''">
-					<xsl:value-of select="$text"/>
-				</xsl:if>
-			</xsl:when>
+			
 			<xsl:otherwise>
-				<xsl:value-of select="."/>
+				<xsl:variable name="str">
+					<xsl:choose>
+						<xsl:when test="contains(., '&#xa;')">
+							<!-- replace line breaks to space -->
+							<xsl:variable name="text_" select="translate(., '&#xa;', ' ')"/>
+							<!-- replace space sequence to one space -->
+							<xsl:variable name="text" select="java:replaceAll(java:java.lang.String.new($text_),' +',' ')"/>
+							<xsl:if test="normalize-space($text) != ''">
+								<xsl:value-of select="$text"/>
+							</xsl:if>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="."/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<!-- Escape "(c)" text to avoid render copyright symbol -->
+				<xsl:variable name="str1" select="java:replaceAll(java:java.lang.String.new($str),'\(c\)','(&#x200c;c)')"/>
+				<xsl:value-of select="$str1"/>
 			</xsl:otherwise>
+			
 		</xsl:choose>		
 	</xsl:template>
 	
