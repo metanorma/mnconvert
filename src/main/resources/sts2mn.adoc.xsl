@@ -3113,11 +3113,28 @@
 						
 						<!-- Remove square brackets around cross-reference (xref with ref-type="bibr") to the bibliography -->
 						<!-- Employment Rights Act 1996 [<xref ref-type="bibr" rid="ref_4">1</xref>].</p> -->
-						<xsl:when test="java:matches(java:java.lang.String.new(.),'.*\[$') and following-sibling::node()[1][self::xref][@ref-type = 'bibr'] and starts-with(following-sibling::node()[2],']')">
-							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($str1),'\[$','')"/> <!-- '$' means end of string -->
-						</xsl:when>
-						<xsl:when test="starts-with(.,']') and preceding-sibling::node()[1][self::xref][@ref-type = 'bibr'] and java:matches(java:java.lang.String.new(preceding-sibling::node()[2]),'.*\[$')">
-							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($str1),'^\]','')"/> <!-- '^' means begin of string -->
+						<!-- string starts with ] or/and ends with [ -->
+						<xsl:when test="(java:matches(java:java.lang.String.new($str1),'.*\[$') and following-sibling::node()[1][self::xref][@ref-type = 'bibr'] and starts-with(following-sibling::node()[2],']')) or
+						(starts-with($str1,']') and preceding-sibling::node()[1][self::xref][@ref-type = 'bibr'] and java:matches(java:java.lang.String.new(preceding-sibling::node()[2]),'.*\[$'))">
+							<xsl:variable name="s1">
+								<xsl:choose>
+									<!-- string ends with [ -->
+									<xsl:when test="java:matches(java:java.lang.String.new($str1),'.*\[$') and following-sibling::node()[1][self::xref][@ref-type = 'bibr'] and starts-with(following-sibling::node()[2],']')">
+										<xsl:value-of select="java:replaceAll(java:java.lang.String.new($str1),'\[$','')"/> <!-- '$' means end of string -->
+									</xsl:when>
+									<xsl:otherwise><xsl:value-of select="$str1"/></xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
+							<xsl:variable name="s2">
+								<xsl:choose>
+									<!-- string starts with ] -->
+									<xsl:when test="starts-with($s1,']') and preceding-sibling::node()[1][self::xref][@ref-type = 'bibr'] and java:matches(java:java.lang.String.new(preceding-sibling::node()[2]),'.*\[$')">
+										<xsl:value-of select="java:replaceAll(java:java.lang.String.new($s1),'^\]','')"/> <!-- '^' means begin of string -->
+									</xsl:when>
+									<xsl:otherwise><xsl:value-of select="$s1"/></xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
+							<xsl:value-of select="$s2"/>
 						</xsl:when>
 						
 						<xsl:otherwise>
