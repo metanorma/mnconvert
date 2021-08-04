@@ -3109,17 +3109,21 @@
 				<!-- Escape "(c)" text to avoid render copyright symbol -->
 				<xsl:variable name="str1" select="java:replaceAll(java:java.lang.String.new($str),'\(c\)','(&#x200c;c)')"/>
 				<xsl:variable name="str2">
+				
+					<!-- string ends with [ -->
+					<xsl:variable name="isEndsWithOpeningBracket" select="java:endsWith(java:java.lang.String.new($str1),'[') and following-sibling::node()[1][self::xref][@ref-type = 'bibr'] and starts-with(following-sibling::node()[2],']')"/>
+					<!-- string starts with ] -->
+					<xsl:variable name="isStartsWithClosingBracket" select="starts-with($str1,']') and preceding-sibling::node()[1][self::xref][@ref-type = 'bibr'] and java:endsWith(java:java.lang.String.new(preceding-sibling::node()[2]),'[')"/>
+					
 					<xsl:choose>
-						
+					
 						<!-- Remove square brackets around cross-reference (xref with ref-type="bibr") to the bibliography -->
 						<!-- Employment Rights Act 1996 [<xref ref-type="bibr" rid="ref_4">1</xref>].</p> -->
 						<!-- string starts with ] or/and ends with [ -->
-						<xsl:when test="(java:matches(java:java.lang.String.new($str1),'.*\[$') and following-sibling::node()[1][self::xref][@ref-type = 'bibr'] and starts-with(following-sibling::node()[2],']')) or
-						(starts-with($str1,']') and preceding-sibling::node()[1][self::xref][@ref-type = 'bibr'] and java:matches(java:java.lang.String.new(preceding-sibling::node()[2]),'.*\[$'))">
+						<xsl:when test="$isEndsWithOpeningBracket = 'true' or $isStartsWithClosingBracket = 'true'">
 							<xsl:variable name="s1">
 								<xsl:choose>
-									<!-- string ends with [ -->
-									<xsl:when test="java:matches(java:java.lang.String.new($str1),'.*\[$') and following-sibling::node()[1][self::xref][@ref-type = 'bibr'] and starts-with(following-sibling::node()[2],']')">
+									<xsl:when test="$isEndsWithOpeningBracket = 'true'">
 										<xsl:value-of select="java:replaceAll(java:java.lang.String.new($str1),'\[$','')"/> <!-- '$' means end of string -->
 									</xsl:when>
 									<xsl:otherwise><xsl:value-of select="$str1"/></xsl:otherwise>
@@ -3127,8 +3131,7 @@
 							</xsl:variable>
 							<xsl:variable name="s2">
 								<xsl:choose>
-									<!-- string starts with ] -->
-									<xsl:when test="starts-with($s1,']') and preceding-sibling::node()[1][self::xref][@ref-type = 'bibr'] and java:matches(java:java.lang.String.new(preceding-sibling::node()[2]),'.*\[$')">
+									<xsl:when test="$isStartsWithClosingBracket = 'true'">
 										<xsl:value-of select="java:replaceAll(java:java.lang.String.new($s1),'^\]','')"/> <!-- '^' means begin of string -->
 									</xsl:when>
 									<xsl:otherwise><xsl:value-of select="$s1"/></xsl:otherwise>
