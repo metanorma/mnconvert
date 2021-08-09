@@ -3216,7 +3216,12 @@
 			<xsl:with-param name="text" select="translate(., '&#xa0;&#x9;', '  ')"/> <!-- replace nbsp and tab to space -->
 		</xsl:call-template>
 	</xsl:template>
-	
+
+	<xsl:variable name="title_text_regex" select="'^([0-9]+(\.[0-9]+)*)(\s|\h)+(.*)$'"/>
+	<!-- remove digits from title: 0  Introduction -> Introduction -->
+	<xsl:template match="sec[not(label)]/title/node()[1][java:org.metanorma.utils.RegExHelper.matches($title_text_regex, normalize-space(.)) = 'true']">
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$title_text_regex,'$4')"/>
+	</xsl:template>
 	
 	<!-- ========================================= -->
 	<!-- END XML Linearization -->
