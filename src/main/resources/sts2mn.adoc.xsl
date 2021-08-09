@@ -2353,7 +2353,10 @@
 	<xsl:template match="disp-quote/related-object"/>
 		
 	<xsl:template match="code | preformat">
-		<xsl:text>[source,</xsl:text><xsl:value-of select="@language"/><xsl:text>]</xsl:text>
+		<xsl:text>[source</xsl:text>
+		<xsl:text>%unnumbered</xsl:text> <!-- otherwise source block gets numbered as a figure -->
+		<xsl:if test="@language">,<xsl:value-of select="@language"/></xsl:if>
+		<xsl:text>]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>--</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
@@ -2361,6 +2364,7 @@
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>--</xsl:text>
 		<xsl:text>&#xa;</xsl:text>		
+		<xsl:if test="not(following-sibling::*)"><xsl:text>&#xa;</xsl:text></xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="element-citation">
