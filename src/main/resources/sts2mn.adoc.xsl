@@ -3146,7 +3146,19 @@
 					</xsl:choose>
 				</xsl:variable>
 				
-				<xsl:value-of select="$str2"/>
+				<!-- remove leading spaces in the paragraph -->
+				<xsl:variable name="str3">
+					<xsl:choose>
+						<xsl:when test="parent::p and not(preceding-sibling::node()) and starts-with($str2, ' ')">
+							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($str2),'^\s+','')"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$str2"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				
+				<xsl:value-of select="$str3"/>
 			</xsl:otherwise>
 			
 		</xsl:choose>		
