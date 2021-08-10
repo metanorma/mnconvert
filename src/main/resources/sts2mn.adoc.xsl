@@ -1402,6 +1402,7 @@
 		<xsl:if test="preceding-sibling::node()[1][self::text()]">
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</xsl:if>
+		<xsl:call-template name="setId"/>
 		<xsl:text>====</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:apply-templates />
@@ -3253,6 +3254,11 @@
 	<!-- convert array (without label) / table with two td in a row, and td starts with EXAMPLE in first td to non-normative-example -->
 	<xsl:template match="array[not(label)][table[count(.//td) div count(.//tr) = 2][starts-with(.//tr[1]/td[1], 'EXAMPLE')]]" mode="linearize">
 		<non-normative-example>
+			<xsl:if test="@id">
+				<xsl:attribute name="id">
+					<xsl:text>array_</xsl:text><xsl:value-of select="@id"/>
+				</xsl:attribute>
+			</xsl:if>
 			<label><xsl:apply-templates select="table//tr[1]/td[1]" mode="linearize_array_example"/></label>
 			<p><xsl:apply-templates select="table//tr[1]/td[2]" mode="linearize_array_example"/></p>
 			<xsl:for-each select="table//tr[position() &gt; 1]/td[normalize-space(translate(., '&#xa0;', '')) != '']">
