@@ -852,25 +852,28 @@
 	
 		<xsl:call-template name="title"/>
 	
-		<xsl:text>[.boilerplate]</xsl:text>
+		<xsl:if test="java:toLowerCase(java:java.lang.String.new(ancestor::sec[1][@sec-type = 'terms']/title)) = 'terms and definitions'">
+			<xsl:text>[.boilerplate]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:variable name="level">
+				<xsl:call-template name="getLevel">
+					<xsl:with-param name="addon">1</xsl:with-param>
+				</xsl:call-template>
+			</xsl:variable>
+			<xsl:value-of select="$level"/>
+			<xsl:choose>
+				<!-- if there isn't paragraph after title -->
+				<!-- https://www.metanorma.org/author/topics/document-format/section-terms/#overriding-predefined-text -->
+				<xsl:when test="following-sibling::*[1][self::term-sec] or following-sibling::*[1][self::sec]">
+					<xsl:text> {blank}</xsl:text>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:text> My predefined text</xsl:text>
+				</xsl:otherwise>
+			</xsl:choose>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:variable name="level">
-			<xsl:call-template name="getLevel">
-				<xsl:with-param name="addon">1</xsl:with-param>
-			</xsl:call-template>
-		</xsl:variable>
-		<xsl:value-of select="$level"/>
-		<xsl:choose>
-			<!-- if there isn't paragraph after title -->
-			<!-- https://www.metanorma.org/author/topics/document-format/section-terms/#overriding-predefined-text -->
-			<xsl:when test="following-sibling::*[1][self::term-sec] or following-sibling::*[1][self::sec]">
-				<xsl:text> {blank}</xsl:text>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:text> My predefined text</xsl:text>
-			</xsl:otherwise>
-		</xsl:choose>
-		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
 	<!-- ======================== -->
 	<!-- END Terms and definitions -->
