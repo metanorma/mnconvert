@@ -3174,7 +3174,18 @@
 					</xsl:choose>
 				</xsl:variable>
 				
-				<xsl:value-of select="$str3"/>
+				<xsl:variable name="str4">
+					<xsl:choose>
+						<xsl:when test="ancestor::td and contains($str3, '|')">
+							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($str3),'\|','\\|')"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$str3"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				
+				<xsl:value-of select="$str4"/>
 			</xsl:otherwise>
 			
 		</xsl:choose>		
