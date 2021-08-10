@@ -999,11 +999,13 @@
 	<xsl:template match="label"/>
 	
 	<xsl:template match="p" name="p">
+		<xsl:if test="ancestor::non-normative-example and not(preceding-sibling::p) and normalize-space(preceding-sibling::node()[1]) != '' and not(preceding-sibling::*[1][self::label])"><xsl:text>&#xa;&#xa;</xsl:text></xsl:if>
 		<xsl:apply-templates />
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:choose>
 			<xsl:when test="ancestor::list-item and not(following-sibling::p) and following-sibling::non-normative-note"></xsl:when>
 			<xsl:when test="ancestor::non-normative-note and not(following-sibling::p)"></xsl:when>
+			<xsl:when test="ancestor::non-normative-example and not(following-sibling::p)"></xsl:when>
 			<xsl:when test="not(following-sibling::p) and ancestor::list/following-sibling::non-normative-note"></xsl:when>
 			<xsl:when test="ancestor::sec[@sec-type = 'norm-refs'] and not(following-sibling::*[1][self::p])"></xsl:when>
 			<xsl:otherwise><xsl:text>&#xa;</xsl:text></xsl:otherwise>
@@ -1396,13 +1398,22 @@
 	</xsl:template>
 	
 	<xsl:template match="tbx:example | non-normative-example">
-		<xsl:text>[example]</xsl:text>
+		<!-- <xsl:text>[example]</xsl:text> -->
+		<xsl:if test="preceding-sibling::node()[1][self::text()]">
+			<xsl:text>&#xa;&#xa;</xsl:text>
+		</xsl:if>
+		<xsl:text>====</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:apply-templates />
-		<xsl:text>&#xa;</xsl:text>
 		<xsl:if test="local-name() = 'example'">
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
+		<xsl:text>====</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<!-- <xsl:if test="local-name() = 'example'">
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if> -->
 	</xsl:template>
 	
 	
@@ -3238,6 +3249,21 @@
 	<xsl:template match="sec[not(label)]/title/node()[1][java:org.metanorma.utils.RegExHelper.matches($title_text_regex, normalize-space(.)) = 'true']">
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$title_text_regex,'$4')"/>
 	</xsl:template>
+	
+	<!-- convert array (without label) / table with two td in a row, and td starts with EXAMPLE in first td to non-normative-example -->
+	<xsl:template match="array[not(label)][table[count(.//td) div count(.//tr) = 2][starts-with(.//tr[1]/td[1], 'EXAMPLE')]]" mode="linearize">
+		<non-normative-example>
+			<label><xsl:apply-templates select="table//tr[1]/td[1]" mode="linearize_array_example"/></label>
+			<p><xsl:apply-templates select="table//tr[1]/td[2]" mode="linearize_array_example"/></p>
+			<xsl:for-each select="table//tr[position() &gt; 1]/td[normalize-space(translate(., '&#xa0;', '')) != '']">
+				<p><xsl:apply-templates select="." mode="linearize_array_example"/></p>
+			</xsl:for-each>
+		</non-normative-example>
+	</xsl:template>
+	<xsl:template match="td" mode="linearize_array_example">
+		<xsl:apply-templates mode="linearize"/>
+	</xsl:template>
+	
 	
 	<!-- ========================================= -->
 	<!-- END XML Linearization -->
