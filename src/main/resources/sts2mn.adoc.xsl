@@ -415,7 +415,9 @@
 		<xsl:text>= </xsl:text>
 		<xsl:value-of select="originator"/>
 		<xsl:text> </xsl:text>
-		<xsl:value-of select="doc-number"/>
+		<xsl:call-template name="getDocNumber">
+			<xsl:with-param name="value" select="doc-number"/>
+		</xsl:call-template>
 		
 		<xsl:if test="part-number != ''">
 			<xsl:text>-</xsl:text>
@@ -425,8 +427,18 @@
 	</xsl:template>
 	
 	<xsl:template match="std-ident[ancestor::front or ancestor::adoption-front]/doc-number[normalize-space(.) != '']">
-		<xsl:text>:docnumber: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>:docnumber: </xsl:text><xsl:call-template name="getDocNumber"/>
 		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+
+	<xsl:template name="getDocNumber">
+		<xsl:param name="value" select="."/>
+		<xsl:variable name="copyright-year">
+			<xsl:call-template name="getCopyrightYear">
+				<xsl:with-param name="value" select="ancestor::*[self::front or self::adoption-front]//permissions/copyright-year"/>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($value), concat(':', $copyright-year, '$'), '')"/> <!-- remove copyright-year from end of docnumber -->
 	</xsl:template>
 	
 	<xsl:template match="std-ident[ancestor::front or ancestor::adoption-front]/part-number[normalize-space(.) != '']">		
@@ -452,8 +464,13 @@
 	</xsl:template>
 	
 	<xsl:template match="permissions[ancestor::front or ancestor::adoption-front]/copyright-year[normalize-space(.) != '']">
-		<xsl:text>:copyright-year: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>:copyright-year: </xsl:text><xsl:call-template name="getCopyrightYear"/>
 		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template name="getCopyrightYear">
+		<xsl:param name="value" select="."/>
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($value), '^©(\s|\h)*', '')"/> <!-- remove copyright sign -->
 	</xsl:template>
 	
 	<xsl:template match="pub-date[ancestor::front or ancestor::adoption-front]">
