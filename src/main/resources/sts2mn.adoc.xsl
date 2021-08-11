@@ -3309,6 +3309,12 @@
 		<xsl:apply-templates mode="linearize"/>
 	</xsl:template>
 	
+	<!-- remove empty italic/bold -->
+	<xsl:template match="italic[not(node())]" mode="linearize"/>
+	<xsl:template match="bold[not(node())]" mode="linearize"/>
+	<xsl:template match="sup[not(node())]" mode="linearize"/>
+	<xsl:template match="sub[not(node())]" mode="linearize"/>
+	
 	<!-- ================== -->
 	<!-- convert array in sec with the title 'Abbreviated terms' to def-list -->
 	<!-- ================== -->
