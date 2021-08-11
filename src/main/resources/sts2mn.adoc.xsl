@@ -75,6 +75,10 @@
 			<xsl:apply-templates select="." mode="linearize"/>
 		</xsl:variable>
 	
+		<!-- <redirect:write file="{$outpath}/{$docfile_name}.linearized.xml">
+			<xsl:copy-of select="$linearized_xml"/>
+		</redirect:write> -->
+  
 		<xsl:variable name="remove_word_clause_xml">
 			<xsl:apply-templates select="xalan:nodeset($linearized_xml)" mode="remove_word_clause"/>
 		</xsl:variable>
@@ -1639,8 +1643,8 @@
 		<xsl:choose>
 			<xsl:when test="string-length($td_1) != 0">
 				<xsl:apply-templates select="td[1]" mode="dl"/>
-				<xsl:text>::</xsl:text>		
-				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>:: </xsl:text>		
+				<!-- <xsl:text>&#xa;</xsl:text> -->
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:text>+</xsl:text>
@@ -2458,8 +2462,8 @@
 	<xsl:template match="def-item/term">
 		<xsl:apply-templates/>
 		<xsl:if test="count(node()) = 0"><xsl:text> </xsl:text></xsl:if>
-		<xsl:text>::</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>:: </xsl:text>
+		<!-- <xsl:text>&#xa;</xsl:text> -->
 	</xsl:template>
 	
 	<xsl:template match="def-item/def">
@@ -3284,6 +3288,40 @@
 		<xsl:apply-templates mode="linearize"/>
 	</xsl:template>
 	
+	<!-- ================== -->
+	<!-- convert array in sec with the title 'Abbreviated terms' to def-list -->
+	<!-- ================== -->
+	<xsl:template match="array[not(label)][parent::sec/title = 'Abbreviated terms'][table[count(.//td) div count(.//tr) = 2]]" mode="linearize">
+		<def-list list-type="abbreviations">
+			<xsl:apply-templates mode="linearize_array_deflist"/>
+		</def-list>
+	</xsl:template>
+	
+	<xsl:template match="text()" mode="linearize_array_deflist" priority="2">
+		<xsl:apply-templates select="." mode="linearize"/>
+	</xsl:template>
+	
+	<xsl:template match="@*|node()" mode="linearize_array_deflist">
+		<xsl:copy>
+				<xsl:apply-templates select="@*|node()" mode="linearize_array_deflist"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="table | tbody | td" mode="linearize_array_deflist">
+		<xsl:apply-templates mode="linearize_array_deflist"/>
+	</xsl:template>
+	
+	<xsl:template match="colgroup" mode="linearize_array_deflist"/>
+	
+	<xsl:template match="tr" mode="linearize_array_deflist">
+		<def-item>
+			<term><xsl:apply-templates select="td[1]" mode="linearize_array_deflist"/></term>
+			<def><p><xsl:apply-templates select="td[2]" mode="linearize_array_deflist"/></p></def>
+		</def-item>
+	</xsl:template>
+	<!-- ================== -->
+	<!-- END: convert array in sec with the title 'Abbreviated terms' to def-list -->
+	<!-- ================== -->
 	
 	<!-- ========================================= -->
 	<!-- END XML Linearization -->
