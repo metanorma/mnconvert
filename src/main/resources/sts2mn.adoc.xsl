@@ -1028,10 +1028,12 @@
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:choose>
 			<!-- if p in list-item and this p is first element (except label), next element is not another nested list, and there are another elements, or last p -->
+			
 			<xsl:when test="parent::list-item and 
 			count(parent::list-item/*[not(self::label)]) &gt; 1 and
 			((count(preceding-sibling::*[not(self::label)]) = 0 and following-sibling::*[1][not(self::list)]) 
 			or not(following-sibling::*[not(self::list)]))"></xsl:when>
+			<xsl:when test="parent::list-item and following-sibling::*[1][self::non-normative-note]"><xsl:text>&#xa;</xsl:text></xsl:when>
 			<xsl:when test="ancestor::list-item and not(following-sibling::p) and following-sibling::non-normative-note"></xsl:when>
 			<xsl:when test="ancestor::non-normative-note and not(following-sibling::p)"></xsl:when>
 			<xsl:when test="ancestor::non-normative-example and not(following-sibling::p)"></xsl:when>
