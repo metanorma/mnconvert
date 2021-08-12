@@ -1124,7 +1124,10 @@
 	<xsl:template match="non-normative-note">
 		<xsl:text>NOTE: </xsl:text>
 		<xsl:apply-templates/>
-		<xsl:text>&#xa;</xsl:text>
+		<xsl:choose>
+			<xsl:when test="parent::list-item and preceding-sibling::*[1][not(self::label)] and not(following-sibling::*)"></xsl:when>
+			<xsl:otherwise><xsl:text>&#xa;</xsl:text></xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	
