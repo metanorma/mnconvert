@@ -1027,6 +1027,11 @@
 		<xsl:apply-templates />
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:choose>
+			<!-- if p in list-item and this p is first element (except label), next element is not another nested list, and there are another elements, or last p -->
+			<xsl:when test="parent::list-item and 
+			count(parent::list-item/*[not(self::label)]) &gt; 1 and
+			((count(preceding-sibling::*[not(self::label)]) = 0 and following-sibling::*[1][not(self::list)]) 
+			or not(following-sibling::*[not(self::list)]))"></xsl:when>
 			<xsl:when test="ancestor::list-item and not(following-sibling::p) and following-sibling::non-normative-note"></xsl:when>
 			<xsl:when test="ancestor::non-normative-note and not(following-sibling::p)"></xsl:when>
 			<xsl:when test="ancestor::non-normative-example and not(following-sibling::p)"></xsl:when>
@@ -1093,18 +1098,18 @@
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="non-normative-note[ancestor::list-item]" priority="3">
+	<!-- <xsl:template match="non-normative-note[ancestor::list-item]" priority="3">
 		<xsl:if test="not(preceding-sibling::*[1][self::list or self::non-normative-note])">
 			<xsl:text>+</xsl:text>
 		</xsl:if>
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>--</xsl:text>
+		<xsl:text>- -</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>NOTE: </xsl:text>
 		<xsl:apply-templates/>
-		<xsl:text>--</xsl:text>
+		<xsl:text>- -</xsl:text>
 		<xsl:text>&#xa;&#xa;</xsl:text>
-	</xsl:template>
+	</xsl:template> -->
 	
 	<xsl:template match="non-normative-note[count(*[not(local-name() = 'label')]) &gt; 1]" priority="2">
 		<xsl:text>[NOTE]</xsl:text>
@@ -1316,6 +1321,9 @@
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
 	
+	<!-- ================= -->
+	<!-- List processing -->
+	<!-- ================= -->
 	<xsl:template match="list">
 		<xsl:if test="not(parent::list-item) and not(parent::non-normative-note and preceding-sibling::p)">
 			<xsl:text>&#xa;</xsl:text>
@@ -1415,11 +1423,62 @@
 			</xsl:choose>
 			<xsl:text> </xsl:text>
 		</xsl:variable>
-		<xsl:variable name="list_item_content"><xsl:apply-templates/></xsl:variable>
+		<xsl:variable name="list_item_content"><xsl:apply-templates mode="list_item"/></xsl:variable>
 		<xsl:if test="normalize-space($list_item_content) != ''">
 			<xsl:value-of select="$list_item_label"/><xsl:value-of select="$list_item_content"/>
 		</xsl:if>
 	</xsl:template>
+	
+	
+	<xsl:template match="list-item/text() | list-item/list | list-item/label" mode="list_item" priority="2">
+		<xsl:apply-templates select="."/> <!-- continue process the element inslde list-item-->
+	</xsl:template>
+	
+	<!-- https://docs.asciidoctor.org/asciidoc/latest/lists/continuation/ -->
+	<xsl:template match="list-item/*" mode="list_item">
+		
+		<!-- opening continuation -->
+		
+		<!-- second element in list-item -->
+		<xsl:variable name="opening_condition1" select="count(preceding-sibling::*[not(self::label) and not(self::list)]) = 1 and
+							not(preceding-sibling::*[1][self::list])"/>
+		
+		<!-- if preceding element is list, then  move up one level of nesting -->
+		<xsl:variable name="opening_condition2" select="preceding-sibling::*[1][self::list] and 1 = 1"/> <!-- for boolean type -->
+		
+		<xsl:if test="$opening_condition1 = 'true' or $opening_condition2 = 'true'">
+			<xsl:text>+</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:text>--</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+		
+		<xsl:text></xsl:text>
+		<xsl:apply-templates select="."/> <!-- continue process the element inslde list-item-->
+		<xsl:text></xsl:text>
+		<!-- closing continuation -->
+		
+		<!-- if there isn't next elements, or next element is nestel list -->
+		<xsl:variable name="closing_condition1" select="count(preceding-sibling::*[1][not(self::label) and not(self::list)]) = 1 and 
+					count(parent::list-item/*[not(self::label) and not(self::list)]) &gt; 1 and
+					(not(following-sibling::*) or following-sibling::*[1][self::list])"/>
+					
+		<!-- p between two lists, or latest after nested list -->
+		<xsl:variable name="closing_condition2" select="preceding-sibling::*[1][self::list] and (following-sibling::*[1][self::list] or not(following-sibling::*))"/>
+		
+		
+		<xsl:if test="$closing_condition1 = 'true' or $closing_condition2 = 'true'">
+			<!-- closing -->
+			<xsl:text>--</xsl:text>
+			<xsl:text>&#xa;&#xa;</xsl:text>
+		</xsl:if>
+		
+		
+	</xsl:template>
+	<!-- ================= -->
+	<!-- END List processing -->
+	<!-- ================= -->
+	
 	
 	<xsl:template match="tbx:example | non-normative-example">
 		<!-- <xsl:text>[example]</xsl:text> -->
