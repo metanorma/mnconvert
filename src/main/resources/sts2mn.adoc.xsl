@@ -1028,11 +1028,11 @@
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:choose>
 			<!-- if p in list-item and this p is first element (except label), next element is not another nested list, and there are another elements, or last p -->
-			
 			<xsl:when test="parent::list-item and 
 			count(parent::list-item/*[not(self::label)]) &gt; 1 and
 			((count(preceding-sibling::*[not(self::label)]) = 0 and following-sibling::*[1][not(self::list)]) 
 			or not(following-sibling::*[not(self::list)]))"></xsl:when>
+			<xsl:when test="parent::list-item and not(../following-sibling::*) and count(ancestor::list-item) &gt; 1"></xsl:when>
 			<xsl:when test="parent::list-item and following-sibling::*[1][self::non-normative-note]"><xsl:text>&#xa;</xsl:text></xsl:when>
 			<xsl:when test="ancestor::list-item and not(following-sibling::p) and following-sibling::non-normative-note"></xsl:when>
 			<xsl:when test="ancestor::non-normative-note and not(following-sibling::p)"></xsl:when>
@@ -1348,9 +1348,9 @@
 		
 		<xsl:apply-templates/>
 		
-		<xsl:if test="not(parent::list-item)">
+		<!-- <xsl:if test="not(parent::list-item)"> -->
 			<xsl:text>&#xa;</xsl:text>
-		</xsl:if>
+		<!-- </xsl:if> -->
 	</xsl:template>
 	
 	<xsl:template match="list/@list-type">
@@ -3191,7 +3191,7 @@
 	<xsl:template match="text()[not(parent::code) and not(parent::preformat) and not(parent::mml:*)]" mode="linearize">
 		<xsl:choose>
 		
-			<xsl:when test="parent::standard or parent::body or parent::sec or parent::term-sec or parent::tbx:termEntry or parent::back or parent::app-group or parent::app or parent::ref-list or parent::ref or parent::fig or parent::caption or parent::table-wrap or parent::tr or parent::thead or parent::colgroup or parent::table or parent::tbody or parent::fn or parent::non-normative-note or parent::array">
+			<xsl:when test="parent::standard or parent::body or parent::sec or parent::term-sec or parent::tbx:termEntry or parent::back or parent::app-group or parent::app or parent::ref-list or parent::ref or parent::fig or parent::caption or parent::table-wrap or parent::tr or parent::thead or parent::colgroup or parent::table or parent::tbody or parent::fn or parent::non-normative-note or parent::array or parent::list-item or parent::list">
 				<xsl:value-of select="normalize-space()"/>
 			</xsl:when>
 			
