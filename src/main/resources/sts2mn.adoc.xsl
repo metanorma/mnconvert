@@ -1098,6 +1098,8 @@
 		not(self::italic) and not(self::italic2) and 
 		not(self::sup) and not(self::sup2) and 
 		not(self::sub) and not(self::sub2) and
+		not(self::std) and not(self::std-ref) and
+		not(self::ext-link) and
 		not(self::xref) and not(self::named-content) and not(local-name() = 'entailedTerm')]) &gt;= 1"/>
 		<xsl:choose>
 			<xsl:when test="$isMultipleNodes = 'true'">
@@ -2038,8 +2040,10 @@
 	</xsl:template>
 	
 	<xsl:template match="td/p | th/p">
-		<xsl:text> +</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
+		<xsl:if test="preceding-sibling::* or normalize-space(preceding-sibling::node()[1]) != ''">
+			<xsl:text> +</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 		<xsl:apply-templates/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
