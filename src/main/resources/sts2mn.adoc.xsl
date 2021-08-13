@@ -1094,8 +1094,26 @@
 	</xsl:template>
 	
 	<xsl:template match="tbx:note" name="tbx_note">
-		<xsl:text>NOTE: </xsl:text>
-		<xsl:apply-templates/>
+		<xsl:variable name="isMultipleNodes" select="count(*[not(self::bold) and not(self::bold2) and not(self::italic) and not(self::italic2) and not(self::sup) and not(self::sup2) and not(self::sub) and not(self::sub2)]) &gt;= 1"/>
+		<xsl:choose>
+			<xsl:when test="$isMultipleNodes = 'true'">
+				<xsl:text>[NOTE]</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>====</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text>NOTE: </xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
+		
+		<xsl:variable name="note_content"><xsl:apply-templates/></xsl:variable>
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($note_content), '(\r\n|\n|\r)+$', '&#xa;')"/>
+		
+		<xsl:if test="$isMultipleNodes = 'true'">
+			<xsl:text>====</xsl:text>
+		</xsl:if>
+		
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
@@ -1118,7 +1136,8 @@
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>====</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:apply-templates/>
+		<xsl:variable name="note_content"><xsl:apply-templates/></xsl:variable>
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($note_content), '(\r\n|\n|\r)+$', '&#xa;')"/>
 		<xsl:text>====</xsl:text>
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
@@ -1430,7 +1449,10 @@
 		</xsl:variable>
 		<xsl:variable name="list_item_content"><xsl:apply-templates mode="list_item"/></xsl:variable>
 		<xsl:if test="normalize-space($list_item_content) != ''">
-			<xsl:value-of select="$list_item_label"/><xsl:value-of select="$list_item_content"/>
+			<xsl:if test="not(count(*) = 1 and list)">
+				<xsl:value-of select="$list_item_label"/>
+			</xsl:if>
+			<xsl:value-of select="$list_item_content"/>
 		</xsl:if>
 	</xsl:template>
 	
