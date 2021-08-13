@@ -1096,9 +1096,9 @@
 	<xsl:template match="tbx:note" name="tbx_note">
 		<xsl:variable name="isMultipleNodes" select="count(*[not(self::bold) and not(self::bold2) and 
 		not(self::italic) and not(self::italic2) and 
-		not(self::sup) and not(self::sup2) 
-		and not(self::sub) and not(self::sub2) and
-		not(xref) and not(named-content)]) &gt;= 1"/>
+		not(self::sup) and not(self::sup2) and 
+		not(self::sub) and not(self::sub2) and
+		not(self::xref) and not(self::named-content) and not(local-name() = 'entailedTerm')]) &gt;= 1"/>
 		<xsl:choose>
 			<xsl:when test="$isMultipleNodes = 'true'">
 				<xsl:text>[NOTE]</xsl:text>
