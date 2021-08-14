@@ -3248,14 +3248,20 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
-				<!-- Escape "(c)" text to avoid render copyright symbol -->
-				<xsl:variable name="str1" select="java:replaceAll(java:java.lang.String.new($str),'\(c\)','(&#x200c;c)')"/>
-				<xsl:variable name="str2">
+				<!-- Escape "(c)", "(C)", "(r)", "(R)" text to avoid render copyright symbol -->
+				<xsl:variable name="str01" select="java:replaceAll(java:java.lang.String.new($str),'\(R\)','(&#x200c;R)')"/>
+				<xsl:variable name="str02" select="java:replaceAll(java:java.lang.String.new($str01),'\(r\)','(&#x200c;r)')"/>
+				<xsl:variable name="str03" select="java:replaceAll(java:java.lang.String.new($str02),'\(TM\)','(&#x200c;TM)')"/>
+				<xsl:variable name="str04" select="java:replaceAll(java:java.lang.String.new($str03),'\(tm\)','(&#x200c;tm)')"/>
+				<xsl:variable name="str05" select="java:replaceAll(java:java.lang.String.new($str04),'\(C\)','(&#x200c;C)')"/>
+				<xsl:variable name="str10" select="java:replaceAll(java:java.lang.String.new($str05),'\(c\)','(&#x200c;c)')"/>
+				
+				<xsl:variable name="str20">
 				
 					<!-- string ends with [ -->
-					<xsl:variable name="isEndsWithOpeningBracket" select="java:endsWith(java:java.lang.String.new($str1),'[') and following-sibling::node()[1][self::xref][@ref-type = 'bibr'] and starts-with(following-sibling::node()[2],']')"/>
+					<xsl:variable name="isEndsWithOpeningBracket" select="java:endsWith(java:java.lang.String.new($str10),'[') and following-sibling::node()[1][self::xref][@ref-type = 'bibr'] and starts-with(following-sibling::node()[2],']')"/>
 					<!-- string starts with ] -->
-					<xsl:variable name="isStartsWithClosingBracket" select="starts-with($str1,']') and preceding-sibling::node()[1][self::xref][@ref-type = 'bibr'] and java:endsWith(java:java.lang.String.new(preceding-sibling::node()[2]),'[')"/>
+					<xsl:variable name="isStartsWithClosingBracket" select="starts-with($str10,']') and preceding-sibling::node()[1][self::xref][@ref-type = 'bibr'] and java:endsWith(java:java.lang.String.new(preceding-sibling::node()[2]),'[')"/>
 					
 					<xsl:choose>
 					
@@ -3266,9 +3272,9 @@
 							<xsl:variable name="s1">
 								<xsl:choose>
 									<xsl:when test="$isEndsWithOpeningBracket = 'true'">
-										<xsl:value-of select="java:replaceAll(java:java.lang.String.new($str1),'\[$','')"/> <!-- '$' means end of string -->
+										<xsl:value-of select="java:replaceAll(java:java.lang.String.new($str10),'\[$','')"/> <!-- '$' means end of string -->
 									</xsl:when>
-									<xsl:otherwise><xsl:value-of select="$str1"/></xsl:otherwise>
+									<xsl:otherwise><xsl:value-of select="$str10"/></xsl:otherwise>
 								</xsl:choose>
 							</xsl:variable>
 							<xsl:variable name="s2">
@@ -3283,35 +3289,35 @@
 						</xsl:when>
 						
 						<xsl:otherwise>
-							<xsl:value-of select="$str1"/>
+							<xsl:value-of select="$str10"/>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
 				
 				<!-- remove leading spaces in the paragraph -->
-				<xsl:variable name="str3">
+				<xsl:variable name="str30">
 					<xsl:choose>
-						<xsl:when test="parent::p and not(preceding-sibling::node()) and starts-with($str2, ' ')">
-							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($str2),'^\s+','')"/>
+						<xsl:when test="parent::p and not(preceding-sibling::node()) and starts-with($str20, ' ')">
+							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($str20),'^\s+','')"/>
 						</xsl:when>
 						<xsl:otherwise>
-							<xsl:value-of select="$str2"/>
+							<xsl:value-of select="$str20"/>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
 				
-				<xsl:variable name="str4">
+				<xsl:variable name="str40">
 					<xsl:choose>
-						<xsl:when test="ancestor::td and contains($str3, '|')">
-							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($str3),'\|','\\|')"/>
+						<xsl:when test="ancestor::td and contains($str30, '|')">
+							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($str30),'\|','\\|')"/>
 						</xsl:when>
 						<xsl:otherwise>
-							<xsl:value-of select="$str3"/>
+							<xsl:value-of select="$str30"/>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
 				
-				<xsl:value-of select="$str4"/>
+				<xsl:value-of select="$str40"/>
 			</xsl:otherwise>
 			
 		</xsl:choose>		
