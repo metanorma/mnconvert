@@ -77,7 +77,8 @@
 	
 		<!-- <redirect:write file="{$outpath}/{$docfile_name}.linearized.xml">
 			<xsl:copy-of select="$linearized_xml"/>
-		</redirect:write> -->
+		</redirect:write>
+		<xsl:message>Linearized xml saved.</xsl:message> -->
   
 		<xsl:variable name="remove_word_clause_xml">
 			<xsl:apply-templates select="xalan:nodeset($linearized_xml)" mode="remove_word_clause"/>
@@ -1787,6 +1788,7 @@
 	<!-- Table -->
 	<!-- =============== -->
 	<xsl:template match="table-wrap">
+		<xsl:if test="preceding-sibling::node()[1][self::text()]"><xsl:text>&#xa;</xsl:text></xsl:if> <!-- if previous node is text, example: environment and requirements.<table-wrap id="tab_e" -->
 		<xsl:apply-templates select="@orientation"/>
 		<xsl:call-template name="setId"/>
 		<xsl:if test="not(label)">[%unnumbered]&#xa;</xsl:if>
@@ -1883,7 +1885,7 @@
 			<xsl:if test="ancestor::table-wrap/table-wrap-foot[count(*[local-name() != 'fn-group' and local-name() != 'non-normative-note']) != 0]">
 				<option>footer</option>
 			</xsl:if>
-			<xsl:if test="ancestor::table-wrap/@content-type = 'ace-table'">
+			<xsl:if test="ancestor::table-wrap/@content-type = 'ace-table' or (ancestor::table-wrap and preceding-sibling::*[1][self::table])">
 				<option>unnumbered</option>
 			</xsl:if>
 		</xsl:variable>
@@ -3451,6 +3453,22 @@
 			<def><p><xsl:apply-templates select="td[2]" mode="linearize_array_deflist"/></p></def>
 		</def-item>
 	</xsl:template>
+	
+	<!-- Move "Table #n —" from table-wrap/caption to table-wrap/label -->
+	<xsl:variable name="regexTableN" select="'^Table((\s|\h)[0-9]+)*(\s|\h)—(\s|\h)'"/>
+	<xsl:template match="table-wrap[not(label)][java:replaceAll(java:java.lang.String.new(caption/title),$regexTableN,'') != caption/title]" mode="linearize">
+		<xsl:copy>
+			<xsl:copy-of select="@*"/>
+			<label><xsl:value-of select="substring-before(caption/title, '—')"/></label>
+			<!-- <label><xsl:value-of select="java:replaceAll(java:java.lang.String.new(caption/title),$regexTableN,'')"/></label> -->
+			<xsl:apply-templates mode="linearize"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="table-wrap[not(label)][java:replaceAll(java:java.lang.String.new(caption/title),$regexTableN,'') != caption/title]/caption/title/node()[1]" mode="linearize" priority="3">
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regexTableN,'')"/>
+	</xsl:template>
+	
 	<!-- ================== -->
 	<!-- END: convert array in sec with the title 'Abbreviated terms' to def-list -->
 	<!-- ================== -->
