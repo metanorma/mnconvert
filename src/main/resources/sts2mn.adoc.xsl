@@ -2170,6 +2170,7 @@
 	<!-- ignore p in Bibliography with text start with 'For dated references, only the edition cited applies'-->
 	<!-- This boilerplate text will be added by metanorma -->
 	<xsl:template match="ref-list[@content-type = 'bibl']//p[starts-with(normalize-space(), 'For dated references, only the edition cited applies')]" priority="2"/>
+	<xsl:template match="ref-list[@content-type = 'bibl']//title[starts-with(normalize-space(), 'For dated references, only the edition cited applies')]" priority="2"/>
 	
 	<xsl:template match="ref-list"> <!-- sub-section for Bibliography -->
 		<!-- <xsl:if test="@content-type = 'bibl' or parent::ref-list/@content-type = 'bibl'"> -->
