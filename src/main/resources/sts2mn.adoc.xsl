@@ -3469,6 +3469,9 @@
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regexTableN,'')"/>
 	</xsl:template>
 	
+	<!-- Removing <sup>)</sup> and <sup>) </sup> from table footnotes -->
+	<xsl:template match="sup[normalize-space() = ')'][preceding-sibling::node()[1][self::xref][@ref-type = 'table-fn']]"/>
+	
 	<!-- ================== -->
 	<!-- END: convert array in sec with the title 'Abbreviated terms' to def-list -->
 	<!-- ================== -->
