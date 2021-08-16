@@ -1410,12 +1410,12 @@
 		<xsl:variable name="first_label" select="translate(.//label[1], ').', '')"/>
 		<xsl:variable name="type">
 			<xsl:choose>
+				<xsl:when test="$first_label != '' and translate($first_label, '1234567890', '') = ''">arabic</xsl:when>
 				<xsl:when test="@list-type = 'alpha-lower'">alphabet</xsl:when>
 				<xsl:when test="@list-type = 'alpha-upper'">alphabet_upper</xsl:when>
 				<xsl:when test="@list-type = 'roman-lower'">roman</xsl:when>
 				<xsl:when test="@list-type = 'roman-upper'">roman_upper</xsl:when>
 				<xsl:when test="@list-type = 'arabic'">arabic</xsl:when>
-				<xsl:when test="$first_label != '' and translate($first_label, '1234567890', '') = ''">arabic</xsl:when>
 				<xsl:when test="$first_label != '' and translate($first_label, 'ixvcm', '') = ''">roman</xsl:when>
 				<xsl:when test="$first_label != '' and translate($first_label, 'IXVCM', '') = ''">roman_upper</xsl:when>
 				<xsl:when test="$first_label != '' and translate($first_label, 'abcdefghijklmnopqrstuvwxyz', '') = ''">alphabet</xsl:when>
@@ -3453,6 +3453,9 @@
 			<def><p><xsl:apply-templates select="td[2]" mode="linearize_array_deflist"/></p></def>
 		</def-item>
 	</xsl:template>
+	<!-- ================== -->
+	<!-- END: convert array in sec with the title 'Abbreviated terms' to def-list -->
+	<!-- ================== -->
 	
 	<!-- Move "Table #n —" from table-wrap/caption to table-wrap/label -->
 	<xsl:variable name="regexTableN" select="'^Table((\s|\h)[0-9]+)*(\s|\h)—(\s|\h)'"/>
@@ -3472,9 +3475,35 @@
 	<!-- Removing <sup>)</sup> and <sup>) </sup> from table footnotes -->
 	<xsl:template match="sup[normalize-space() = ')'][preceding-sibling::node()[1][self::xref][@ref-type = 'table-fn']]"/>
 	
-	<!-- ================== -->
-	<!-- END: convert array in sec with the title 'Abbreviated terms' to def-list -->
-	<!-- ================== -->
+	<!-- ======================================= -->
+	<!-- move list item label from p into the element label. -->
+	<!-- ======================================= -->
+	<xsl:variable name="regexListItemLabel" select="'^((([0-9]|[a-z]|[A-Z])+(\)|\.))(\s|\h)+)(.*)'"/>
+	<!-- find list-item without label, and with first text matches regex -->
+	<xsl:template match="list-item[not(label)][.//node()[self::text()][normalize-space() != ''][1][java:org.metanorma.utils.RegExHelper.matches($regexListItemLabel, normalize-space(.)) = 'true']]" mode="linearize">
+		<xsl:copy>
+			<xsl:copy-of select="@*"/>
+			<label><xsl:value-of select="java:replaceAll(java:java.lang.String.new(.//node()[self::text()][normalize-space() != ''][1]), $regexListItemLabel, '$2')"/></label>
+			<xsl:apply-templates mode="linearize_listitem"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="list-item[not(label)]//node()[self::text()][normalize-space() != ''][1]" mode="linearize_listitem" priority="3">
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regexListItemLabel, '$6')"/> <!-- get last group from regexListItemLabel, i.e. list item text without label-->
+	</xsl:template>
+	
+	<xsl:template match="@*|node()" mode="linearize_listitem">
+		<xsl:copy>
+				<xsl:apply-templates select="@*|node()" mode="linearize_listitem"/>
+		</xsl:copy>
+	</xsl:template>
+	<xsl:template match="text()" mode="linearize_listitem" priority="2">
+		<xsl:apply-templates select="." mode="linearize"/>
+	</xsl:template>
+	<!-- ======================================= -->
+	<!-- END: move list item label from p into the element label.-->
+	<!-- ======================================= -->
+	
 	
 	<!-- ========================================= -->
 	<!-- END XML Linearization -->
