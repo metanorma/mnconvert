@@ -3548,6 +3548,8 @@
 		<xsl:variable name="last_char" select="substring($text, string-length($text))"/>
 		
 		<xsl:choose>
+			<!-- bold text inside italic -->
+			<xsl:when test="self::bold and parent::italic">true</xsl:when>
 			<!--  a blank space does not precede the text to format -->
 			<xsl:when test="$prev_char != '' and $prev_char != ' '">true</xsl:when>
 			
