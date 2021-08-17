@@ -3045,7 +3045,8 @@
 		<xsl:if test="xalan:nodeset($imageList)//image">
 			<redirect:write file="{$taskCopyImagesFilename}"> <!-- this list will be processed and deleted in java program -->
 				<xsl:for-each select="xalan:nodeset($imageList)//image">
-					<xsl:text>copy</xsl:text><xsl:value-of select="."/>
+					<!-- <xsl:text>copy</xsl:text><xsl:value-of select="."/> -->
+					<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),'image::','copyimage::')"/>
 				</xsl:for-each>
 			</redirect:write>
 		</xsl:if>
