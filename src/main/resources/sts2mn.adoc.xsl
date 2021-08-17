@@ -1288,7 +1288,55 @@
 	<xsl:template match="tbx:source">
 		<xsl:text>[.source]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
+    
+		<!-- text=<xsl:value-of select="normalize-space(.)"/> -->
+		<xsl:variable name="isModified" select="contains(normalize-space(.), ' modified')"/>
+		<xsl:variable name="textModified" select="java:replaceAll(java:java.lang.String.new(substring-after(normalize-space(.), ' modified')), '^(\s|\h)*(-|–)(\s|\h)*','')"/>
 		<xsl:variable name="modified_text" select="' modified — '"/>
+		
+		<xsl:variable name="tbx_source_simplified">
+			<xsl:apply-templates mode="tbx_source_simplify"/>
+		</xsl:variable>
+    
+		<xsl:variable name="text_tbx_source_simplified" select="xalan:nodeset($tbx_source_simplified)"/>
+    
+		<!-- text2='<xsl:value-of select="xalan:nodeset($tbx_source_simplified)"/>' -->
+		
+		<xsl:variable name="reference">
+			<xsl:choose>
+				<xsl:when test=".//xref[@ref-type='bibr']"><xsl:value-of select=".//xref[@ref-type='bibr']/@rid"/></xsl:when>
+				<xsl:otherwise>
+					<xsl:variable name="text_ref">
+						<xsl:choose>
+							<xsl:when test="contains($text_tbx_source_simplified, ',')"><xsl:value-of select="substring-before($text_tbx_source_simplified, ',')"/></xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="$text_tbx_source_simplified"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+					<!-- replace space, non-break space, semicolon to '_' -->
+					<xsl:value-of select="translate($text_ref, ' &#xA0;:', '___')"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+    <!-- reference=<xsl:value-of select="$reference"/> -->
+    
+		<xsl:variable name="reference_text" select="normalize-space($text_tbx_source_simplified)"/>
+			<!-- <xsl:choose>
+				<xsl:when test=".//xref[@ref-type='bibr']">
+					<xsl:value-of select="normalize-space($text_tbx_source_simplified)"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:choose>
+						<xsl:when test="contains($text_tbx_source_simplified, ',')"><xsl:value-of select="normalize-space(substring-after($text_tbx_source_simplified, ','))"/></xsl:when>
+						<xsl:otherwise></xsl:otherwise>
+					</xsl:choose>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable> -->
+		
+		<!-- reference_text=<xsl:value-of select="$reference_text"/> -->
 		
 		<xsl:variable name="source_text" select="normalize-space(translate(., '&#xA0;', ' '))"/>
 		<!-- Output examples: <<ref_2,clause=3.1>> -->
@@ -1308,7 +1356,9 @@
 		<xsl:variable name="part_modified" select="substring-after($source_text, $modified_text)"/>		
 		
 		<xsl:text>&lt;&lt;</xsl:text>
-		<xsl:choose>
+		<xsl:value-of select="$reference"/>
+		<xsl:if test="$reference_text != ''">,<xsl:value-of select="$reference_text"/></xsl:if>
+		<!-- <xsl:choose>
 			<xsl:when test="contains($part1, ',')">
 				<xsl:variable name="source_parts">
 					<xsl:call-template name="split">
@@ -1316,28 +1366,18 @@
 						<xsl:with-param name="sep" select="','"/>
 					</xsl:call-template>
 				</xsl:variable>
-				
 				<xsl:for-each select="xalan:nodeset($source_parts)//item">					
-					<!-- text=<xsl:value-of select="."/> -->
 					<xsl:choose>
 						<xsl:when test="position() = 1">
 							<xsl:call-template name="getStdRef">
 								<xsl:with-param name="text" select="."/>
 							</xsl:call-template>					
 						</xsl:when>
-						<!-- <xsl:when test="starts-with(., $modified_text)">
-							<xsl:text>&gt;&gt;</xsl:text>
-							<xsl:text>, </xsl:text>
-							<xsl:value-of select="substring-after(., $modified_text)"/>
-						</xsl:when>	 -->					
 						<xsl:otherwise>
 							<xsl:text>,</xsl:text>
 							<xsl:call-template name="getUpdatedRef">
 								<xsl:with-param name="text" select="."/>
 							</xsl:call-template>
-							<!-- <xsl:if test="not(contains($source_text,$modified_text)) and position() = last()">
-								<xsl:text>&gt;&gt;</xsl:text>
-							</xsl:if> -->
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:for-each>
@@ -1345,14 +1385,34 @@
 			<xsl:otherwise>
 				<xsl:value-of select="$part1"/>
 			</xsl:otherwise>
-		</xsl:choose>
+		</xsl:choose> -->
+    
 		<xsl:text>&gt;&gt;</xsl:text>
-		<xsl:if test="$part_modified != ''">
-			<xsl:text>, </xsl:text><xsl:value-of select="$part_modified"/>
+		<xsl:if test="$isModified = 'true'">
+			<xsl:text>,</xsl:text>
+			<xsl:value-of select="$textModified"/>
 		</xsl:if>
-		
+		<!-- <xsl:if test="$part_modified != ''">
+			<xsl:text>, </xsl:text><xsl:value-of select="$part_modified"/>
+		</xsl:if> -->
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
+	
+	<xsl:template match="@*|node()" mode="tbx_source_simplify">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="tbx_source_simplify"/>		
+		</xsl:copy>
+	</xsl:template>
+
+	<xsl:template match="text()" priority="2" mode="tbx_source_simplify"> <!-- [starts-with(., ', modified') or starts-with(., ' modified')] -->
+		<xsl:choose>
+			<xsl:when test="contains(., ', modified')"><xsl:value-of select="substring-before(., ', modified')"/></xsl:when>
+			<xsl:when test="contains(., 'modified')"><xsl:value-of select="substring-before(., 'modified')"/></xsl:when>
+			<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template match="xref[@ref-type = 'bibr']" mode="tbx_source_simplify"/>
 	
 	<!-- ================= -->
 	<!-- List processing -->
