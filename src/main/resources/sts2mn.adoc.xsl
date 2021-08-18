@@ -2520,7 +2520,11 @@
 		</xsl:variable>
 		<xsl:choose>
 			<xsl:when test="contains($text, 'image::')"><xsl:value-of select="$text"/></xsl:when>
-			<xsl:otherwise><xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),'(\s|\h)','')"/></xsl:otherwise>
+			<xsl:otherwise>
+				<xsl:if test="java:replaceAll(java:java.lang.String.new($text),'(\s|\h)','') != ''">
+					<xsl:value-of select="$text"/>
+				</xsl:if>
+			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
 	
