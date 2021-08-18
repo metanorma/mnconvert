@@ -3565,6 +3565,10 @@
 	<!-- END: move list item label from p into the element label.-->
 	<!-- ======================================= -->
 	
+	<!-- remove break from tbx:term -->
+	<xsl:template match="tbx:term/break" mode="linearize">
+		<xsl:if test="preceding-sibling::node()"><xsl:text> </xsl:text></xsl:if>
+	</xsl:template>
 	
 	<!-- ========================================= -->
 	<!-- END XML Linearization -->
