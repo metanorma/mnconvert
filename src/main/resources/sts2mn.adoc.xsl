@@ -2515,8 +2515,15 @@
 	</xsl:template>
 	
 	<xsl:template match="td|th" mode="ignore_array">
-		<xsl:apply-templates/>
+		<xsl:variable name="text">
+			<xsl:apply-templates/>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="contains($text, 'image::')"><xsl:value-of select="$text"/></xsl:when>
+			<xsl:otherwise><xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),'(\s|\h)','')"/></xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
+	
 	
 	
 	<!-- ============================ -->
