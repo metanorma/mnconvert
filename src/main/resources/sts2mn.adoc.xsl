@@ -3544,9 +3544,6 @@
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regexTableN,'')"/>
 	</xsl:template>
 	
-	<!-- Removing <sup>)</sup> and <sup>) </sup> from table footnotes -->
-	<xsl:template match="sup[normalize-space() = ')'][preceding-sibling::node()[1][self::xref][@ref-type = 'table-fn']]"/>
-	
 	<!-- ======================================= -->
 	<!-- move list item label from p into the element label. -->
 	<!-- ======================================= -->
@@ -3580,6 +3577,13 @@
 	<xsl:template match="tbx:term/break" mode="linearize">
 		<xsl:if test="preceding-sibling::node()"><xsl:text> </xsl:text></xsl:if>
 	</xsl:template>
+	
+	<!-- Removing <sup>)</sup> and <sup>) </sup> from table footnotes -->
+	<xsl:template match="sup[normalize-space() = ')'][preceding-sibling::node()[1][self::xref][@ref-type = 'table-fn']]" mode="linearize"/>
+	<xsl:template match="bold[preceding-sibling::node()[1][self::xref][@ref-type = 'table-fn']]/sup[normalize-space() = ')']" mode="linearize"/>
+	<xsl:template match="bold[preceding-sibling::node()[1][self::xref][@ref-type = 'table-fn']][sup[normalize-space() = ')'] and normalize-space() = ')']" mode="linearize"/>
+	<!-- Removing <sup>)</sup> immediately after <fn></fn>  -->
+	<xsl:template match="sup[normalize-space() = ')'][preceding-sibling::node()[1][self::fn]]" mode="linearize"/>
 	
 	<!-- ========================================= -->
 	<!-- END XML Linearization -->
