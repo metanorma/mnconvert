@@ -1850,24 +1850,47 @@
 	<xsl:template match="table-wrap">
 		<xsl:if test="preceding-sibling::node()[1][self::text()]"><xsl:text>&#xa;</xsl:text></xsl:if> <!-- if previous node is text, example: environment and requirements.<table-wrap id="tab_e" -->
 		<xsl:apply-templates select="@orientation"/>
+		<xsl:if test="not(@orientation)">
+			<xsl:apply-templates select="table/@width" mode="orientation"/>
+		</xsl:if>
 		<xsl:call-template name="setId"/>
 		<xsl:if test="not(label)">[%unnumbered]&#xa;</xsl:if>
 		<xsl:apply-templates select="table-wrap-foot/fn-group" mode="footnotes"/>
 		<xsl:apply-templates />
 		<xsl:apply-templates select="@orientation" mode="after_table"/>
+		<xsl:if test="not(@orientation)">
+			<xsl:apply-templates select="table/@width" mode="after_table"/>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="table-wrap/@orientation">
-		<xsl:text>&#xa;&#xa;</xsl:text>
-		<xsl:text>[%</xsl:text><xsl:value-of select="."/><xsl:text>]</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>&lt;&lt;&lt;</xsl:text>
-		<xsl:text>&#xa;&#xa;&#xa;</xsl:text>
+		<xsl:call-template name="setPageOrientation">
+			<xsl:with-param name="orientation" select="."/>
+		</xsl:call-template>
+	</xsl:template>
+	
+	<xsl:template match="table/@width" mode="orientation">
+		<xsl:if test=". &gt;= 700">
+			<xsl:call-template name="setPageOrientation">
+				<xsl:with-param name="orientation" select="'landscape'"/>
+			</xsl:call-template>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="table-wrap/@orientation" mode="after_table">
+		<xsl:call-template name="setPageOrientation"/>
+	</xsl:template>
+	
+	<xsl:template match="table/@width" mode="after_table">
+		<xsl:if test=". &gt;= 700">
+			<xsl:call-template name="setPageOrientation"/>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template name="setPageOrientation">
+		<xsl:param name="orientation">portrait</xsl:param>
 		<xsl:text>&#xa;&#xa;</xsl:text>
-		<xsl:text>[%portrait]</xsl:text>
+		<xsl:text>[%</xsl:text><xsl:value-of select="$orientation"/><xsl:text>]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&lt;&lt;&lt;</xsl:text>
 		<xsl:text>&#xa;&#xa;&#xa;</xsl:text>
