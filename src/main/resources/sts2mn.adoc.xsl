@@ -406,8 +406,8 @@
 	
 	<xsl:template match="//standard/back">
 		<xsl:if test="$split-bibdata != 'true'">		
-			<xsl:apply-templates select="ref-list[@content-type = 'bibl']" />
 			<xsl:apply-templates select="*[not(local-name() = 'ref-list' and @content-type = 'bibl')]" />
+			<xsl:apply-templates select="ref-list[@content-type = 'bibl']" />
 		</xsl:if>
 	</xsl:template>
 	
