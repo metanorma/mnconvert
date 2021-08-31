@@ -16,12 +16,37 @@
 	<xsl:param name="debug">false</xsl:param>
 	<xsl:param name="outputformat">NISO</xsl:param>
 	
+	<!-- ===================== -->
+	<!-- remove namespace -->
+	<!-- ===================== -->
+	<xsl:variable name="xml_">
+		<xsl:apply-templates mode="remove_namespace"/>
+	</xsl:variable>
+	
+	<xsl:template match="*" mode="remove_namespace" priority="2">
+		<xsl:element name="{local-name()}">
+			<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
+		</xsl:element>
+	</xsl:template>
+	<xsl:template match="@*|node()" mode="remove_namespace">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
+		</xsl:copy>
+	</xsl:template>
+	<xsl:template match="mml:*" mode="remove_namespace" priority="3">
+		<xsl:copy-of select="."/>
+	</xsl:template>
+	<!-- ===================== -->
+	<!-- END remove namespace -->
+	<!-- ===================== -->
+	<xsl:variable name="xml" select="xalan:nodeset($xml_)"/>
+	
 	<xsl:variable name="format" select="normalize-space($outputformat)"/>
 	
 	<xsl:variable name="change_id">true</xsl:variable>
 		
-	<xsl:variable name="organization_abbreviation" select="/*/*[local-name() = 'bibdata']/*[local-name() = 'copyright']/*[local-name() = 'owner']/*[local-name() = 'organization']/*[local-name() = 'abbreviation']"/>
-	<xsl:variable name="organization_name" select="/*/*[local-name() = 'bibdata']/*[local-name() = 'copyright']/*[local-name() = 'owner']/*[local-name() = 'organization']/*[local-name() = 'name']"/>
+	<xsl:variable name="organization_abbreviation" select="$xml/*/bibdata/copyright/owner/organization/abbreviation"/>
+	<xsl:variable name="organization_name" select="$xml/*/bibdata/copyright/owner/organization/name"/>
 	
 	<xsl:variable name="organization">
 		<xsl:choose>
@@ -32,44 +57,44 @@
 	</xsl:variable>
 	
 	<xsl:variable name="nat_meta_only">
-		<xsl:if test="not(/*/*[local-name() = 'bibdata']/*[local-name() = 'relation'][@type = 'adopted-from']) and $organization = 'BSI'">true</xsl:if>
+		<xsl:if test="not($xml/*/bibdata/relation[@type = 'adopted-from']) and $organization = 'BSI'">true</xsl:if>
 	</xsl:variable>
 	
 	<!-- ====================================================================== -->
 	<!-- ====================================================================== -->
 	<xsl:variable name="elements_">
 		<elements>
-			<xsl:apply-templates select="/*/*[local-name() = 'preface']/*" mode="elements"/>
+			<xsl:apply-templates select="$xml/*/preface/*" mode="elements"/>
       
       <!-- Introduction in sections -->
-      <xsl:apply-templates select="/*/*[local-name() = 'sections']/*[local-name() = 'clause'][@type='intro']" mode="elements"> <!-- [0] -->
+      <xsl:apply-templates select="$xml/*/sections/clause[@type='intro']" mode="elements"> <!-- [0] -->
 				<xsl:with-param name="sectionNum" select="'0'"/>
 			</xsl:apply-templates>
       
 			<!-- Scope -->
-			<xsl:apply-templates select="/*/*[local-name() = 'sections']/*[local-name() = 'clause'][@type='scope']" mode="elements"> <!-- [1] -->
+			<xsl:apply-templates select="$xml/*/sections/clause[@type='scope']" mode="elements"> <!-- [1] -->
 				<xsl:with-param name="sectionNum" select="'1'"/>
 			</xsl:apply-templates>
 			
 			<!-- Normative References -->
-			<xsl:apply-templates select="/*/*[local-name() = 'bibliography']/*[local-name() = 'references'][@normative='true']" mode="elements"> <!-- [@id = '_normative_references'] -->
-				<xsl:with-param name="sectionNum" select="count(/*/*[local-name() = 'sections']/*[local-name() = 'clause'][@type='scope']) + 1"/>
+			<xsl:apply-templates select="$xml/*/bibliography/references[@normative='true']" mode="elements"> <!-- [@id = '_normative_references'] -->
+				<xsl:with-param name="sectionNum" select="count(/*/sections/clause[@type='scope']) + 1"/>
 			</xsl:apply-templates>
 			
       <!-- Terms and definitions -->
-		<xsl:apply-templates select="/*/*[local-name()='sections']/*[local-name()='terms'] | 
-																						/*/*[local-name()='sections']/*[local-name()='clause'][.//*[local-name()='terms']] |
-																						/*/*[local-name()='sections']/*[local-name()='definitions'] | 
-																						/*/*[local-name()='sections']/*[local-name()='clause'][.//*[local-name()='definitions']]" mode="elements">
+		<xsl:apply-templates select="$xml/*/sections/terms | 
+																						/*/sections/clause[.//terms] |
+																						/*/sections/definitions | 
+																						/*/sections/clause[.//definitions]" mode="elements">
 			<xsl:with-param name="sectionNumSkew" select="'1'"/>
 		</xsl:apply-templates>
 				<!-- Another main sections -->
-		<xsl:apply-templates select="/*/*[local-name()='sections']/*[local-name() != 'terms' and 
+		<xsl:apply-templates select="$xml/*/sections/*[local-name() != 'terms' and 
 																																														local-name() != 'definitions' and 
 																																														not(@type='intro') and
 																																														not(@type='scope') and
-																																														not(local-name() = 'clause' and .//*[local-name()='terms']) and
-																																														not(local-name() = 'clause' and .//*[local-name()='definitions'])]" mode="elements" />
+																																														not(self::clause and .//terms) and
+																																														not(self::clause and .//definitions)]" mode="elements" />
 
 					
 			<!-- Other main sections: Terms, etc... -->					
@@ -77,11 +102,11 @@
 				<xsl:with-param name="sectionNumSkew" select="'1'"/>
 			</xsl:apply-templates> -->
 			
-			<xsl:apply-templates select="/*/*[local-name() = 'annex']" mode="elements"/>
+			<xsl:apply-templates select="$xml/*/annex" mode="elements"/>
 			
-			<xsl:apply-templates select="//*[local-name() = 'appendix']" mode="elements"/>
+			<xsl:apply-templates select="$xml//appendix" mode="elements"/>
 			
-			<xsl:apply-templates select="/*/*[local-name() = 'bibliography']/*[local-name() = 'references'][not(@normative='true')]" mode="elements"/>
+			<xsl:apply-templates select="$xml/*/bibliography/references[not(@normative='true')]" mode="elements"/>
 			
 		</elements>
 	</xsl:variable>
@@ -171,21 +196,21 @@
 			
 			<xsl:variable name="section">
 				<xsl:choose>
-					<xsl:when test="normalize-space(*[local-name() = 'title']/*[local-name() = 'tab'][1]/preceding-sibling::node()) != ''">
+					<xsl:when test="normalize-space(title/tab[1]/preceding-sibling::node()) != ''">
 						<!-- presentation xml data -->
-						<xsl:value-of select="*[local-name() = 'title']/*[local-name() = 'tab'][1]/preceding-sibling::node()"/>
+						<xsl:value-of select="title/tab[1]/preceding-sibling::node()"/>
 					</xsl:when>
-					<xsl:when test="local-name() = 'term' and normalize-space(*[local-name() = 'name']) != '' and  normalize-space(translate(*[local-name() = 'name'], '0123456789.', '')) = ''">
-						<xsl:value-of select="*[local-name() = 'name']"/>
+					<xsl:when test="self::term and normalize-space(name) != '' and  normalize-space(translate(name, '0123456789.', '')) = ''">
+						<xsl:value-of select="name"/>
 					</xsl:when>
-					<xsl:when test="*[local-name() = 'title'] and not(*[local-name() = 'title']/*[local-name() = 'tab']) and normalize-space(translate(*[local-name() = 'title'], '0123456789.', '')) = ''">
-						<xsl:value-of select="*[local-name() = 'title']"/>
+					<xsl:when test="title and not(title/tab) and normalize-space(translate(title, '0123456789.', '')) = ''">
+						<xsl:value-of select="title"/>
 					</xsl:when>
-					<xsl:when test="(local-name() = 'table' or local-name() = 'figure') and contains(*[local-name() = 'name'], '&#8212; ')">
-						<xsl:variable name="_name" select="substring-before(*[local-name() = 'name'], '&#8212; ')"/>
+					<xsl:when test="(self::table or self::figure) and contains(name, '&#8212; ')">
+						<xsl:variable name="_name" select="substring-before(name, '&#8212; ')"/>
 						<xsl:value-of select="translate(normalize-space(translate($_name, '&#xa0;', ' ')), ' ', '&#xa0;')"/>
 					</xsl:when>
-					<xsl:when test="(local-name() = 'table' or local-name() = 'figure') and not(contains(*[local-name() = 'name'], '&#8212; '))"/>
+					<xsl:when test="(self::table or self::figure) and not(contains(name, '&#8212; '))"/>
 					<xsl:when test="$section_ = '0' and not(@type='intro')"></xsl:when>
 					<xsl:otherwise>
 						<xsl:choose>
@@ -200,7 +225,7 @@
 			
 			<xsl:variable name="parent">
 				<xsl:choose>
-					<xsl:when test="ancestor::*[local-name() = 'annex'] and not($name = 'figure' or $name = 'table' or $name = 'annex' or $name = 'fn')">annex</xsl:when>
+					<xsl:when test="ancestor::annex and not($name = 'figure' or $name = 'table' or $name = 'annex' or $name = 'fn')">annex</xsl:when>
 					<xsl:otherwise><xsl:value-of select="$name"/></xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
@@ -255,14 +280,18 @@
 	
 	<!-- root element, for example: iso-standard -->
 	<xsl:template match="/*">
+		<xsl:apply-templates select="$xml" mode="xml"/>
+	</xsl:template>
+	
+	<xsl:template match="/*" mode="xml">
 		
 		<standard xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:tbx="urn:iso:std:iso:30042:ed-1" xmlns:xlink="http://www.w3.org/1999/xlink">
 			
 			<front>
-				<xsl:for-each select="*[local-name() = 'bibdata']/*[local-name() = 'relation'][@type = 'adopted-from']">
+				<xsl:for-each select="bibdata/relation[@type = 'adopted-from']">
 				
 					<xsl:variable name="element_name">
-						<xsl:variable name="adopted_from_abbreviation" select="*[local-name() = 'bibitem']/*[local-name() = 'contributor'][*[local-name() = 'role']/@type='publisher']/*[local-name() = 'organization']/*[local-name() = 'abbreviation']" />
+						<xsl:variable name="adopted_from_abbreviation" select="bibitem/contributor[role/@type='publisher']/organization/abbreviation" />
 						<xsl:choose>
 							<!-- If //bibdata//relation[@type = 'adopted-from']/bibitem/contributor[role/@type = 'publisher']/organization[abbreviation = 'xxx'] exists, where xxx = ISO or IEC, -->
 							<xsl:when test="$adopted_from_abbreviation = 'ISO' or $adopted_from_abbreviation = 'IEC'">iso-meta</xsl:when>
@@ -272,7 +301,7 @@
 						</xsl:choose>
 					</xsl:variable>
 					
-					<xsl:apply-templates select="*[local-name() = 'bibitem']" mode="front">
+					<xsl:apply-templates select="bibitem" mode="front">
 						<xsl:with-param name="element_name" select="$element_name"/>
 					</xsl:apply-templates>
 				</xsl:for-each>
@@ -280,58 +309,58 @@
 				<xsl:variable name="element_name">
 					<xsl:choose>
 						<!-- If //bibdata/relation[@type = 'adopted-from'] exists -->
-						<xsl:when test="*[local-name() = 'bibdata']/*[local-name() = 'relation'][@type = 'adopted-from']">nat-meta</xsl:when>
+						<xsl:when test="bibdata/relation[@type = 'adopted-from']">nat-meta</xsl:when>
 						<xsl:when test="$organization = 'BSI'">nat-meta</xsl:when>
 						<xsl:otherwise>iso-meta</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
 				
-				<xsl:apply-templates select="*[local-name() = 'bibdata']" mode="front">
+				<xsl:apply-templates select="bibdata" mode="front">
 					<xsl:with-param name="element_name" select="$element_name"/>
 				</xsl:apply-templates>
 				
 				<xsl:call-template name="insert_publication_info"/>
 				
-				<xsl:apply-templates select="*[local-name() = 'preface']" mode="front_preface"/>
+				<xsl:apply-templates select="preface" mode="front_preface"/>
 			</front>
 			
 			
-			<xsl:if test="*[local-name() = 'sections'] or *[local-name() = 'bibliography']/*[local-name() = 'references'][@normative='true']">
+			<xsl:if test="sections or bibliography/references[@normative='true']">
 				<body>
 					<xsl:if test="$nat_meta_only = 'true'"> <!-- $organization = 'BSI' -->
-						<xsl:apply-templates select="*[local-name() = 'preface']/*[local-name() = 'introduction']" mode="front_preface"> <!-- [0] -->
+						<xsl:apply-templates select="preface/introduction" mode="front_preface"> <!-- [0] -->
 							<xsl:with-param name="skipIntroduction">false</xsl:with-param>
 						</xsl:apply-templates>
 					</xsl:if>
 					
           <!-- Introduction in sections -->
-          <xsl:apply-templates select="*[local-name() = 'sections']/*[local-name() = 'clause'][@type='intro']"> <!-- [0] -->
+          <xsl:apply-templates select="sections/clause[@type='intro']"> <!-- [0] -->
             <xsl:with-param name="sectionNum" select="'0'"/>
           </xsl:apply-templates>
           
         
 					<!-- Scope -->
-					<xsl:apply-templates select="*[local-name() = 'sections']/*[local-name() = 'clause'][@type='scope']"> <!-- [1] -->
+					<xsl:apply-templates select="sections/clause[@type='scope']"> <!-- [1] -->
 						<xsl:with-param name="sectionNum" select="'1'"/>
 					</xsl:apply-templates>
 					
 					<!-- Normative References -->
-					<xsl:apply-templates select="*[local-name() = 'bibliography']/*[local-name() = 'references'][@normative='true']"> <!-- [@id = '_normative_references'] -->
-						<xsl:with-param name="sectionNum" select="count(*[local-name() = 'sections']/*[local-name() = 'clause'][@type='scope']) + 1"/>
+					<xsl:apply-templates select="bibliography/references[@normative='true']"> <!-- [@id = '_normative_references'] -->
+						<xsl:with-param name="sectionNum" select="count(sections/clause[@type='scope']) + 1"/>
 					</xsl:apply-templates>
 					
           <!-- Terms and definitions -->
-          <xsl:apply-templates select="*[local-name()='sections']/*[local-name()='terms'] | 
-                                                  *[local-name()='sections']/*[local-name()='clause'][.//*[local-name()='terms']] |
-                                                  *[local-name()='sections']/*[local-name()='definitions'] | 
-                                                  *[local-name()='sections']/*[local-name()='clause'][.//*[local-name()='definitions']]" />		
+          <xsl:apply-templates select="sections/terms | 
+                                                  sections/clause[.//terms] |
+                                                  sections/definitions | 
+                                                  sections/clause[.//definitions]" />		
               <!-- Another main sections -->
-          <xsl:apply-templates select="*[local-name()='sections']/*[local-name() != 'terms' and 
+          <xsl:apply-templates select="sections/*[local-name() != 'terms' and 
                                                                                                   local-name() != 'definitions' and 
                                                                                                   not(@type='intro') and
                                                                                                   not(@type='scope') and
-                                                                                                  not(local-name() = 'clause' and .//*[local-name()='terms']) and
-                                                                                                  not(local-name() = 'clause' and .//*[local-name()='definitions'])]" />
+                                                                                                  not(self::clause and .//terms) and
+                                                                                                  not(self::clause and .//definitions)]" />
           
 					<!-- Other main sections: Terms, etc... -->					
 					<!-- <xsl:apply-templates select="*[local-name() = 'sections']/*[not(@type='scope') and not(@type='intro')]">
@@ -341,15 +370,15 @@
 				</body>	
 			</xsl:if>
 						
-			<xsl:if test="*[local-name() = 'annex'] or *[local-name() = 'bibliography']/*[local-name() = 'references']">
+			<xsl:if test="annex or bibliography/references">
 				<back>
-					<xsl:if test="*[local-name() = 'annex']">
+					<xsl:if test="annex">
 						<app-group>
-							<xsl:apply-templates select="*[local-name() = 'annex']" mode="back"/>
+							<xsl:apply-templates select="annex" mode="back"/>
 						</app-group>
 					</xsl:if>
-					<xsl:apply-templates select="*[local-name() = 'bibliography']/*[local-name() = 'references'][not(@normative='true')] | *[local-name() = 'bibliography']/*[local-name() = 'clause'][*[local-name() = 'references'][not(@normative='true')]]" mode="back"/>
-					<xsl:apply-templates select="*[local-name() = 'indexsect']"/>
+					<xsl:apply-templates select="bibliography/references[not(@normative='true')] | bibliography/clause[references[not(@normative='true')]]" mode="back"/>
+					<xsl:apply-templates select="indexsect"/>
 				</back>
 			</xsl:if>
 			<xsl:if test="$debug = 'true'">
@@ -362,22 +391,22 @@
 		</standard>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'bibdata']"/>
-	<xsl:template match="*[local-name() = 'preface']"/>
-	<xsl:template match="*[local-name() = 'annex']"/>
-	<xsl:template match="*[local-name() = 'bibliography']"/>
+	<xsl:template match="bibdata"/>
+	<xsl:template match="preface"/>
+	<xsl:template match="annex"/>
+	<xsl:template match="bibliography"/>
 	
 	<!-- ================================== -->
 	<!-- Publishing and copyright information block -->
 	<!-- ================================== -->
 	<xsl:template name="insert_publication_info">
 			<sec id="sec_pub_info_nat" sec-type="publication_info">
-				<xsl:apply-templates select="*[local-name() = 'boilerplate']/*[local-name() = 'copyright-statement']/*" mode="publication_info"/>
-				<xsl:apply-templates select="*[local-name() = 'bibdata']/*[local-name() = 'docidentifier'][@type = 'ISBN']" mode="publication_info"/>
+				<xsl:apply-templates select="boilerplate/copyright-statement/*" mode="publication_info"/>
+				<xsl:apply-templates select="bibdata/docidentifier[@type = 'ISBN']" mode="publication_info"/>
 				
-				<xsl:if test="*[local-name() = 'bibdata']/*[local-name() = 'ext']/*[local-name() = 'ics']">
+				<xsl:if test="bibdata/ext/ics">
 					<p><xsl:text>ICS </xsl:text>
-						<xsl:for-each select="*[local-name() = 'bibdata']/*[local-name() = 'ext']/*[local-name() = 'ics']">
+						<xsl:for-each select="bibdata/ext/ics">
 							<xsl:sort />
 							<xsl:value-of select="normalize-space()"/>
 							<xsl:if test="position() != last()">; </xsl:if>
@@ -385,32 +414,32 @@
 					</p>
 				</xsl:if>
 				
-				<xsl:apply-templates select="*[local-name() = 'preface']/*[local-name() = 'clause'][@type = 'related-refs']"  mode="publication_info"/>
+				<xsl:apply-templates select="preface/clause[@type = 'related-refs']"  mode="publication_info"/>
 				
-				<xsl:apply-templates select="*[local-name() = 'preface']/*[local-name() = 'clause'][@type = 'corrigenda']"  mode="publication_info"/>
+				<xsl:apply-templates select="preface/clause[@type = 'corrigenda']"  mode="publication_info"/>
 				
 			</sec>
 		</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'title']" mode="publication_info">
+	<xsl:template match="title" mode="publication_info">
 		<xsl:call-template name="title"/>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'p']" mode="publication_info">
+	<xsl:template match="p" mode="publication_info">
 		<xsl:call-template name="p"/>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'bibdata']/*[local-name() = 'docidentifier'][@type = 'ISBN']" mode="publication_info">
+	<xsl:template match="bibdata/docidentifier[@type = 'ISBN']" mode="publication_info">
 		<p>ISBN <xsl:apply-templates /></p>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'preface']/*[local-name() = 'clause'][@type = 'related-refs']" priority="2" mode="front_preface"/>
-	<xsl:template match="*[local-name() = 'preface']/*[local-name() = 'clause'][@type = 'related-refs']"  mode="publication_info">
+	<xsl:template match="preface/clause[@type = 'related-refs']" priority="2" mode="front_preface"/>
+	<xsl:template match="preface/clause[@type = 'related-refs']"  mode="publication_info">
 		<xsl:apply-templates />
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'preface']/*[local-name() = 'clause'][@type = 'corrigenda']" priority="2" mode="front_preface"/>
-	<xsl:template match="*[local-name() = 'preface']/*[local-name() = 'clause'][@type = 'corrigenda']"  mode="publication_info">
+	<xsl:template match="preface/clause[@type = 'corrigenda']" priority="2" mode="front_preface"/>
+	<xsl:template match="preface/clause[@type = 'corrigenda']"  mode="publication_info">
 		<sec>
 			<xsl:copy-of select="@id"/>
 			<xsl:apply-templates />
@@ -420,14 +449,14 @@
 	<!-- END Publishing and copyright information block -->
 	<!-- ================================== -->
 	
-	<xsl:template match="*[local-name() = 'bibdata'] | *[local-name() = 'bibdata']/*[local-name() = 'relation'][@type = 'adopted-from']/*[local-name() = 'bibitem']" mode="front">
+	<xsl:template match="bibdata | bibdata/relation[@type = 'adopted-from']/bibitem" mode="front">
 		<xsl:param name="element_name"/>
 		
 		<!-- <iso-meta> -->
 		<xsl:element name="{$element_name}">
 			<xsl:if test="$element_name != 'iso-meta'">
 				<xsl:attribute name="originator">
-					<xsl:variable name="abbrev" select="*[local-name() = 'contributor'][*[local-name() = 'role']/@type='publisher']/*[local-name() = 'organization']/*[local-name() = 'abbreviation']"/>
+					<xsl:variable name="abbrev" select="contributor[role/@type='publisher']/organization/abbreviation"/>
 					<xsl:choose>
 						<xsl:when test="starts-with($abbrev, 'BS')">BSI</xsl:when>
 						<xsl:when test="starts-with($abbrev, 'CEN')">CEN</xsl:when>
@@ -440,7 +469,7 @@
 			
 			<!-- get unique languages from element title -->
 			<xsl:variable name="languages">
-				<xsl:for-each select="*[local-name() = 'title']">
+				<xsl:for-each select="title">
 					<xsl:if test="not(preceding-sibling::*/@language = current()/@language)">
 						<item language="{@language}"/>
 					</xsl:if>
@@ -454,12 +483,12 @@
 					<xsl:variable name="titles-components">
 						<xsl:variable name="title-intro">
 							 <!-- <xsl:apply-templates select="/*/*[local-name() = 'bibdata']/*[local-name() = 'title'][@language = current()/@language and @type = 'title-intro']" mode="front"/> -->
-							 <xsl:apply-templates select="xalan:nodeset($bibdata)/*/*[local-name() = 'title'][@language = current()/@language and @type = 'title-intro']" mode="front"/>
+							 <xsl:apply-templates select="xalan:nodeset($bibdata)/*/title[@language = current()/@language and @type = 'title-intro']" mode="front"/>
 						</xsl:variable>
 						
 						<xsl:variable name="title-main">					
 							<!-- <xsl:apply-templates select="/*/*[local-name() = 'bibdata']/*[local-name() = 'title'][@language = current()/@language and @type = 'title-main']" mode="front"/> -->
-							<xsl:apply-templates select="xalan:nodeset($bibdata)/*/*[local-name() = 'title'][@language = current()/@language and @type = 'title-main']" mode="front"/>
+							<xsl:apply-templates select="xalan:nodeset($bibdata)/*/title[@language = current()/@language and @type = 'title-main']" mode="front"/>
 						</xsl:variable>
 						
 						<xsl:choose>
@@ -476,20 +505,20 @@
 						
 						<xsl:variable name="title-amd">
 							<!-- <xsl:apply-templates select="/*/*[local-name() = 'bibdata']/*[local-name() = 'title'][@language = current()/@language and @type = 'title-amd']" mode="front"/> -->
-							<xsl:apply-templates select="xalan:nodeset($bibdata)/*/*[local-name() = 'title'][@language = current()/@language and @type = 'title-amd']" mode="front"/>
+							<xsl:apply-templates select="xalan:nodeset($bibdata)/*/title[@language = current()/@language and @type = 'title-amd']" mode="front"/>
 						</xsl:variable>
 						
 						<xsl:variable name="title-part">
 							<!-- <xsl:apply-templates select="/*/*[local-name() = 'bibdata']/*[local-name() = 'title'][@language = current()/@language and @type = 'title-part']" mode="front"/> -->
-							<xsl:apply-templates select="xalan:nodeset($bibdata)/*/*[local-name() = 'title'][@language = current()/@language and @type = 'title-part']" mode="front"/>
+							<xsl:apply-templates select="xalan:nodeset($bibdata)/*/title[@language = current()/@language and @type = 'title-part']" mode="front"/>
 						</xsl:variable>
 						
 						<xsl:variable name="part">
 							<!-- <xsl:apply-templates select="/*/*[local-name() = 'bibdata']/*[local-name() = 'ext']/*[local-name() = 'structuredidentifier']/*[local-name() = 'project-number']/@part" mode="front"/> -->
-							<xsl:apply-templates select="xalan:nodeset($bibdata)/*/*[local-name() = 'ext']/*[local-name() = 'structuredidentifier']/*[local-name() = 'project-number']/@part" mode="front"/>
+							<xsl:apply-templates select="xalan:nodeset($bibdata)/*/ext/structuredidentifier/project-number/@part" mode="front"/>
 						</xsl:variable>
 						<part>
-							<xsl:if test="local-name() = 'compl' and $part != ''">
+							<xsl:if test="self::compl and $part != ''">
 								<xsl:choose>
 									<xsl:when test="current()/@language = 'en'"><xsl:text>Part </xsl:text></xsl:when>
 									<xsl:when test="current()/@language = 'fr'"><xsl:text>Partie </xsl:text></xsl:when>
@@ -522,7 +551,7 @@
 					</xsl:variable>
 				
 					
-					<xsl:for-each select="xalan:nodeset($titles-components)/*[normalize-space() != '' and not(local-name() = 'part')]">
+					<xsl:for-each select="xalan:nodeset($titles-components)/*[normalize-space() != '' and not(self::part)]">
 						<xsl:copy-of select="."/>
 					</xsl:for-each>
 
@@ -566,36 +595,36 @@
 			
 			<doc-ident>
 				<sdo>
-					<xsl:apply-templates select="*[local-name() = 'contributor'][*[local-name() = 'role']/@type='author']/*[local-name() = 'organization']/*[local-name() = 'abbreviation']" mode="front"/>
+					<xsl:apply-templates select="contributor[role/@type='author']/organization/abbreviation" mode="front"/>
 				</sdo>
 				<proj-id>
-					<xsl:apply-templates select="*[local-name() = 'ext']/*[local-name() = 'structuredidentifier']/*[local-name() = 'project-number']" mode="front"/>
+					<xsl:apply-templates select="ext/structuredidentifier/project-number" mode="front"/>
 				</proj-id>
 				<language>
-					<xsl:apply-templates select="*[local-name() = 'language']" mode="front"/>
+					<xsl:apply-templates select="language" mode="front"/>
 					</language>
 				<release-version>
-					<xsl:apply-templates select="*[local-name() = 'status']/*[local-name() = 'stage']/@abbreviation" mode="front"/>
+					<xsl:apply-templates select="status/stage/@abbreviation" mode="front"/>
 				</release-version>
 			</doc-ident>
 			
 			<std-ident>
 				<originator>
-					<xsl:apply-templates select="*[local-name() = 'contributor'][*[local-name() = 'role']/@type='publisher']/*[local-name() = 'organization']/*[local-name() = 'abbreviation']" mode="front"/>
+					<xsl:apply-templates select="contributor[role/@type='publisher']/organization/abbreviation" mode="front"/>
 				</originator>
 				<doc-type>
-					<xsl:apply-templates select="*[local-name() = 'ext']/*[local-name() = 'doctype']" mode="front"/>
+					<xsl:apply-templates select="ext/doctype" mode="front"/>
 				</doc-type>
 				
-				<xsl:apply-templates select="*[local-name() = 'ext']/*[local-name() = 'subdoctype']" mode="front"/>
+				<xsl:apply-templates select="ext/subdoctype" mode="front"/>
 				
 				<doc-number>					
-					<xsl:apply-templates select="*[local-name() = 'docnumber']" mode="front"/>
+					<xsl:apply-templates select="docnumber" mode="front"/>
 				</doc-number>
 				
 				<!-- <part-number> -->
 				<xsl:variable name="part_number">
-					<xsl:apply-templates select="*[local-name() = 'ext']/*[local-name() = 'structuredidentifier']/*[local-name() = 'partnumber'] | *[local-name() = 'ext']/*[local-name() = 'structuredidentifier']/*[local-name() = 'project-number']/@part" mode="front"/>
+					<xsl:apply-templates select="ext/structuredidentifier/partnumber | ext/structuredidentifier/project-number/@part" mode="front"/>
 				</xsl:variable>
 				<xsl:if test="normalize-space($part_number) != ''">
 					<part-number>
@@ -604,29 +633,29 @@
 				</xsl:if>
 				
 				<edition>
-					<xsl:apply-templates select="*[local-name() = 'edition']" mode="front"/>
+					<xsl:apply-templates select="edition" mode="front"/>
 				</edition>
 				<version>
-					<xsl:apply-templates select="*[local-name() = 'version']/*[local-name() = 'revision-date']" mode="front"/>
+					<xsl:apply-templates select="version/revision-date" mode="front"/>
 				</version>
 			</std-ident>
 			
 			<content-language>
-				<xsl:apply-templates select="*[local-name() = 'language']" mode="front"/>
+				<xsl:apply-templates select="language" mode="front"/>
 			</content-language>
 			<std-ref type="dated">
-				<xsl:apply-templates select="*[local-name() = 'docidentifier'][1]" mode="front"/>
+				<xsl:apply-templates select="docidentifier[1]" mode="front"/>
 			</std-ref>
 			<std-ref type="undated">
-				<xsl:value-of select="substring-before(*[local-name() = 'docidentifier'], ':')"/>
+				<xsl:value-of select="substring-before(docidentifier, ':')"/>
 			</std-ref>
 			<doc-ref>
 				<xsl:choose>
-					<xsl:when test="*[local-name() = 'docidentifier'][@type='iso-reference']">
-						<xsl:apply-templates select="*[local-name() = 'docidentifier'][@type='iso-reference'][last()]" mode="front"/>
+					<xsl:when test="docidentifier[@type='iso-reference']">
+						<xsl:apply-templates select="docidentifier[@type='iso-reference'][last()]" mode="front"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:apply-templates select="*[local-name() = 'docidentifier'][@type='iso-with-lang']" mode="front"/>
+						<xsl:apply-templates select="docidentifier[@type='iso-with-lang']" mode="front"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</doc-ref>
@@ -634,7 +663,7 @@
 			<!-- <release-date> -->
 			<xsl:variable name="release-date">
 				<dates>
-					<xsl:apply-templates select="*[local-name() = 'date'][@type='release']/*[local-name() = 'on']" mode="front"/>
+					<xsl:apply-templates select="date[@type='release']/on" mode="front"/>
 				</dates>
 			</xsl:variable>
 			
@@ -655,23 +684,23 @@
 				</xsl:otherwise>
 			</xsl:choose>
 			
-			<xsl:variable name="related_comm_ref" select="*[local-name() = 'relation'][@type='related']/*[local-name() = 'bibitem']/*[local-name() = 'docidentifier']"/>
+			<xsl:variable name="related_comm_ref" select="relation[@type='related']/bibitem/docidentifier"/>
 			<xsl:variable name="related_comm_ref_text">Committee reference</xsl:variable>
 			<comm-ref>
 				<xsl:choose>
 					<xsl:when test="$organization = 'BSI' and starts-with($related_comm_ref, $related_comm_ref_text)">
 						<xsl:value-of select="normalize-space(substring-after($related_comm_ref, $related_comm_ref_text))"/>
 					</xsl:when>
-					<xsl:when test="*[local-name() = 'ext']/*[local-name() = 'editorialgroup']/*[local-name() = 'technical-committee'] and not(
-						*[local-name() = 'ext']/*[local-name() = 'editorialgroup']/*[local-name() = 'subcommittee'] and 
-						*[local-name() = 'ext']/*[local-name() = 'editorialgroup']/*[local-name() = 'workgroup'] )">
-						<xsl:value-of select="*[local-name() = 'ext']/*[local-name() = 'editorialgroup']/*[local-name() = 'technical-committee']/@number"/>
+					<xsl:when test="ext/editorialgroup/technical-committee and not(
+						ext/editorialgroup/subcommittee and 
+						ext/editorialgroup/workgroup )">
+						<xsl:value-of select="ext/editorialgroup/technical-committee/@number"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:apply-templates select="*[local-name() = 'copyright']/*[local-name() = 'owner']/*[local-name() = 'organization']/*[local-name() = 'abbreviation']" mode="front"/>
-						<xsl:apply-templates select="*[local-name() = 'ext']/*[local-name() = 'editorialgroup']/*[local-name() = 'technical-committee']" mode="front"/>
-						<xsl:apply-templates select="*[local-name() = 'ext']/*[local-name() = 'editorialgroup']/*[local-name() = 'subcommittee']" mode="front"/>
-						<xsl:apply-templates select="*[local-name() = 'ext']/*[local-name() = 'editorialgroup']/*[local-name() = 'workgroup']" mode="front"/>
+						<xsl:apply-templates select="copyright/owner/organization/abbreviation" mode="front"/>
+						<xsl:apply-templates select="ext/editorialgroup/technical-committee" mode="front"/>
+						<xsl:apply-templates select="ext/editorialgroup/subcommittee" mode="front"/>
+						<xsl:apply-templates select="ext/editorialgroup/workgroup" mode="front"/>
 					</xsl:otherwise>
 				</xsl:choose>
 				
@@ -681,49 +710,49 @@
  -->				
 			</comm-ref>
 			<secretariat>
-				<xsl:apply-templates select="*[local-name() = 'ext']/*[local-name() = 'editorialgroup']/*[local-name() = 'secretariat']" mode="front"/>
+				<xsl:apply-templates select="ext/editorialgroup/secretariat" mode="front"/>
 			</secretariat>				
 			<!-- <ics> -->
-			<xsl:apply-templates select="*[local-name() = 'ext']/*[local-name() = 'ics']/*[local-name() = 'code']" mode="front"/>
+			<xsl:apply-templates select="ext/ics/code" mode="front"/>
 			
 			<!-- std-xref -->
 			<!-- ignoring all instances of .//relation[@type = 'adopted-from']/bibitem -->
-			<xsl:apply-templates select="*[local-name() = 'relation'][@type != 'adopted-from' and @type != 'related']" mode="front" /><!-- adopted-from -> to standalone xxx-meta , related -> comm-ref  -->
+			<xsl:apply-templates select="relation[@type != 'adopted-from' and @type != 'related']" mode="front" /><!-- adopted-from -> to standalone xxx-meta , related -> comm-ref  -->
 			
-			<xsl:apply-templates select="*[local-name() = 'relation'][@type = 'related'][starts-with(*[local-name() = 'bibitem']/*[local-name() = 'docidentifier'], 'Draft for comment')]" mode="front" />
+			<xsl:apply-templates select="relation[@type = 'related'][starts-with(bibitem/docidentifier, 'Draft for comment')]" mode="front" />
 			
 			
 			<permissions>
 				<!-- <copyright-statement>All rights reserved</copyright-statement> -->
-				<xsl:apply-templates select="/*/*[local-name() = 'boilerplate']/*[local-name() = 'copyright-statement']"/>
+				<xsl:apply-templates select="/*/boilerplate/copyright-statement"/>
 				<copyright-year>
-					<xsl:apply-templates select="*[local-name() = 'copyright']/*[local-name() = 'from']" mode="front"/>
+					<xsl:apply-templates select="copyright/from" mode="front"/>
 				</copyright-year>
 				<copyright-holder>
 					<xsl:choose>
-						<xsl:when test="*[local-name() = 'copyright']/*[local-name() = 'owner']/*[local-name() = 'organization']/*[local-name() = 'abbreviation']">
-							<xsl:apply-templates select="*[local-name() = 'copyright']/*[local-name() = 'owner']/*[local-name() = 'organization']/*[local-name() = 'abbreviation']" mode="front"/>
+						<xsl:when test="copyright/owner/organization/abbreviation">
+							<xsl:apply-templates select="copyright/owner/organization/abbreviation" mode="front"/>
 						</xsl:when>
 						<xsl:otherwise>
-							<xsl:apply-templates select="*[local-name() = 'copyright']/*[local-name() = 'owner']/*[local-name() = 'organization']/*[local-name() = 'name']" mode="front"/>
+							<xsl:apply-templates select="copyright/owner/organization/name" mode="front"/>
 						</xsl:otherwise>
 					</xsl:choose>
 					
 				</copyright-holder>
-				<xsl:apply-templates select="/*/*[local-name() = 'boilerplate']/*[local-name() = 'legal-statement']"/>
-				<xsl:apply-templates select="/*/*[local-name() = 'boilerplate']/*[local-name() = 'license-statement']"/>
+				<xsl:apply-templates select="/*/boilerplate/legal-statement"/>
+				<xsl:apply-templates select="/*/boilerplate/license-statement"/>
 			</permissions>
 			
-			<xsl:if test="*[local-name() = 'docidentifier'][@type = 'ISBN']">
+			<xsl:if test="docidentifier[@type = 'ISBN']">
 				<custom-meta-group>
 					<custom-meta>
 						<meta-name>ISBN</meta-name>
-						<meta-value><xsl:value-of select="*[local-name() = 'docidentifier'][@type = 'ISBN']"/></meta-value>
+						<meta-value><xsl:value-of select="docidentifier[@type = 'ISBN']"/></meta-value>
 					</custom-meta>
 				</custom-meta-group>
 			</xsl:if>
 			
-			<xsl:if test="local-name() = 'bibdata'">
+			<xsl:if test="self::bibdata">
 				<!-- check non-processed elements in bibdata -->
 				<xsl:variable name="front_check">
 					<xsl:apply-templates mode="front_check"/>
@@ -759,9 +788,9 @@
 		<xsl:apply-templates />
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'ext']/*[local-name() = 'editorialgroup']/*[local-name() = 'technical-committee'] |
-																*[local-name() = 'ext']/*[local-name() = 'editorialgroup']/*[local-name() = 'subcommittee'] |
-																*[local-name() = 'ext']/*[local-name() = 'editorialgroup']/*[local-name() = 'workgroup']" mode="front">
+	<xsl:template match="ext/editorialgroup/technical-committee |
+																ext/editorialgroup/subcommittee |
+																ext/editorialgroup/workgroup" mode="front">
 		<xsl:if test="normalize-space(@type) != '' or normalize-space(@number) != ''">
 			<xsl:text>/</xsl:text>
 			<xsl:choose>
@@ -770,9 +799,9 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:choose>
-						<xsl:when test="local-name() = 'technical-committee'">TC</xsl:when>
-						<xsl:when test="local-name() = 'subcommittee'">SC</xsl:when>
-						<xsl:when test="local-name() = 'workgroup'">WG</xsl:when>
+						<xsl:when test="self::technical-committee">TC</xsl:when>
+						<xsl:when test="self::subcommittee">SC</xsl:when>
+						<xsl:when test="self::workgroup">WG</xsl:when>
 					</xsl:choose>
 				</xsl:otherwise>
 			</xsl:choose>
@@ -783,14 +812,14 @@
 	</xsl:template>
 	
 	
-	<xsl:template match="*[local-name() = 'bibdata']/*[local-name() = 'date']/*[local-name() = 'on'] | *[local-name() = 'bibitem']/*[local-name() = 'date']/*[local-name() = 'on']" mode="front">
+	<xsl:template match="bibdata/date/on | bibitem/date/on" mode="front">
 		<xsl:choose>
 			<xsl:when test="../@type = 'release'">
 				<release-date>
 					<xsl:value-of select="."/>
 				</release-date>
 			</xsl:when>
-			<xsl:when test="position() = 1 and ../@type = 'published' and ../following-sibling::*[local-name() = 'date']/@type = 'published' ">
+			<xsl:when test="position() = 1 and ../@type = 'published' and ../following-sibling::date/@type = 'published' ">
 				<pub-date>
 					<xsl:if test="$organization = 'BSI'">
 						<xsl:attribute name="pub-type">PUBL</xsl:attribute>
@@ -812,11 +841,11 @@
 	</xsl:template>
 
 	
-	<xsl:template match="*[local-name() = 'ext']/*[local-name() = 'ics']/*[local-name() = 'code']" mode="front">
+	<xsl:template match="ext/ics/code" mode="front">
 		<ics><xsl:apply-templates mode="front"/></ics>
 	</xsl:template>
 
-	<xsl:template match="*[local-name() = 'ext']/*[local-name() = 'doctype']" mode="front">
+	<xsl:template match="ext/doctype" mode="front">
 		<xsl:variable name="value" select="normalize-space()"/>
 		<xsl:choose>
 			<xsl:when test="$value = 'international-standard'">IS</xsl:when>
@@ -829,14 +858,14 @@
 		</xsl:choose>
 	</xsl:template>
 
-	<xsl:template match="*[local-name() = 'ext']/*[local-name() = 'subdoctype']" mode="front">
+	<xsl:template match="ext/subdoctype" mode="front">
 		<xsl:text disable-output-escaping="yes">&lt;!--</xsl:text>
 			<xsl:copy-of select="."/>
 		<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'bibdata' or local-name() = 'bibitem']/*[local-name() = 'relation']" mode="front">
-		<xsl:variable name="value" select="*[local-name() = 'bibitem']/*[local-name() = 'docidentifier']"/>
+	<xsl:template match="*[self::bibdata or self::bibitem]/relation" mode="front">
+		<xsl:variable name="value" select="bibitem/docidentifier"/>
 		<xsl:variable name="draft_comment_text">Draft for comment</xsl:variable>
 		<xsl:choose>
 			<xsl:when test="@type = 'related' and starts-with($value, $draft_comment_text)">
@@ -885,7 +914,7 @@
 	
 	
 	
-	<xsl:template match="*[local-name() = 'bibdata' or local-name() = 'bibitem']/*[local-name() = 'relation'][@type != 'adopted-from']/*[local-name() = 'bibitem']" mode="front">
+	<xsl:template match="*[self::bibdata or self::bibitem]/relation[@type != 'adopted-from']/bibitem" mode="front">
 		<std-ref>
 			<xsl:copy-of select="@*"/>
 			<xsl:attribute name="type">
@@ -899,68 +928,68 @@
 	
 
 	<!-- skip processed ^ attributes  and stop -->
-	<xsl:template match="*[local-name() = 'bibdata']/*[local-name() = 'ext']/*[local-name() = 'structuredidentifier']/*[local-name() = 'project-number']/@part |
-																*[local-name() = 'status']/*[local-name() = 'stage']/@abbreviation |
-																*[local-name() = 'ext']/*[local-name() = 'editorialgroup']/*[local-name() = 'technical-committee']/@type |
-																*[local-name() = 'ext']/*[local-name() = 'editorialgroup']/*[local-name() = 'technical-committee']/@number" 
+	<xsl:template match="bibdata/ext/structuredidentifier/project-number/@part |
+																status/stage/@abbreviation |
+																ext/editorialgroup/technical-committee/@type |
+																ext/editorialgroup/technical-committee/@number" 
 																mode="front_check"/>
 	
 	<!-- skip processed ^ elements and stop -->
-	<xsl:template match="*[local-name() = 'bibdata']/*[local-name() = 'title'][@type = 'title-intro'] |
-																*[local-name() = 'bibdata']/*[local-name() = 'title'][@type = 'title-main'] |
-																*[local-name() = 'bibdata']/*[local-name() = 'title'][@type = 'title-part'] |
-																*[local-name() = 'bibdata']/*[local-name() = 'title'][@type = 'main'] |
-																*[local-name() = 'bibdata']/*[local-name() = 'title'][@type = 'title-amd'] |
-																*[local-name() = 'contributor'][*[local-name() = 'role']/@type='author']/*[local-name() = 'organization']/*[local-name() = 'abbreviation'] |																
-																*[local-name() = 'contributor'][*[local-name() = 'role']/@type='author']/*[local-name() = 'organization']/*[local-name() = 'name'] |
-																*[local-name() = 'ext']/*[local-name() = 'structuredidentifier']/*[local-name() = 'project-number'] |
-																*[local-name() = 'language'] |
-																*[local-name() = 'script'] |
-																*[local-name() = 'contributor'][*[local-name() = 'role']/@type='publisher']/*[local-name() = 'organization']/*[local-name() = 'abbreviation'] |																
-																*[local-name() = 'contributor'][*[local-name() = 'role']/@type='publisher']/*[local-name() = 'organization']/*[local-name() = 'name'] |
-																*[local-name() = 'status']/*[local-name() = 'stage'] |
-																*[local-name() = 'status']/*[local-name() = 'substage'] |
-																*[local-name() = 'ext']/*[local-name() = 'doctype'] |
-																*[local-name() = 'ext']/*[local-name() = 'subdoctype'] |
-																*[local-name() = 'ext']/*[local-name() = 'updates-document-type'] |
-																*[local-name() = 'docnumber'] |
-																*[local-name() = 'ext']/*[local-name() = 'structuredidentifier']/*[local-name() = 'partnumber'] |
-																*[local-name() = 'edition'] |
-																*[local-name() = 'version']|
-																*[local-name() = 'version']/*[local-name() = 'revision-date'] |
-																*[local-name() = 'language'] |
-																*[local-name() = 'docidentifier'] |
-																*[local-name() = 'docidentifier'][@type='iso-with-lang'] |
-																*[local-name() = 'bibdata']/*[local-name() = 'date'] |
-																*[local-name() = 'bibdata']/*[local-name() = 'copyright']/*[local-name() = 'owner']/*[local-name() = 'organization']/*[local-name() = 'abbreviation'] |
-																*[local-name() = 'bibdata']/*[local-name() = 'copyright']/*[local-name() = 'owner']/*[local-name() = 'organization']/*[local-name() = 'name'] |
-																*[local-name() = 'ext']/*[local-name() = 'editorialgroup']/*[local-name() = 'secretariat'] |
-																*[local-name() = 'ext']/*[local-name() = 'stagename']|
-																*[local-name() = 'ext']/*[local-name() = 'ics']/*[local-name() = 'code'] | 
-																*[local-name() = 'copyright']/*[local-name() = 'from'] |
-																*[local-name() = 'ext']/*[local-name() = 'structuredidentifier'] |
-																*[local-name() = 'ext']/*[local-name() = 'editorialgroup']/*[local-name() = 'technical-committee'] |
-																*[local-name() = 'ext']/*[local-name() = 'editorialgroup']/*[local-name() = 'subcommittee'] |
-																*[local-name() = 'ext']/*[local-name() = 'editorialgroup']/*[local-name() = 'workgroup'] |
-																*[local-name() = 'bibdata']/*[local-name() = 'relation'] |
-																*[local-name() = 'bibdata']/*[local-name() = 'relation']/*[local-name() = 'bibitem']"
+	<xsl:template match="bibdata/title[@type = 'title-intro'] |
+																bibdata/title[@type = 'title-main'] |
+																bibdata/title[@type = 'title-part'] |
+																bibdata/title[@type = 'main'] |
+																bibdata/title[@type = 'title-amd'] |
+																contributor[role/@type='author']/organization/abbreviation |																
+																contributor[role/@type='author']/organization/name |
+																ext/structuredidentifier/project-number |
+																language |
+																script |
+																contributor[role/@type='publisher']/organization/abbreviation |																
+																contributor[role/@type='publisher']/organization/name |
+																status/stage |
+																status/substage |
+																ext/doctype |
+																ext/subdoctype |
+																ext/updates-document-type |
+																docnumber |
+																ext/structuredidentifier/partnumber |
+																edition |
+																version|
+																version/revision-date |
+																language |
+																docidentifier |
+																docidentifier[@type='iso-with-lang'] |
+																bibdata/date |
+																bibdata/copyright/owner/organization/abbreviation |
+																bibdata/copyright/owner/organization/name |
+																ext/editorialgroup/secretariat |
+																ext/stagename|
+																ext/ics/code | 
+																copyright/from |
+																ext/structuredidentifier |
+																ext/editorialgroup/technical-committee |
+																ext/editorialgroup/subcommittee |
+																ext/editorialgroup/workgroup |
+																bibdata/relation |
+																bibdata/relation/bibitem"
 																mode="front_check"/>
 
 	<!-- skip processed structure and deep down -->
-	<xsl:template match="*[local-name() = 'contributor'][*[local-name() = 'role']/@type='author'] |
-																*[local-name() = 'contributor']/*[local-name() = 'role'][@type='author'] |
-																*[local-name() = 'contributor'][*[local-name() = 'role']/@type='author']/*[local-name() = 'organization'] | 
-																*[local-name() = 'contributor'][*[local-name() = 'role']/@type='publisher'] |
-																*[local-name() = 'contributor']/*[local-name() = 'role'][@type='publisher'] |
-																*[local-name() = 'contributor'][*[local-name() = 'role']/@type='publisher']/*[local-name() = 'organization'] |
-																*[local-name() = 'bibdata']/*[local-name() = 'status'] |
-																*[local-name() = 'bibdata']/*[local-name() = 'relation'] |
-																*[local-name() = 'bibdata']/*[local-name() = 'copyright'] |
-																*[local-name() = 'bibdata']/*[local-name() = 'copyright']/*[local-name() = 'owner'] |
-																*[local-name() = 'bibdata']/*[local-name() = 'copyright']/*[local-name() = 'owner']/*[local-name() = 'organization'] |
-																*[local-name() = 'ext']/*[local-name() = 'editorialgroup'] |
-																*[local-name() = 'ext']/*[local-name() = 'ics'] |
-																*[local-name() = 'ext']
+	<xsl:template match="contributor[role/@type='author'] |
+																contributor/role[@type='author'] |
+																contributor[role/@type='author']/organization | 
+																contributor[role/@type='publisher'] |
+																contributor/role[@type='publisher'] |
+																contributor[role/@type='publisher']/organization |
+																bibdata/status |
+																bibdata/relation |
+																bibdata/copyright |
+																bibdata/copyright/owner |
+																bibdata/copyright/owner/organization |
+																ext/editorialgroup |
+																ext/ics |
+																ext
 																" mode="front_check">
 		<xsl:apply-templates mode="front_check"/>
 	</xsl:template>
@@ -974,18 +1003,18 @@
 		<xsl:value-of select="."/>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'boilerplate']/*[local-name() = 'copyright-statement']">
+	<xsl:template match="boilerplate/copyright-statement">
 		<xsl:apply-templates/>
 	</xsl:template>
-	<xsl:template match="*[local-name() = 'boilerplate']/*[local-name() = 'copyright-statement']/*[local-name() = 'clause']" priority="1">
+	<xsl:template match="boilerplate/copyright-statement/clause" priority="1">
 		<xsl:apply-templates/>
 	</xsl:template>
-	<xsl:template match="*[local-name() = 'boilerplate']/*[local-name() = 'copyright-statement']//*[local-name() = 'title']"  priority="1">
+	<xsl:template match="boilerplate/copyright-statement//title"  priority="1">
 		<copyright-statement>
 			<xsl:apply-templates/>
 		</copyright-statement>
 	</xsl:template>
-	<xsl:template match="*[local-name() = 'boilerplate']/*[local-name() = 'copyright-statement']//*[local-name() = 'p']"  priority="1">
+	<xsl:template match="boilerplate/copyright-statement//p"  priority="1">
 		<xsl:variable name="id" select="normalize-space(@id)"/>
 		<xsl:if test="$id != 'boilerplate-year'">
 			<copyright-statement>
@@ -993,13 +1022,13 @@
 			</copyright-statement>
 		</xsl:if>
 	</xsl:template>
-	<xsl:template match="*[local-name() = 'boilerplate']/*[local-name() = 'copyright-statement']//*[local-name() = 'p']//*[local-name() = 'br']"  priority="1">
+	<xsl:template match="boilerplate/copyright-statement//p//br"  priority="1">
 		<xsl:value-of select="'&#x2028;'"/><!-- linebreak -->
 	</xsl:template>	
 		
-	<xsl:template match="*[local-name() = 'boilerplate']/*[local-name() = 'legal-statement']">
+	<xsl:template match="boilerplate/legal-statement">
 		<license specific-use="legal">
-			<xsl:for-each select="*[local-name() = 'clause'][1]/*[local-name() = 'title']">
+			<xsl:for-each select="clause[1]/title">
 				<xsl:attribute name="xlink:title">
 					<xsl:value-of select="."/>
 				</xsl:attribute>
@@ -1007,8 +1036,8 @@
 			<xsl:apply-templates/>
 		</license>	
 	</xsl:template>
-	<xsl:template match="*[local-name() = 'boilerplate']/*[local-name() = 'legal-statement']/*[local-name() = 'clause']/*[local-name() = 'title']" priority="1"/>
-	<xsl:template match="*[local-name() = 'boilerplate']/*[local-name() = 'legal-statement']/*[local-name() = 'clause']" priority="1">
+	<xsl:template match="boilerplate/legal-statement/clause/title" priority="1"/>
+	<xsl:template match="boilerplate/legal-statement/clause" priority="1">
 		<license-p>
 			<xsl:if test="$format = 'NISO'">
 				<xsl:attribute name="id">
@@ -1019,9 +1048,9 @@
 		</license-p>
 	</xsl:template>	
 	
-	<xsl:template match="*[local-name() = 'boilerplate']/*[local-name() = 'license-statement']">
+	<xsl:template match="boilerplate/license-statement">
 		<license>
-			<xsl:for-each select="*[local-name() = 'clause'][1]/*[local-name() = 'title']">
+			<xsl:for-each select="clause[1]/title">
 				<xsl:attribute name="xlink:title">
 					<xsl:value-of select="."/>
 				</xsl:attribute>
@@ -1029,11 +1058,11 @@
 			<xsl:apply-templates/>
 		</license>	
 	</xsl:template>
-	<xsl:template match="*[local-name() = 'boilerplate']/*[local-name() = 'license-statement']/*[local-name() = 'clause']/*[local-name() = 'title']" priority="1"/>
-	<xsl:template match="*[local-name() = 'boilerplate']/*[local-name() = 'license-statement']/*[local-name() = 'clause']" priority="1">
+	<xsl:template match="boilerplate/license-statement/clause/title" priority="1"/>
+	<xsl:template match="boilerplate/license-statement/clause" priority="1">
 		<xsl:apply-templates/>
 	</xsl:template>
-	<xsl:template match="*[local-name() = 'boilerplate']/*[local-name() = 'license-statement']//*[local-name() = 'p']" priority="1">
+	<xsl:template match="boilerplate/license-statement//p" priority="1">
 		<license-p>
 			<xsl:if test="$format = 'NISO'">
 				<xsl:attribute name="id">
@@ -1045,7 +1074,7 @@
 	</xsl:template>
 	
 	
-	<xsl:template match="*[local-name() = 'preface']/*" mode="front_preface">
+	<xsl:template match="preface/*" mode="front_preface">
 		<xsl:param name="skipIntroduction">true</xsl:param>
 		<xsl:variable name="name" select="local-name()"/>
 		<xsl:choose>
@@ -1083,7 +1112,7 @@
 	</xsl:template>
 	
 	
-	<xsl:template match="*[local-name() = 'annex']" mode="back">
+	<xsl:template match="annex" mode="back">
 		<xsl:variable name="current_id">
 			<xsl:call-template name="getId"/>
 		</xsl:variable>
@@ -1104,8 +1133,8 @@
 			</xsl:if>
 			<label>
 				<xsl:choose>
-					<xsl:when test="ancestor::*[local-name() = 'amend']/*[local-name() = 'autonumber'][@type = 'annex']">
-						<xsl:value-of select="ancestor::*[local-name() = 'amend']/*[local-name() = 'autonumber'][@type = 'annex']/text()"/>
+					<xsl:when test="ancestor::amend/autonumber[@type = 'annex']">
+						<xsl:value-of select="ancestor::amend/autonumber[@type = 'annex']/text()"/>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:value-of select="$section"/>
@@ -1120,12 +1149,12 @@
 	</xsl:template>
 	
 	
-	<xsl:template match="*[local-name() = 'bibliography']/*[local-name() = 'references'][not(@normative='true')]" mode="back">
+	<xsl:template match="bibliography/references[not(@normative='true')]" mode="back">
 		<ref-list content-type="bibl">
 			<xsl:attribute name="id">
 				<xsl:text>sec_bibl</xsl:text>
-				<xsl:if test="count(//*[local-name() = 'references'][not(@normative='true')]) &gt; 1">
-					<xsl:number format="_1" count="*[local-name() = 'references'][not(@normative='true')]"/>
+				<xsl:if test="count(//references[not(@normative='true')]) &gt; 1">
+					<xsl:number format="_1" count="references[not(@normative='true')]"/>
 				</xsl:if>
 			</xsl:attribute>
 			<!-- <xsl:apply-templates select="*[local-name() = 'title'][1]" mode="back"/> -->
@@ -1151,18 +1180,18 @@
 		<title><xsl:apply-templates /></title>
 	</xsl:template> -->
 	
-	<xsl:template match="*[local-name() = 'bibliography']/*[local-name() = 'references'][not(@normative='true')]/*[local-name() = 'title']">
+	<xsl:template match="bibliography/references[not(@normative='true')]/title">
 		<title><xsl:apply-templates /></title>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'bibliography']/*[local-name() = 'clause'][*[local-name() = 'references'][not(@normative='true')]]" mode="back">
+	<xsl:template match="bibliography/clause[references[not(@normative='true')]]" mode="back">
 		<ref-list content-type="bibl">
 			<xsl:copy-of select="@id"/>
 			<xsl:apply-templates/>
 		</ref-list>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'bibliography']/*[local-name() = 'clause']/*[local-name() = 'references'][not(@normative='true')]">
+	<xsl:template match="bibliography/clause/references[not(@normative='true')]">
 		<ref-list>
 			<xsl:copy-of select="@id"/>
 			<xsl:apply-templates/>
@@ -1170,18 +1199,18 @@
 	</xsl:template>
 	
 	
-	<xsl:template match="*[local-name() = 'bibitem'][1][ancestor::*[local-name() = 'references'][@normative='true']]" priority="2">
+	<xsl:template match="bibitem[1][ancestor::references[@normative='true']]" priority="2">
 		<ref-list content-type="norm-refs">
-			<xsl:for-each select="../*[local-name() = 'bibitem']">
+			<xsl:for-each select="../bibitem">
 				<xsl:call-template name="bibitem"/>
 			</xsl:for-each>
 		</ref-list>
 	</xsl:template>
-	<xsl:template match="*[local-name() = 'bibitem'][position() &gt; 1][ancestor::*[local-name() = 'references'][@normative='true']]" priority="2"/>
+	<xsl:template match="bibitem[position() &gt; 1][ancestor::references[@normative='true']]" priority="2"/>
 	
-	<xsl:variable name="count_non_normative_references" select="count(//*[local-name() = 'references'][not(@normative='true')])"/>
+	<xsl:variable name="count_non_normative_references" select="count(//references[not(@normative='true')])"/>
 	
-	<xsl:template match="*[local-name() = 'bibitem']" name="bibitem">
+	<xsl:template match="bibitem" name="bibitem">
 		<!-- <xsl:variable name="current_id">
 			<xsl:call-template name="getId"/>
 		</xsl:variable>
@@ -1201,40 +1230,40 @@
 			</xsl:attribute> -->
 			<xsl:copy-of select="@id"/>
 			
-			<xsl:apply-templates select="*[local-name() = 'docidentifier'][@type = 'metanorma']" mode="docidentifier_metanorma"/>
-			<xsl:if test="not(*[local-name() = 'docidentifier'][@type='metanorma'])">
+			<xsl:apply-templates select="docidentifier[@type = 'metanorma']" mode="docidentifier_metanorma"/>
+			<xsl:if test="not(docidentifier[@type='metanorma'])">
 				<!-- <label><xsl:number format="[1]"/></label> --> <!-- see docidentifier @type="metanorma" -->
 			</xsl:if>
 						
 			<xsl:choose>
-				<xsl:when test="count(*) = 2 and *[local-name() = 'docidentifier'][@type='metanorma'] and *[local-name() = 'title']">
-					<xsl:apply-templates select="*[local-name() = 'docidentifier']"/>
-					<xsl:apply-templates select="*[local-name() = 'title']" mode="mixed_citation"/>
+				<xsl:when test="count(*) = 2 and docidentifier[@type='metanorma'] and title">
+					<xsl:apply-templates select="docidentifier"/>
+					<xsl:apply-templates select="title" mode="mixed_citation"/>
 				</xsl:when>
 				<xsl:otherwise>
 					<std>
-						<xsl:variable name="urn" select="*[local-name() = 'docidentifier'][@type = 'URN']"/>
+						<xsl:variable name="urn" select="docidentifier[@type = 'URN']"/>
 						<xsl:if test="normalize-space($urn) != ''">
 							<xsl:attribute name="std-id"><xsl:value-of select="$urn"/></xsl:attribute>
 						</xsl:if>
-						<xsl:if test="*[local-name() = 'eref']/@citeas">
+						<xsl:if test="eref/@citeas">
 							<xsl:attribute name="type">
 								<xsl:call-template name="setDatedUndatedType">
-									<xsl:with-param name="value" select="*[local-name() = 'eref']/@citeas"/>
+									<xsl:with-param name="value" select="eref/@citeas"/>
 								</xsl:call-template>
 							</xsl:attribute>
 						</xsl:if>
 						
 						
-						<xsl:if test="*[local-name() = 'docidentifier'][not(@type = 'metanorma' or @type = 'URN')]">
-							<std-ref><xsl:value-of select="*[local-name() = 'docidentifier'][not(@type = 'metanorma' or @type = 'URN')]"/></std-ref>
+						<xsl:if test="docidentifier[not(@type = 'metanorma' or @type = 'URN')]">
+							<std-ref><xsl:value-of select="docidentifier[not(@type = 'metanorma' or @type = 'URN')]"/></std-ref>
 						</xsl:if>
 						
 						<xsl:choose>
-							<xsl:when test="*[local-name() = 'note'] or *[local-name() = 'title'][(@type = 'main' and @language = 'en') or not(@type and @language)] or *[local-name() = 'formattedref']">
-								<xsl:apply-templates select="*[local-name() = 'note']"/>				
-								<xsl:apply-templates select="*[local-name() = 'title'][(@type = 'main' and @language = 'en') or not(@type and @language)]"/>				
-								<xsl:apply-templates select="*[local-name() = 'formattedref']"/>
+							<xsl:when test="note or title[(@type = 'main' and @language = 'en') or not(@type and @language)] or formattedref">
+								<xsl:apply-templates select="note"/>				
+								<xsl:apply-templates select="title[(@type = 'main' and @language = 'en') or not(@type and @language)]"/>				
+								<xsl:apply-templates select="formattedref"/>
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:apply-templates />
@@ -1250,52 +1279,52 @@
 		
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'references']/*[local-name() = 'bibitem']/*[local-name() = 'docidentifier' or local-name() = 'docnumber' or local-name() = 'date' or local-name() = 'contributor']" priority="2">
+	<xsl:template match="references/bibitem/*[self::docidentifier or self::docnumber or self::date or self::contributor]" priority="2">
 		<xsl:text disable-output-escaping="yes">&lt;!--</xsl:text>
 			<xsl:copy-of select="."/>
 		<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'bibitem']/*[local-name() = 'title']" priority="2">
+	<xsl:template match="bibitem/title" priority="2">
 		<xsl:text>, </xsl:text>
 		<title><xsl:apply-templates/></title>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'bibitem']/*[local-name() = 'title']" mode="mixed_citation">
+	<xsl:template match="bibitem/title" mode="mixed_citation">
 		<mixed-citation><xsl:apply-templates/></mixed-citation>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'bibitem']/*[local-name() = 'formattedref']">
+	<xsl:template match="bibitem/formattedref">
 		<title><xsl:apply-templates/></title>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'bibitem']/*[local-name() = 'docidentifier'][@type = 'metanorma']" mode="docidentifier_metanorma">
+	<xsl:template match="bibitem/docidentifier[@type = 'metanorma']" mode="docidentifier_metanorma">
 		<label><xsl:apply-templates /></label>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'bibitem']/*[local-name() = 'docidentifier'][@type = 'metanorma']" priority="3"/>
-	<xsl:template match="*[local-name() = 'bibitem']/*[local-name() = 'docidentifier'][@type = 'URN']" priority="3"/>
+	<xsl:template match="bibitem/docidentifier[@type = 'metanorma']" priority="3"/>
+	<xsl:template match="bibitem/docidentifier[@type = 'URN']" priority="3"/>
 	
-	<xsl:template match="*[local-name() = 'formattedref']/*[local-name() = 'em']" priority="2">
+	<xsl:template match="formattedref/em" priority="2">
 		<xsl:apply-templates/>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'bibitem']/*[local-name() = 'eref']" priority="2">
+	<xsl:template match="bibitem/eref" priority="2">
 		<xsl:variable name="reference" select="@bibitemid"/>
-		<xsl:variable name="docidentifier_URN" select="//*[local-name() = 'bibitem'][@id = $reference]/*[local-name() = 'docidentifier'][@type = 'URN']"/>
+		<xsl:variable name="docidentifier_URN" select="//bibitem[@id = $reference]/docidentifier[@type = 'URN']"/>
 		<xsl:if test="$docidentifier_URN != ''">
 			<xsl:attribute name="std-id">
 				<xsl:value-of select="$docidentifier_URN"/>
 			</xsl:attribute>
 		</xsl:if>
 		<std-ref><xsl:value-of select="java:replaceAll(java:java.lang.String.new(@citeas),'--','—')"/></std-ref>
-		<xsl:apply-templates select="*[local-name() = 'localityStack']"/>
+		<xsl:apply-templates select="localityStack"/>
 		<xsl:apply-templates />
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'bibitem']/*[local-name() = 'note']" priority="2">
+	<xsl:template match="bibitem/note" priority="2">
 		<xsl:variable name="number">
-			<xsl:number level="any" count="*[local-name() = 'bibitem']/*[local-name() = 'note']"/>
+			<xsl:number level="any" count="bibitem/note"/>
 		</xsl:variable>
 		
 		<xsl:variable name="xref_fn">
@@ -1314,13 +1343,13 @@
 		
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'fn'] " priority="2">
+	<xsl:template match="fn " priority="2">
 		<xsl:variable name="number" select="@reference"/>
 		<xsl:variable name="number_id">
-			<xsl:value-of select="$number"/>_<xsl:number level="any" count="*[local-name() = 'fn']"/>
+			<xsl:value-of select="$number"/>_<xsl:number level="any" count="fn"/>
 		</xsl:variable>
 		<xsl:variable name="sfx">
-			<xsl:if test="ancestor::*[local-name() = 'table']"><xsl:value-of select="ancestor::*[local-name() = 'table'][1]/@id"/>_</xsl:if>
+			<xsl:if test="ancestor::table"><xsl:value-of select="ancestor::table[1]/@id"/>_</xsl:if>
 		</xsl:variable>
 		<xsl:variable name="xref_fn">
 			<xref ref-type="fn" rid="fn_{$number_id}"> <!-- {$sfx} rid="fn_{$number}" -->
@@ -1335,7 +1364,7 @@
 		</xsl:variable>
 		
 		<xsl:choose>		
-			<xsl:when test="preceding-sibling::*[1][local-name() = 'image']">
+			<xsl:when test="preceding-sibling::*[1][self::image]">
 				<!-- enclose in 'p' -->
 				<p>
 					<xsl:copy-of select="$xref_fn"/>
@@ -1349,21 +1378,21 @@
 	</xsl:template>
 	
 	
-	<xsl:template match="*[local-name() = 'fn']/text()" priority="2">
+	<xsl:template match="fn/text()" priority="2">
 		<xsl:if test="normalize-space(.) != ''">
 			<p><xsl:value-of select="."/></p>
 		</xsl:if>
 	</xsl:template>
 	
 	
-	<xsl:template match="*[local-name() = 'clause'] | 
-																*[local-name() = 'references'][@normative='true'] | 
-																*[local-name() = 'terms'] |
-																*[local-name() = 'definitions']">
+	<xsl:template match="clause | 
+																references[@normative='true'] | 
+																terms |
+																definitions">
 		<xsl:param name="sectionNum"/>
 		<xsl:param name="sectionNumSkew" select="0"/>
 		<xsl:if test="$debug = 'true'">
-			<xsl:message>DEBUG: clause processing <xsl:number level="any" count="*[local-name() = 'clause']"/></xsl:message>
+			<xsl:message>DEBUG: clause processing <xsl:number level="any" count="clause"/></xsl:message>
 		</xsl:if>
 		<xsl:variable name="sectionNum_">
 			<xsl:choose>
@@ -1383,8 +1412,8 @@
 				<xsl:when test="@type='scope'">scope</xsl:when>
 				<xsl:when test="@type='intro'">intro</xsl:when>
 				<xsl:when test="@normative='true'">norm-refs</xsl:when>
-				<xsl:when test="@id = 'tda' or @id = 'terms' or local-name() = 'terms' or (contains(*[local-name() = 'title'][1], 'Terms') and not(ancestor::*[local-name() = 'clause']))">terms</xsl:when>
-				<xsl:when test="ancestor::*[local-name() = 'foreword']"><xsl:value-of select="@type"/></xsl:when>
+				<xsl:when test="@id = 'tda' or @id = 'terms' or self::terms or (contains(title[1], 'Terms') and not(ancestor::clause))">terms</xsl:when>
+				<xsl:when test="ancestor::foreword"><xsl:value-of select="@type"/></xsl:when>
 				<xsl:otherwise><!-- <xsl:value-of select="@id"/> --></xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -1413,7 +1442,7 @@
 				</xsl:attribute>
 			</xsl:if>
 			<xsl:choose>
-				<xsl:when test="ancestor::*[local-name() = 'foreword']"></xsl:when>
+				<xsl:when test="ancestor::foreword"></xsl:when>
 				<xsl:otherwise><label><xsl:value-of select="$section"/></label>			</xsl:otherwise>
 			</xsl:choose>
 			
@@ -1424,7 +1453,7 @@
 	</xsl:template>
 
 
-	<xsl:template match="*[local-name() = 'term']">
+	<xsl:template match="term">
 		<xsl:param name="sectionNum"/>
 		<xsl:variable name="current_id">
 			<xsl:call-template name="getId"/>
@@ -1436,8 +1465,8 @@
 		
 		<xsl:variable name="section">
 			<xsl:choose>
-				<xsl:when test="normalize-space(*[local-name() = 'name']) != '' and  normalize-space(translate(*[local-name() = 'name'], '0123456789.', '')) = ''">
-					<xsl:value-of select="*[local-name() = 'name']"/>
+				<xsl:when test="normalize-space(name) != '' and  normalize-space(translate(name, '0123456789.', '')) = ''">
+					<xsl:value-of select="name"/>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:value-of select="$elements//element[@source_id = $current_id]/@section"/>
@@ -1450,21 +1479,21 @@
 			<label><xsl:value-of select="$section"/></label>
 			<tbx:termEntry id="{$current_id}">
 				<tbx:langSet xml:lang="en">
-					<xsl:apply-templates select="node()[not(local-name() = 'termexample' or local-name() = 'termnote' or local-name() = 'termsource' or 
-																										local-name() = 'preferred' or local-name() = 'admitted' or local-name() = 'deprecates' or local-name() = 'domain')]">
+					<xsl:apply-templates select="node()[not(self::termexample or self::termnote or self::termsource or 
+																										self::preferred or self::admitted or self::deprecates or self::domain)]">
 						<xsl:with-param name="sectionNum" select="$sectionNum"/>
 					</xsl:apply-templates>
-					<xsl:apply-templates select="*[local-name() = 'termexample']"><!--  mode="termEntry"> -->
+					<xsl:apply-templates select="termexample"><!--  mode="termEntry"> -->
 						<xsl:with-param name="sectionNum" select="$sectionNum"/>
 					</xsl:apply-templates>
-					<xsl:apply-templates select="*[local-name() = 'termnote']"> <!--  mode="termEntry" -->
+					<xsl:apply-templates select="termnote"> <!--  mode="termEntry" -->
 						<xsl:with-param name="sectionNum" select="$sectionNum"/>
 					</xsl:apply-templates>
-					<xsl:apply-templates select="*[local-name() = 'termsource']"> <!--  mode="termEntry" -->
+					<xsl:apply-templates select="termsource"> <!--  mode="termEntry" -->
 						<xsl:with-param name="sectionNum" select="$sectionNum"/>
 					</xsl:apply-templates>
 					
-					<xsl:apply-templates select="*[local-name() = 'preferred'] | *[local-name() = 'admitted'] | *[local-name() = 'deprecates'] | *[local-name() = 'domain']"> <!--  mode="termEntry" -->
+					<xsl:apply-templates select="preferred | admitted | deprecates | domain"> <!--  mode="termEntry" -->
 						<xsl:with-param name="sectionNum" select="$sectionNum"/>
 					</xsl:apply-templates>
 					
@@ -1473,52 +1502,52 @@
 		</term-sec>
 	</xsl:template>	
 
-	<xsl:template match="*[local-name() = 'term']/text()">
+	<xsl:template match="term/text()">
 		<xsl:value-of select="normalize-space()"/>
 	</xsl:template>
 
-	<xsl:template match="*[local-name() = 'definition']">
+	<xsl:template match="definition">
 		<tbx:definition>
 			<xsl:apply-templates />
 		</tbx:definition>
 	</xsl:template>
 
-	<xsl:template match="*[local-name() = 'termexample']"> <!--  mode="termEntry" -->
+	<xsl:template match="termexample"> <!--  mode="termEntry" -->
 		<tbx:example>
 			<xsl:apply-templates />
 		</tbx:example>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'definition']/text()[1] |
-																*[local-name() = 'termexample']/text()[1] | 
-																*[local-name() = 'termnote']/text()[1] |
-																*[local-name() = 'termsource']/text()[1] |
-																*[local-name() = 'modification']/text()[1] |
-																*[local-name() = 'dd']/text()[1] |
-																*[local-name() = 'formattedref']/text()[1]">
+	<xsl:template match="definition/text()[1] |
+																termexample/text()[1] | 
+																termnote/text()[1] |
+																termsource/text()[1] |
+																modification/text()[1] |
+																dd/text()[1] |
+																formattedref/text()[1]">
 		<xsl:value-of select="normalize-space()"/>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'termnote']"> <!--  mode="termEntry" -->
+	<xsl:template match="termnote"> <!--  mode="termEntry" -->
 		<tbx:note>
 			<xsl:apply-templates />
 		</tbx:note>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'termsource']"> <!--  mode="termEntry" -->
+	<xsl:template match="termsource"> <!--  mode="termEntry" -->
 		<!-- <xsl:if test="$debug = 'true'">
 			<xsl:message>DEBUG: termsource processing <xsl:value-of select="parent::*/*[local-name() = 'name']"/></xsl:message>
 		</xsl:if> -->
 		<tbx:source>
-			<xsl:value-of select="*[local-name() = 'origin']/@citeas"/>
-			<xsl:apply-templates select="*[local-name() = 'origin']/*[local-name() = 'localityStack']"/>
-			<xsl:apply-templates select="*[local-name() = 'modification']"/>
+			<xsl:value-of select="origin/@citeas"/>
+			<xsl:apply-templates select="origin/localityStack"/>
+			<xsl:apply-templates select="modification"/>
 		</tbx:source>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'localityStack']">
+	<xsl:template match="localityStack">
 		<xsl:text>, </xsl:text>
-		<xsl:for-each select="*[local-name() = 'locality']">
+		<xsl:for-each select="locality">
 			<xsl:variable name="type">
 				<xsl:call-template name="capitalize">
 					<xsl:with-param name="str" select="@type"/>
@@ -1528,12 +1557,12 @@
 				<xsl:value-of select="$type"/>
 				<xsl:text> </xsl:text>
 			</xsl:if>
-			<xsl:value-of select="*[local-name() = 'referenceFrom']"/>
+			<xsl:value-of select="referenceFrom"/>
 			<xsl:if test="position() != last()">; </xsl:if>
 		</xsl:for-each>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'modification']">
+	<xsl:template match="modification">
 		<xsl:text>, modified — </xsl:text>
 		<xsl:apply-templates />
 	</xsl:template>
@@ -1542,14 +1571,14 @@
 	<!-- <xsl:template match="*[local-name() = 'termexample'] | *[local-name() = 'termnote'] | *[local-name() = 'termsource']"/> -->
 	
 	<!-- temporary solution for https://github.com/metanorma/iso-10303-2/issues/44 -->
-	<xsl:template match="*[local-name() = 'clause']/*[local-name() = 'domain'] | *[local-name() = 'clause']/*[local-name() = 'termsource']" priority="2">
+	<xsl:template match="clause/domain | clause/termsource" priority="2">
 		<xsl:text disable-output-escaping="yes">&lt;!--</xsl:text>
 			<xsl:copy-of select="."/>
 		<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
 	</xsl:template>
 	
 	<!-- <xsl:template match="*[local-name() = 'preferred'] | *[local-name() = 'admitted'] | *[local-name() = 'deprecates'] | *[local-name() = 'domain']"/> -->
-	<xsl:template match="*[local-name() = 'preferred'] | *[local-name() = 'admitted'] | *[local-name() = 'deprecates'] | *[local-name() = 'domain']"> <!--  mode="termEntry" -->
+	<xsl:template match="preferred | admitted | deprecates | domain"> <!--  mode="termEntry" -->
 		<xsl:param name="sectionNum"/>
 		
 		<!-- <xsl:variable name="current_id">
@@ -1558,9 +1587,9 @@
 		
 		<xsl:variable name="id" select="$elements//element[@source_id = $current_id]/@id"/>	 -->
 		<!-- <xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable> -->
-		<xsl:variable name="number"><xsl:number count="*[local-name() = 'preferred'] | *[local-name() = 'admitted'] | *[local-name() = 'deprecates'] | *[local-name() = 'domain']"/></xsl:variable>
+		<xsl:variable name="number"><xsl:number count="preferred | admitted | deprecates | domain"/></xsl:variable>
 		<xsl:variable name="id">
-			<xsl:for-each select="ancestor::*[local-name() = 'term'][1]">
+			<xsl:for-each select="ancestor::term[1]">
 				<xsl:call-template name="getId"/><xsl:text>-</xsl:text><xsl:value-of select="$number"/>
 			</xsl:for-each>
 		</xsl:variable>
@@ -1578,8 +1607,8 @@
 			</xsl:variable>
 			<xsl:if test="normalize-space($normativeAuthorization) != ''">
 				<xsl:choose>
-					<xsl:when test="$element_name = 'preferred' and not(following-sibling::*[local-name() = 'admitted'] or preceding-sibling::*[local-name() = 'admitted'] or
-					following-sibling::*[local-name() = 'deprecates'] or preceding-sibling::*[local-name() = 'deprecates'])"></xsl:when>
+					<xsl:when test="$element_name = 'preferred' and not(following-sibling::admitted or preceding-sibling::admitted or
+					following-sibling::deprecates or preceding-sibling::deprecates)"></xsl:when>
 					<xsl:otherwise>
 						<tbx:normativeAuthorization value="{$normativeAuthorization}"/>
 					</xsl:otherwise>
@@ -1588,7 +1617,7 @@
 		</tbx:tig>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'p']" name="p">
+	<xsl:template match="p" name="p">
 		<!-- <xsl:if test="$debug = 'true'">
 			<xsl:message>DEBUG: p processing <xsl:number level="any" count="*[local-name() = 'p']"/></xsl:message>
 		</xsl:if> -->
@@ -1620,9 +1649,9 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'p']/@align"/>
+	<xsl:template match="p/@align"/>
 	
-	<xsl:template match="*[local-name() = 'p' or local-name() = 'ul' or local-name() = 'ol']/@id">
+	<xsl:template match="*[self::p or self::ul or self::ol]/@id">
 		<xsl:variable name="p_id" select="."/>
 		<xsl:choose>
 			<xsl:when test="$organization = 'BSI' and starts-with($p_id, '_') and not(//*[@target = $p_id])"></xsl:when> <!-- remove @id -->
@@ -1633,7 +1662,7 @@
 	</xsl:template>
 	
 	
-	<xsl:template match="*[local-name() = 'ul']">
+	<xsl:template match="ul">
 		<list> 
 			<xsl:apply-templates select="@*"/>
 			<xsl:attribute name="list-type">
@@ -1644,13 +1673,13 @@
 			</xsl:attribute>
 			<xsl:apply-templates />
 		</list>
-		<xsl:for-each select="*[local-name() = 'note']">
+		<xsl:for-each select="note">
 			<xsl:call-template name="note"/>
 		</xsl:for-each>
 	</xsl:template>
-	<xsl:template match="*[local-name() = 'ul']/@type"/>
+	<xsl:template match="ul/@type"/>
 	
-	<xsl:template match="*[local-name() = 'ol']">
+	<xsl:template match="ol">
 		<list>
 			<xsl:apply-templates select="@*"/>
 			<xsl:attribute name="list-type">
@@ -1672,16 +1701,16 @@
 			</xsl:attribute>
 			<xsl:apply-templates />
 		</list>
-		<xsl:for-each select="*[local-name() = 'note']">
+		<xsl:for-each select="note">
 			<xsl:call-template name="note"/>
 		</xsl:for-each>
 	</xsl:template>
-	<xsl:template match="*[local-name() = 'ol']/@type"/>
-	<xsl:template match="*[local-name() = 'ol']/@start"/>
+	<xsl:template match="ol/@type"/>
+	<xsl:template match="ol/@start"/>
 
-	<xsl:template match="*[local-name() = 'ul']/*[local-name() = 'note'] | *[local-name() = 'ol']/*[local-name() = 'note']" priority="2"/>
+	<xsl:template match="ul/note | ol/note" priority="2"/>
 	
-	<xsl:template match="*[local-name() = 'li']">
+	<xsl:template match="li">
 		<list-item>
 			<!-- <xsl:if test="@id">
 				<xsl:attribute name="id"><xsl:value-of select="@id"/></xsl:attribute>
@@ -1731,16 +1760,16 @@
 		</list-item>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'example']">
-		<xsl:variable name="clause_id" select="ancestor::*[local-name() = 'clause'][1]/@id"/>		
+	<xsl:template match="example">
+		<xsl:variable name="clause_id" select="ancestor::clause[1]/@id"/>		
 		<non-normative-example>
 			<label>
 				<xsl:text>EXAMPLE</xsl:text>
-				<xsl:if test="ancestor::*[local-name() = 'amend']/*[local-name() = 'autonumber'][@type = 'example']">
-					<xsl:text> </xsl:text><xsl:value-of select="ancestor::*[local-name() = 'amend']/*[local-name() = 'autonumber'][@type = 'example']/text()"/>
+				<xsl:if test="ancestor::amend/autonumber[@type = 'example']">
+					<xsl:text> </xsl:text><xsl:value-of select="ancestor::amend/autonumber[@type = 'example']/text()"/>
 				</xsl:if>
-				<xsl:if test="count(ancestor::*[local-name() = 'clause'][1]//*[local-name() = 'example']) &gt; 1">
-					<xsl:text> </xsl:text><xsl:number level="any" count="*[local-name() = 'example'][ancestor::*[local-name() = 'clause'][@id = $clause_id]]"/>
+				<xsl:if test="count(ancestor::clause[1]//example) &gt; 1">
+					<xsl:text> </xsl:text><xsl:number level="any" count="example[ancestor::clause[@id = $clause_id]]"/>
 				</xsl:if>
 			</label>
 			<xsl:apply-templates/>
@@ -1749,20 +1778,20 @@
 	
 	
 	
-	<xsl:template match="*[local-name() = 'note']" name="note">
+	<xsl:template match="note" name="note">
 		<!-- <xsl:if test="$debug = 'true'">
 			<xsl:message>DEBUG: note processing <xsl:number level="any" count="*[local-name() = 'note']"/></xsl:message>
 		</xsl:if> -->
-		<xsl:variable name="clause_id" select="ancestor::*[local-name() = 'clause'][1]/@id"/>		
+		<xsl:variable name="clause_id" select="ancestor::clause[1]/@id"/>		
 		<non-normative-note>
-			<xsl:if test="not(*[local-name() = 'name'])">
+			<xsl:if test="not(name)">
 				<label>
 					<xsl:text>NOTE</xsl:text>
-					<xsl:if test="ancestor::*[local-name() = 'amend']/*[local-name() = 'autonumber'][@type = 'note']">
-						<xsl:text>&#xA0;</xsl:text><xsl:value-of select="ancestor::*[local-name() = 'amend']/*[local-name() = 'autonumber'][@type = 'note']/text()"/>
+					<xsl:if test="ancestor::amend/autonumber[@type = 'note']">
+						<xsl:text>&#xA0;</xsl:text><xsl:value-of select="ancestor::amend/autonumber[@type = 'note']/text()"/>
 					</xsl:if>
-					<xsl:if test="count(ancestor::*[local-name() = 'clause'][1]//*[local-name() = 'note']) &gt; 1">
-						<xsl:text>&#xA0;</xsl:text><xsl:number level="any" count="*[local-name() = 'note'][ancestor::*[local-name() = 'clause'][@id = $clause_id]]"/>
+					<xsl:if test="count(ancestor::clause[1]//note) &gt; 1">
+						<xsl:text>&#xA0;</xsl:text><xsl:number level="any" count="note[ancestor::clause[@id = $clause_id]]"/>
 					</xsl:if>
 				</label>
 			</xsl:if>
@@ -1770,21 +1799,21 @@
 		</non-normative-note>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'note']/*[local-name() = 'name']" priority="2">
+	<xsl:template match="note/name" priority="2">
 		<label><xsl:apply-templates /></label>
 	</xsl:template>
 	
 	<xsl:variable name="bibitems_URN_">
-		<xsl:for-each select="//*[local-name() = 'bibitem'][*[local-name() = 'docidentifier'][@type = 'URN']]">
+		<xsl:for-each select="//bibitem[docidentifier[@type = 'URN']]">
 			<bibitem>
 				<xsl:copy-of select="@id"/>
-				<urn><xsl:value-of select="*[local-name() = 'docidentifier'][@type = 'URN']"/></urn>
+				<urn><xsl:value-of select="docidentifier[@type = 'URN']"/></urn>
 			</bibitem>
 		</xsl:for-each>
 	</xsl:variable>
 	<xsl:variable name="bibitems_URN" select="xalan:nodeset($bibitems_URN_)"/>
 		
-	<xsl:template match="*[local-name() = 'eref']">
+	<xsl:template match="eref">
 		<xsl:variable name="citeas_" select="java:replaceAll(java:java.lang.String.new(@citeas),'--','—')"/>
 		<xsl:variable name="citeas">
 			<xsl:choose>
@@ -1829,11 +1858,11 @@
 				</xsl:choose>
 				
 			</std-ref>
-			<xsl:apply-templates select="*[local-name() = 'localityStack']"/>
+			<xsl:apply-templates select="localityStack"/>
 		</std>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'link']">
+	<xsl:template match="link">
     <xsl:choose>
       <xsl:when test="normalize-space() = ''">
         <uri><xsl:value-of select="@target"/></uri>
@@ -1849,11 +1878,11 @@
     </xsl:choose>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'strong']">
+	<xsl:template match="strong">
 		<bold><xsl:apply-templates /></bold>
 	</xsl:template>
 
-	<xsl:template match="*[local-name() = 'sup'][*[local-name() = 'stem']]">
+	<xsl:template match="sup[stem]">
 		<xsl:apply-templates />
 	</xsl:template>
 
@@ -1867,7 +1896,7 @@
 	<!-- to: -->
 	<!-- <tbx:entailedTerm target="term_3.8">objectives (3.8)</tbx:entailedTerm> -->
 	<!-- for em, when next is xref -->
-	<xsl:template match="*[local-name() = 'em'][following-sibling::node()[1][. = ' ('] and following-sibling::*[1][local-name() = 'xref']]" priority="2">
+	<xsl:template match="em[following-sibling::node()[1][. = ' ('] and following-sibling::*[1][self::xref]]" priority="2">
 		<tbx:entailedTerm target="{following-sibling::*[1]/@target}">
 			<xsl:apply-templates />
 			<xsl:apply-templates select="following-sibling::*[1]" mode="em_xref"/><!-- get xref -->
@@ -1875,7 +1904,7 @@
 	</xsl:template>
 	
 	<!-- for xref, when previous is em -->
-	<xsl:template match="*[local-name() = 'xref']" mode="em_xref">
+	<xsl:template match="xref" mode="em_xref">
 		<xsl:text> </xsl:text>
 		<!-- preceding-sibling-text='<xsl:value-of select="normalize-space(preceding-sibling::node()[1])"/>' -->
 		<xsl:if test="normalize-space(preceding-sibling::node()[1]) ='('">(</xsl:if>
@@ -1884,39 +1913,39 @@
 		<!-- following-sibling-text='<xsl:value-of select="following-sibling::node()[1]"/>' -->
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'xref'][preceding-sibling::node()[1][. = ' ('] and preceding-sibling::*[1][local-name() = 'em']]" priority="2"/>
+	<xsl:template match="xref[preceding-sibling::node()[1][. = ' ('] and preceding-sibling::*[1][self::em]]" priority="2"/>
 	
 	<!-- remove '(' between em and xref -->
-	<xsl:template match="text()[normalize-space() = '('][preceding-sibling::*[1][local-name() = 'em'] and following-sibling::*[1][local-name() = 'xref']]"/>
+	<xsl:template match="text()[normalize-space() = '('][preceding-sibling::*[1][self::em] and following-sibling::*[1][self::xref]]"/>
 	<!-- remove ')' after em and xref -->
-	<xsl:template match="text()[substring(normalize-space(),1,1) = ')'][preceding-sibling::*[1][local-name() = 'xref'] and preceding-sibling::*[2][local-name() = 'em']]">
+	<xsl:template match="text()[substring(normalize-space(),1,1) = ')'][preceding-sibling::*[1][self::xref] and preceding-sibling::*[2][self::em]]">
 		<xsl:value-of select="substring-after(., ')')"/>
 	</xsl:template>
 	<!-- ===================== -->
 	<!-- END tbx:entailedTerm -->
 	<!-- ===================== -->
 	
-	<xsl:template match="*[local-name() = 'em']">
+	<xsl:template match="em">
 		<italic><xsl:apply-templates /></italic>
 	</xsl:template>
 
-	<xsl:template match="*[local-name() = 'br']">
+	<xsl:template match="br">
 		<break/>
 	</xsl:template>
 	
 	
-	<xsl:template match="*[local-name() = 'th'][*[local-name() = 'strong']][*[local-name() = 'br'][parent::*[local-name() = 'strong']]]/node()[1][self::text()]">
+	<xsl:template match="th[strong][br[parent::strong]]/node()[1][self::text()]">
 		<xsl:text disable-output-escaping="yes">&lt;bold&gt;</xsl:text>
 		<xsl:value-of select="."/>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'th'][*[local-name() = 'strong']]/*[local-name() = 'br'][parent::*[local-name() = 'strong']]">
+	<xsl:template match="th[strong]/br[parent::strong]">
 		<xsl:text disable-output-escaping="yes">&lt;/bold&gt;</xsl:text>
 		<break/>
 		<xsl:text disable-output-escaping="yes">&lt;bold&gt;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'xref'][normalize-space() != '' and string-length(normalize-space()) = string-length(translate(normalize-space(), '0123456789', '')) and not(contains(normalize-space(), 'Annex'))]" priority="2">
+	<xsl:template match="xref[normalize-space() != '' and string-length(normalize-space()) = string-length(translate(normalize-space(), '0123456789', '')) and not(contains(normalize-space(), 'Annex'))]" priority="2">
 		<named-content>
 			<xsl:attribute name="content-type">
 				<xsl:choose>
@@ -1929,7 +1958,7 @@
 		</named-content>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'xref']">
+	<xsl:template match="xref">
 		<xsl:variable name="section" select="$elements//element[@source_id = current()/@target]/@section"/>
 		<!-- <xsl:variable name="id" select="$elements//element[@source_id = current()/@target]/@id"/> -->
 		<xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
@@ -1980,12 +2009,12 @@
 		</xref>
 	</xsl:template>
 	
-  <xsl:template match="*[local-name() = 'strong'] | *[local-name() = 'em'] | *" mode="internalFormat">
+  <xsl:template match="strong | em | *" mode="internalFormat">
     <xsl:param name="text"/>
     <xsl:variable name="element">
       <xsl:choose>
-        <xsl:when test="local-name() = 'strong'">bold</xsl:when>
-        <xsl:when test="local-name() = 'em'">italic</xsl:when>
+        <xsl:when test="self::strong">bold</xsl:when>
+        <xsl:when test="self::em">italic</xsl:when>
       </xsl:choose>
     </xsl:variable>
     <xsl:element name="{$element}">
@@ -2004,14 +2033,14 @@
   
   
 	<!-- need to be tested (find original NISO) -->
-	<xsl:template match="*[local-name() = 'callout']">
+	<xsl:template match="callout">
 		<xref ref-type="other" rid="{@target}">
 			<xsl:apply-templates/>
 		</xref>
 	</xsl:template>
 	
 	<!-- https://github.com/metanorma/mn2sts/issues/8 -->
-	<xsl:template match="*[local-name() = 'admonition']">
+	<xsl:template match="admonition">
 		<non-normative-note id="{@id}">
 			<label><xsl:value-of select="java:toUpperCase(java:java.lang.String.new(@type))"/></label>
 			<xsl:apply-templates />
@@ -2020,50 +2049,50 @@
 	
 	
 	<!-- https://github.com/metanorma/mn2sts/issues/9 -->
-	<xsl:template match="*[local-name() = 'quote']">
+	<xsl:template match="quote">
 		<disp-quote id="{@id}">
-			<xsl:apply-templates select="*[local-name() = 'p']"/>
-			<xsl:if test="*[local-name() = 'source'] or *[local-name() = 'author']">
+			<xsl:apply-templates select="p"/>
+			<xsl:if test="source or author">
 				<related-object>
-					<xsl:apply-templates select="*[local-name() = 'author']" mode="disp-quote"/>
-					<xsl:if test="*[local-name() = 'source'] and *[local-name() = 'author']">, </xsl:if>
-					<xsl:apply-templates select="*[local-name() = 'source']" mode="disp-quote"/>
+					<xsl:apply-templates select="author" mode="disp-quote"/>
+					<xsl:if test="source and author">, </xsl:if>
+					<xsl:apply-templates select="source" mode="disp-quote"/>
 				</related-object>
 			</xsl:if>
 		</disp-quote>
 	</xsl:template>	
-	<xsl:template match="*[local-name() = 'quote']/*[local-name() = 'source']"/>
-	<xsl:template match="*[local-name() = 'quote']/*[local-name() = 'author']"/>
+	<xsl:template match="quote/source"/>
+	<xsl:template match="quote/author"/>
 	
-	<xsl:template match="*[local-name() = 'quote']/*[local-name() = 'author']" mode="disp-quote">
+	<xsl:template match="quote/author" mode="disp-quote">
 		<xsl:apply-templates />
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'quote']/*[local-name() = 'source']" mode="disp-quote">
+	<xsl:template match="quote/source" mode="disp-quote">
 		<xsl:value-of select="@citeas"/>
 		<xsl:apply-templates mode="disp-quote"/>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'localityStack']" mode="disp-quote">		
-		<xsl:for-each select="*[local-name()='locality']">
+	<xsl:template match="localityStack" mode="disp-quote">		
+		<xsl:for-each select="locality">
 			<xsl:if test="position() = 1"><xsl:text>, </xsl:text></xsl:if>
 			<xsl:apply-templates select="." mode="disp-quote"/>
 			<xsl:if test="position() != last()"><xsl:text>; </xsl:text></xsl:if>
 		</xsl:for-each>	
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'locality']"  mode="disp-quote">
+	<xsl:template match="locality"  mode="disp-quote">
 		<xsl:choose>
 			<xsl:when test="@type ='clause'">Clause </xsl:when>
 			<xsl:when test="@type ='annex'">Annex </xsl:when>
 			<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
 		</xsl:choose>
-		<xsl:value-of select="*[local-name() = 'referenceFrom']"/>
+		<xsl:value-of select="referenceFrom"/>
 	</xsl:template>
 	
 
 	<!-- https://github.com/metanorma/mn2sts/issues/10 -->
-	<xsl:template match="*[local-name() = 'appendix']">
+	<xsl:template match="appendix">
 		<sec id="{@id}" sec-type="appendix">
 			<xsl:variable name="current_id" select="@id"/>
 			<xsl:variable name="section" select="$elements//element[@source_id = $current_id]/@section"/>
@@ -2074,7 +2103,7 @@
 		</sec>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'annotation']">
+	<xsl:template match="annotation">
 		<element-citation>			
 			<xsl:if test="$format = 'ISO'">
 				<xsl:attribute name="id">
@@ -2094,7 +2123,7 @@
 	
 	
 	
-	<xsl:template match="*[local-name() = 'table']" name="table"> <!-- [*[local-name() = 'name']] -->
+	<xsl:template match="table" name="table"> <!-- [*[local-name() = 'name']] -->
 		<xsl:variable name="number"><xsl:number level="any"/></xsl:variable>
 		<xsl:variable name="current_id">
 			<xsl:call-template name="getId"/>
@@ -2104,7 +2133,7 @@
     <xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
     <xsl:variable name="wrap-element">
       <xsl:choose>
-        <xsl:when test="ancestor::*[local-name() = 'figure']">array</xsl:when>
+        <xsl:when test="ancestor::figure">array</xsl:when>
         <xsl:otherwise>table-wrap</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -2114,16 +2143,16 @@
       <xsl:attribute name="id">
         <xsl:value-of select="$id"/>
       </xsl:attribute>
-			<xsl:variable name="orientation" select="normalize-space(preceding-sibling::*[1][local-name() = 'pagebreak']/@orientation)"/>
+			<xsl:variable name="orientation" select="normalize-space(preceding-sibling::*[1][self::pagebreak]/@orientation)"/>
 			<xsl:if test="$orientation = 'landscape'">
 				<xsl:attribute name="orientation"><xsl:value-of select="$orientation"/></xsl:attribute>
 			</xsl:if>
 			<xsl:variable name="label">
 				<xsl:choose>
-					<xsl:when test="ancestor::*[local-name() = 'amend']/*[local-name() = 'autonumber'][@type = 'table']">
-						<xsl:value-of select="ancestor::*[local-name() = 'amend']/*[local-name() = 'autonumber'][@type = 'table']/text()"/>
+					<xsl:when test="ancestor::amend/autonumber[@type = 'table']">
+						<xsl:value-of select="ancestor::amend/autonumber[@type = 'table']/text()"/>
 					</xsl:when>
-          <xsl:when test="ancestor::*[local-name() = 'figure']"></xsl:when>
+          <xsl:when test="ancestor::figure"></xsl:when>
 					<xsl:otherwise>
 						<xsl:value-of select="$section"/>
 					</xsl:otherwise>
@@ -2134,15 +2163,15 @@
 					<xsl:value-of select="$label"/>
 				</label>
 			</xsl:if>
-			<xsl:apply-templates select="*[local-name() = 'name']" mode="table"/>				
+			<xsl:apply-templates select="name" mode="table"/>				
 			<table>
 				<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered')]"/>
 				<xsl:apply-templates select="@width"/>
 				
-				<xsl:apply-templates select="*[local-name() = 'colgroup']" mode="table"/>
-				<xsl:apply-templates select="*[local-name() = 'thead']" mode="table"/>
-				<xsl:apply-templates select="*[local-name() = 'tfoot']" mode="table"/>
-				<xsl:apply-templates select="*[local-name() = 'tbody']" mode="table"/>
+				<xsl:apply-templates select="colgroup" mode="table"/>
+				<xsl:apply-templates select="thead" mode="table"/>
+				<xsl:apply-templates select="tfoot" mode="table"/>
+				<xsl:apply-templates select="tbody" mode="table"/>
 				<xsl:apply-templates />
 			</table>
 			
@@ -2150,12 +2179,12 @@
 			<table></table>
 			<table></table>
 			</table-wrap> -->
-			<xsl:apply-templates select="following-sibling::*[1][local-name() = 'table']" mode="table_wrap_multiple"/>
+			<xsl:apply-templates select="following-sibling::*[1][self::table]" mode="table_wrap_multiple"/>
 			
 			<!-- move notes outside table -->
-			<xsl:if test="*[local-name() = 'note']">
+			<xsl:if test="note">
 				<table-wrap-foot>
-					<xsl:for-each select="*[local-name() = 'note']">
+					<xsl:for-each select="note">
 						<xsl:call-template name="note"/>
 					</xsl:for-each>
 				</table-wrap-foot>
@@ -2172,28 +2201,28 @@
 	<table></table>
 	</table-wrap> -->
 	<!-- ========================================= -->
-	<xsl:template match="*[local-name() = 'table'][preceding-sibling::*[1][local-name() = 'table']]" priority="2">
-		<xsl:variable name="first_table_id" select="preceding-sibling::*[local-name() = 'table'][not(preceding-sibling::*[local-name() = 'table'])][1]/@id"/>
+	<xsl:template match="table[preceding-sibling::*[1][self::table]]" priority="2">
+		<xsl:variable name="first_table_id" select="preceding-sibling::table[not(preceding-sibling::table)][1]/@id"/>
 		<xsl:if test="not(starts-with(@id, concat($first_table_id, '_')))">
 			<xsl:call-template name="table"/>
 		</xsl:if>
 	</xsl:template>
 
-	<xsl:template match="*[local-name() = 'table']" mode="table_wrap_multiple">
-		<xsl:variable name="first_table_id" select="preceding-sibling::*[local-name() = 'table'][not(preceding-sibling::*[local-name() = 'table'])][1]/@id"/>
+	<xsl:template match="table" mode="table_wrap_multiple">
+		<xsl:variable name="first_table_id" select="preceding-sibling::table[not(preceding-sibling::table)][1]/@id"/>
 
 		<xsl:if test="starts-with(@id, concat($first_table_id, '_'))">
 			<table>
 				<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered')]"/>
 				<xsl:apply-templates select="@width"/>
 				
-				<xsl:apply-templates select="*[local-name() = 'colgroup']" mode="table"/>
-				<xsl:apply-templates select="*[local-name() = 'thead']" mode="table"/>
-				<xsl:apply-templates select="*[local-name() = 'tfoot']" mode="table"/>
-				<xsl:apply-templates select="*[local-name() = 'tbody']" mode="table"/>
+				<xsl:apply-templates select="colgroup" mode="table"/>
+				<xsl:apply-templates select="thead" mode="table"/>
+				<xsl:apply-templates select="tfoot" mode="table"/>
+				<xsl:apply-templates select="tbody" mode="table"/>
 				<xsl:apply-templates />
 			</table>
-			<xsl:apply-templates select="following-sibling::*[1][local-name() = 'table']" mode="table_wrap_multiple"/>
+			<xsl:apply-templates select="following-sibling::*[1][self::table]" mode="table_wrap_multiple"/>
 		</xsl:if>
 	</xsl:template>
 	<!-- ========================================= -->
@@ -2204,7 +2233,7 @@
 	</table-wrap> -->
 	<!-- ========================================= -->
 	
-	<xsl:template match="*[local-name() = 'table']/@width">
+	<xsl:template match="table/@width">
 		<xsl:attribute name="width">
 			<xsl:choose>
 				<xsl:when test="contains(., 'px')">
@@ -2215,10 +2244,10 @@
 		</xsl:attribute>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'table']/*[local-name() = 'note']" priority="2"/>
+	<xsl:template match="table/note" priority="2"/>
 	
-	<xsl:template match="*[local-name() = 'name']"/>
-	<xsl:template match="*[local-name() = 'name']" mode="table">
+	<xsl:template match="name"/>
+	<xsl:template match="name" mode="table">
 		<caption>
 			<title>
 				<xsl:apply-templates/>
@@ -2226,8 +2255,8 @@
 		</caption>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'colgroup'] | *[local-name() = 'thead'] | *[local-name() = 'tfoot'] | *[local-name() = 'tbody']"/>
-	<xsl:template match="*[local-name() = 'colgroup'] | *[local-name() = 'thead'] | *[local-name() = 'tfoot'] | *[local-name() = 'tbody']" mode="table">
+	<xsl:template match="colgroup | thead | tfoot | tbody"/>
+	<xsl:template match="colgroup | thead | tfoot | tbody" mode="table">
 		<xsl:element name="{local-name()}">
 			<xsl:copy-of select="@*"/>
 			<xsl:apply-templates />
@@ -2235,7 +2264,7 @@
 	</xsl:template>
 	
 	
-	<xsl:template match="*[local-name() = 'th']">
+	<xsl:template match="th">
 		<th>
 			<xsl:apply-templates select="@*"/>
 			<!-- <bold> -->
@@ -2244,13 +2273,13 @@
 		</th>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'dl']">
+	<xsl:template match="dl">
 		<!-- <xsl:variable name="current_id">
 			<xsl:call-template name="getId"/>
 		</xsl:variable>
 		<xsl:variable name="id" select="$elements//element[@source_id = $current_id]/@id"/> -->
 		<xsl:choose>
-			<xsl:when test="preceding-sibling::*[1][local-name() = 'figure']">
+			<xsl:when test="preceding-sibling::*[1][self::figure]">
 				<xsl:call-template name="create_array"/>
 			</xsl:when>
 			<xsl:otherwise>
@@ -2266,7 +2295,7 @@
 		<!-- <xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable> -->
 		<array> <!-- id="{$id}" -->
 			<xsl:copy-of select="@id"/>
-			<xsl:if test="preceding-sibling::*[1][local-name() = 'figure']">
+			<xsl:if test="preceding-sibling::*[1][self::figure]">
 				<xsl:attribute name="content-type">figure-index</xsl:attribute>
 			</xsl:if>
 			<xsl:if test="@key = 'true'">
@@ -2279,28 +2308,28 @@
 			</table>
 		</array>
 		<!-- move notes outside table -->
-		<xsl:for-each select="*[local-name() = 'note']">
+		<xsl:for-each select="note">
 			<xsl:call-template name="note"/>
 		</xsl:for-each>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'dl']/*[local-name() = 'note']" priority="2"/>
+	<xsl:template match="dl/note" priority="2"/>
 	
 	
-	<xsl:template match="*[local-name() = 'dt']">
+	<xsl:template match="dt">
 		<tr>
 			<td align="left" scope="row" valign="top"><xsl:apply-templates/></td>
-			<xsl:apply-templates select="following-sibling::*[local-name() = 'dd'][1]" mode="array"/>
+			<xsl:apply-templates select="following-sibling::dd[1]" mode="array"/>
 			
 		</tr>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'dd']"/>
-	<xsl:template match="*[local-name() = 'dd']" mode="array">
+	<xsl:template match="dd"/>
+	<xsl:template match="dd" mode="array">
 		<td align="left" valign="top"><xsl:apply-templates/></td>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'figure'][*[local-name() = 'figure']]" priority="1">
+	<xsl:template match="figure[figure]" priority="1">
 		<xsl:variable name="current_id">
 			<xsl:call-template name="getId"/>
 		</xsl:variable>
@@ -2323,7 +2352,7 @@
 		</xsl:element>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'figure']">
+	<xsl:template match="figure">
 		<xsl:variable name="current_id">
 			<xsl:call-template name="getId"/>
 		</xsl:variable>
@@ -2332,17 +2361,17 @@
 		<xsl:variable name="section" select="$elements//element[@source_id = $current_id]/@section"/>
 		
 		<xsl:choose>
-			<xsl:when test="$organization = 'BSI' and parent::*[local-name() = 'figure']">
-				<graphic xlink:href="{*[local-name() = 'image']/@src}">
-					<xsl:apply-templates select="*[not(local-name() = 'image')]"/>
+			<xsl:when test="$organization = 'BSI' and parent::figure">
+				<graphic xlink:href="{image/@src}">
+					<xsl:apply-templates select="*[not(self::image)]"/>
 				</graphic>
 			</xsl:when>
 			<xsl:otherwise>	
 				<fig id="{$id}" fig-type="figure">
 					<label>
 						<xsl:choose>
-							<xsl:when test="ancestor::*[local-name() = 'amend']/*[local-name() = 'autonumber'][@type = 'figure']">
-								<xsl:value-of select="ancestor::*[local-name() = 'amend']/*[local-name() = 'autonumber'][@type = 'figure']/text()"/>
+							<xsl:when test="ancestor::amend/autonumber[@type = 'figure']">
+								<xsl:value-of select="ancestor::amend/autonumber[@type = 'figure']/text()"/>
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:value-of select="$section"/>
@@ -2356,9 +2385,9 @@
 	</xsl:template>
 	
 	
-	<xsl:template match="*[local-name() = 'figure']/*[local-name() = 'name']" priority="2">
+	<xsl:template match="figure/name" priority="2">
 		<xsl:variable name="label" select="substring-before(node()[1][self::text()], '&#xa0;')"/>
-		<xsl:if test="../parent::*[local-name() = 'figure'] and $organization = 'BSI' and normalize-space($label) != ''">
+		<xsl:if test="../parent::figure and $organization = 'BSI' and normalize-space($label) != ''">
 			<label><xsl:value-of select="$label"/></label>
 		</xsl:if>
 		<caption>
@@ -2368,12 +2397,12 @@
 		</caption>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name()='table' or local-name()='figure']/*[local-name() = 'name']/node()[1][self::text()]" priority="2">
+	<xsl:template match="*[self::table or self::figure]/name/node()[1][self::text()]" priority="2">
 		<xsl:choose>
 			<xsl:when test="contains(., '—')">
 				<xsl:value-of select="normalize-space(substring-after(., '—'))"/>
 			</xsl:when>
-			<xsl:when test="../parent::*[local-name() = 'figure'] and contains(., '&#xa0;')"><!-- move text like 'a)' to label, see above -->
+			<xsl:when test="../parent::figure and contains(., '&#xa0;')"><!-- move text like 'a)' to label, see above -->
 				<xsl:value-of select="normalize-space(substring-after(., '&#xa0;'))"/>
 			</xsl:when>
 			<xsl:otherwise>
@@ -2382,7 +2411,7 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'figure']/*[local-name() = 'image']">
+	<xsl:template match="figure/image">
 		<!--<xsl:variable name="current_id">
 			<xsl:call-template name="getId"/>
 		</xsl:variable>
@@ -2400,40 +2429,40 @@
 		</graphic>
 	</xsl:template>
 	
-  <xsl:template match="*[local-name() = 'image'][not(parent::*[local-name() = 'figure'])]">
+  <xsl:template match="image[not(parent::figure)]">
     <graphic>
 			<xsl:apply-templates select="@*"/>
 		</graphic>
   </xsl:template>
   
-	<xsl:template match="*[local-name() = 'image']/@src">
+	<xsl:template match="image/@src">
 		<xsl:attribute name="xlink:href">
 			<xsl:value-of select="."/>
 		</xsl:attribute>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'image']/@mimetype">
+	<xsl:template match="image/@mimetype">
 		<xsl:copy-of select="."/>
 	</xsl:template> <!-- created image processing -->
-	<xsl:template match="*[local-name() = 'image']/@alt">
+	<xsl:template match="image/@alt">
 		<xsl:element name="alt-text">
 			<xsl:value-of select="."/>
 		</xsl:element>
 	</xsl:template>
-	<xsl:template match="*[local-name() = 'image']/@height"/>	
-	<xsl:template match="*[local-name() = 'image']/@width"/>	
+	<xsl:template match="image/@height"/>	
+	<xsl:template match="image/@width"/>	
 	
 	
-	<xsl:template match="*[local-name() = 'formula']">
+	<xsl:template match="formula">
 		<xsl:apply-templates />
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'stem']">
-		<xsl:if test="parent::*[local-name() = 'th'][*[local-name() = 'strong']]">
+	<xsl:template match="stem">
+		<xsl:if test="parent::th[strong]">
 			<xsl:text disable-output-escaping="yes">&lt;/bold&gt;</xsl:text>
 		</xsl:if>
 		<disp-formula>
-			<xsl:if test="parent::*[local-name() = 'formula']">
+			<xsl:if test="parent::formula">
 				<xsl:variable name="current_id" select="../@id"/>		
 				<!-- <xsl:variable name="id" select="$elements//element[@source_id = $current_id]/@id"/> -->
 				<xsl:variable name="id"><xsl:value-of select="$current_id"/></xsl:variable><!-- <xsl:call-template name="getId"/> -->
@@ -2443,7 +2472,7 @@
 			</xsl:if>
 			<xsl:apply-templates />
 		</disp-formula>
-		<xsl:if test="parent::*[local-name() = 'th'][*[local-name() = 'strong']]">
+		<xsl:if test="parent::th[strong]">
 			<xsl:text disable-output-escaping="yes">&lt;bold&gt;</xsl:text>
 		</xsl:if>
 	</xsl:template>
@@ -2455,21 +2484,21 @@
 		</xsl:element>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'tt']">
+	<xsl:template match="tt">
 		<monospace>
 			<xsl:apply-templates/>
 		</monospace>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'smallcap']">
+	<xsl:template match="smallcap">
 		<sc>
 			<xsl:apply-templates/>
 		</sc>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'review']"/>
+	<xsl:template match="review"/>
 
-	<xsl:template match="*[local-name() = 'sourcecode']">
+	<xsl:template match="sourcecode">
 		<xsl:choose>
 			<xsl:when test="$format = 'NISO'">
 				<code>
@@ -2491,20 +2520,20 @@
 		</xsl:choose>
 	</xsl:template>
 		
-	<xsl:template match="*[local-name() = 'sourcecode']/@lang">
+	<xsl:template match="sourcecode/@lang">
 		<xsl:attribute name="language">
 			<xsl:value-of select="."/>
 		</xsl:attribute>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'title']" name="title">
+	<xsl:template match="title" name="title">
 		<xsl:choose>
-			<xsl:when test="not(*[local-name() = 'tab']) and normalize-space(translate(., '0123456789.', '')) = ''"><!-- put number in label, see above --></xsl:when>
+			<xsl:when test="not(tab) and normalize-space(translate(., '0123456789.', '')) = ''"><!-- put number in label, see above --></xsl:when>
 			<xsl:otherwise>
 				<title>
 					<xsl:choose>
-						<xsl:when test="*[local-name() = 'tab']">
-							<xsl:apply-templates select="*[local-name() = 'tab'][1]/following-sibling::node()"/>
+						<xsl:when test="tab">
+							<xsl:apply-templates select="tab[1]/following-sibling::node()"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:apply-templates />
@@ -2515,22 +2544,22 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'title']/@depth"/>
-	<xsl:template match="*[local-name() = 'tab']"/>
+	<xsl:template match="title/@depth"/>
+	<xsl:template match="tab"/>
 	
-	<xsl:template match="*[local-name() = 'amend']">
+	<xsl:template match="amend">
 		<!-- <p id="{@id}"> -->
 			<xsl:apply-templates />
 		<!-- </p> -->
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'amend']/*[local-name() = 'description']">
+	<xsl:template match="amend/description">
 		<xsl:choose>
 			<xsl:when test="$format = 'NISO'">
 				<editing-instruction>
-					<xsl:if test="parent::*[local-name() = 'amend']/@id">
+					<xsl:if test="parent::amend/@id">
 						<xsl:attribute name="id">
-							<xsl:value-of select="parent::*[local-name() = 'amend']/@id"/>
+							<xsl:value-of select="parent::amend/@id"/>
 							<xsl:variable name="pos"><xsl:number/></xsl:variable>
 							<xsl:if test="number($pos) &gt; 1">_<xsl:value-of select="$pos"/></xsl:if>
 						</xsl:attribute>
@@ -2550,16 +2579,16 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'amend']/*[local-name() = 'description']/*[local-name() = 'p']">
+	<xsl:template match="amend/description/p">
 		<xsl:choose>
 			<xsl:when test="$format = 'NISO'">
 				<xsl:call-template name="p"/>
 			</xsl:when>
 			<xsl:otherwise>
 				<p id="{@id}">
-					<xsl:if test="ancestor::*[local-name() = 'amend']/@change">
+					<xsl:if test="ancestor::amend/@change">
 						<xsl:attribute name="content-type">
-							<xsl:value-of select="ancestor::*[local-name() = 'amend']/@change"/>
+							<xsl:value-of select="ancestor::amend/@change"/>
 						</xsl:attribute>
 					</xsl:if>
 					<xsl:apply-templates />
@@ -2568,27 +2597,27 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'amend']/*[local-name() = 'newcontent']">
+	<xsl:template match="amend/newcontent">
 		<xsl:apply-templates />
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'amend']/*[local-name() = 'autonumber']"/>
+	<xsl:template match="amend/autonumber"/>
 	
 	<xsl:template match="comment()[starts-with(., 'STS: ')]">
 		<xsl:value-of disable-output-escaping="yes" select="substring-after(., 'STS: ')"/>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'indexsect']">
+	<xsl:template match="indexsect">
 		<sec sec-type="index">
 			<xsl:copy-of select="@id"/>
 			<xsl:apply-templates/>
 		</sec>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'pagebreak']">
+	<xsl:template match="pagebreak">
 		<xsl:choose>
-			<xsl:when test="@orientation = 'landscape' and following-sibling::*[1][local-name() = 'table']"></xsl:when> <!-- attribute orientation will be added in table-wrap element -->
-			<xsl:when test="@orientation = 'portrait' and preceding-sibling::*[1][local-name() = 'table'] and preceding-sibling::*[2][local-name() = 'pagebreak']"></xsl:when> <!-- attribute orientation  added in table-wrap element -->
+			<xsl:when test="@orientation = 'landscape' and following-sibling::*[1][self::table]"></xsl:when> <!-- attribute orientation will be added in table-wrap element -->
+			<xsl:when test="@orientation = 'portrait' and preceding-sibling::*[1][self::table] and preceding-sibling::*[2][self::pagebreak]"></xsl:when> <!-- attribute orientation  added in table-wrap element -->
 			<xsl:otherwise>
 				<xsl:processing-instruction name="Para">
 					<xsl:text>Page_Break</xsl:text>
@@ -2602,13 +2631,13 @@
 		<xsl:variable name="level_total" select="count(ancestor::*)"/>
 		<xsl:variable name="level">
 			<xsl:choose>
-				<xsl:when test="ancestor::*[local-name() = 'preface']">
+				<xsl:when test="ancestor::preface">
 					<xsl:value-of select="$level_total - 1"/>
 				</xsl:when>
-				<xsl:when test="ancestor::*[local-name() = 'sections']">
+				<xsl:when test="ancestor::sections">
 					<xsl:value-of select="$level_total - 1"/>
 				</xsl:when>
-				<xsl:when test="ancestor::*[local-name() = 'bibliography']">
+				<xsl:when test="ancestor::bibliography">
 					<xsl:value-of select="$level_total - 1"/>
 				</xsl:when>
 				<xsl:when test="local-name(ancestor::*[1]) = 'annex'">2</xsl:when>
@@ -2627,39 +2656,39 @@
 		</xsl:variable>		
 		<xsl:variable name="section">
 			<xsl:choose>
-				<xsl:when test="local-name() = 'dl'"><xsl:number format="a" level="any"/></xsl:when>
-				<xsl:when test="local-name() = 'bibitem' and ancestor::*[local-name() = 'references'][@normative='true']">norm_ref_<xsl:number/></xsl:when>
-				<xsl:when test="local-name() = 'bibitem'">ref_<xsl:number/></xsl:when>
-				<xsl:when test="ancestor::*[local-name() = 'bibliography']">
+				<xsl:when test="self::dl"><xsl:number format="a" level="any"/></xsl:when>
+				<xsl:when test="self::bibitem and ancestor::references[@normative='true']">norm_ref_<xsl:number/></xsl:when>
+				<xsl:when test="self::bibitem">ref_<xsl:number/></xsl:when>
+				<xsl:when test="ancestor::bibliography">
 					<xsl:value-of select="$sectionNum"/>
 				</xsl:when>
-				<xsl:when test="local-name() = 'annex'">
-					<xsl:number format="A" level="any" count="*[local-name() = 'annex']"/>
+				<xsl:when test="self::annex">
+					<xsl:number format="A" level="any" count="annex"/>
 				</xsl:when>
-				<xsl:when test="ancestor::*[local-name() = 'sections']">
+				<xsl:when test="ancestor::sections">
 					<!-- 1, 2, 3, 4, ... from main section (not annex, bibliography, ...) -->
 					<xsl:choose>
-						<xsl:when test="local-name() = 'table'"><xsl:number format="1" level="any" count="*[local-name() = 'sections']//*[local-name() = 'table']"/></xsl:when>
-						<xsl:when test="local-name() = 'figure'"><xsl:number format="1" level="any" count="*[local-name() = 'sections']//*[local-name() = 'figure']"/></xsl:when>
+						<xsl:when test="self::table"><xsl:number format="1" level="any" count="sections//table"/></xsl:when>
+						<xsl:when test="self::figure"><xsl:number format="1" level="any" count="sections//figure"/></xsl:when>
 						<xsl:when test="$level = 1">
 							<xsl:value-of select="$sectionNum"/>
 						</xsl:when>
 						<xsl:when test="$level &gt;= 2">
 							<xsl:variable name="num">
-								<xsl:number format=".1" level="multiple" count="*[local-name() = 'clause']/*[local-name() = 'clause'] | 
-																																										*[local-name() = 'clause']/*[local-name() = 'terms'] | 
-																																										*[local-name() = 'terms']/*[local-name() = 'term'] | 
-																																										*[local-name() = 'clause']/*[local-name() = 'term'] |  
-																																										*[local-name() = 'terms']/*[local-name() = 'clause'] |
-																																										*[local-name() = 'terms']/*[local-name() = 'definitions'] |
-																																										*[local-name() = 'definitions']/*[local-name() = 'clause'] |
-																																										*[local-name() = 'clause']/*[local-name() = 'definitions'] |
-																																										*[local-name() = 'definitions']/*[local-name() = 'definitions']"/>
+								<xsl:number format=".1" level="multiple" count="clause/clause | 
+																																										clause/terms | 
+																																										terms/term | 
+																																										clause/term |  
+																																										terms/clause |
+																																										terms/definitions |
+																																										definitions/clause |
+																																										clause/definitions |
+																																										definitions/definitions"/>
 							</xsl:variable>
 							<xsl:variable name="addon">
 								<xsl:choose>
-									<xsl:when test="local-name() = 'preferred' or local-name() = 'admitted' or local-name() = 'deprecates' or local-name() = 'domain'">
-										<xsl:number format="-1" count="*[local-name() = 'preferred'] | *[local-name() = 'admitted'] | *[local-name() = 'deprecates'] | *[local-name() = 'domain']"/>
+									<xsl:when test="self::preferred or self::admitted or self::deprecates or self::domain">
+										<xsl:number format="-1" count="preferred | admitted | deprecates | domain"/>
 									</xsl:when>
 									<xsl:otherwise></xsl:otherwise>
 								</xsl:choose>
@@ -2670,45 +2699,45 @@
 						<xsl:otherwise></xsl:otherwise>
 					</xsl:choose>
 				</xsl:when>				
-				<xsl:when test="ancestor::*[local-name() = 'annex']">
-					<xsl:variable name="annexid" select="normalize-space(/*/*[local-name() = 'bibdata']/*[local-name() = 'ext']/*[local-name() = 'structuredidentifier']/*[local-name() = 'annexid'])"/>
+				<xsl:when test="ancestor::annex">
+					<xsl:variable name="annexid" select="normalize-space(/*/bibdata/ext/structuredidentifier/annexid)"/>
 					<xsl:choose>
-						<xsl:when test="local-name() = 'table'">
-							<xsl:variable name="curr_annexid" select="ancestor::*[local-name() = 'annex']/@id"/>							
-							<xsl:number format="A" count="*[local-name() = 'annex']"/>
-							<xsl:number format=".1" level="any" count="*[local-name() = 'table'][ancestor::*[local-name() = 'annex']/@id = $curr_annexid]"/>
+						<xsl:when test="self::table">
+							<xsl:variable name="curr_annexid" select="ancestor::annex/@id"/>							
+							<xsl:number format="A" count="annex"/>
+							<xsl:number format=".1" level="any" count="table[ancestor::annex/@id = $curr_annexid]"/>
 						</xsl:when>						
-						<xsl:when test="local-name() = 'figure'">
-							<xsl:number format="A.1-1" level="multiple" count="*[local-name() = 'annex'] | *[local-name() = 'figure']"/>
+						<xsl:when test="self::figure">
+							<xsl:number format="A.1-1" level="multiple" count="annex | figure"/>
 						</xsl:when>
 						<xsl:when test="$level = 1">							
 							<xsl:choose>
-								<xsl:when test="count(//*[local-name() = 'annex']) = 1 and $annexid != ''">
+								<xsl:when test="count(//annex) = 1 and $annexid != ''">
 									<xsl:value-of select="$annexid"/>
 								</xsl:when>
 								<xsl:otherwise>
-									<xsl:number format="A" level="any" count="*[local-name() = 'annex']"/>
+									<xsl:number format="A" level="any" count="annex"/>
 								</xsl:otherwise>
 							</xsl:choose>
 						</xsl:when>
 						<xsl:otherwise>							
 							<xsl:choose>
-								<xsl:when test="count(//*[local-name() = 'annex']) = 1 and $annexid != ''">
-									<xsl:value-of select="$annexid"/><xsl:number format=".1" level="multiple" count="*[local-name() = 'clause']"/>
+								<xsl:when test="count(//annex) = 1 and $annexid != ''">
+									<xsl:value-of select="$annexid"/><xsl:number format=".1" level="multiple" count="clause"/>
 								</xsl:when>
 								<xsl:otherwise>
-									<xsl:number format="A.1" level="multiple" count="*[local-name() = 'annex'] | *[local-name() = 'clause']"/>
+									<xsl:number format="A.1" level="multiple" count="annex | clause"/>
 								</xsl:otherwise>
 							</xsl:choose>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:when>
-				<xsl:when test="ancestor::*[local-name() = 'preface']"> <!-- if preface and there is clause(s) -->
+				<xsl:when test="ancestor::preface"> <!-- if preface and there is clause(s) -->
 					<xsl:choose>
-						<xsl:when test="$level = 1 and  ..//*[local-name() = 'clause']">0</xsl:when>
+						<xsl:when test="$level = 1 and  ..//clause">0</xsl:when>
 						<xsl:when test="$level &gt;= 2">
 							<xsl:variable name="num">
-								<xsl:number format=".1" level="multiple" count="*[local-name() = 'clause']"/>
+								<xsl:number format=".1" level="multiple" count="clause"/>
 							</xsl:variable>
 							<xsl:value-of select="concat('0', $num)"/>
 						</xsl:when>
