@@ -83,9 +83,9 @@
 			
       <!-- Terms and definitions -->
 		<xsl:apply-templates select="$xml/*/sections/terms | 
-																						/*/sections/clause[.//terms] |
-																						/*/sections/definitions | 
-																						/*/sections/clause[.//definitions]" mode="elements">
+																						$xml/*/sections/clause[.//terms] |
+																						$xml/*/sections/definitions | 
+																						$xml/*/sections/clause[.//definitions]" mode="elements">
 			<xsl:with-param name="sectionNumSkew" select="'1'"/>
 		</xsl:apply-templates>
 				<!-- Another main sections -->
