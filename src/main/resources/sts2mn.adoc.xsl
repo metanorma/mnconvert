@@ -69,6 +69,51 @@
 	
 	<xsl:variable name="taskCopyImagesFilename" select="concat($outpath, '/task.copyImages.adoc')"/>
 	
+	<!-- prepare assosiative array - id and index term -->
+	<xsl:variable name="index_">
+		<xsl:for-each select="//sec[@id = 'ind']//xref">
+			<reference rid="{@rid}">
+				<xsl:for-each select="ancestor::list-item/p">
+					<xsl:for-each select="node()[not(preceding-sibling::xref) and not(self::xref)]">
+						<xsl:choose>
+							<xsl:when test="self::text() and position() = last()">
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.), ',(\s|\h)*$', '')"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:copy-of select="."/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:for-each>
+					<xsl:if test="position() != last()"><xsl:text>, </xsl:text></xsl:if>
+				</xsl:for-each>
+			</reference>
+		</xsl:for-each>
+		<xsl:for-each select="//sec[@id = 'ind']//p[italic/text() = 'see' or italic/text() = 'see also']">
+			<reference type="{italic/text()}">
+				<xsl:attribute name="term">
+					<xsl:for-each select="italic/following-sibling::node()">
+						<xsl:copy-of select="."/>
+					</xsl:for-each>
+				</xsl:attribute>
+				<xsl:for-each select="ancestor::list-item/p">
+					<xsl:for-each select="node()[not(preceding-sibling::xref or preceding-sibling::italic) and not(self::xref or self::italic)]">
+						<xsl:choose>
+							<xsl:when test="self::text() and position() = last()">
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.), ',*(\s|\h)*$', '')"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:copy-of select="."/>
+							</xsl:otherwise>
+						</xsl:choose>
+						<xsl:if test="position() != last()"><xsl:text>, </xsl:text></xsl:if>
+					</xsl:for-each>
+				</xsl:for-each>
+			</reference>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:for-each>
+	</xsl:variable>
+	<xsl:variable name="index" select="xalan:nodeset($index_)"/>
+	
 	<xsl:template match="/">
 	
 		<xsl:variable name="linearized_xml">
@@ -171,7 +216,7 @@
 	<xsl:template match="//standard/front | //adoption/adoption-front">
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$docfile}">
-	
+			<!-- index=<xsl:copy-of select="$index"/> -->
 			<!-- nat-meta -> iso-meta -> reg-meta -> std-meta -->
 			<xsl:for-each select="nat-meta">
 				<xsl:call-template name="xxx-meta">
@@ -858,6 +903,7 @@
 		</xsl:if>
 		<xsl:call-template name="p"/>
 		<xsl:if test="not(following-sibling::*[1][self::p])"> <!-- last p in norm-refs -->
+			<xsl:call-template name="addIndexTerms"/>
 			<xsl:text>--</xsl:text>
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</xsl:if>
@@ -934,8 +980,39 @@
 		<xsl:value-of select="normalize-space(.)"/>
 	</xsl:template>
 	
-	<!-- ignore index -->
-	<xsl:template match="sec[@sec-type = 'index'] | back/sec[@id = 'ind']" priority="2"/> 
+	<!-- put index terms with 'see', 'see also' -->
+	<xsl:template match="sec[@sec-type = 'index'] | back/sec[@id = 'ind']" priority="2">
+		<xsl:if test="$index//reference[@type = 'see' or @type = 'see also']">
+			<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
+			<redirect:write file="{$outpath}/{$sectionsFolder}/index-see-terms.adoc">
+				<xsl:for-each select="$index//reference[@type = 'see']">
+					<xsl:variable name="mainterm">
+						<xsl:apply-templates/>
+					</xsl:variable>
+					<xsl:if test="normalize-space($mainterm) != ''">
+						<xsl:text>index:see[</xsl:text>
+							<xsl:copy-of select="$mainterm"/><xsl:text>,</xsl:text><xsl:value-of select="@term"/>
+						<xsl:text>]&#xa;</xsl:text>
+					</xsl:if>
+				</xsl:for-each>
+				<xsl:for-each select="$index//reference[@type = 'see also']">
+					<xsl:variable name="mainterm">
+						<xsl:apply-templates/>
+					</xsl:variable>
+					<xsl:if test="normalize-space($mainterm) != ''">
+						<xsl:text>index:also[</xsl:text>
+							<xsl:apply-templates/><xsl:text>,</xsl:text><xsl:value-of select="@term"/>
+						<xsl:text>]&#xa;</xsl:text>
+					</xsl:if>
+				</xsl:for-each>
+			</redirect:write>
+			<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
+			<redirect:write file="{$outpath}/{$docfile}">
+				<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/index-see-terms.adoc[]</xsl:text>
+				<xsl:text>&#xa;&#xa;</xsl:text>
+			</redirect:write>
+		</xsl:if>
+	</xsl:template>
 	
 	<xsl:template match="term-sec">
 		<!-- [[ ]] -->
@@ -951,6 +1028,7 @@
 		<xsl:value-of select="$level"/><xsl:text> </xsl:text>
 		<!-- <xsl:call-template name="setId"/> --><!-- [[ ]] -->
 		<xsl:apply-templates select=".//tbx:term" mode="term"/>	
+		<xsl:call-template name="addIndexTerms"/>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:apply-templates />
@@ -961,6 +1039,7 @@
 			<xsl:when test="parent::sec/@sec-type = 'foreword'">
 				<xsl:text>== </xsl:text>
 				<xsl:apply-templates />
+				<xsl:call-template name="addIndexTerms"/>
 				<xsl:text>&#xa;&#xa;</xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
@@ -977,6 +1056,9 @@
 				</xsl:variable>				
 				<xsl:value-of select="$level"/>
 				<xsl:text> </xsl:text><xsl:apply-templates />
+				<xsl:if test="not(ancestor::sec[@sec-type = 'norm-refs'])">
+					<xsl:call-template name="addIndexTerms"/>
+				</xsl:if>
 				<xsl:text>&#xa;</xsl:text>
 				<xsl:text>&#xa;</xsl:text>
 			</xsl:otherwise>
@@ -1002,7 +1084,6 @@
 				<xsl:text>]</xsl:text>
 			</xsl:otherwise>			
 		</xsl:choose>
-		
 	</xsl:template>
 	
 	
@@ -3260,6 +3341,17 @@
 			<xsl:text>&#xa;&#xa;&#xa;</xsl:text>
 		</xsl:if>
 	</xsl:template>
+	
+	<xsl:template name="addIndexTerms">
+		<xsl:variable name="id" select="../@id"/>
+		<xsl:for-each select="$index//reference[@rid = $id]">
+			<xsl:text>(((</xsl:text>
+				<xsl:apply-templates />
+			<xsl:text>)))</xsl:text>
+			<xsl:if test="position() = last()"><xsl:text>&#xa;</xsl:text></xsl:if>
+		</xsl:for-each>
+	</xsl:template>
+	
 	
 	<xsl:template name="getDocFilename">
 		<xsl:variable name="doc-number" select="ancestor-or-self::standard/@doc-number" />
