@@ -90,6 +90,9 @@
 		</xsl:for-each>
 		<xsl:for-each select="//sec[@id = 'ind']//p[italic/text() = 'see' or italic/text() = 'see also']">
 			<reference type="{italic/text()}">
+				<xsl:if test="italic/text() = 'see also'">
+					<xsl:attribute name="type">also</xsl:attribute>
+				</xsl:if>
 				<xsl:attribute name="term">
 					<xsl:for-each select="italic/following-sibling::node()">
 						<xsl:copy-of select="."/>
@@ -982,27 +985,32 @@
 	
 	<!-- put index terms with 'see', 'see also' -->
 	<xsl:template match="sec[@sec-type = 'index'] | back/sec[@id = 'ind']" priority="2">
-		<xsl:if test="$index//reference[@type = 'see' or @type = 'see also']">
+		<xsl:if test="$index//reference[@type]">
 			<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 			<redirect:write file="{$outpath}/{$sectionsFolder}/index-see-terms.adoc">
-				<xsl:for-each select="$index//reference[@type = 'see']">
+				<xsl:for-each select="$index//reference[@type]">
 					<xsl:variable name="mainterm">
 						<xsl:apply-templates/>
 					</xsl:variable>
 					<xsl:if test="normalize-space($mainterm) != ''">
-						<xsl:text>index:see[</xsl:text>
-							<xsl:copy-of select="$mainterm"/><xsl:text>,</xsl:text><xsl:value-of select="@term"/>
-						<xsl:text>]&#xa;</xsl:text>
-					</xsl:if>
-				</xsl:for-each>
-				<xsl:for-each select="$index//reference[@type = 'see also']">
-					<xsl:variable name="mainterm">
-						<xsl:apply-templates/>
-					</xsl:variable>
-					<xsl:if test="normalize-space($mainterm) != ''">
-						<xsl:text>index:also[</xsl:text>
-							<xsl:apply-templates/><xsl:text>,</xsl:text><xsl:value-of select="@term"/>
-						<xsl:text>]&#xa;</xsl:text>
+						<xsl:variable name="type" select="@type"/>
+						
+						<!-- split list of terms into separate term -->
+						<xsl:variable name="term_parts">
+							<xsl:call-template name="split">
+								<xsl:with-param name="pText" select="@term"/>
+								<xsl:with-param name="sep" select="','"/>
+							</xsl:call-template>
+						</xsl:variable>
+						
+						<!-- create index: entry for each term -->
+						<xsl:for-each select="xalan:nodeset($term_parts)//item">
+							<xsl:text>index:</xsl:text>
+							<xsl:value-of select="$type"/> <!-- see or also -->
+							<xsl:text>[</xsl:text>
+								<xsl:copy-of select="$mainterm"/><xsl:text>,</xsl:text><xsl:value-of select="."/>
+							<xsl:text>]&#xa;</xsl:text>
+						</xsl:for-each>
 					</xsl:if>
 				</xsl:for-each>
 			</redirect:write>
