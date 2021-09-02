@@ -1495,7 +1495,8 @@
 			<tbx:termEntry id="{$current_id}">
 				<tbx:langSet xml:lang="en">
 					<xsl:apply-templates select="node()[not(self::termexample or self::termnote or self::termsource or 
-																										self::preferred or self::admitted or self::deprecates or self::domain)]">
+																										self::preferred or self::admitted or self::deprecates or self::domain or 
+																										self::term)]">
 						<xsl:with-param name="sectionNum" select="$sectionNum"/>
 					</xsl:apply-templates>
 					<xsl:apply-templates select="termexample"><!--  mode="termEntry"> -->
@@ -1514,6 +1515,10 @@
 					
 				</tbx:langSet>
 			</tbx:termEntry>
+			
+			<xsl:apply-templates select="term">
+				<xsl:with-param name="sectionNum" select="$sectionNum"/>
+			</xsl:apply-templates>
 		</term-sec>
 	</xsl:template>	
 
@@ -1604,8 +1609,9 @@
 		<!-- <xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable> -->
 		<xsl:variable name="number"><xsl:number count="preferred | admitted | deprecates | domain"/></xsl:variable>
 		<xsl:variable name="id">
+			<xsl:variable name="element_name" select="local-name()"/>
 			<xsl:for-each select="ancestor::term[1]">
-				<xsl:call-template name="getId"/><xsl:text>-</xsl:text><xsl:value-of select="$number"/>
+				<xsl:call-template name="getId"/><xsl:text>-</xsl:text><xsl:value-of select="$number"/>_<xsl:value-of select="$element_name"/>
 			</xsl:for-each>
 		</xsl:variable>
 		
@@ -2705,6 +2711,7 @@
 																																										clause/terms | 
 																																										terms/term | 
 																																										clause/term |  
+																																										term/term |  
 																																										terms/clause |
 																																										terms/definitions |
 																																										definitions/clause |
