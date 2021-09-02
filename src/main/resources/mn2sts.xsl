@@ -1392,7 +1392,22 @@
 		<xsl:param name="sectionNum"/>
 		<xsl:param name="sectionNumSkew" select="0"/>
 		<xsl:if test="$debug = 'true'">
-			<xsl:message>DEBUG: clause processing <xsl:number level="any" count="clause"/></xsl:message>
+			<xsl:message>DEBUG: <xsl:value-of select="local-name()"/><xsl:text> processing </xsl:text>
+				<xsl:choose>
+					<xsl:when test="local-name() = 'clause'">
+						<xsl:number level="any" count="clause"/>
+					</xsl:when>
+					<xsl:when test="local-name() = 'references'">
+						<xsl:number level="any" count="references"/>
+					</xsl:when>
+					<xsl:when test="local-name() = 'terms'">
+						<xsl:number level="any" count="terms"/>
+					</xsl:when>
+					<xsl:when test="local-name() = 'definitions'">
+						<xsl:number level="any" count="definitions"/>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:message>
 		</xsl:if>
 		<xsl:variable name="sectionNum_">
 			<xsl:choose>
@@ -2121,6 +2136,17 @@
 		</element-citation>
 	</xsl:template>
 	
+	<xsl:template match="concept">
+		<named-content content-type="term" xlink:href="#{xref/@target}">
+			<xsl:choose>
+				<xsl:when test="renderterm"><xsl:value-of select="renderterm"/></xsl:when>
+				<xsl:otherwise>
+					<xsl:attribute name="xlink:href">#<xsl:value-of select=".//tt[2]"/></xsl:attribute>
+					<xsl:value-of select=".//tt[1]"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</named-content>
+	</xsl:template>
 	
 	
 	<xsl:template match="table" name="table"> <!-- [*[local-name() = 'name']] -->
