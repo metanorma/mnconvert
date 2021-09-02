@@ -171,6 +171,7 @@ public class mnconvert {
                 String argXmlIn = arglist.get(0);
                 
                 STSValidator validator = new STSValidator(argXmlIn, cmdSTSCheckOnly.getOptionValue("check-type"));
+                validator.setDebugMode(cmdSTSCheckOnly.hasOption("debug"));
                 
                 if (!validator.check()) {
                     System.exit(ERROR_EXIT_CODE);
@@ -256,7 +257,8 @@ public class mnconvert {
                 converter.setOutputFormat(cmdMain.getOptionValue("output-format", defaultOutputFormat));
                 converter.setInputXslPath(cmdMain.getOptionValue("xsl-file"));
                 converter.setOutputFilePath(cmdMain.getOptionValue("output"));
-
+                converter.setDebugMode(cmdMain.hasOption("debug"));
+                
                 if (!converter.process()) {
                     System.exit(ERROR_EXIT_CODE);
                 }
