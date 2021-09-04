@@ -114,6 +114,9 @@
 			</reference>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:for-each>
+		<xsl:for-each select="//sec[@sec-type = 'index']//bold">
+			<term><xsl:apply-templates/></term>
+		</xsl:for-each>
 	</xsl:variable>
 	<xsl:variable name="index" select="xalan:nodeset($index_)"/>
 	
@@ -1094,6 +1097,16 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<xsl:template match="tbx:term/text()">
+		<xsl:variable name="term_text" select="normalize-space(.)"/>
+		<xsl:choose>
+			<xsl:when test="$index//term[. = $term_text]">
+				<xsl:text>((</xsl:text><xsl:value-of select="$term_text"/><xsl:text>))</xsl:text>
+				<xsl:if test="following-sibling::node()"><xsl:text> </xsl:text></xsl:if>
+			</xsl:when>
+			<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 	
 	
 	<xsl:template match="tbx:langSet">
