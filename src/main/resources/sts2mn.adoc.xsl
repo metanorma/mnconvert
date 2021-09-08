@@ -955,7 +955,14 @@
 	
 	
 	<xsl:template match="body/sec">
-		<xsl:variable name="sec_number" select="format-number(label, '00')" />
+		<xsl:variable name="sec_number_" select="format-number(label, '00')" />
+		<xsl:variable name="sec_number">
+			<xsl:choose>
+				<!-- Example: Section 3 -->
+				<xsl:when test="$sec_number_ = 'NaN'"><xsl:value-of select="java:toLowerCase(java:java.lang.String.new(normalize-space(translate(label, ',&#x200b;&#xa0; ','___'))))"/></xsl:when>
+				<xsl:otherwise><xsl:value-of select="$sec_number_"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
 		<xsl:variable name="title" select="normalize-space(translate(title, ',&#x200b;&#xa0;‑','    '))"/> <!-- get first word -->
 		<xsl:variable name="sec_title_">
 			<xsl:choose>
@@ -3492,7 +3499,7 @@
 	<xsl:template match="text()[not(parent::code) and not(parent::preformat) and not(parent::mml:*)]" mode="linearize">
 		<xsl:choose>
 		
-			<xsl:when test="parent::standard or parent::body or parent::sec or parent::term-sec or parent::tbx:termEntry or parent::back or parent::app-group or parent::app or parent::ref-list or parent::ref or parent::fig or parent::caption or parent::table-wrap or parent::tr or parent::thead or parent::colgroup or parent::table or parent::tbody or parent::fn or parent::non-normative-note or parent::array or parent::list-item or parent::list">
+			<xsl:when test="parent::standard or parent::body or parent::sec or parent::term-sec or parent::tbx:termEntry or parent::back or parent::app-group or parent::app or parent::ref-list or parent::ref or parent::fig or parent::caption or parent::table-wrap or parent::tr or parent::thead or parent::colgroup or parent::table or parent::tbody or parent::fn or parent::non-normative-note or parent::non-normative-example or parent::array or parent::list-item or parent::list">
 				<xsl:value-of select="normalize-space()"/>
 			</xsl:when>
 			
