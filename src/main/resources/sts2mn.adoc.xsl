@@ -1849,13 +1849,16 @@
 		<xsl:choose>
 			<xsl:when test="@ref-type = 'fn' or @ref-type = 'table-fn'">
 				<!-- find <fn id="$rid" -->
+				<xsl:variable name="addspace" select="count(following-sibling::node()[1][self::bold or self::bold2 or self::italic or self::italic2 or self::sup or self::sup2 or self::sub or self::sub2]) != 0"/> <!-- [starts-with(text(), ' ')] -->
 				<xsl:choose>
 					<xsl:when test="//fn[@id = current()/@rid]/ancestor::table-wrap-foot">
 						<xsl:apply-templates select="//fn[@id = current()/@rid]"/>
+						<xsl:if test="$addspace = 'true'"><xsl:text> </xsl:text></xsl:if>
 					</xsl:when>
 					<!-- in fn in fn-group -->
 					<xsl:when test="//fn[@id = current()/@rid]/ancestor::fn-group">
 						<xsl:apply-templates select="//fn[@id = current()/@rid]"/>
+						<xsl:if test="$addspace = 'true'"><xsl:text> </xsl:text></xsl:if>
 						<!-- <xsl:text>{</xsl:text>
 						<xsl:value-of select="@rid"/>
 						<xsl:text>}</xsl:text> -->
