@@ -959,7 +959,16 @@
 		<xsl:variable name="sec_number">
 			<xsl:choose>
 				<!-- Example: Section 3 -->
-				<xsl:when test="$sec_number_ = 'NaN'"><xsl:value-of select="java:toLowerCase(java:java.lang.String.new(normalize-space(translate(label, ',&#x200b;&#xa0; ','___'))))"/></xsl:when>
+				<xsl:when test="$sec_number_ = 'NaN'">
+					<xsl:choose>
+						<xsl:when test="label">
+							<xsl:value-of select="java:toLowerCase(java:java.lang.String.new(normalize-space(translate(label, ',&#x200b;&#xa0; ','___'))))"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="@id"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
 				<xsl:otherwise><xsl:value-of select="$sec_number_"/></xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
