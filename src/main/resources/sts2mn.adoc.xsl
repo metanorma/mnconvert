@@ -1127,24 +1127,58 @@
 	
 	<xsl:template match="p" name="p">
 		<xsl:if test="ancestor::non-normative-example and not(preceding-sibling::p) and normalize-space(preceding-sibling::node()[1]) != '' and not(preceding-sibling::*[1][self::label])"><xsl:text>&#xa;&#xa;</xsl:text></xsl:if>
-		<xsl:apply-templates />
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:choose>
-			<!-- if p in list-item and this p is first element (except label), next element is not another nested list, and there are another elements, or last p -->
-			<xsl:when test="parent::list-item and 
-			count(parent::list-item/*[not(self::label)]) &gt; 1 and
-			((count(preceding-sibling::*[not(self::label)]) = 0 and following-sibling::*[1][not(self::list)]) 
-			or not(following-sibling::*[not(self::list)]))"></xsl:when>
-			<xsl:when test="parent::list-item and not(../following-sibling::*) and count(ancestor::list-item) &gt; 1"></xsl:when>
-			<xsl:when test="parent::list-item and following-sibling::*[1][self::non-normative-note]"><xsl:text>&#xa;</xsl:text></xsl:when>
-			<xsl:when test="ancestor::list-item and not(following-sibling::p) and following-sibling::non-normative-note"></xsl:when>
-			<xsl:when test="ancestor::non-normative-note and not(following-sibling::p)"></xsl:when>
-			<xsl:when test="ancestor::non-normative-example and not(following-sibling::p)"></xsl:when>
-			<xsl:when test="not(following-sibling::p) and ancestor::list/following-sibling::non-normative-note"></xsl:when>
-			<xsl:when test="ancestor::sec[@sec-type = 'norm-refs'] and not(following-sibling::*[1][self::p])"></xsl:when>
-			<xsl:otherwise><xsl:text>&#xa;</xsl:text></xsl:otherwise>
-		</xsl:choose>
 		
+		<xsl:variable name="isFirstPinCommentary" select="starts-with(normalize-space(), 'COMMENTARY ON') and 
+		(starts-with(normalize-space(.//italic/text()), 'COMMENTARY ON') or starts-with(normalize-space(.//italic2/text()), 'COMMENTARY ON'))"/>
+		<xsl:choose>
+			<xsl:when test="$isFirstPinCommentary = 'true'"> <!-- COMMENTARY ON -->
+				<xsl:text>[NOTE,type=commentary</xsl:text>
+				<!-- determine commentary target -->
+				<xsl:variable name="commentary_target">
+					<xsl:choose>
+						<xsl:when test=".//xref"><xsl:value-of select=".//xref/@rid"/></xsl:when>
+						<xsl:otherwise>
+							<xsl:variable name="text_target" select=".//*[contains(local-name(),'bold')]"/>
+							<xsl:if test="ancestor::*[@id and label][1]/label = $text_target">
+								<xsl:value-of select="ancestor::*[@id and label][1]/@id"/>
+							</xsl:if>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:if test="normalize-space($commentary_target) != ''">,target=<xsl:value-of select="$commentary_target"/></xsl:if>
+				<xsl:text>]</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>====</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:when>
+			<xsl:otherwise> <!-- usual paragraph -->
+				<xsl:apply-templates />
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:variable name="isLastPinCommentary" select="preceding-sibling::p[starts-with(normalize-space(), 'COMMENTARY ON') and 
+							(starts-with(normalize-space(.//italic/text()), 'COMMENTARY ON') or starts-with(normalize-space(.//italic2/text()), 'COMMENTARY ON'))] and
+							*[1][self::italic or self::italic2] and normalize-space(translate(./text(),'&#xa0;.','  ')) = '' and
+							not(following-sibling::p[*[1][self::italic or self::italic2] and normalize-space(translate(./text(),'&#xa0;.','  ')) = ''])"/>
+				<xsl:if test="$isLastPinCommentary = 'true'">
+					<xsl:text>====</xsl:text>
+					<xsl:text>&#xa;&#xa;</xsl:text>
+				</xsl:if>
+				<xsl:choose>
+					<!-- if p in list-item and this p is first element (except label), next element is not another nested list, and there are another elements, or last p -->
+					<xsl:when test="parent::list-item and 
+					count(parent::list-item/*[not(self::label)]) &gt; 1 and
+					((count(preceding-sibling::*[not(self::label)]) = 0 and following-sibling::*[1][not(self::list)]) 
+					or not(following-sibling::*[not(self::list)]))"></xsl:when>
+					<xsl:when test="parent::list-item and not(../following-sibling::*) and count(ancestor::list-item) &gt; 1"></xsl:when>
+					<xsl:when test="parent::list-item and following-sibling::*[1][self::non-normative-note]"><xsl:text>&#xa;</xsl:text></xsl:when>
+					<xsl:when test="ancestor::list-item and not(following-sibling::p) and following-sibling::non-normative-note"></xsl:when>
+					<xsl:when test="ancestor::non-normative-note and not(following-sibling::p)"></xsl:when>
+					<xsl:when test="ancestor::non-normative-example and not(following-sibling::p)"></xsl:when>
+					<xsl:when test="not(following-sibling::p) and ancestor::list/following-sibling::non-normative-note"></xsl:when>
+					<xsl:when test="ancestor::sec[@sec-type = 'norm-refs'] and not(following-sibling::*[1][self::p])"></xsl:when>
+					<xsl:otherwise><xsl:text>&#xa;</xsl:text></xsl:otherwise>
+				</xsl:choose>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 		
 	<xsl:template match="tbx:entailedTerm">
@@ -1714,13 +1748,37 @@
 		<xsl:text>**</xsl:text><xsl:apply-templates /><xsl:text>**</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="italic">
-		<xsl:text>_</xsl:text><xsl:apply-templates /><xsl:text>_</xsl:text>
+	<xsl:template match="italic | italic2">
+		<xsl:choose>
+			<!-- if italic in paragraph that relates to COMMENTARY -->
+			<xsl:when test="parent::p[*[1][self::italic or self::italic2] and normalize-space(translate(./text(),'&#xa0;.','  ')) = ''] and 
+			parent::p/preceding-sibling::p[starts-with(normalize-space(), 'COMMENTARY ON') and 
+							(starts-with(normalize-space(.//italic/text()), 'COMMENTARY ON') or starts-with(normalize-space(.//italic2/text()), 'COMMENTARY ON'))]">
+				<!-- no italic -->
+				<xsl:apply-templates />
+			</xsl:when>
+			<!-- if italic in list-item that relates to COMMENTARY -->
+			<xsl:when test="ancestor::list/preceding-sibling::p[starts-with(normalize-space(), 'COMMENTARY ON') and 
+							(starts-with(normalize-space(.//italic/text()), 'COMMENTARY ON') or starts-with(normalize-space(.//italic2/text()), 'COMMENTARY ON'))]">
+				<!-- no italic -->
+				<xsl:apply-templates />
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:if test="self::italic2"><xsl:text>_</xsl:text></xsl:if>
+				<xsl:text>_</xsl:text><xsl:apply-templates /><xsl:text>_</xsl:text>
+				<xsl:if test="self::italic2"><xsl:text>_</xsl:text></xsl:if>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
-	<xsl:template match="italic2">
-		<xsl:text>__</xsl:text><xsl:apply-templates /><xsl:text>__</xsl:text>
+	<xsl:template match="*[local-name() = 'italic' or local-name() = 'italic2'][parent::p[*[1][self::italic or self::italic2] and normalize-space(translate(./text(),'&#xa0;.','  ')) = ''] and 
+			parent::p/preceding-sibling::p[starts-with(normalize-space(), 'COMMENTARY ON') and 
+							(starts-with(normalize-space(.//italic/text()), 'COMMENTARY ON') or starts-with(normalize-space(.//italic2/text()), 'COMMENTARY ON'))]]/text()[1]">
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),'^[a-z]\)(\s|\h)+','. ')"/>
 	</xsl:template>
+	<!-- <xsl:template match="italic2">
+		<xsl:text>__</xsl:text><xsl:apply-templates /><xsl:text>__</xsl:text>
+	</xsl:template> -->
 	
 	<xsl:template match="underline">
 		<xsl:text>[underline]#</xsl:text><xsl:apply-templates /><xsl:text>#</xsl:text>
