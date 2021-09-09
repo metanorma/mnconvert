@@ -2797,16 +2797,26 @@
 	</xsl:template>
 	
 	<xsl:template match="inline-formula">		
-		<xsl:text>stem:[</xsl:text>				
-		<xsl:apply-templates />		
+		<xsl:text>stem:[</xsl:text>
+		<xsl:variable name="math"><xsl:apply-templates /></xsl:variable>
+		<!-- <xsl:variable name="math01" select="java:replaceAll(java:java.lang.String.new($math),'\]','\]')"/> -->
+		<xsl:value-of select="$math"/>
 		<xsl:text>]</xsl:text>		
 	</xsl:template>
 	
 	<xsl:template match="disp-formula">
-		<xsl:text>stem:[</xsl:text>				
-		<xsl:apply-templates />		
-		<xsl:text>]</xsl:text>
-		<!-- <xsl:text>&#xa;</xsl:text> -->
+		<!-- <xsl:text>stem:[</xsl:text> -->
+		<xsl:text>[stem]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>++++</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:variable name="math"><xsl:apply-templates /></xsl:variable>
+		<!-- <xsl:variable name="math01" select="java:replaceAll(java:java.lang.String.new($math),']','\\]')"/> -->
+		<xsl:value-of select="$math"/>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>++++</xsl:text>
+		<!-- <xsl:text>]</xsl:text> -->
+		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
 	
 	<!-- MathML -->
