@@ -1967,7 +1967,14 @@
 		<xsl:choose>
 			<xsl:when test="count(table/col) + count(table/colgroup/col) = 2 and $organization != 'BSI'">
 				<xsl:if test="@content-type = 'figure-index' and label">*<xsl:value-of select="label"/>*&#xa;&#xa;</xsl:if>
-				<xsl:apply-templates mode="dl"/>				
+				<xsl:apply-templates mode="dl"/>
+			</xsl:when>
+			<!-- description of math symbols marked up as definitions list -->
+			<xsl:when test="count(table/col) + count(table/colgroup/col) = 2 and 
+			@content-type = 'fig-index' and 
+			preceding-sibling::*[1][starts-with(text(), 'where')] and
+			preceding-sibling::*[2][self::disp-formula]">
+				<xsl:apply-templates mode="dl"/>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:apply-templates />
@@ -1975,6 +1982,13 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<!-- description of math symbols marked up as definitions list -->
+	<xsl:template match="table-wrap[@content-type = 'formula-index' and
+									count(table/col) + count(table/colgroup/col) = 2 and
+									preceding-sibling::*[1][starts-with(text(), 'where')] and
+									preceding-sibling::*[2][self::disp-formula]]" priority="2">
+		<xsl:apply-templates mode="dl"/>
+	</xsl:template>
 	
 	<xsl:template match="@*|node()" mode="dl">		
 		<xsl:apply-templates select="@*|node()" mode="dl"/>		
