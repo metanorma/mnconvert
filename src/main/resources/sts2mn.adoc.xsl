@@ -2503,8 +2503,6 @@
 					</xsl:if>
 				</xsl:if>
 				
-				<xsl:text>,</xsl:text>
-				
 				<xsl:variable name="referenceTitle">
 				
 					<xsl:variable name="std-ref">
@@ -2535,7 +2533,10 @@
 					
 				</xsl:variable>
 				
-				<xsl:value-of select="translate($referenceTitle, '&#x2011;', '-')"/> <!-- non-breaking hyphen minus -->
+				<xsl:if test="$referenceTitle != ''">
+					<xsl:text>,</xsl:text>
+					<xsl:value-of select="translate($referenceTitle, '&#x2011;', '-')"/> <!-- non-breaking hyphen minus -->
+				</xsl:if>
 				
 				<xsl:text>]]]</xsl:text>
 			</xsl:if>
