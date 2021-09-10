@@ -2480,7 +2480,6 @@
 			<!-- comment repeated references -->
 			<xsl:if test="normalize-space($unique) = 'false'">// </xsl:if>
 			
-			<xsl:text>* </xsl:text>
 			<xsl:if test="@id or std/@std-id or std/std-ref">
 				<xsl:text>[[[</xsl:text>
 				<xsl:value-of select="@id"/>
@@ -2545,16 +2544,21 @@
 			<!-- Example: Further Reading -->
 			<xsl:if test="not(@id or std/@std-id or std/std-ref)">
 				<xsl:variable name="preceding_title" select="java:toLowerCase(java:java.lang.String.new(translate(preceding-sibling::title[1]/text(), ' ', '_')))"/>
-				<xsl:text>[[[</xsl:text>
-				<xsl:value-of select="$preceding_title"/>_<xsl:number/>
-				<xsl:text>]]]</xsl:text>
+				<xsl:if test="normalize-space($preceding_title) != ''">
+					<xsl:text>[[[</xsl:text>
+					<xsl:value-of select="$preceding_title"/>_<xsl:number/>
+					<xsl:text>]]]</xsl:text>
+				</xsl:if>
 			</xsl:if>
 			
 			<xsl:apply-templates/>
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:variable>
-		<xsl:value-of select="$reference"/>
+		<xsl:if test="normalize-space($reference) != ''">
+			<xsl:text>* </xsl:text>
+			<xsl:value-of select="$reference"/>
+		</xsl:if>
 		
 		<xsl:if test="normalize-space($unique) = 'false'">
 			<xsl:message>WARNING: Repeated reference - <xsl:copy-of select="."/></xsl:message>
