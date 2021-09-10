@@ -2477,8 +2477,6 @@
 		</xsl:variable>
 		
 		<xsl:variable name="reference">
-			<!-- comment repeated references -->
-			<xsl:if test="normalize-space($unique) = 'false'">// </xsl:if>
 			
 			<xsl:if test="@id or std/@std-id or std/std-ref">
 				<xsl:text>[[[</xsl:text>
@@ -2557,6 +2555,8 @@
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:variable>
 		<xsl:if test="normalize-space($reference) != ''">
+			<!-- comment repeated references -->
+			<xsl:if test="normalize-space($unique) = 'false'">// </xsl:if>
 			<xsl:text>* </xsl:text>
 			<xsl:value-of select="$reference"/>
 		</xsl:if>
