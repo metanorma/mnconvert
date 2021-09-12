@@ -2101,6 +2101,12 @@
 			<xsl:text>[%unnumbered]&#xa;</xsl:text>
 		</xsl:if>
 		
+		<xsl:if test="parent::array/@content-type = 'fig-index' and parent::array/label">
+			<xsl:text>. </xsl:text>
+			<xsl:value-of select="parent::array/label"/>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+		
 		<xsl:if test="parent::table-wrap and preceding-sibling::table"> <!-- if there are  few table inside table-wrap -->
 			<xsl:variable name="id" select="parent::table-wrap/@id"/>
 			<xsl:variable name="counter" select="count(preceding-sibling::table) + 1"/>
@@ -2151,9 +2157,9 @@
 			</xsl:otherwise>
 		</xsl:choose>
 		<xsl:text>"</xsl:text>
-		<xsl:if test="thead">
+		<!-- <xsl:if test="thead">
 			<xsl:text>,</xsl:text>
-		</xsl:if>
+		</xsl:if> -->
 		<xsl:variable name="options">
 			<xsl:if test="thead">
 				<option>header</option>
@@ -2161,11 +2167,14 @@
 			<xsl:if test="ancestor::table-wrap/table-wrap-foot[count(*[local-name() != 'fn-group' and local-name() != 'non-normative-note']) != 0]">
 				<option>footer</option>
 			</xsl:if>
-			<xsl:if test="ancestor::table-wrap/@content-type = 'ace-table' or (ancestor::table-wrap and preceding-sibling::*[1][self::table])">
+			<xsl:if test="ancestor::table-wrap/@content-type = 'ace-table' or 
+					(ancestor::table-wrap and preceding-sibling::*[1][self::table]) or
+					parent::array/@content-type = 'fig-index'">
 				<option>unnumbered</option>
 			</xsl:if>
 		</xsl:variable>
 		<xsl:if test="count(xalan:nodeset($options)/option) != 0">
+			<xsl:text>,</xsl:text>
 			<xsl:text>options="</xsl:text>
 				<xsl:for-each select="xalan:nodeset($options)/option">
 					<xsl:value-of select="."/>
