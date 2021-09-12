@@ -2299,7 +2299,7 @@
 	</xsl:template>
 	
 	<xsl:template name="complexFormatProcessing">
-		<xsl:if test=".//graphic">a</xsl:if> <!-- AsciiDoc prefix before table cell -->
+		<xsl:if test=".//graphic or .//inline-graphic">a</xsl:if> <!-- AsciiDoc prefix before table cell -->
 	</xsl:template>
 	
 	<xsl:template name="getAlignFormat">
