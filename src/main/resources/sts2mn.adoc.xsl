@@ -2102,7 +2102,7 @@
 		</xsl:if>
 		
 		<xsl:if test="parent::array/@content-type = 'fig-index' and parent::array/label">
-			<xsl:text>. </xsl:text>
+			<xsl:text>.</xsl:text>
 			<xsl:value-of select="parent::array/label"/>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
