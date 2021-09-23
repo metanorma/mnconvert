@@ -1349,9 +1349,9 @@
 					<!-- get text -->
 					<xsl:variable name="std_text_">
 						<xsl:choose>
-							<xsl:when test="std-ref">
+							<xsl:when test=".//std-ref">
 								<xsl:variable name="text">
-									<xsl:for-each select="std-ref/following-sibling::node()">
+									<xsl:for-each select=".//std-ref/following-sibling::node()">
 										<xsl:value-of select="."/>
 									</xsl:for-each>
 								</xsl:variable>
@@ -1387,10 +1387,12 @@
 								</xsl:call-template>
 							</xsl:variable>
 							<xsl:for-each select="xalan:nodeset($parts)//item">
+								<xsl:variable name="item_text" select="java:replaceAll(java:java.lang.String.new(.),'^(.*?),?$','$1')"/> <!-- remove trailing comma -->
 								<xsl:choose>
-									<xsl:when test="translate(substring(., 1, 1), '0123456789', '') = ''">,clause=<xsl:value-of select="."/></xsl:when>
-									<xsl:when test=". = 'and' or . = ','"><!-- skip --></xsl:when>
-									<xsl:otherwise>,annex=<xsl:value-of select="."/></xsl:otherwise>
+									<xsl:when test="normalize-space($item_text) = ''"><!-- skip --></xsl:when>
+									<xsl:when test="translate(substring($item_text, 1, 1), '0123456789', '') = ''">,clause=<xsl:value-of select="$item_text"/></xsl:when>
+									<xsl:when test="$item_text = 'and' or $item_text = ','"><!-- skip --></xsl:when>
+									<xsl:otherwise>,annex=<xsl:value-of select="$item_text"/></xsl:otherwise>
 								</xsl:choose>
 							</xsl:for-each>
 						</xsl:otherwise>
