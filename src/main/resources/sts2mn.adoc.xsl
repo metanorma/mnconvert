@@ -1347,7 +1347,22 @@
 				<xsl:when test="$clause != ''">,annex=<xsl:value-of select="$clause"/></xsl:when>
 				<xsl:when test="not(@std-id)">
 					<!-- get text -->
-					<xsl:variable name="std_text_" select="normalize-space(translate(text(), '&#xa0;', ' '))"/>
+					<xsl:variable name="std_text_">
+						<xsl:choose>
+							<xsl:when test="std-ref">
+								<xsl:variable name="text">
+									<xsl:for-each select="std-ref/following-sibling::node()">
+										<xsl:value-of select="."/>
+									</xsl:for-each>
+								</xsl:variable>
+								<xsl:value-of select="normalize-space(translate($text, '&#xa0;', ' '))"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="normalize-space(translate(., '&#xa0;', ' '))"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+					<!-- DEBUG: std_text_='<xsl:value-of select="$std_text_"/>' -->
 					<xsl:variable name="std_text">
 						<xsl:choose>
 							<xsl:when test="starts-with($std_text_, ',')"><xsl:value-of select="normalize-space(substring-after($std_text_, ','))"/></xsl:when>
