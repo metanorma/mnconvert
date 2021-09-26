@@ -1353,7 +1353,7 @@
 							<xsl:when test=".//std-ref">
 								<xsl:variable name="text">
 									<xsl:for-each select=".//std-ref/following-sibling::node()">
-										<xsl:value-of select="."/>
+										<xsl:value-of select="translate(., '&#xa0;', ' ')"/>
 									</xsl:for-each>
 								</xsl:variable>
 								<xsl:value-of select="normalize-space(translate($text, '&#xa0;', ' '))"/>
@@ -1363,27 +1363,76 @@
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:variable>
+					
 					<!-- DEBUG: std_text_='<xsl:value-of select="$std_text_"/>' -->
-					<xsl:variable name="std_text">
+					
+					<!-- remove leading comma -->
+					<xsl:variable name="std_text" select="normalize-space(java:replaceAll(java:java.lang.String.new($std_text_),'^,?(.*)$','$1'))"/>
+					<!-- replace ' to ' to '-' -->
+					<xsl:variable name="std_text1" select="java:replaceAll(java:java.lang.String.new($std_text),' to [cC]lause ','-')"/>
+					<xsl:variable name="std_text2" select="java:replaceAll(java:java.lang.String.new($std_text1),' to [aA]nnex ','-')"/>
+					<xsl:variable name="std_text3" select="java:replaceAll(java:java.lang.String.new($std_text2),' to [tT]able ','-')"/>
+					<xsl:variable name="std_text4" select="java:replaceAll(java:java.lang.String.new($std_text3),' to [sS]ection ','-')"/>
+					<xsl:variable name="std_text5" select="java:replaceAll(java:java.lang.String.new($std_text4),' to ','-')"/>
+					
+					<!-- replace ' and|or Xxxxx ' to 'xxxxx' -->
+					<xsl:variable name="std_text6" select="java:replaceAll(java:java.lang.String.new($std_text5),'( and | or )[cC]lause',',clause')"/>
+					<xsl:variable name="std_text7" select="java:replaceAll(java:java.lang.String.new($std_text6),'( and | or )[aA]nnex',',annex')"/>
+					<xsl:variable name="std_text8" select="java:replaceAll(java:java.lang.String.new($std_text7),'( and | or )[tT]able',',table')"/>
+					<xsl:variable name="std_text9" select="java:replaceAll(java:java.lang.String.new($std_text8),'( and | or )[sS]ection',',section')"/>
+					
+					<!-- replace  'Xxxxx' to 'xxxxx' -->
+					<xsl:variable name="std_text10" select="java:replaceAll(java:java.lang.String.new($std_text9),'[aA]nnex','annex')"/>
+					<xsl:variable name="std_text11" select="java:replaceAll(java:java.lang.String.new($std_text10),'[tT]able','table')"/>
+					<xsl:variable name="std_text12" select="java:replaceAll(java:java.lang.String.new($std_text11),'[cC]lause','clause')"/>
+					<xsl:variable name="std_text13" select="java:replaceAll(java:java.lang.String.new($std_text12),'[sS]ection','section')"/>
+					
+					<xsl:variable name="std_text_lc_" select="$std_text13"/>
+					
+					<xsl:variable name="std_text_lc">
 						<xsl:choose>
-							<xsl:when test="starts-with($std_text_, ',')"><xsl:value-of select="normalize-space(substring-after($std_text_, ','))"/></xsl:when>
-							<xsl:otherwise><xsl:value-of select="$std_text_"/></xsl:otherwise>
+							<xsl:when test="starts-with($std_text_lc_, 'annex')">
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),' and | or ',',annex ')"/>
+							</xsl:when>
+							<xsl:when test="starts-with($std_text_lc_, 'table')">
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),' and | or ',',table ')"/>
+							</xsl:when>
+							<xsl:when test="starts-with($std_text_lc_, 'clause')">
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),' and | or ',',clause ')"/>
+							</xsl:when>
+							<xsl:when test="starts-with($std_text_lc_, 'section')">
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),' and | or ',',section ')"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="$std_text_lc_"/>
+							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:variable>
-					<xsl:variable name="std_text_lc" select="java:toLowerCase(java:java.lang.String.new($std_text))"/>
-					<!-- DEBUG <xsl:value-of select="$std_text"/> -->
+					
+					<!-- DEBUG:std_text_lc='<xsl:value-of select="$std_text_lc"/>' -->
 					<xsl:choose>
-						<xsl:when test="contains($std_text_lc, 'annex') or contains($std_text_lc, 'table')">
+						<!-- <xsl:when test="contains($std_text_lc, 'clause') or contains($std_text_lc, 'annex') or contains($std_text_lc, 'table') or contains($std_text_lc, 'section')"> -->
+						<xsl:when test="starts-with($std_text_lc, 'clause') or starts-with($std_text_lc, 'annex') or starts-with($std_text_lc, 'table') or starts-with($std_text_lc, 'section')">
 							<xsl:text>,</xsl:text>
-							<xsl:variable name="pair" select="translate($std_text, ' ', '=')"/>
-							<xsl:value-of select="java:toLowerCase(java:java.lang.String.new(substring-before($pair, '=')))"/>
+							<xsl:variable name="pairs" select="translate($std_text_lc, ' ', '=')"/>
+							<xsl:value-of select="$pairs"/>
+							<!-- <xsl:value-of select="java:toLowerCase(java:java.lang.String.new(substring-before($pair, '=')))"/>
 							<xsl:text>=</xsl:text>
-							<xsl:value-of select="substring-after($pair, '=')"/>
+							<xsl:variable name="localityDestination" select="substring-after($pair, '=')"/>
+							<xsl:value-of select="$localityDestination"/> -->
+						</xsl:when>
+						<xsl:when test="contains($std_text_lc, 'clause') or contains($std_text_lc, 'annex') or contains($std_text_lc, 'table') or contains($std_text_lc, 'section')">
+							<xsl:text>,</xsl:text>
+							<xsl:variable name="pairs" select="translate($std_text_lc, ' ', '=')"/>
+							<xsl:choose>
+								<xsl:when test="translate(substring($pairs, 1, 1), '0123456789', '') = ''">clause=<xsl:value-of select="$pairs"/></xsl:when>
+								<xsl:otherwise>annex=<xsl:value-of select="$pairs"/>></xsl:otherwise>
+							</xsl:choose>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:variable name="parts">
 								<xsl:call-template name="split">
-									<xsl:with-param name="pText" select="$std_text"/>
+									<xsl:with-param name="pText" select="$std_text_lc"/>
 									<xsl:with-param name="sep" select="' '"/>
 								</xsl:call-template>
 							</xsl:variable>
@@ -1393,7 +1442,7 @@
 									<xsl:when test="normalize-space($item_text) = ''"><!-- skip --></xsl:when>
 									<xsl:when test="translate(substring($item_text, 1, 1), '0123456789', '') = ''">,clause=<xsl:value-of select="$item_text"/></xsl:when>
 									<xsl:when test="$item_text = 'and' or $item_text = ','"><!-- skip --></xsl:when>
-									<xsl:otherwise>,annex=<xsl:value-of select="$item_text"/></xsl:otherwise>
+									<xsl:otherwise>,annex=<xsl:value-of select="java:toUpperCase(java:java.lang.String.new($item_text))"/></xsl:otherwise>
 								</xsl:choose>
 							</xsl:for-each>
 						</xsl:otherwise>
@@ -3309,7 +3358,7 @@
 					<xsl:when test=". = ','">
 						<xsl:value-of select="."/>
 					</xsl:when>
-					<xsl:when test="$item = 'clause' or $item = 'table' or $item = 'annex'">
+					<xsl:when test="$item = 'clause' or $item = 'table' or $item = 'annex' or $item = 'section'">
 						<xsl:value-of select="$item"/><xsl:text>=</xsl:text>
 					</xsl:when>
 					<xsl:otherwise>
