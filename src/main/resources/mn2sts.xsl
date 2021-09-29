@@ -45,8 +45,27 @@
 	
 	<xsl:variable name="change_id">true</xsl:variable>
 		
-	<xsl:variable name="organization_abbreviation" select="$xml/*/bibdata/copyright/owner/organization/abbreviation"/>
-	<xsl:variable name="organization_name" select="$xml/*/bibdata/copyright/owner/organization/name"/>
+	<xsl:variable name="organization_abbreviation">
+		<xsl:choose>
+			<xsl:when test="$xml/metanorma-collection">
+				<xsl:value-of select="$xml/metanorma-collection/doc-container[1]/*/bibdata/copyright/owner/organization/abbreviation"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$xml/*/bibdata/copyright/owner/organization/abbreviation"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	
+	<xsl:variable name="organization_name">
+		<xsl:choose>
+			<xsl:when test="$xml/metanorma-collection">
+				<xsl:value-of select="$xml/metanorma-collection/doc-container[1]/*/bibdata/copyright/owner/organization/name"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$xml/*/bibdata/copyright/owner/organization/name"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
 	
 	<xsl:variable name="organization">
 		<xsl:choose>
@@ -64,49 +83,54 @@
 	<!-- ====================================================================== -->
 	<xsl:variable name="elements_">
 		<elements>
-			<xsl:apply-templates select="$xml/*/preface/*" mode="elements"/>
-      
-      <!-- Introduction in sections -->
-      <xsl:apply-templates select="$xml/*/sections/clause[@type='intro']" mode="elements"> <!-- [0] -->
-				<xsl:with-param name="sectionNum" select="'0'"/>
-			</xsl:apply-templates>
-      
-			<!-- Scope -->
-			<xsl:apply-templates select="$xml/*/sections/clause[@type='scope']" mode="elements"> <!-- [1] -->
-				<xsl:with-param name="sectionNum" select="'1'"/>
-			</xsl:apply-templates>
+		
+			<xsl:for-each select="$xml/* | $xml/metanorma-collection/*/*">
 			
-			<!-- Normative References -->
-			<xsl:apply-templates select="$xml/*/bibliography/references[@normative='true']" mode="elements"> <!-- [@id = '_normative_references'] -->
-				<xsl:with-param name="sectionNum" select="count(/*/sections/clause[@type='scope']) + 1"/>
-			</xsl:apply-templates>
-			
-      <!-- Terms and definitions -->
-		<xsl:apply-templates select="$xml/*/sections/terms | 
-																						$xml/*/sections/clause[.//terms] |
-																						$xml/*/sections/definitions | 
-																						$xml/*/sections/clause[.//definitions]" mode="elements">
-			<xsl:with-param name="sectionNumSkew" select="'1'"/>
-		</xsl:apply-templates>
-				<!-- Another main sections -->
-		<xsl:apply-templates select="$xml/*/sections/*[local-name() != 'terms' and 
-																																														local-name() != 'definitions' and 
-																																														not(@type='intro') and
-																																														not(@type='scope') and
-																																														not(self::clause and .//terms) and
-																																														not(self::clause and .//definitions)]" mode="elements" />
-
+				<xsl:apply-templates select="preface/*" mode="elements"/>
 					
-			<!-- Other main sections: Terms, etc... -->					
-			<!-- <xsl:apply-templates select="/*/*[local-name() = 'sections']/*[not(@type='scope') and not(@type='intro')]" mode="elements">
-				<xsl:with-param name="sectionNumSkew" select="'1'"/>
-			</xsl:apply-templates> -->
+					<!-- Introduction in sections -->
+					<xsl:apply-templates select="sections/clause[@type='intro']" mode="elements"> <!-- [0] -->
+						<xsl:with-param name="sectionNum" select="'0'"/>
+					</xsl:apply-templates>
+					
+					<!-- Scope -->
+					<xsl:apply-templates select="sections/clause[@type='scope']" mode="elements"> <!-- [1] -->
+						<xsl:with-param name="sectionNum" select="'1'"/>
+					</xsl:apply-templates>
+					
+					<!-- Normative References -->
+					<xsl:apply-templates select="bibliography/references[@normative='true']" mode="elements"> <!-- [@id = '_normative_references'] -->
+						<xsl:with-param name="sectionNum" select="count(/*/sections/clause[@type='scope']) + 1"/>
+					</xsl:apply-templates>
+					
+					<!-- Terms and definitions -->
+					<xsl:apply-templates select="sections/terms | 
+																			sections/clause[.//terms] |
+																			sections/definitions | 
+																			sections/clause[.//definitions]" mode="elements">
+						<xsl:with-param name="sectionNumSkew" select="'1'"/>
+					</xsl:apply-templates>
+							<!-- Another main sections -->
+					<xsl:apply-templates select="sections/*[local-name() != 'terms' and 
+																			local-name() != 'definitions' and 
+																			not(@type='intro') and
+																			not(@type='scope') and
+																			not(self::clause and .//terms) and
+																			not(self::clause and .//definitions)]" mode="elements" />
+
+							
+					<!-- Other main sections: Terms, etc... -->					
+					<!-- <xsl:apply-templates select="/*/*[local-name() = 'sections']/*[not(@type='scope') and not(@type='intro')]" mode="elements">
+						<xsl:with-param name="sectionNumSkew" select="'1'"/>
+					</xsl:apply-templates> -->
+					
+					<xsl:apply-templates select="annex" mode="elements"/>
+					
+					<xsl:apply-templates select=".//appendix" mode="elements"/>
+					
+					<xsl:apply-templates select="bibliography/references[not(@normative='true')]" mode="elements"/>
 			
-			<xsl:apply-templates select="$xml/*/annex" mode="elements"/>
-			
-			<xsl:apply-templates select="$xml//appendix" mode="elements"/>
-			
-			<xsl:apply-templates select="$xml/*/bibliography/references[not(@normative='true')]" mode="elements"/>
+			</xsl:for-each>
 			
 		</elements>
 	</xsl:variable>
@@ -287,108 +311,207 @@
 		
 		<standard xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:tbx="urn:iso:std:iso:30042:ed-1" xmlns:xlink="http://www.w3.org/1999/xlink">
 			
-			<front>
-				<xsl:for-each select="bibdata/relation[@type = 'adopted-from']">
-				
-					<xsl:variable name="element_name">
-						<xsl:variable name="adopted_from_abbreviation" select="bibitem/contributor[role/@type='publisher']/organization/abbreviation" />
-						<xsl:choose>
-							<!-- If //bibdata//relation[@type = 'adopted-from']/bibitem/contributor[role/@type = 'publisher']/organization[abbreviation = 'xxx'] exists, where xxx = ISO or IEC, -->
-							<xsl:when test="$adopted_from_abbreviation = 'ISO' or $adopted_from_abbreviation = 'IEC'">iso-meta</xsl:when>
-							<!-- If //bibdata//relation[@type = 'adopted-from']/bibitem/contributor[role/@type = 'publisher']/organization[abbreviation = 'xxx'] exists, where xxx = CEN or CENELEC, -->
-							<xsl:when test="$adopted_from_abbreviation = 'CEN' or $adopted_from_abbreviation = 'CENELEC'">reg-meta</xsl:when>
-							<xsl:otherwise>std-meta</xsl:otherwise>
-						</xsl:choose>
-					</xsl:variable>
-					
-					<xsl:apply-templates select="bibitem" mode="front">
-						<xsl:with-param name="element_name" select="$element_name"/>
-					</xsl:apply-templates>
-				</xsl:for-each>
-
-				<xsl:variable name="element_name">
-					<xsl:choose>
-						<!-- If //bibdata/relation[@type = 'adopted-from'] exists -->
-						<xsl:when test="bibdata/relation[@type = 'adopted-from']">nat-meta</xsl:when>
-						<xsl:when test="$organization = 'BSI'">nat-meta</xsl:when>
-						<xsl:otherwise>iso-meta</xsl:otherwise>
-					</xsl:choose>
-				</xsl:variable>
-				
-				<xsl:apply-templates select="bibdata" mode="front">
-					<xsl:with-param name="element_name" select="$element_name"/>
-				</xsl:apply-templates>
-				
-				<xsl:call-template name="insert_publication_info"/>
-				
-				<xsl:apply-templates select="preface" mode="front_preface"/>
-			</front>
+			<xsl:call-template name="insertFront"/>
 			
+			<xsl:call-template name="insertBody"/>
 			
-			<xsl:if test="sections or bibliography/references[@normative='true']">
-				<body>
-					<xsl:if test="$nat_meta_only = 'true'"> <!-- $organization = 'BSI' -->
-						<xsl:apply-templates select="preface/introduction" mode="front_preface"> <!-- [0] -->
-							<xsl:with-param name="skipIntroduction">false</xsl:with-param>
-						</xsl:apply-templates>
-					</xsl:if>
-					
-          <!-- Introduction in sections -->
-          <xsl:apply-templates select="sections/clause[@type='intro']"> <!-- [0] -->
-            <xsl:with-param name="sectionNum" select="'0'"/>
-          </xsl:apply-templates>
-          
-        
-					<!-- Scope -->
-					<xsl:apply-templates select="sections/clause[@type='scope']"> <!-- [1] -->
-						<xsl:with-param name="sectionNum" select="'1'"/>
-					</xsl:apply-templates>
-					
-					<!-- Normative References -->
-					<xsl:apply-templates select="bibliography/references[@normative='true']"> <!-- [@id = '_normative_references'] -->
-						<xsl:with-param name="sectionNum" select="count(sections/clause[@type='scope']) + 1"/>
-					</xsl:apply-templates>
-					
-          <!-- Terms and definitions -->
-          <xsl:apply-templates select="sections/terms | 
-                                                  sections/clause[.//terms] |
-                                                  sections/definitions | 
-                                                  sections/clause[.//definitions]" />		
-              <!-- Another main sections -->
-          <xsl:apply-templates select="sections/*[local-name() != 'terms' and 
-                                                                                                  local-name() != 'definitions' and 
-                                                                                                  not(@type='intro') and
-                                                                                                  not(@type='scope') and
-                                                                                                  not(self::clause and .//terms) and
-                                                                                                  not(self::clause and .//definitions)]" />
-          
-					<!-- Other main sections: Terms, etc... -->					
-					<!-- <xsl:apply-templates select="*[local-name() = 'sections']/*[not(@type='scope') and not(@type='intro')]">
-						<xsl:with-param name="sectionNumSkew" select="'1'"/>
-					</xsl:apply-templates> -->
-					
-				</body>	
-			</xsl:if>
+			<xsl:call-template name="insertBack"/>
 						
-			<xsl:if test="annex or bibliography/references">
-				<back>
-					<xsl:if test="annex">
-						<app-group>
-							<xsl:apply-templates select="annex" mode="back"/>
-						</app-group>
-					</xsl:if>
-					<xsl:apply-templates select="bibliography/references[not(@normative='true')] | bibliography/clause[references[not(@normative='true')]]" mode="back"/>
-					<xsl:apply-templates select="indexsect"/>
-				</back>
-			</xsl:if>
 			<xsl:if test="$debug = 'true'">
 				<xsl:text disable-output-escaping="yes">&lt;!-- </xsl:text>
 				<xsl:value-of select="count($elements//element)"/>
-				<!-- <xsl:copy-of select="xalan:nodeset($elements)"/> -->
 				<xsl:copy-of select="$elements"/>
 				<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
 			</xsl:if>
 		</standard>
+		
+	</xsl:template>
+	
+	<!-- ================================ -->
+	<!-- metanorma collection processing -->
+	<!-- ================================ -->
+	
+	<!--
+	<metanorma-collection ..>
+			<doc-container id="...">
+			</doc-container>
+			<doc-container id="...">
+			</doc-container>
+	</metanorma-collection>
+	
+	to
+	
+	<standard>
+		<front>
+			<nat-meta> </nat-meta> bibdata for 1st document
+			<sec>Foreword, Introduction ....</sec>  for 1st document
+		</front>
+		<body>
+			<sub-part>
+				<body></body><back></back> Sections for 1st document
+			</sub-part>
+			<sub-part>
+				<body>
+					<sec id="sec_sp-Foreword">....</sec> Foreword, Introduction sections for 2nd document
+					<sec id="sec_sp-Introduction">...</sec>
+					<sub-part>
+						Sections for 2nd document
+						<body>Scope..... </body>
+						<back>...</back>
+					</sub-part>
+				</body>
+			</sub-part>
+		</body>
+	</standard>
+	-->
+	
+	
+	<xsl:template match="metanorma-collection" mode="xml" priority="2">
+		<standard xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:tbx="urn:iso:std:iso:30042:ed-1" xmlns:xlink="http://www.w3.org/1999/xlink">
+		
+			<!-- get 'front' from 1st doc-container -->
+			<xsl:for-each select="doc-container[1]/*">
+				<xsl:call-template name="insertFront"/>
+			</xsl:for-each>
+			
+			<body>
+				<sub-part> <!-- Sections for 1st document -->
+					<label/>
+					<title/>
+					<xsl:for-each select="doc-container[1]/*">
+						<xsl:call-template name="insertBody"/>
+						<xsl:call-template name="insertBack"/>
+					</xsl:for-each>
+				</sub-part>
+				<sub-part>
+					<label/>
+					<title/>
+					<body>
+						<!-- Foreword, Introduction sections for 2nd document -->
+						<xsl:for-each select="doc-container[2]/*">
+							<xsl:apply-templates select="preface" mode="front_preface"/>
+						</xsl:for-each>
+						<sub-part> <!-- Sections for 2nd document -->
+							<label/>
+							<title/>
+							<xsl:for-each select="doc-container[2]/*">
+								<xsl:call-template name="insertBody"/>
+								<xsl:call-template name="insertBack"/>
+							</xsl:for-each>
+						</sub-part>
+					</body>
+				</sub-part>
+			
+			</body>
+		
+		</standard>
+	</xsl:template>
+	
+	<!-- skip processing -->
+	<xsl:template match="coverimages"/>
+	<!-- ================================ -->
+	<!-- END: metanorma collection processing -->
+	<!-- ================================ -->
+	
+	<xsl:template name="insertFront">
+		<front>
+			<xsl:for-each select="bibdata/relation[@type = 'adopted-from']">
+			
+				<xsl:variable name="element_name">
+					<xsl:variable name="adopted_from_abbreviation" select="bibitem/contributor[role/@type='publisher']/organization/abbreviation" />
+					<xsl:choose>
+						<!-- If //bibdata//relation[@type = 'adopted-from']/bibitem/contributor[role/@type = 'publisher']/organization[abbreviation = 'xxx'] exists, where xxx = ISO or IEC, -->
+						<xsl:when test="$adopted_from_abbreviation = 'ISO' or $adopted_from_abbreviation = 'IEC'">iso-meta</xsl:when>
+						<!-- If //bibdata//relation[@type = 'adopted-from']/bibitem/contributor[role/@type = 'publisher']/organization[abbreviation = 'xxx'] exists, where xxx = CEN or CENELEC, -->
+						<xsl:when test="$adopted_from_abbreviation = 'CEN' or $adopted_from_abbreviation = 'CENELEC'">reg-meta</xsl:when>
+						<xsl:otherwise>std-meta</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				
+				<xsl:apply-templates select="bibitem" mode="front">
+					<xsl:with-param name="element_name" select="$element_name"/>
+				</xsl:apply-templates>
+			</xsl:for-each>
+
+			<xsl:variable name="element_name">
+				<xsl:choose>
+					<!-- If //bibdata/relation[@type = 'adopted-from'] exists -->
+					<xsl:when test="bibdata/relation[@type = 'adopted-from']">nat-meta</xsl:when>
+					<xsl:when test="$organization = 'BSI'">nat-meta</xsl:when>
+					<xsl:otherwise>iso-meta</xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
+			
+			<xsl:apply-templates select="bibdata" mode="front">
+				<xsl:with-param name="element_name" select="$element_name"/>
+			</xsl:apply-templates>
+			
+			<xsl:call-template name="insert_publication_info"/>
+			
+			<xsl:apply-templates select="preface" mode="front_preface"/>
+		</front>
+	</xsl:template>
+	
+	
+	<xsl:template name="insertBody">
+		<xsl:if test="sections or bibliography[.//references[@normative='true']]">
+			<body>
+				<xsl:if test="$nat_meta_only = 'true'"> <!-- $organization = 'BSI' -->
+					<xsl:apply-templates select="preface/introduction" mode="front_preface"> <!-- [0] -->
+						<xsl:with-param name="skipIntroduction">false</xsl:with-param>
+					</xsl:apply-templates>
+				</xsl:if>
+				
+				<!-- Introduction in sections -->
+				<xsl:apply-templates select="sections/clause[@type='intro']"> <!-- [0] -->
+					<xsl:with-param name="sectionNum" select="'0'"/>
+				</xsl:apply-templates>
+				
+			
+				<!-- Scope -->
+				<xsl:apply-templates select="sections/clause[@type='scope']"> <!-- [1] -->
+					<xsl:with-param name="sectionNum" select="'1'"/>
+				</xsl:apply-templates>
+				
+				<!-- Normative References -->
+				<xsl:apply-templates select="bibliography/references[@normative='true'] | bibliography/clause[references[@normative='true']]"> <!-- [@id = '_normative_references'] -->
+					<xsl:with-param name="sectionNum" select="count(sections/clause[@type='scope']) + 1"/>
+				</xsl:apply-templates>
+				
+				<!-- Terms and definitions -->
+				<xsl:apply-templates select="sections/terms | 
+																								sections/clause[.//terms] |
+																								sections/definitions | 
+																								sections/clause[.//definitions]" />		
+						<!-- Another main sections -->
+				<xsl:apply-templates select="sections/*[local-name() != 'terms' and 
+																																																local-name() != 'definitions' and 
+																																																not(@type='intro') and
+																																																not(@type='scope') and
+																																																not(self::clause and .//terms) and
+																																																not(self::clause and .//definitions)]" />
+				
+				<!-- Other main sections: Terms, etc... -->					
+				<!-- <xsl:apply-templates select="*[local-name() = 'sections']/*[not(@type='scope') and not(@type='intro')]">
+					<xsl:with-param name="sectionNumSkew" select="'1'"/>
+				</xsl:apply-templates> -->
+				
+			</body>	
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template name="insertBack">
+		<xsl:if test="annex or bibliography/references">
+			<back>
+				<xsl:if test="annex">
+					<app-group>
+						<xsl:apply-templates select="annex" mode="back"/>
+					</app-group>
+				</xsl:if>
+				<xsl:apply-templates select="bibliography/references[not(@normative='true')] | bibliography/clause[references[not(@normative='true')]]" mode="back"/>
+				<xsl:apply-templates select="indexsect"/>
+			</back>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="bibdata"/>
@@ -972,7 +1095,8 @@
 																ext/editorialgroup/subcommittee |
 																ext/editorialgroup/workgroup |
 																bibdata/relation |
-																bibdata/relation/bibitem"
+																bibdata/relation/bibitem |
+																coverimages"
 																mode="front_check"/>
 
 	<!-- skip processed structure and deep down -->
@@ -2658,7 +2782,7 @@
 		</xsl:choose>
 	</xsl:template>
 
-	
+
 	<xsl:template name="getLevel">
 		<xsl:variable name="level_total" select="count(ancestor::*)"/>
 		<xsl:variable name="level">
