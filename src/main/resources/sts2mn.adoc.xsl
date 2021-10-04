@@ -41,10 +41,13 @@
 			
 	<xsl:variable name="path" select="java:replaceAll(java:java.lang.String.new($path_),'#lang',$language)"/>
 	
+	<xsl:variable name="regex_refid_replacement" select="'( |&#xA0;|:|\+|/)'"/>
+	
 	<xsl:variable name="refs">
 		<xsl:for-each select="//ref">
 			<xsl:variable name="text_" select="concat(std/std-ref, std/italic/std-ref, std/bold/std-ref, std/italic2/std-ref, std/bold2/std-ref)"/>
-			<xsl:variable name="text" select="translate($text_, ' &#xA0;:+', '____')"/>
+			<!-- <xsl:variable name="text" select="translate($text_, ' &#xA0;:+/', '_____')"/> -->
+			<xsl:variable name="text" select="java:replaceAll(java:java.lang.String.new($text_), $regex_refid_replacement, '_')"/>
 			<ref id="{@id}" std-ref="{$text}"/>
 			
 			<xsl:variable name="isDated">
@@ -1534,7 +1537,8 @@
 						</xsl:choose>
 					</xsl:variable>
 					<!-- replace space, non-break space, semicolon, plus to '_' -->
-					<xsl:variable name="text_ref__" select="translate($text_ref_, ' &#xA0;:+', '____')"/>
+					<!-- <xsl:variable name="text_ref__" select="translate($text_ref_, ' &#xA0;:+/', '_____')"/> -->
+					<xsl:variable name="text_ref__" select="java:replaceAll(java:java.lang.String.new($text_ref_), $regex_refid_replacement, '_')"/>
 					
 					<xsl:variable name="text_ref">
 						<xsl:call-template name="getNormalizedId">
@@ -3607,7 +3611,9 @@
 	<!-- generate normalized form for id  (std-id, std-ref, etc.) -->
 	<xsl:template name="getNormalizedId">
 		<xsl:param name="id"/>
-		<xsl:variable name="id_normalized1" select="translate($id, ' &#xA0;:+', '____')"/> <!-- replace space, non-break space, colon, plus to _ -->
+		<!-- <xsl:variable name="id_normalized1" select="translate($id, ' &#xA0;:+/', '_____')"/> --> <!-- replace space, non-break space, colon, plus, slash to _ -->
+		<xsl:variable name="id_normalized1" select="java:replaceAll(java:java.lang.String.new($id), $regex_refid_replacement, '_')"/> <!-- replace space, non-break space, colon, plus, slash to _ -->
+		
 		<xsl:variable name="id_normalized2" select="translate($id_normalized1, '&#x2011;', '-')"/> <!-- replace non-breaking hyphen minus to simple minus-->
 		<xsl:variable name="first_char" select="substring(id_normalized2,1,1)"/>
 		<xsl:if test="$first_char != '' and translate($first_char, '0123456789', '') = ''">_</xsl:if> <!-- if first char is digit, then add _ -->
