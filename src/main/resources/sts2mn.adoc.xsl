@@ -1199,6 +1199,14 @@
 				</xsl:choose>
 			</xsl:otherwise>
 		</xsl:choose>
+		
+		<!-- insert Multi-paragraph footnotes after paragraph -->
+		<xsl:for-each select=".//xref[@ref-type='fn']">
+			<xsl:for-each select="//fn[@id = current()/@rid]">
+				<xsl:call-template name="insertMultiParagraphFootnote" />
+			</xsl:for-each>
+		</xsl:for-each>
+		
 	</xsl:template>
 		
 	<xsl:template match="tbx:entailedTerm">
@@ -2006,6 +2014,13 @@
 	
 	<xsl:template match="fn-group"/><!-- fn from fn-group  moved to after the text -->
 	
+	<!-- Multi-paragraph footnote -->
+	<xsl:template match="fn[count(p) &gt; 1]" priority="2">
+		<xsl:text> footnoteblock:[</xsl:text>
+		<xsl:value-of select="@id"/>
+		<xsl:text>]</xsl:text>
+	</xsl:template>
+	
 	<xsl:template match="fn">
 		<xsl:text> footnote:[</xsl:text>
 			<xsl:apply-templates />
@@ -2013,6 +2028,7 @@
 	</xsl:template>
 	
 	<xsl:template match="fn/p">
+		<xsl:if test="preceding-sibling::p"><xsl:text>&#xa;&#xa;</xsl:text></xsl:if> <!-- for multi-paragraph footnotes -->
 		<xsl:apply-templates />
 	</xsl:template>
 
@@ -2028,6 +2044,22 @@
 
 	<xsl:template match="fn[not(@reference) and not(@id)]/p/text()" priority="2">
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.), '^NOTE(\s|\h)+', '')"/>
+	</xsl:template>
+	
+	<xsl:template name="insertMultiParagraphFootnote">
+		<xsl:if test="count(p) &gt; 1">
+			<xsl:text>[[</xsl:text><xsl:value-of select="@id"/><xsl:text>]]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:text>[NOTE]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:text>--</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:apply-templates />
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:text>--</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="uri">
@@ -2132,6 +2164,14 @@
 		<xsl:if test="not(label)">[%unnumbered]&#xa;</xsl:if>
 		<xsl:apply-templates select="table-wrap-foot/fn-group" mode="footnotes"/>
 		<xsl:apply-templates />
+		
+		<!-- insert Multi-paragraph footnotes after table -->
+		<xsl:for-each select=".//xref[@ref-type='table-fn']">
+			<xsl:for-each select="//fn[@id = current()/@rid]">
+				<xsl:call-template name="insertMultiParagraphFootnote" />
+			</xsl:for-each>
+		</xsl:for-each>
+		
 		<xsl:apply-templates select="@orientation" mode="after_table"/>
 		<xsl:if test="not(@orientation)">
 			<xsl:apply-templates select="table/@width" mode="after_table"/>
@@ -2460,6 +2500,7 @@
 	<xsl:template match="fn-group/fn/label"/>
 	
 	<xsl:template match="fn-group/fn/p">
+		<xsl:if test="preceding-sibling::p"><xsl:text>&#xa;&#xa;</xsl:text></xsl:if> <!-- for multi-paragraph footnotes -->
 		<xsl:apply-templates />
 	</xsl:template>
 	
