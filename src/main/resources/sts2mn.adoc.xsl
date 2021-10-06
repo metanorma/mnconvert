@@ -30,6 +30,7 @@
 	<xsl:variable name="demomode">
 		<xsl:choose>
 			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '59752'">true</xsl:when>
+			<!-- <xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '36786'">true</xsl:when> -->
 			<xsl:otherwise>false</xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable> 
@@ -765,7 +766,10 @@
 	
 	<xsl:template match="title-wrap/full | title-wrap/main" mode="bibdata_title_full">
 	
-		<xsl:variable name="title" select="translate(., '-–', '——')"/> <!-- replace dash, en dash to em dash -->
+		<!-- <xsl:variable name="title" select="translate(., '-–', '——')"/> -->
+		<!-- replace dash, en dash to em dash -->
+		<xsl:variable name="title" select="java:replaceAll(java:java.lang.String.new(.), '( - |–)', '—')"/>
+		
 		<xsl:variable name="parts">
 			<xsl:call-template name="split">
 				<xsl:with-param name="pText" select="$title"/>
