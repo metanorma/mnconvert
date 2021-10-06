@@ -2063,10 +2063,15 @@
 	</xsl:template>
 	
 	<xsl:template match="uri">
-		<xsl:apply-templates />
-		<xsl:text>[</xsl:text>
-		<xsl:value-of select="."/>
-		<xsl:text>]</xsl:text>
+		<xsl:choose>
+			<xsl:when test="count(node()) = 1"><xsl:value-of select="."/></xsl:when>
+			<xsl:otherwise>
+				<xsl:apply-templates />
+				<xsl:text>[</xsl:text>
+				<xsl:value-of select="."/>
+				<xsl:text>]</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="mixed-citation">		
