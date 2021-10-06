@@ -26,6 +26,17 @@
 	
 	<xsl:param name="imagesdir" select="'images'"/>
 	
+	<!-- false --> <!-- true, for new features -->
+	<xsl:variable name="demomode">
+		<xsl:choose>
+			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '59752'">true</xsl:when>
+			<xsl:otherwise>false</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable> 
+	
+	<xsl:variable name="one_document_" select="count(//standard/front/*[contains(local-name(), '-meta')]) = 1"/>
+	<xsl:variable name="one_document" select="normalize-space($one_document_)"/>
+	
 	<xsl:variable name="language" select="//standard/front/*/doc-ident/language"/>
 	
 	<xsl:variable name="organization">
@@ -224,64 +235,181 @@
 	
 	<!-- <xsl:template match="/*"> -->
 	<xsl:template match="//standard/front | //adoption/adoption-front">
+	
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
-		<redirect:write file="{$outpath}/{$docfile}">
-			<!-- index=<xsl:copy-of select="$index"/> -->
-			<!-- nat-meta -> iso-meta -> reg-meta -> std-meta -->
-			<xsl:for-each select="nat-meta">
-				<xsl:call-template name="xxx-meta">
-					<xsl:with-param name="include_iso_meta">true</xsl:with-param>
-					<xsl:with-param name="include_reg_meta">true</xsl:with-param>
-					<xsl:with-param name="include_std_meta">true</xsl:with-param>
-				</xsl:call-template>
-			</xsl:for-each>
-			
-			<xsl:if test="not(nat-meta)">
-				<xsl:for-each select="iso-meta">
-					<xsl:call-template name="xxx-meta">
-						<xsl:with-param name="include_reg_meta">true</xsl:with-param>
-						<xsl:with-param name="include_std_meta">true</xsl:with-param>
-					</xsl:call-template>
-				</xsl:for-each>
-			
-				<xsl:if test="not(iso-meta)">
-					<xsl:for-each select="reg-meta">
+	
+		<xsl:choose>
+			<xsl:when test="$demomode = 'false'">
+				<redirect:write file="{$outpath}/{$docfile}">
+					<!-- index=<xsl:copy-of select="$index"/> -->
+					<!-- nat-meta -> iso-meta -> reg-meta -> std-meta -->
+					<xsl:for-each select="nat-meta">
 						<xsl:call-template name="xxx-meta">
+							<xsl:with-param name="include_iso_meta">true</xsl:with-param>
+							<xsl:with-param name="include_reg_meta">true</xsl:with-param>
 							<xsl:with-param name="include_std_meta">true</xsl:with-param>
 						</xsl:call-template>
 					</xsl:for-each>
 					
-					<xsl:if test="not(reg-meta)">
-						<xsl:for-each select="std-meta">
-							<xsl:call-template name="xxx-meta"/>
+					<xsl:if test="not(nat-meta)">
+						<xsl:for-each select="iso-meta">
+							<xsl:call-template name="xxx-meta">
+								<xsl:with-param name="include_reg_meta">true</xsl:with-param>
+								<xsl:with-param name="include_std_meta">true</xsl:with-param>
+							</xsl:call-template>
 						</xsl:for-each>
+					
+						<xsl:if test="not(iso-meta)">
+							<xsl:for-each select="reg-meta">
+								<xsl:call-template name="xxx-meta">
+									<xsl:with-param name="include_std_meta">true</xsl:with-param>
+								</xsl:call-template>
+							</xsl:for-each>
+							
+							<xsl:if test="not(reg-meta)">
+								<xsl:for-each select="std-meta">
+									<xsl:call-template name="xxx-meta"/>
+								</xsl:for-each>
+							</xsl:if>
+						</xsl:if>
 					</xsl:if>
-				</xsl:if>
-			</xsl:if>
-			
-			
-			<xsl:text>:mn-document-class: </xsl:text><xsl:value-of select="$sdo"/>
-			<xsl:text>&#xa;</xsl:text>
-			<xsl:text>:mn-output-extensions: xml,html</xsl:text> <!-- ,doc,html_alt -->
-			<xsl:text>&#xa;</xsl:text>
-			
-			<xsl:text>:local-cache-only:</xsl:text>
-			<xsl:text>&#xa;</xsl:text>
-			<xsl:text>:data-uri-image:</xsl:text>
-			<xsl:text>&#xa;</xsl:text>
-			
-			<xsl:text>:imagesdir: </xsl:text><xsl:value-of select="$imagesdir"/>
-			<xsl:text>&#xa;</xsl:text>
-			
-			<!-- The :docfile: attribute is no longer used -->
-			<!-- <xsl:if test="normalize-space($docfile) != ''">
-				<xsl:text>:docfile: </xsl:text><xsl:value-of select="$docfile"/>
-				<xsl:text>&#xa;</xsl:text>
-			</xsl:if> -->
-			
-			<xsl:text>&#xa;</xsl:text>
+					
+					<xsl:call-template name="insertCommonAttributes"/>
+					
+				</redirect:write>
+			</xsl:when>
+			<xsl:otherwise> <!-- demo mode -->
+				
+				<xsl:for-each select="*[contains(local-name(), '-meta')]">
+					<xsl:variable name="docfile_bib">
+						<xsl:choose>
+							<xsl:when test="$one_document = 'true'"><xsl:value-of select="$docfile"/></xsl:when>
+							<xsl:otherwise>
+								<xsl:call-template name="getMetaBibFilename"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+				
+					<redirect:write file="{$outpath}/{$docfile_bib}">
+						<!-- <xsl:text>DEBUG name=</xsl:text><xsl:value-of select="local-name()"/><xsl:text>&#xa;</xsl:text> -->
+						<xsl:call-template name="xxx-meta" />
+						
+						
+						<xsl:if test="$one_document = 'true'">
+							<xsl:call-template name="insertCommonAttributes"/>
+						</xsl:if>
+						
+						<xsl:if test="$one_document = 'false'">
+							
+							<!-- ========================= -->
+							<!-- nat-meta processing -->
+							<!-- ========================= -->
+							<xsl:if test="local-name() = 'nat-meta'">
+								
+								<xsl:if test="not(../reg-meta) and not(../iso-meta)">
+									<xsl:call-template name="insertCommonAttributes"/>
+								</xsl:if>
+								
+								<xsl:text>&#xa;&#xa;</xsl:text>
+								
+								<xsl:apply-templates select="ancestor::front/sec[contains(@id, '_nat') or title = 'National foreword']"/>
+								
+								<xsl:variable name="embed_file_">
+									<xsl:choose>
+										<xsl:when test="../reg-meta">
+											<xsl:for-each select="../reg-meta"> <!-- set context to reg-meta -->
+												<xsl:call-template name="getMetaBibFilename"/>
+											</xsl:for-each>
+										</xsl:when>
+										<xsl:when test="../iso-meta">
+											<xsl:for-each select="../iso-meta"> <!-- set context to iso-meta -->
+												<xsl:call-template name="getMetaBibFilename"/>
+											</xsl:for-each>
+										</xsl:when>
+									</xsl:choose>
+								</xsl:variable>
+								
+								<xsl:call-template name="insertEmbedFile">
+									<xsl:with-param name="embed_file"  select="normalize-space($embed_file_)"/>
+								</xsl:call-template>
+								
+							</xsl:if>
+							<!-- ========================= -->
+							<!-- END nat-meta processing -->
+							<!-- ========================= -->
+							
+							<!-- ========================= -->
+							<!-- reg-meta processing --> <!-- European -->
+							<!-- ========================= -->
+							<xsl:if test="local-name() = 'reg-meta'">
+								
+								<xsl:if test="not(../iso-meta)">
+									<xsl:call-template name="insertCommonAttributes"/>
+								</xsl:if>
+								
+								<xsl:text>&#xa;&#xa;</xsl:text>
+								
+								<xsl:apply-templates select="ancestor::front/sec[contains(@id, '_euro') or title = 'European foreword']"/>
+								
+								<xsl:variable name="embed_file_">
+									<xsl:choose>
+										<xsl:when test="../iso-meta">
+											<xsl:for-each select="../iso-meta"> <!-- set context to iso-meta -->
+												<xsl:call-template name="getMetaBibFilename"/>
+											</xsl:for-each>
+										</xsl:when>
+									</xsl:choose>
+								</xsl:variable>
+								
+								<xsl:for-each select="ancestor::standard//app[starts-with(@id, 'sec_Z')]">
+									<xsl:variable name="annex_label_" select="translate(label, ' &#xa0;', '--')" />
+									<xsl:variable name="annex_label" select="java:toLowerCase(java:java.lang.String.new($annex_label_))" />
+									<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
+									
+									<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/</xsl:text><xsl:value-of select="$annex_label"/><xsl:text>.adoc[]</xsl:text>
+									<xsl:text>&#xa;&#xa;</xsl:text>
 
-		</redirect:write>
+								</xsl:for-each>
+								
+								<xsl:call-template name="insertEmbedFile">
+									<xsl:with-param name="embed_file"  select="normalize-space($embed_file_)"/>
+								</xsl:call-template>
+								
+							</xsl:if>
+							<!-- ========================= -->
+							<!-- END reg-meta processing -->
+							<!-- ========================= -->
+							
+							<!-- ========================= -->
+							<!-- iso-meta processing -->
+							<!-- ========================= -->
+							<xsl:if test="local-name() = 'iso-meta'">
+								
+								<xsl:call-template name="insertCommonAttributes"/>
+								
+								<xsl:text>&#xa;&#xa;</xsl:text>
+								
+								<xsl:apply-templates select="ancestor::front/sec[not(contains(@id, '_nat') or title = 'National foreword' or contains(@id, '_euro') or title = 'European foreword')]"/>
+								
+								<xsl:text>&#xa;&#xa;</xsl:text>
+								
+							</xsl:if>
+							
+							<!-- ========================= -->
+							<!-- END iso-meta processing -->
+							<!-- ========================= -->
+
+						</xsl:if>
+												
+					</redirect:write>
+					
+				</xsl:for-each>
+					
+			</xsl:otherwise>
+		</xsl:choose>
+	
+		
+		
 
 		<xsl:if test="$split-bibdata != 'true'">
 			
@@ -295,23 +423,68 @@
 				</xsl:variable>
 				<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 				<xsl:variable name="filename">
-					<xsl:value-of select="$sectionsFolder"/><xsl:text>/00-</xsl:text><xsl:value-of select="$number"/>-<xsl:value-of select="$section_name"/><xsl:text>.adoc</xsl:text>
+					<xsl:value-of select="$sectionsFolder"/><xsl:text>/00-</xsl:text><xsl:value-of select="$number"/>-<xsl:value-of select="$section_name"/><xsl:text>.</xsl:text><xsl:value-of select="$docfile_ext"/>
 				</xsl:variable>
-				<redirect:write file="{$outpath}/{$filename}">
-					<xsl:text>&#xa;</xsl:text>
-					<xsl:apply-templates select="."/>
-				</redirect:write>
-				<redirect:write file="{$outpath}/{$docfile}">
-					<xsl:text>include::</xsl:text><xsl:value-of select="$filename"/><xsl:text>[]</xsl:text>
-					<xsl:text>&#xa;&#xa;</xsl:text>
-				</redirect:write>
+				
+				<xsl:choose>
+					<xsl:when test="$demomode = 'true' and $one_document = 'false' and ((contains(@id, '_nat') or title = 'National foreword'))"/> <!-- skip National Foreword and another National clause-->
+					<xsl:when test="$demomode = 'true' and $one_document = 'false' and ((contains(@id, '_euro') or title = 'European foreword'))"/> <!-- skip European Foreword and another European clauses -->
+					<xsl:when test="$demomode = 'true' and $one_document = 'false' and (not(contains(@id, '_nat') or title = 'National foreword' or contains(@id, '_euro') or title = 'European foreword'))"/> <!-- skip Foreword and another clauses -->
+					<xsl:otherwise>
+						<redirect:write file="{$outpath}/{$filename}">
+							<xsl:text>&#xa;</xsl:text>
+							<xsl:apply-templates select="."/>
+						</redirect:write>
+						<redirect:write file="{$outpath}/{$docfile}">
+							<xsl:text>include::</xsl:text><xsl:value-of select="$filename"/><xsl:text>[]</xsl:text>
+							<xsl:text>&#xa;&#xa;</xsl:text>
+						</redirect:write>
+					</xsl:otherwise>
+				</xsl:choose>
+				
 			</xsl:for-each>
 			
 			<!-- <xsl:apply-templates select="/standard/body"/>			
 			<xsl:apply-templates select="/standard/back"/> -->
 		</xsl:if>
 		
+	</xsl:template>
+	
+	<xsl:template name="insertCommonAttributes">
+		<xsl:text>:mn-document-class: </xsl:text><xsl:value-of select="$sdo"/>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>:mn-output-extensions: xml,html</xsl:text> <!-- ,doc,html_alt -->
+		<xsl:text>&#xa;</xsl:text>
 		
+		<xsl:text>:local-cache-only:</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>:data-uri-image:</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		
+		<xsl:text>:imagesdir: </xsl:text><xsl:value-of select="$imagesdir"/>
+		<xsl:text>&#xa;</xsl:text>
+		
+		<!-- The :docfile: attribute is no longer used -->
+		<!-- <xsl:if test="normalize-space($docfile) != ''">
+			<xsl:text>:docfile: </xsl:text><xsl:value-of select="$docfile"/>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if> -->
+		
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template name="getMetaBibFilename">
+		<xsl:variable name="name1" select="java:replaceAll(java:java.lang.String.new(std-ref[@type = 'undated']), '(\s|\h)', '-')"/>
+		<xsl:value-of select="java:toLowerCase(java:java.lang.String.new($name1))"/><xsl:text>.</xsl:text><xsl:value-of select="$docfile_ext"/>
+	</xsl:template>
+	
+	<xsl:template name="insertEmbedFile">
+		<xsl:param name="embed_file"/>
+		<xsl:if test="$embed_file != ''">
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:text>embed::</xsl:text><xsl:value-of select="$embed_file"/><xsl:text>[]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template name="xxx-meta">
@@ -2545,11 +2718,18 @@
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:apply-templates />
 		</redirect:write>
-		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
-		<redirect:write file="{$outpath}/{$docfile}">
-			<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/</xsl:text><xsl:value-of select="$annex_label"/><xsl:text>.adoc[]</xsl:text>
-			<xsl:text>&#xa;&#xa;</xsl:text>
-		</redirect:write>
+		
+		<xsl:choose>
+			<xsl:when test="$demomode = 'true' and $one_document = 'false' and starts-with(@id, 'sec_Z')"/> <!-- include:: created in national doc -->
+			<xsl:otherwise>
+				<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
+				<redirect:write file="{$outpath}/{$docfile}">
+					<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/</xsl:text><xsl:value-of select="$annex_label"/><xsl:text>.adoc[]</xsl:text>
+					<xsl:text>&#xa;&#xa;</xsl:text>
+				</redirect:write>
+			</xsl:otherwise>
+		</xsl:choose>
+
 	</xsl:template>
 	
 	<xsl:template match="app/annex-type"/>
@@ -3618,6 +3798,36 @@
 	
 	
 	<xsl:template name="getDocFilename">
+		<xsl:choose>
+			<xsl:when test="$demomode = 'true' and $one_document = 'false'">
+				<!-- iso-meta - reg-meta - nat-meta -->
+				<xsl:variable name="docfile_name_from_meta_">
+					<xsl:choose>
+						<xsl:when test="ancestor-or-self::standard/front/iso-meta">
+							<xsl:for-each select="ancestor-or-self::standard/front/iso-meta"> <!-- set context to iso-meta -->
+								<xsl:call-template name="getMetaBibFilename"/>
+							</xsl:for-each>
+						</xsl:when>
+						<xsl:when test="ancestor-or-self::standard/front/reg-meta">
+							<xsl:for-each select="ancestor-or-self::standard/front/reg-meta"> <!-- set context to iso-meta -->
+								<xsl:call-template name="getMetaBibFilename"/>
+							</xsl:for-each>
+						</xsl:when>
+						<xsl:when test="ancestor-or-self::standard/front/nat-meta"><xsl:value-of select="concat($docfile_name, '.', $docfile_ext)"/></xsl:when>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:variable name="docfile_name_from_meta" select="normalize-space($docfile_name_from_meta_)"/>
+				<xsl:value-of select="$docfile_name_from_meta"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:variable name="doc-number" select="ancestor-or-self::standard/@doc-number" />
+				<xsl:variable name="sfx"><xsl:if test="$doc-number != ''">.<xsl:value-of select="$doc-number"/></xsl:if></xsl:variable>
+				<xsl:value-of select="concat($docfile_name, $sfx, '.', $docfile_ext)"/> <!-- Example: iso-tc154-8601-1-en.adoc , or document.adoc -->
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template name="getDocFilename2">
 		<xsl:variable name="doc-number" select="ancestor-or-self::standard/@doc-number" />
 		<xsl:variable name="sfx"><xsl:if test="$doc-number != ''">.<xsl:value-of select="$doc-number"/></xsl:if></xsl:variable>
 		<xsl:value-of select="concat($docfile_name, $sfx, '.', $docfile_ext)"/> <!-- Example: iso-tc154-8601-1-en.adoc , or document.adoc -->
