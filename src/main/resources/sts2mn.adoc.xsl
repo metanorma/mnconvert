@@ -753,7 +753,6 @@
 					<xsl:text>&#xa;</xsl:text>
 				</xsl:for-each>
 				
-				
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:apply-templates>
@@ -766,7 +765,7 @@
 	
 	<xsl:template match="title-wrap/full | title-wrap/main" mode="bibdata_title_full">
 	
-		<xsl:variable name="title" select="translate(., '–', '—')"/> <!-- replace en dash to em dash -->
+		<xsl:variable name="title" select="translate(., '-–', '——')"/> <!-- replace dash, en dash to em dash -->
 		<xsl:variable name="parts">
 			<xsl:call-template name="split">
 				<xsl:with-param name="pText" select="$title"/>
