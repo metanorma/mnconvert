@@ -2443,10 +2443,10 @@
 		<xsl:text>&#xa;</xsl:text>		
 	</xsl:template>
 	
-	<xsl:template match="fn-group">
+	<!-- <xsl:template match="fn-group">
 		<xsl:apply-templates/>	
 		<xsl:text>&#xa;</xsl:text>		
-	</xsl:template>
+	</xsl:template> -->
 	
 	<!-- <xsl:template match="fn-group/fn">
 		<xsl:text>:</xsl:text>
