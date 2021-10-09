@@ -671,9 +671,20 @@
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($value), concat(':', $copyright-year, '$'), '')"/> <!-- remove copyright-year from end of docnumber -->
 	</xsl:template>
 	
+	
 	<xsl:template match="std-ident[ancestor::front or ancestor::adoption-front]/part-number[normalize-space(.) != '']">		
 		<xsl:text>:partnumber: </xsl:text><xsl:value-of select="."/>
 		<xsl:text>&#xa;</xsl:text>		
+	</xsl:template>
+	
+	<!-- in some documents part-number is empty, but there is 'Part N' in title-wrap/compl -->
+	<xsl:template match="std-ident[ancestor::front or ancestor::adoption-front]/part-number[normalize-space(.) = '']">
+		<xsl:variable name="complTitle" select="ancestor::*[contains(local-name(), '-meta')]/title-wrap/compl"/>
+		<xsl:variable name="partNumberFromComplTitle" select="normalize-space(java:replaceAll(java:java.lang.String.new($complTitle),'^Part(\s|\h)+(\d*).*','$2'))"/>
+		<xsl:if test="$partNumberFromComplTitle != '' and translate($partNumberFromComplTitle, '0123456789', '') = ''">
+			<xsl:text>:partnumber: </xsl:text><xsl:value-of select="$partNumberFromComplTitle"/>
+			<xsl:text>&#xa;</xsl:text>		
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="std-ident[ancestor::front or ancestor::adoption-front]/edition[normalize-space(.) != '']">
@@ -731,14 +742,9 @@
 				<xsl:variable name="titles">
 					<xsl:apply-templates select="intro[normalize-space() != '']" mode="bibdata"/>
 					<xsl:apply-templates select="compl[normalize-space() != '']" mode="bibdata"/>
+					<xsl:apply-templates select="main[normalize-space() != '']" mode="bibdata"/>
 					<xsl:if test="normalize-space(main) = ''">
 						<xsl:apply-templates select="full[normalize-space() != '']" mode="bibdata_title_full"/>
-					</xsl:if>
-					<xsl:if test="normalize-space(intro) = ''">
-						<xsl:apply-templates select="main[normalize-space() != '']" mode="bibdata_title_full"/>
-					</xsl:if>
-					<xsl:if test="normalize-space(intro) != ''">
-						<xsl:apply-templates select="main[normalize-space() != '']" mode="bibdata"/>
 					</xsl:if>
 				</xsl:variable>
 
@@ -770,31 +776,25 @@
 		<!-- replace dash, en dash to em dash -->
 		<xsl:variable name="title" select="java:replaceAll(java:java.lang.String.new(.), '( - |–)', '—')"/>
 		
-		<xsl:variable name="parts">
+		<xsl:variable name="parts_">
 			<xsl:call-template name="split">
 				<xsl:with-param name="pText" select="$title"/>
 				<xsl:with-param name="sep" select="'—'"/>
 			</xsl:call-template>
 		</xsl:variable>
 		
+		<xsl:variable name="parts" select="xalan:nodeset($parts_)"/>
+		
 		<xsl:variable name="lang" select="../@xml:lang"/>
-		<xsl:for-each select="xalan:nodeset($parts)/*">
-			<xsl:if test="position() = 1">
-				<title language="{$lang}" format="text/plain" type="title-intro">
+		
+		<xsl:if test="count($parts/*) &gt; 0">
+			<title language="{$lang}" format="text/plain" type="title-main">
+				<xsl:for-each select="$parts/*">
 					<xsl:apply-templates mode="bibdata"/>
-				</title>
-			</xsl:if>
-			<xsl:if test="position() = 2">
-				<title language="{$lang}" format="text/plain" type="title-main">
-					<xsl:apply-templates mode="bibdata"/>
-				</title>
-			</xsl:if>
-			<xsl:if test="position() &gt; 2">
-				<title language="{$lang}" format="text/plain" type="title-part">
-					<xsl:apply-templates mode="bibdata"/>
-				</title>
-			</xsl:if>
-		</xsl:for-each>
+					<xsl:if test="position() != last()"> — </xsl:if>
+				</xsl:for-each>
+			</title>
+		</xsl:if>
 		
 	</xsl:template>
 	
@@ -816,6 +816,10 @@
 		</title>
 	</xsl:template>
 	
+	<xsl:template match="title-wrap/compl/node()[1][self::text()]" mode="bibdata">
+		<!-- strip 'Part N:' -->
+		<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(.), '^Part(\s|\h)*(\d)+:(.+)$', '$3'))"/>
+	</xsl:template>
 	
 	<xsl:template match="title-wrap[ancestor::front or ancestor::adoption-front]/intro[normalize-space(.) != '']">
 		<xsl:param name="lang"/>
