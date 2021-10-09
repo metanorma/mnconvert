@@ -1055,6 +1055,7 @@
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$sectionsFolder}/01-scope.adoc">
 			<xsl:text>&#xa;</xsl:text>
+			<xsl:call-template name="setId"/>
 			<xsl:apply-templates />
 		</redirect:write>
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
