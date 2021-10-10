@@ -2472,7 +2472,7 @@
 			<xsl:if test="thead">
 				<option>header</option>
 			</xsl:if>
-			<xsl:if test="ancestor::table-wrap/table-wrap-foot[count(*[local-name() != 'fn-group' and local-name() != 'non-normative-note']) != 0]">
+			<xsl:if test="ancestor::table-wrap/table-wrap-foot[count(*[local-name() != 'fn-group' and local-name() != 'fn' and local-name() != 'non-normative-note']) != 0]">
 				<option>footer</option>
 			</xsl:if>
 			<xsl:if test="ancestor::table-wrap/@content-type = 'ace-table' or 
