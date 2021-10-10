@@ -53,7 +53,7 @@
 			
 	<xsl:variable name="path" select="java:replaceAll(java:java.lang.String.new($path_),'#lang',$language)"/>
 	
-	<xsl:variable name="regex_refid_replacement" select="'( |&#xA0;|:|\+|/)'"/>
+	<xsl:variable name="regex_refid_replacement" select="'( |&#xA0;|:|\+|/|\-|\(|\)|–)'"/>
 	
 	<xsl:variable name="refs">
 		<xsl:for-each select="//ref">
