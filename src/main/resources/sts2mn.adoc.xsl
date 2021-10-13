@@ -1429,12 +1429,16 @@
 	<xsl:template name="insertTermReference">
 		<xsl:param name="term"/>
 		<xsl:param name="rendering"/>
+		<xsl:param name="options"/> <!-- Example: {{process,*3.21*,options="noref,noital,linkmention"}} -->
 		<!-- <xsl:text>term:[</xsl:text>
 		<xsl:text>]</xsl:text> -->
 		<xsl:text>{{</xsl:text>
 		<xsl:value-of select="$term"/>
 		<xsl:if test="$rendering != '' and $rendering != $term">
 			<xsl:text>,</xsl:text><xsl:value-of select="$rendering"/>
+		</xsl:if>
+		<xsl:if test="$options != ''">
+			<xsl:text>,options="</xsl:text><xsl:value-of select="$options"/><xsl:text>"</xsl:text>
 		</xsl:if>
 		<xsl:text>}}</xsl:text>
 	</xsl:template>
@@ -2173,14 +2177,19 @@
 			<xsl:when test="@ref-type = 'other'">
 				<xsl:text>&lt;</xsl:text><xsl:value-of select="."/><xsl:text>&gt;</xsl:text>
 			</xsl:when>
-			<xsl:when test="@ref-type = 'sec' and local-name(//*[@id = current()/@rid]) = 'term-sec'"> <!-- <xref ref-type="sec" rid="sec_3.21"> link to term-->
+			<xsl:when test="@ref-type = 'sec' and local-name(//*[@id = current()/@rid]) = 'term-sec'"> <!-- <xref ref-type="sec" rid="sec_3.21"> link to term clause -->
 				<xsl:variable name="term_name" select="//*[@id = current()/@rid]//tbx:term[1]"/>
 				
 				<!-- <xsl:variable name="term_name" select="java:toLowerCase(java:java.lang.String.new(translate($term_name_, ' ', '-')_))"/>				 -->
 				<!-- <xsl:text>&lt;&lt;</xsl:text>term-<xsl:value-of select="$term_name"/><xsl:text>&gt;&gt;</xsl:text> -->
 				<!-- <xsl:text>term:[</xsl:text><xsl:value-of select="$term_name"/><xsl:text>]</xsl:text> -->
+				<xsl:variable name="rendering"><xsl:apply-templates /></xsl:variable>
+				
+				<!-- Example: {{process,*3.21*,options="noref,noital,linkmention"}} -->
 				<xsl:call-template name="insertTermReference">
 					<xsl:with-param name="term" select="$term_name"/>
+					<xsl:with-param name="rendering" select="$rendering"/>
+					<xsl:with-param name="options" select="'noref,noital,linkmention'"/>
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:otherwise> <!-- example: ref-type="sec" "table" "app" -->
@@ -3377,6 +3386,7 @@
 		<xsl:value-of select="$space_after"/>
 	</xsl:template>
 	
+	<!-- reference to the term -->
 	<xsl:template match="named-content">
 
 		<xsl:variable name="space_before"><xsl:if test="local-name(preceding-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
