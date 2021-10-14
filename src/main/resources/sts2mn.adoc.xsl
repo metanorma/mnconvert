@@ -1674,10 +1674,6 @@
 		<xsl:value-of select="$space_after"/>
 	</xsl:template>
 	
-	<xsl:template match="std/italic | std/bold | std/italic2 | std/bold2" priority="2">
-		<xsl:apply-templates />
-	</xsl:template>
-	
 	<xsl:template match="std-id-group"/>
 	
 	<!-- <xsl:template match="std[not(ancestor::ref)]/text()">
@@ -2067,9 +2063,10 @@
 							(starts-with(normalize-space(.//italic/text()), 'COMMENTARY ON') or starts-with(normalize-space(.//italic2/text()), 'COMMENTARY ON'))]]/text()[1]">
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),'^[a-z]\)(\s|\h)+','. ')"/>
 	</xsl:template>
-	<!-- <xsl:template match="italic2">
-		<xsl:text>__</xsl:text><xsl:apply-templates /><xsl:text>__</xsl:text>
-	</xsl:template> -->
+	
+	<xsl:template match="std/italic | std/bold | std/italic2 | std/bold2 | non-normative-note//italic | non-normative-note//italic2" priority="2">
+		<xsl:apply-templates />
+	</xsl:template>
 	
 	<xsl:template match="underline">
 		<xsl:text>[underline]#</xsl:text><xsl:apply-templates /><xsl:text>#</xsl:text>
@@ -4023,7 +4020,7 @@
 		<xsl:choose>
 		
 			<xsl:when test="parent::standard or parent::body or parent::sec or parent::term-sec or parent::tbx:termEntry or parent::back or parent::app-group or parent::app or parent::ref-list or parent::ref or parent::fig or parent::caption or parent::table-wrap or parent::tr or parent::thead or parent::colgroup or parent::table or parent::tbody or parent::fn or parent::non-normative-note or parent::non-normative-example or parent::array or parent::list-item or parent::list or parent::boxed-text">
-				<xsl:value-of select="normalize-space()"/>
+				<xsl:value-of select="normalize-space()"/> <!-- tab to space -->
 			</xsl:when>
 			
 			<xsl:when test="parent::td and preceding-sibling::*[1][self::p or self::non-normative-note or self::list] and 
@@ -4033,13 +4030,23 @@
 			<xsl:otherwise>
 				<xsl:variable name="str">
 					<xsl:choose>
-						<xsl:when test="contains(., '&#xa;')">
+						<xsl:when test="contains(., '&#xa;') or contains(., '&#x9;')">
 							<!-- replace line breaks to space -->
-							<xsl:variable name="text_" select="translate(., '&#xa;', ' ')"/>
+							<xsl:variable name="text_" select="translate(., '&#xa;&#x9;', '  ')"/>
 							<!-- replace space sequence to one space -->
 							<xsl:variable name="text" select="java:replaceAll(java:java.lang.String.new($text_),' +',' ')"/>
 							<xsl:if test="normalize-space($text) != ''">
-								<xsl:value-of select="$text"/>
+								<!-- <xsl:if test="parent::p">parent::p</xsl:if>
+								<xsl:if test="(not(preceding-sibling::*) or preceding-sibling::*[1][self::break])">(not(preceding-sibling::*) or preceding-sibling::*[1][self::break])</xsl:if>
+								<xsl:if test="starts-with($text, ' ')">starts-with($text, ' ')</xsl:if> -->
+								<xsl:choose>
+									<xsl:when test="(parent::p or parent::tbx:note) and (not(preceding-sibling::*) or preceding-sibling::*[1][self::break]) and starts-with($text, ' ')"> <!-- remove space at start of line -->
+										<xsl:value-of select="substring($text, 2)"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="$text"/>
+									</xsl:otherwise>
+								</xsl:choose>
 							</xsl:if>
 						</xsl:when>
 						<xsl:otherwise>
