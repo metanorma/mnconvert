@@ -2064,7 +2064,8 @@
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),'^[a-z]\)(\s|\h)+','. ')"/>
 	</xsl:template>
 	
-	<xsl:template match="std/italic | std/bold | std/italic2 | std/bold2 | non-normative-note//italic | non-normative-note//italic2" priority="2">
+	<!-- <xsl:template match="std/italic | std/bold | std/italic2 | std/bold2 | non-normative-note//italic[count(parent::*) = 1] | non-normative-note//italic2[count(parent::*) = 1]" priority="2"> -->
+	<xsl:template match="std/italic | std/bold | std/italic2 | std/bold2 | non-normative-note//italic[count(parent::*/node()) = 1] | non-normative-note//italic2[count(parent::*/node()) = 1]" priority="2">
 		<xsl:apply-templates />
 	</xsl:template>
 	
