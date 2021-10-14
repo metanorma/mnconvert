@@ -1530,10 +1530,10 @@
 		<xsl:variable name="space_after"><xsl:if test="local-name(following-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		<xsl:value-of select="$space_before"/>
 		
-		<xsl:if test="italic">_</xsl:if>
-		<xsl:if test="italic2">__</xsl:if>
-		<xsl:if test="bold">*</xsl:if>
-		<xsl:if test="bold2">**</xsl:if>
+		<xsl:if test="italic[std-ref]">_</xsl:if>
+		<xsl:if test="italic2[std-ref]">__</xsl:if>
+		<xsl:if test="bold[std-ref]">*</xsl:if>
+		<xsl:if test="bold2[std-ref]">**</xsl:if>
 		
 		<xsl:text>&lt;&lt;</xsl:text>
 		
@@ -1666,10 +1666,10 @@
 
 		<xsl:text>&gt;&gt;</xsl:text>
 		
-		<xsl:if test="italic">_</xsl:if>
-		<xsl:if test="italic2">__</xsl:if>
-		<xsl:if test="bold">*</xsl:if>
-		<xsl:if test="bold2">**</xsl:if>
+		<xsl:if test="italic[std-ref]">_</xsl:if>
+		<xsl:if test="italic2[std-ref]">__</xsl:if>
+		<xsl:if test="bold[std-ref]">*</xsl:if>
+		<xsl:if test="bold2[std-ref]">**</xsl:if>
 		
 		<xsl:value-of select="$space_after"/>
 	</xsl:template>
