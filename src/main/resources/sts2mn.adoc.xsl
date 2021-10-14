@@ -3742,7 +3742,7 @@
 	</xsl:template>
 	
 	<xsl:template name="setIdOrType">
-		<xsl:if test="parent::front">
+		<xsl:if test="parent::front and not(@sec-type = 'foreword')">
 			<xsl:text>[.preface</xsl:text>
 			<xsl:if test="@sec-type = 'amendment'">
 			<xsl:text>,type=corrigenda</xsl:text>
