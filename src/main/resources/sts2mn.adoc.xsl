@@ -1860,7 +1860,13 @@
 		<xsl:apply-templates/>
 		
 		<!-- <xsl:if test="not(parent::list-item)"> -->
-			<xsl:text>&#xa;</xsl:text>
+		<xsl:choose>
+			<xsl:when test="following-sibling::*[1][not(self::list)] and parent::list-item"></xsl:when> <!-- no need to insert new line, because '+ new line' will be inserted -->
+			<xsl:otherwise>
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
+			
 		<!-- </xsl:if> -->
 	</xsl:template>
 	
