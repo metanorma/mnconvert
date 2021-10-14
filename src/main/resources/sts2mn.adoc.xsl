@@ -1849,13 +1849,16 @@
 			<xsl:apply-templates select="@list-type"/>
 		</xsl:variable>
 		
-		<xsl:variable name="start">
+		<!-- https://www.metanorma.org/author/topics/document-format/text/#ordered-lists: 
+		commented due: The start attribute for ordered lists is only allowed by certain Metanorma flavors, such as BIPM.
+		-->
+		<!-- <xsl:variable name="start">
 			<xsl:call-template name="getListStartValue"/>
 		</xsl:variable>
 		<xsl:if test="$start != '' and $start != '1'">
 			<xsl:text>[start=</xsl:text><xsl:value-of select="$start"/><xsl:text>]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
-		</xsl:if>
+		</xsl:if> -->
 		
 		<xsl:apply-templates/>
 		
