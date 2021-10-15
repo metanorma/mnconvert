@@ -53,7 +53,7 @@
 			
 	<xsl:variable name="path" select="java:replaceAll(java:java.lang.String.new($path_),'#lang',$language)"/>
 	
-	<xsl:variable name="regex_refid_replacement" select="'( |&#xA0;|:|\+|/|\-|\(|\)|–)'"/>
+	<xsl:variable name="regex_refid_replacement" select="'( |&#xA0;|:|\+|/|\-|\(|\)|–|‑)'"/>
 	
 	<xsl:variable name="refs">
 		<xsl:for-each select="//ref">
@@ -1709,6 +1709,8 @@
 			<xsl:apply-templates mode="tbx_source_simplify"/>
 		</xsl:variable>
     
+		<!-- tbx_source_simplified=<xsl:value-of select="$tbx_source_simplified"/> -->
+		
 		<xsl:variable name="text_tbx_source_simplified" select="xalan:nodeset($tbx_source_simplified)"/>
     
 		<!-- text2='<xsl:value-of select="xalan:nodeset($tbx_source_simplified)"/>' -->
@@ -2280,6 +2282,12 @@
 	<!-- =============== -->
 	<xsl:template match="array">
 		<xsl:text>&#xa;</xsl:text>
+		<xsl:if test="ancestor::list-item and preceding-sibling::*[not(label)]">
+			<xsl:text>+</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:text>--</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 		<xsl:choose>
 			<xsl:when test="count(table/col) + count(table/colgroup/col) = 2 and $organization != 'BSI'">
 				<xsl:if test="@content-type = 'figure-index' and label">*<xsl:value-of select="label"/>*&#xa;&#xa;</xsl:if>
@@ -2296,6 +2304,10 @@
 				<xsl:apply-templates />
 			</xsl:otherwise>
 		</xsl:choose>
+		<xsl:if test="ancestor::list-item and preceding-sibling::*[not(label)]">
+			<xsl:text>--</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 	</xsl:template>
 	
 	<!-- description of math symbols marked up as definitions list -->
