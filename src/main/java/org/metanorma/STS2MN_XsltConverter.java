@@ -44,6 +44,8 @@ public class STS2MN_XsltConverter extends XsltConverter {
     
     private String typeStandard = ""; // default value empty - allows to determine standard via xslt
     
+    private boolean isSemanticXML = false;
+    
     final String SPLIT = "///SPLIT ";
     
     public STS2MN_XsltConverter() {
@@ -65,6 +67,10 @@ public class STS2MN_XsltConverter extends XsltConverter {
         if (typeStandard != null) {
             this.typeStandard = typeStandard;
         }
+    }
+
+    public void setIsSemanticXML(boolean isSemanticXML) {
+        this.isSemanticXML = isSemanticXML;
     }
     
     
@@ -192,6 +198,7 @@ public class STS2MN_XsltConverter extends XsltConverter {
             transformer.setParameter("imagesdir", imagesDir);
             transformer.setParameter("outpath", outputFolder);
             transformer.setParameter("typestandard", typeStandard);
+            transformer.setParameter("semantic", isSemanticXML);
             transformer.setParameter("debug", isDebugMode);
 
             StringWriter resultWriter = new StringWriter();

@@ -107,10 +107,15 @@ public class mnconvert {
                     .hasArg()
                     .required(false)
                     .build());
-            addOption(Option.builder("t")
+            addOption(Option.builder("st")
                     .longOpt("type")
                     .desc("For STS input only: type of standard to generate (Metanorma XML output only)")
                     .hasArg()
+                    .required(false)
+                    .build());
+            addOption(Option.builder("sx")
+                    .longOpt("semantic")
+                    .desc("For STS input only: generate semantic XML (Metanorma XML output only)")
                     .required(false)
                     .build());
             addOption(Option.builder("ct")
@@ -230,6 +235,7 @@ public class mnconvert {
                             sts2mn.setImagesDir(cmdMain.getOptionValue("imagesdir"));
                             sts2mn.setIsSplitBibdata(cmdMain.hasOption("split-bibdata"));
                             sts2mn.setTypeStandard(cmdMain.getOptionValue("type"));
+                            sts2mn.setIsSemanticXML(cmdMain.hasOption("semantic"));
                             defaultOutputFormat = "adoc";
                             converter = sts2mn;
                             break;

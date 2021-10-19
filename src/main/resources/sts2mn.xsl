@@ -21,7 +21,9 @@
 	<xsl:param name="imagesdir" select="'images'"/>
 
 	<xsl:param name="typestandard" />
-
+	
+	<xsl:param name="semantic">false</xsl:param>
+	
 	<xsl:variable name="organization">
 		<xsl:choose>
 			<xsl:when test="/standard/front/nat-meta/@originator = 'BSI' or /standard/front/iso-meta/secretariat = 'BSI'">BSI</xsl:when>
