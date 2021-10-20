@@ -3056,6 +3056,10 @@
 	
 	<xsl:template match="graphic | inline-graphic" name="graphic">
 		<xsl:apply-templates select="caption/title" mode="graphic-title"/>
+		<xsl:if test="not(caption/title) and not(ancestor::fig) and not(ancestor::table)">
+			<xsl:text>[%unnumbered]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 		<xsl:text>image::</xsl:text>
 		<xsl:if test="not(processing-instruction('isoimg-id'))">
 			<xsl:variable name="image_link" select="@xlink:href"/>
