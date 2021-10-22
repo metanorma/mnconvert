@@ -3479,10 +3479,16 @@
 		
 		<xsl:variable name="level_standard" select="count(ancestor::standard/ancestor::*)"/>
 		
+		<xsl:variable name="label" select="normalize-space(preceding-sibling::*[1][self::label])"/>
+		
 		<xsl:variable name="level_">
 			<xsl:choose>
 				<xsl:when test="$calculated_level != 0">
 					<xsl:value-of select="$calculated_level"/>
+				</xsl:when>
+				<xsl:when test="$label != ''">
+					<!-- level from the element 'label' - count '.' -->
+					<xsl:value-of  select="string-length($label) - string-length(translate($label, '.', '')) + 2"/>
 				</xsl:when>
 				<xsl:when test="ancestor::app-group">
 					<xsl:value-of select="$level_total - $level_standard - 2"/>
@@ -3521,7 +3527,6 @@
 			<xsl:with-param name="char" select="$list-label"/>
 			<xsl:with-param name="count" select="$level"/>
 		</xsl:call-template>
-		
 	</xsl:template>
 	
 	<xsl:template name="repeat">
