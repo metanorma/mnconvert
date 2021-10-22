@@ -2427,8 +2427,10 @@
 	</xsl:template>
 	
 	<xsl:template match="table">
-		<xsl:if test="parent::array/@id">
-			<xsl:text>[[array_</xsl:text><xsl:value-of select="parent::array/@id"/><xsl:text>]]&#xa;</xsl:text>
+		<xsl:if test="parent::array">
+			<xsl:if test="parent::array/@id">
+				<xsl:text>[[array_</xsl:text><xsl:value-of select="parent::array/@id"/><xsl:text>]]&#xa;</xsl:text>
+			</xsl:if>
 			<xsl:text>[%unnumbered]&#xa;</xsl:text>
 		</xsl:if>
 		
