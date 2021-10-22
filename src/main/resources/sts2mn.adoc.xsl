@@ -1075,6 +1075,7 @@
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:text>[bibliography]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
+			<xsl:call-template name="setId"/>
 			<xsl:apply-templates />
 		</redirect:write>
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
