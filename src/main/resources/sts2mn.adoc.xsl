@@ -4358,6 +4358,9 @@
 	<!-- Removing <sup>)</sup> immediately after <fn></fn>  -->
 	<xsl:template match="sup[normalize-space() = ')'][preceding-sibling::node()[1][self::fn]]" mode="linearize"/>
 	
+	<xsl:template match="tbx:source[italic and count(node()) = 1]" mode="linearize">
+		<tbx:note><xsl:apply-templates mode="linearize"/></tbx:note>
+	</xsl:template>
 	<!-- ========================================= -->
 	<!-- END XML Linearization -->
 	<!-- ========================================= -->
