@@ -645,11 +645,14 @@
 		<xsl:text>= </xsl:text>
 		<xsl:value-of select="originator"/>
 		<xsl:text> </xsl:text>
-		<xsl:call-template name="getDocNumber">
-			<xsl:with-param name="value" select="doc-number"/>
-		</xsl:call-template>
+		<xsl:variable name="docnumber">
+			<xsl:call-template name="getDocNumber">
+				<xsl:with-param name="value" select="doc-number"/>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:value-of select="$docnumber"/>
 		
-		<xsl:if test="part-number != ''">
+		<xsl:if test="part-number != '' and not(contains($docnumber, concat('-', part-number)))">
 			<xsl:text>-</xsl:text>
 			<xsl:value-of select="part-number"/>
 		</xsl:if>
@@ -668,7 +671,13 @@
 				<xsl:with-param name="value" select="ancestor::*[self::front or self::adoption-front]//permissions/copyright-year"/>
 			</xsl:call-template>
 		</xsl:variable>
-		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($value), concat(':', $copyright-year, '$'), '')"/> <!-- remove copyright-year from end of docnumber -->
+		<xsl:variable name="regex_copyright-year" select="concat('(:', $copyright-year, ')?')"/>
+		<xsl:variable name="part" select="../part-number"/>
+		<xsl:variable name="regex_part" select="concat('(-', $part, ')?')"/>
+		
+		<!-- remove part and copyright-year from end of docnumber -->
+		<!-- <xsl:value-of select="java:replaceAll(java:java.lang.String.new($value), concat(':', $copyright-year, '$'), '')"/>  -->
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($value), concat($regex_part, $regex_copyright-year, '$'), '')"/> 
 	</xsl:template>
 	
 	
