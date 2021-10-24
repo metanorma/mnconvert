@@ -1240,6 +1240,23 @@
 		<!-- [[ ]] -->
 		<!-- <xsl:call-template name="setId"/>
 		<xsl:text>&#xa;</xsl:text>		 -->
+
+		<xsl:variable name="level">
+			<xsl:call-template name="getLevelFromLabel"/>
+		</xsl:variable>
+		<!-- <xsl:text>level=</xsl:text><xsl:value-of select="$level"/><xsl:text>&#xa;</xsl:text> -->
+		<xsl:variable name="level_next_term">
+			<xsl:for-each select="following-sibling::*[1][self::term-sec]">
+				<xsl:call-template name="getLevelFromLabel"/>
+			</xsl:for-each>
+		</xsl:variable>
+		<!-- <xsl:text>level_next_term=</xsl:text><xsl:value-of select="$level_next_term"/><xsl:text>&#xa;</xsl:text> -->
+		
+		<!-- According to systematic order documentation (https://www.metanorma.org/author/iso/topics/markup/#systematic-order), non-terminal subclauses must be preceded by [.term] in order to get proper results. -->
+		<xsl:variable name="isThereNestedTerm" select="term-sec or $level_next_term &gt; $level"/>
+		<xsl:if test="normalize-space($isThereNestedTerm) = 'true'"> <!-- if there is nested term-sec -->
+			<xsl:text>[.term]&#xa;</xsl:text>
+		</xsl:if>
 		<xsl:apply-templates />
 	</xsl:template>
 	
@@ -3500,7 +3517,9 @@
 				</xsl:when>
 				<xsl:when test="$label != ''">
 					<!-- level from the element 'label' - count '.' -->
-					<xsl:value-of  select="string-length($label) - string-length(translate($label, '.', '')) + 2"/>
+					<xsl:call-template name="getLevelFromLabel">
+						<xsl:with-param name="label" select="$label"/>
+					</xsl:call-template>
 				</xsl:when>
 				<xsl:when test="ancestor::app-group">
 					<xsl:value-of select="$level_total - $level_standard - 2"/>
@@ -3530,6 +3549,12 @@
 			<xsl:with-param name="count" select="$level + $addon"/>
 		</xsl:call-template>
 		
+	</xsl:template>
+	
+	<!-- level from the element 'label' - count '.' -->
+	<xsl:template name="getLevelFromLabel">
+		<xsl:param name="label" select="label"/>
+		<xsl:value-of  select="string-length($label) - string-length(translate($label, '.', '')) + 2"/>
 	</xsl:template>
 	
 	<xsl:template name="getLevelListItem">
