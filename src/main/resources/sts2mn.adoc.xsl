@@ -2052,6 +2052,10 @@
 	</xsl:template>
 	
 	
+	<xsl:template match="title/break" priority="2">
+		<xsl:text>+++&lt;br/&gt;+++</xsl:text>
+	</xsl:template>
+	
 	<xsl:template match="break">
 		<xsl:text> +</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
