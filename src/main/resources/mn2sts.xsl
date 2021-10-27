@@ -1690,6 +1690,10 @@
 		</tbx:definition>
 	</xsl:template>
 
+	<xsl:template match="verbaldefinition">
+		<xsl:apply-templates />
+	</xsl:template>
+
 	<xsl:template match="termexample"> <!--  mode="termEntry" -->
 		<tbx:example>
 			<xsl:apply-templates />
@@ -1796,6 +1800,10 @@
 		</tbx:tig>
 	</xsl:template>
 	
+	<xsl:template match="expression | expression/name" priority="2">
+		<xsl:apply-templates/>
+	</xsl:template>
+	
 	<xsl:template match="p" name="p">
 		<!-- <xsl:if test="$debug = 'true'">
 			<xsl:message>DEBUG: p processing <xsl:number level="any" count="*[local-name() = 'p']"/></xsl:message>
@@ -1811,6 +1819,7 @@
 			</xsl:when> -->
 			<xsl:when test="$parent_name = 'termexample' or 
 														$parent_name = 'definition'  or 
+														$parent_name = 'verbaldefinition'  or 
 														$parent_name = 'termnote' or 
 														$parent_name = 'modification' or
 														$parent_name = 'dd'">
