@@ -1783,7 +1783,7 @@
 						<xsl:when test="normalize-space($xref_bibr_rid) != ''">
 							<xsl:value-of select="$xref_bibr_rid"/>
 							<xsl:text>,</xsl:text>
-							<xsl:value-of select="$text"/>
+							<xsl:value-of select="."/>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:variable name="first_text" select="$source_parts/item[1]"/>
@@ -1802,6 +1802,7 @@
 							<xsl:text>clause </xsl:text><xsl:value-of select="."/>
 						</xsl:when>
 						<xsl:otherwise>
+							<xsl:if test=". = 'definition'"><xsl:text>locality:</xsl:text></xsl:if>
 							<xsl:value-of select="."/>
 						</xsl:otherwise>
 					</xsl:choose>
@@ -1819,7 +1820,11 @@
 	
 	
 	<xsl:template match="tbx:source/bold | tbx:source/bold2" priority="2">
-		<xsl:text>clause </xsl:text><xsl:apply-templates />
+		<xsl:choose>
+			<xsl:when test="contains(preceding-sibling::node(), 'definition')"><xsl:text>=</xsl:text></xsl:when>
+			<xsl:otherwise><xsl:text>clause </xsl:text></xsl:otherwise>
+		</xsl:choose>
+		<xsl:apply-templates />
 	</xsl:template>
 	<xsl:template match="tbx:source/bold/xref[@ref-type = 'sec'] | tbx:source/bold2/xref[@ref-type = 'sec']" priority="2">
 		<xsl:apply-templates />
