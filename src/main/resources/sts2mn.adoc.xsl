@@ -1775,7 +1775,25 @@
 		
 		<xsl:variable name="xref_bibr_rid" select="following-sibling::xref[@ref-type='bibr']/@rid"/>
 		
+		<xsl:variable name="is_next_xref_bibr" select="normalize-space(following-sibling::*[1][self::xref[@ref-type='bibr']] and 1 = 1)"/>
+		<xsl:variable name="is_prev_xref_bibr" select="normalize-space(preceding-sibling::*[1][self::xref[@ref-type='bibr']] and 1 = 1)"/>
+		
 		<xsl:for-each select="$source_parts//item">
+			<xsl:variable name="item_text">
+				<xsl:choose>
+					<!-- remove [ before xref -->
+					<xsl:when test="position() = last() and $is_next_xref_bibr = 'true' and substring(., string-length(.)) = '['">
+						<xsl:value-of select="substring(., 1, string-length(.) - 1)"/>
+					</xsl:when>
+					<!-- remove ] after xref -->
+					<xsl:when test="position() = 1 and $is_prev_xref_bibr = 'true' and starts-with(., ']')">
+						<xsl:value-of select="substring(., 2)"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="."/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
 			<xsl:choose>
 				<xsl:when test="$isFirstText = 'true' and position() = 1">
 					<xsl:choose>
@@ -1783,27 +1801,27 @@
 						<xsl:when test="normalize-space($xref_bibr_rid) != ''">
 							<xsl:value-of select="$xref_bibr_rid"/>
 							<xsl:text>,</xsl:text>
-							<xsl:value-of select="."/>
+							<xsl:value-of select="$item_text"/>
 						</xsl:when>
 						<xsl:otherwise>
-							<xsl:variable name="first_text" select="$source_parts/item[1]"/>
+							<!-- <xsl:variable name="first_text" select="$source_parts/item[1]"/> -->
 							<xsl:call-template name="getStdRef">
-								<xsl:with-param name="text" select="$first_text"/>
+								<xsl:with-param name="text" select="$item_text"/>
 							</xsl:call-template>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:choose>
-						<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^(Clause(\s|\h)+)[0-9]+(\.[0-9]+)*$', normalize-space(.)) = 'true'"> <!-- Example: Clause 4 -->
-							<xsl:value-of select="java:toLowerCase(java:java.lang.String.new(.))"/>
+						<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^(Clause(\s|\h)+)[0-9]+(\.[0-9]+)*$', normalize-space($item_text)) = 'true'"> <!-- Example: Clause 4 -->
+							<xsl:value-of select="java:toLowerCase(java:java.lang.String.new($item_text))"/>
 						</xsl:when>
-						<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^[0-9]+(\.[0-9]+)*$', normalize-space(.)) = 'true'"> <!-- Example: 3.23 or 3.2.4 -->
-							<xsl:text>clause </xsl:text><xsl:value-of select="."/>
+						<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^[0-9]+(\.[0-9]+)*$', normalize-space($item_text)) = 'true'"> <!-- Example: 3.23 or 3.2.4 -->
+							<xsl:text>clause </xsl:text><xsl:value-of select="$item_text"/>
 						</xsl:when>
 						<xsl:otherwise>
-							<xsl:if test=". = 'definition'"><xsl:text>locality:</xsl:text></xsl:if>
-							<xsl:value-of select="."/>
+							<xsl:if test="$item_text = 'definition'"><xsl:text>locality:</xsl:text></xsl:if>
+							<xsl:value-of select="$item_text"/>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:otherwise>
@@ -1829,10 +1847,8 @@
 	<xsl:template match="tbx:source/bold/xref[@ref-type = 'sec'] | tbx:source/bold2/xref[@ref-type = 'sec']" priority="2">
 		<xsl:apply-templates />
 	</xsl:template>
-	<xsl:template match="tbx:source/xref[@ref-type = 'bibr']" priority="2">
-		<!-- to do -->
-		<xsl:apply-templates />
-	</xsl:template>
+	<xsl:template match="tbx:source/xref[@ref-type = 'bibr']" priority="2" />
+		
 	<xsl:template match="tbx:source/xref[@ref-type = 'fn']" priority="3">
 		<!-- to do -->
 		<xsl:apply-templates />
