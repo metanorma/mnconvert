@@ -1690,7 +1690,11 @@
 		</tbx:definition>
 	</xsl:template>
 
-	<xsl:template match="verbaldefinition">
+	<xsl:template match="verbaldefinition | nonverbalrepresentation">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="letter-symbol">
 		<xsl:apply-templates />
 	</xsl:template>
 
@@ -1823,6 +1827,7 @@
 														$parent_name = 'termnote' or 
 														$parent_name = 'modification' or
 														$parent_name = 'dd'">
+				<xsl:if test="preceding-sibling::*[1][self::p]"><break /></xsl:if>
 				<xsl:apply-templates />
 			</xsl:when>
 			<xsl:otherwise>
@@ -2084,6 +2089,10 @@
 
 	<xsl:template match="sup[stem]">
 		<xsl:apply-templates />
+	</xsl:template>
+
+	<xsl:template match="pre">
+		<preformat><xsl:apply-templates /></preformat>
 	</xsl:template>
 
 	<!-- <xsl:template match="*[local-name() = 'definition']//*[local-name() = 'em']" priority="2"> -->
@@ -2585,7 +2594,13 @@
 		</xsl:element>
 	</xsl:template>
 	
-	<xsl:template match="figure">
+	<xsl:template match="li/figure" priority="2">
+		<p>
+			<xsl:call-template name="figure"/>
+		</p>
+	</xsl:template>
+	
+	<xsl:template match="figure" name="figure">
 		<xsl:variable name="current_id">
 			<xsl:call-template name="getId"/>
 		</xsl:variable>
@@ -2690,24 +2705,30 @@
 		<xsl:apply-templates />
 	</xsl:template>
 	
-	<xsl:template match="stem">
+	<xsl:template match="formula/stem" priority="2">
 		<xsl:if test="parent::th[strong]">
 			<xsl:text disable-output-escaping="yes">&lt;/bold&gt;</xsl:text>
 		</xsl:if>
 		<disp-formula>
-			<xsl:if test="parent::formula">
-				<xsl:variable name="current_id" select="../@id"/>		
-				<!-- <xsl:variable name="id" select="$elements//element[@source_id = $current_id]/@id"/> -->
-				<xsl:variable name="id"><xsl:value-of select="$current_id"/></xsl:variable><!-- <xsl:call-template name="getId"/> -->
-				<xsl:attribute name="id">
-					<xsl:value-of select="$id"/>
-				</xsl:attribute>
-			</xsl:if>
+			<!-- <xsl:variable name="current_id" select="../@id"/>		 -->
+			<!-- <xsl:variable name="id" select="$elements//element[@source_id = $current_id]/@id"/> -->
+			<!-- <xsl:variable name="id"><xsl:value-of select="$current_id"/></xsl:variable> --> <!-- <xsl:call-template name="getId"/> -->
+			<!-- <xsl:attribute name="id">
+				<xsl:value-of select="$id"/>
+			</xsl:attribute> -->
+			<xsl:copy-of select="../@id"/>
 			<xsl:apply-templates />
 		</disp-formula>
 		<xsl:if test="parent::th[strong]">
 			<xsl:text disable-output-escaping="yes">&lt;bold&gt;</xsl:text>
 		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="stem">
+		<inline-formula>
+			<xsl:copy-of select="@id"/>
+			<xsl:apply-templates />
+		</inline-formula>
 	</xsl:template>
 	
 	<xsl:template match="mml:*">
@@ -2731,7 +2752,7 @@
 	
 	<xsl:template match="review"/>
 
-	<xsl:template match="sourcecode">
+	<xsl:template match="sourcecode_old">
 		<xsl:choose>
 			<xsl:when test="$format = 'NISO'">
 				<code>
@@ -2741,18 +2762,25 @@
 			</xsl:when>
 			<!-- ISO -->
 			<xsl:otherwise>
-				<preformat>
+				<code>
 					<xsl:if test="@lang">
-						<xsl:attribute name="preformat-type">
+						<xsl:attribute name="language"> <!-- preformat-type -->
 							<xsl:value-of select="@lang"/>
 						</xsl:attribute>
 					</xsl:if>
 					<xsl:apply-templates/>
-				</preformat>
+				</code>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-		
+	
+	<xsl:template match="sourcecode">
+		<code>
+			<xsl:apply-templates select="@*"/>
+			<xsl:apply-templates/>
+		</code>
+	</xsl:template>
+	
 	<xsl:template match="sourcecode/@lang">
 		<xsl:attribute name="language">
 			<xsl:value-of select="."/>
