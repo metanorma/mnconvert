@@ -2752,7 +2752,7 @@
 	
 	<xsl:template match="review"/>
 
-	<xsl:template match="sourcecode_old">
+	<xsl:template match="sourcecode">
 		<xsl:choose>
 			<xsl:when test="$format = 'NISO'">
 				<code>
@@ -2762,23 +2762,16 @@
 			</xsl:when>
 			<!-- ISO -->
 			<xsl:otherwise>
-				<code>
+				<preformat>
 					<xsl:if test="@lang">
-						<xsl:attribute name="language"> <!-- preformat-type -->
+						<xsl:attribute name="preformat-type">
 							<xsl:value-of select="@lang"/>
 						</xsl:attribute>
 					</xsl:if>
 					<xsl:apply-templates/>
-				</code>
+				</preformat>
 			</xsl:otherwise>
 		</xsl:choose>
-	</xsl:template>
-	
-	<xsl:template match="sourcecode">
-		<code>
-			<xsl:apply-templates select="@*"/>
-			<xsl:apply-templates/>
-		</code>
 	</xsl:template>
 	
 	<xsl:template match="sourcecode/@lang">
