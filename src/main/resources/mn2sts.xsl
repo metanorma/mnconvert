@@ -288,15 +288,34 @@
 			
 			<xsl:variable name="section_bolded" select="($name = 'clause' or $name = 'terms') and $section != ''"/>
 			
-			<element source_id="{$source_id}" id="{$id}" section="{$section}" section_prefix="{$section_prefix}" section_bolded="{$section_bolded}" parent="{$parent}"/>
-			<xsl:if test="$debug = 'true'">
-				<!-- <xsl:message><xsl:value-of select="$source_id"/></xsl:message> -->
-			</xsl:if>
+			<xsl:variable name="wrapper" select="$name"/>
+			
+			<xsl:choose>
+				<xsl:when test="$name = 'terms'">
+					<terms id="{@id}">
+						<element source_id="{$source_id}" id="{$id}" section="{$section}" section_prefix="{$section_prefix}" section_bolded="{$section_bolded}" parent="{$parent}"/>
+						<xsl:apply-templates mode="elements">
+							<xsl:with-param name="sectionNum" select="$sectionNum_"/>
+						</xsl:apply-templates>
+					</terms>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:element name="{$wrapper}">
+						<element source_id="{$source_id}" id="{$id}" section="{$section}" section_prefix="{$section_prefix}" section_bolded="{$section_bolded}" parent="{$parent}"/>
+					</xsl:element>
+				</xsl:otherwise>
+			</xsl:choose>
+			
+			<!-- <xsl:if test="$debug = 'true'">
+				<xsl:message><xsl:value-of select="$source_id"/></xsl:message>
+			</xsl:if> -->
 		</xsl:if>
 		
-		<xsl:apply-templates mode="elements">
-			<xsl:with-param name="sectionNum" select="$sectionNum_"/>
-		</xsl:apply-templates>
+		<xsl:if test="$name != 'terms'">
+			<xsl:apply-templates mode="elements">
+				<xsl:with-param name="sectionNum" select="$sectionNum_"/>
+			</xsl:apply-templates>
+		</xsl:if>
 	</xsl:template>
 		
 	<xsl:template name="getId">
@@ -338,7 +357,14 @@
 	
 	<!-- root element, for example: iso-standard -->
 	<xsl:template match="/*">
+		<xsl:variable name="startTime" select="java:getTime(java:java.util.Date.new())"/>
+		
 		<xsl:apply-templates select="$xml" mode="xml"/>
+    
+		<xsl:variable name="endTime" select="java:getTime(java:java.util.Date.new())"/>
+		<xsl:if test="$debug = 'true'">
+			<xsl:message>DEBUG: processing time <xsl:value-of select="$endTime - $startTime"/> msec.</xsl:message>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="/*" mode="xml">
@@ -1606,7 +1632,12 @@
 			</xsl:choose>
 		</xsl:variable> -->
 		<xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
-		<xsl:variable name="section" select="$elements//element[@source_id = $current_id]/@section"/>
+		<xsl:variable name="section">
+			<xsl:choose>
+				<xsl:when test="self::terms"><xsl:value-of select="$elements/elements/terms[@id = current()/@id]/element[@source_id = $current_id]/@section"/></xsl:when>
+				<xsl:otherwise><xsl:value-of select="$elements//element[@source_id = $current_id]/@section"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
 		
 		<sec id="{$id}">
 			<xsl:if test="normalize-space($sec_type) != ''">
@@ -1635,6 +1666,9 @@
 		<!-- <xsl:variable name="id" select="$elements//element[@source_id = $current_id]/@id"/> -->
 		
 		<!-- <xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable> -->
+		<!-- <xsl:if test="$debug = 'true'">
+			<xsl:message>DEBUG: term '<xsl:value-of select="normalize-space(preferred)"/>' processing </xsl:message>
+		</xsl:if> -->
 		
 		<xsl:variable name="section">
 			<xsl:choose>
@@ -1642,8 +1676,8 @@
 					<xsl:value-of select="name"/>
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:value-of select="$elements//element[@source_id = $current_id]/@section"/>
-					<!-- <xsl:value-of select="$sectionNum"/> -->
+					<xsl:variable name="terms_id" select="../@id"/>
+					<xsl:value-of select="$elements/elements/terms[@id = $terms_id]/term//element[@source_id = $current_id]/@section"/>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -1657,17 +1691,17 @@
 																										self::term)]">
 						<xsl:with-param name="sectionNum" select="$sectionNum"/>
 					</xsl:apply-templates>
-					<xsl:apply-templates select="termexample"><!--  mode="termEntry"> -->
+					<xsl:apply-templates select="termexample">
 						<xsl:with-param name="sectionNum" select="$sectionNum"/>
 					</xsl:apply-templates>
-					<xsl:apply-templates select="termnote"> <!--  mode="termEntry" -->
+					<xsl:apply-templates select="termnote">
 						<xsl:with-param name="sectionNum" select="$sectionNum"/>
 					</xsl:apply-templates>
-					<xsl:apply-templates select="termsource"> <!--  mode="termEntry" -->
+					<xsl:apply-templates select="termsource">
 						<xsl:with-param name="sectionNum" select="$sectionNum"/>
 					</xsl:apply-templates>
 					
-					<xsl:apply-templates select="preferred | admitted | deprecates | domain"> <!--  mode="termEntry" -->
+					<xsl:apply-templates select="preferred | admitted | deprecates | domain">
 						<xsl:with-param name="sectionNum" select="$sectionNum"/>
 					</xsl:apply-templates>
 					
