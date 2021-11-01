@@ -23,6 +23,7 @@
 	<xsl:param name="typestandard" />
 	
 	<xsl:param name="semantic">false</xsl:param>
+	<xsl:variable name="semantic_" select="normalize-space($semantic)"/>
 	
 	<xsl:variable name="organization">
 		<xsl:choose>
@@ -1253,7 +1254,6 @@
 	<!-- End Table processing -->
 	<!-- ============= -->
 	
-
 	
 	<xsl:template match="p">
 		<xsl:element name="{local-name()}">
@@ -1265,13 +1265,57 @@
 	<xsl:template match="title">
 		<xsl:element name="{local-name()}">
 			<xsl:apply-templates select="@*"/>
+			<xsl:if test="$semantic_ = 'false'">
+				<xsl:variable name="label" select="parent::sec/label"/>
+				<xsl:variable name="calculated_level">
+					<xsl:value-of select="string-length($label) - string-length(translate($label, '.', '')) + 1"/>
+				</xsl:variable>
+				<xsl:variable name="level_">
+					<xsl:call-template name="getLevel">
+						<xsl:with-param name="calculated_level" select="$calculated_level"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:variable name="level" select="normalize-space($level_)"/>
+				<xsl:if test="$level != '0'">
+					<xsl:attribute name="depth"><xsl:value-of select="$level"/></xsl:attribute>
+				</xsl:if>
+			</xsl:if>
 			<xsl:apply-templates select="parent::sec/label" mode="label"/>
 			<xsl:apply-templates />
 		</xsl:element>
 	</xsl:template>
 	
+	<xsl:template name="getLevel">
+		<xsl:param name="addon">0</xsl:param>
+		<xsl:param name="calculated_level">0</xsl:param>
+		
+		<xsl:variable name="level_total" select="count(ancestor::*)"/>
+		
+		<xsl:variable name="level_standard" select="count(ancestor::standard/ancestor::*)"/>
+		
+		<xsl:variable name="label" select="normalize-space(preceding-sibling::*[1][self::label])"/>
+		
+		<xsl:variable name="level">
+			<xsl:choose>
+				<xsl:when test="$calculated_level != 0">
+					<xsl:value-of select="$calculated_level"/>
+				</xsl:when>
+				<xsl:when test="ancestor::app-group">
+					<xsl:value-of select="$level_total - $level_standard - 2"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$level_total - $level_standard - 1"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:value-of select="$level"/>
+	</xsl:template>
+	
 	<xsl:template match="label" mode="label">
-		<xsl:apply-templates/><tab/>
+		<xsl:if test="$semantic_ = 'false'">
+			<xsl:apply-templates/><tab/>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="label" mode="label_name">
@@ -1743,23 +1787,38 @@
 	</xsl:template>
 	
 	<xsl:template match="named-content">
-		<xref>
-			<xsl:attribute name="target">
-				<xsl:choose>
-					<xsl:when test="translate(@xlink:href, '#', '') = ''"> <!-- empty xlink:href -->
-						<xsl:value-of select="translate(normalize-space(), ' ()', '---')"/>
-					</xsl:when>
-					<xsl:when test="starts-with(@xlink:href, '#')">
-						<xsl:value-of select="substring-after(@xlink:href, '#')"/>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:value-of select="@xlink:href"/>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:attribute>
-			<xsl:copy-of select="@content-type"/>
-			<xsl:apply-templates />
-		</xref>
+		<xsl:variable name="target">
+			<xsl:choose>
+				<xsl:when test="translate(@xlink:href, '#', '') = ''"> <!-- empty xlink:href -->
+					<xsl:value-of select="translate(normalize-space(), ' ()', '---')"/>
+				</xsl:when>
+				<xsl:when test="starts-with(@xlink:href, '#')">
+					<xsl:value-of select="substring-after(@xlink:href, '#')"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="@xlink:href"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="$semantic_ = 'true' and (@content-type = 'term' and (local-name(//*[@id = $target]) = 'term-sec' or local-name(//*[@id = $target]) = 'termEntry'))">
+				<xsl:variable name="term_real" select="//*[@id = $target]//tbx:term[1]"/>
+				<concept>
+					<refterm><xsl:value-of select="$term_real"/></refterm>
+					<renderterm><xsl:value-of select="."/></renderterm>
+					<xref target="{$target}"/>
+				</concept>
+			</xsl:when>
+			<xsl:otherwise>
+				<xref>
+					<xsl:attribute name="target">
+						<xsl:value-of select="$target"/>
+					</xsl:attribute>
+					<xsl:copy-of select="@content-type"/>
+					<xsl:apply-templates />
+				</xref>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="sub-part">
