@@ -506,6 +506,8 @@
 				<xsl:with-param name="element_name" select="$element_name"/>
 			</xsl:apply-templates>
 			
+			<xsl:apply-templates select="preface/clause[@type = 'front_notes']" mode="front_notes"/>
+			
 			<xsl:call-template name="insert_publication_info"/>
 			
 			<xsl:apply-templates select="preface" mode="front_preface"/>
@@ -615,6 +617,13 @@
 	<xsl:template match="bibdata/docidentifier[@type = 'ISBN']" mode="publication_info">
 		<p>ISBN <xsl:apply-templates /></p>
 	</xsl:template>
+	
+	<xsl:template match="preface/clause[@type = 'front_notes']" mode="front_notes">
+		<notes>
+			<xsl:apply-templates />
+		</notes>
+	</xsl:template>
+	<xsl:template match="preface/clause[@type = 'front_notes']" priority="2" mode="front_preface"/>
 	
 	<xsl:template match="preface/clause[@type = 'related-refs']" priority="2" mode="front_preface"/>
 	<xsl:template match="preface/clause[@type = 'related-refs']"  mode="publication_info">

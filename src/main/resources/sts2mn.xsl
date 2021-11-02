@@ -183,8 +183,9 @@
 					</copyright-statement>
 				</boilerplate>
 			</xsl:if>
-			<xsl:if test="sec">
+			<xsl:if test="sec or notes">
 				<preface>
+					<xsl:apply-templates select="notes" mode="preface"/>
 					<xsl:apply-templates select="sec" mode="preface"/>
 					<xsl:if test="$nat_meta_only = 'true'"> <!-- move Introduction section from body to preface, if  nat_meta_only -->
 						<xsl:apply-templates select="/standard/body/sec[@sec-type = 'intro']" mode="preface"/>
@@ -440,6 +441,7 @@
 															reg-meta/std-ident/suppl-version |
 															nat-meta/std-ident/suppl-type |
 															reg-meta/std-ident/suppl-type |
+															front/notes |
 															front/sec" mode="bibdata_check"/>
 	
 	
@@ -878,6 +880,11 @@
 	<!-- <xsl:template match="processing-instruction()"/> -->
 	<xsl:template match="processing-instruction('foreward')"/>
 	
+	<xsl:template match="front/notes" mode="preface">
+		<clause type="front_notes" inline-header="false" obligation="informative">
+			<xsl:apply-templates />
+		</clause>
+	</xsl:template>
 	
 	<xsl:template match="front/sec | body/sec[@sec-type = 'intro']" mode="preface">
 		<xsl:variable name="sec_type" select="normalize-space(@sec-type)"/>

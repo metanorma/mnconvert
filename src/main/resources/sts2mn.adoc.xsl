@@ -1020,6 +1020,15 @@
 	<!-- end bibdata (standard/front) -->
 	<!-- =========== -->
 	
+	<xsl:template match="front/notes" priority="2">
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>[.preface,type="front_notes"]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>== {blank}</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:apply-templates />
+	</xsl:template>
+	
 	<xsl:template match="front/sec[@sec-type = 'publication_info']" priority="2">
 		<!-- process only Amendments/corrigenda table, because other data implemented in metanorma gem -->
 		<xsl:if test="*[@content-type = 'ace-table']">
