@@ -31,6 +31,7 @@
 		<xsl:choose>
 			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '59752'">true</xsl:when>
 			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '36786'">true</xsl:when>
+			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '69315'">true</xsl:when>
 			<xsl:otherwise>false</xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable> 
