@@ -1964,13 +1964,20 @@
 	<!-- End of relref processing -->
 	<!-- ================ -->
 	
-	<xsl:template match="contact[not(parent::section)]">
+	<xsl:template match="contact"> <!-- [not(parent::section)] -->
 		<xsl:apply-templates select="@*"/>
 		<xsl:apply-templates />
+		<xsl:if test="following-sibling::node()[1][self::contact]">
+			<xsl:text>; </xsl:text>
+		</xsl:if>
 	</xsl:template>
 	
-	<xsl:template match="contact[not(parent::section)]/@*">
+	<xsl:template match="contact/@*"> <!-- [not(parent::section)] -->
 		<xsl:value-of select="."/>
+	</xsl:template>
+	
+	<xsl:template match="contact/organization[normalize-space(text()) != ''] | contact/address/*[normalize-space(text()) != ''] | contact/address/postal/*[normalize-space(text()) != '']">
+		<xsl:text>, </xsl:text><xsl:apply-templates />
 	</xsl:template>
 	
 	<!-- ================ -->
