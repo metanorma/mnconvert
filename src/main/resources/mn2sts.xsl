@@ -1392,6 +1392,8 @@
 	</xsl:template>
 	
 	
+	<xsl:template match="bibitem[starts-with(@id, 'hidden_bibitem_')]" priority="3"/>
+	
 	<xsl:template match="bibitem[1][ancestor::references[@normative='true']]" priority="2">
 		<ref-list content-type="norm-refs">
 			<xsl:for-each select="../bibitem">
@@ -2089,7 +2091,14 @@
 						<xsl:value-of select="$docidentifier_URN"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:value-of select="$reference"/>
+						<xsl:choose>
+							<xsl:when test="starts-with($reference, 'hidden_bibitem_')">
+								<xsl:value-of select="substring-after($reference, 'hidden_bibitem_')"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="$reference"/>
+							</xsl:otherwise>
+						</xsl:choose>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:attribute>
