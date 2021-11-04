@@ -2567,6 +2567,10 @@
 		</th>
 	</xsl:template>
 	
+	
+	<!-- =============================== -->
+	<!-- Definitions list processing -->
+	<!-- =============================== -->
 	<xsl:template match="dl">
 		<!-- <xsl:variable name="current_id">
 			<xsl:call-template name="getId"/>
@@ -2577,9 +2581,15 @@
 				<xsl:call-template name="create_array"/>
 			</xsl:when>
 			<xsl:otherwise>
-				<p>
+				<!-- <p>
 					<xsl:call-template name="create_array"/>
-				</p>
+				</p> -->
+				<def-list>
+					<xsl:if test="preceding-sibling::*[1][self::title][contains(normalize-space(), 'Abbrev')]">
+						<xsl:attribute name="type">abbreviations</xsl:attribute>
+					</xsl:if>
+					<xsl:apply-templates mode="dl"/>
+				</def-list>
 			</xsl:otherwise>
 		</xsl:choose>
 		
@@ -2614,7 +2624,6 @@
 		<tr>
 			<td align="left" scope="row" valign="top"><xsl:apply-templates/></td>
 			<xsl:apply-templates select="following-sibling::dd[1]" mode="array"/>
-			
 		</tr>
 	</xsl:template>
 	
@@ -2622,6 +2631,25 @@
 	<xsl:template match="dd" mode="array">
 		<td align="left" valign="top"><xsl:apply-templates/></td>
 	</xsl:template>
+	
+	<xsl:template match="dt" mode="dl">
+		<def-item>
+			<xsl:copy-of select="@id"/>
+			<term>
+				<xsl:apply-templates />
+			</term>
+			<def><xsl:apply-templates select="following-sibling::dd[1]" mode="dd"/></def>
+		</def-item>
+	</xsl:template>
+	
+	<xsl:template match="dd" mode="dl"/>
+	<xsl:template match="dd" mode="dd">
+		<p><xsl:apply-templates /></p>
+	</xsl:template>
+	
+	<!-- =============================== -->
+	<!-- END Definitions list processing -->
+	<!-- =============================== -->
 	
 	<xsl:template match="figure[figure]" priority="1">
 		<xsl:variable name="current_id">
