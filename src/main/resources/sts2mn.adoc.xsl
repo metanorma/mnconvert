@@ -137,30 +137,33 @@
 	</xsl:variable>
 	<xsl:variable name="index" select="xalan:nodeset($index_)"/>
 	
-	<xsl:template match="/">
 	
-		<xsl:variable name="linearized_xml">
-			<xsl:apply-templates select="." mode="linearize"/>
-		</xsl:variable>
+	<xsl:variable name="linearized_xml">
+		<xsl:apply-templates select="/" mode="linearize"/>
+	</xsl:variable>
+	
+	<xsl:variable name="remove_word_clause_xml">
+		<xsl:apply-templates select="xalan:nodeset($linearized_xml)" mode="remove_word_clause"/>
+	</xsl:variable>
+
+	<xsl:variable name="unconstrained_formatting_xml">
+		<xsl:apply-templates select="xalan:nodeset($remove_word_clause_xml)" mode="unconstrained_formatting"/>
+	</xsl:variable>
+
+	<xsl:variable name="ref_fix">
+		<xsl:apply-templates select="xalan:nodeset($unconstrained_formatting_xml)" mode="ref_fix"/>
+	</xsl:variable>
+	
+	<xsl:variable name="updated_xml" select="xalan:nodeset($ref_fix)"/>
+	
+	<xsl:template match="/">
 	
 		<!-- <redirect:write file="{$outpath}/{$docfile_name}.linearized.xml">
 			<xsl:copy-of select="$linearized_xml"/>
 		</redirect:write>
 		<xsl:message>Linearized xml saved.</xsl:message> -->
   
-		<xsl:variable name="remove_word_clause_xml">
-			<xsl:apply-templates select="xalan:nodeset($linearized_xml)" mode="remove_word_clause"/>
-		</xsl:variable>
-	
-		<xsl:variable name="unconstrained_formatting_xml">
-			<xsl:apply-templates select="xalan:nodeset($remove_word_clause_xml)" mode="unconstrained_formatting"/>
-		</xsl:variable>
-	
-		<xsl:variable name="ref_fix">
-			<xsl:apply-templates select="xalan:nodeset($unconstrained_formatting_xml)" mode="ref_fix"/>
-		</xsl:variable>
-	
-		<xsl:for-each select="xalan:nodeset($ref_fix)">
+		<xsl:for-each select="$updated_xml">
 	
 			<xsl:choose>
 				<xsl:when test=".//sub-part"> <!-- multiple documents in one xml -->
@@ -435,6 +438,10 @@
 					<xsl:otherwise>
 						<redirect:write file="{$outpath}/{$filename}">
 							<xsl:text>&#xa;</xsl:text>
+							<xsl:if test="title = 'National foreword' or title = 'European foreword'">
+								<xsl:text>[.preface]</xsl:text>
+								<xsl:text>&#xa;</xsl:text>
+							</xsl:if>
 							<xsl:apply-templates select="."/>
 						</redirect:write>
 						<redirect:write file="{$outpath}/{$docfile}">
@@ -1696,15 +1703,21 @@
 			</xsl:choose>
 		</xsl:variable>
 		
-		<!-- @stdid attribute was added in linearize.xsl -->
-		<xsl:variable name="ref_by_stdid" select="//ref[@stdid = current()/@stdid or @stdid_option = current()/@stdid]"/> <!-- find ref by id -->
+		<xsl:variable name="reference">
+			<xsl:call-template name="getReference">
+				<xsl:with-param name="stdid" select="current()/@stdid"/>
+			</xsl:call-template>
+		</xsl:variable>
 		
 		<xsl:choose>
-			<xsl:when test="xalan:nodeset($ref_by_stdid)/*"> <!-- if references in References found, then put id of those reference -->
-				<xsl:value-of select="xalan:nodeset($ref_by_stdid)/@id"/>
+			<!-- <xsl:when test="xalan:nodeset($ref_by_stdid)/*"> --> <!-- if references in References found, then put id of those reference -->
+			<xsl:when test="$reference != ''"> <!-- if references in References found, then put id of those reference -->
+				<!-- <xsl:value-of select="xalan:nodeset($ref_by_stdid)/@id"/> -->
+				<xsl:value-of select="$reference"/>
 				<xsl:value-of select="$locality"/>
 			</xsl:when>
 			<xsl:otherwise> <!-- put id of current std -->
+				<xsl:text>hidden_bibitem_</xsl:text>
 				<xsl:value-of select="@stdid"/>
 				<xsl:value-of select="$locality"/>
 				<!-- if there isn't in References, then display name -->
@@ -1712,6 +1725,14 @@
 			</xsl:otherwise>
 		</xsl:choose>
 		
+	</xsl:template>
+	
+	
+	<xsl:template name="getReference">
+		<xsl:param name="stdid"/>
+		<!-- @stdid and @stdid_option attributes were added in linearize.xsl -->
+		<xsl:variable name="ref_by_stdid" select="normalize-space(//ref[@stdid = $stdid or @stdid_option = $stdid]/@id)"/> <!-- find ref by id -->
+		<xsl:value-of select="$ref_by_stdid"/>
 	</xsl:template>
 	
 	<xsl:template match="std-id-group"/>
@@ -2871,6 +2892,39 @@
 			<xsl:text>[bibliography]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:apply-templates />
+			
+			<!-- ===================== -->
+			<!-- insert hidden bibitem -->
+			<!-- ===================== -->
+			<xsl:variable name="hidden_bibitems">
+				<xsl:for-each select="$updated_xml//std[not(parent::ref)][@stdid != '']">
+					<xsl:variable name="reference">
+						<xsl:call-template name="getReference">
+							<xsl:with-param name="stdid" select="@stdid"/>
+						</xsl:call-template>
+					</xsl:variable>
+					<!-- reference=<xsl:value-of select="$reference"/><xsl:text>&#xa;</xsl:text> -->
+					<xsl:if test="normalize-space($reference) = ''">
+						<item>
+							<xsl:text>* [[[hidden_bibitem_</xsl:text>
+							<xsl:value-of select="@stdid"/>
+							<xsl:text>,</xsl:text><xsl:value-of select=".//std-ref/text()"/>
+							<xsl:text>]]]</xsl:text>
+						</item>
+					</xsl:if>
+				</xsl:for-each>
+			</xsl:variable>
+			<xsl:for-each select="xalan:nodeset($hidden_bibitems)//item">
+				<xsl:if test="not(preceding-sibling::item[text() = current()/text()])"> <!-- unique bibitems -->
+					<xsl:value-of select="."/>
+					<xsl:text>&#xa;</xsl:text>
+					<xsl:text>&#xa;</xsl:text>
+				</xsl:if>
+			</xsl:for-each>
+			<!-- ===================== -->
+			<!-- END insert hidden bibitem -->
+			<!-- ===================== -->
+			
 		</redirect:write>
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$docfile}">
