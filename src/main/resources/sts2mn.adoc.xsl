@@ -2905,7 +2905,7 @@
 					</xsl:variable>
 					<!-- reference=<xsl:value-of select="$reference"/><xsl:text>&#xa;</xsl:text> -->
 					<xsl:if test="normalize-space($reference) = ''">
-						<item>
+						<item id="{@stdid}">
 							<xsl:text>* [[[hidden_bibitem_</xsl:text>
 							<xsl:value-of select="@stdid"/>
 							<xsl:text>,</xsl:text><xsl:value-of select=".//std-ref/text()"/>
@@ -2915,7 +2915,7 @@
 				</xsl:for-each>
 			</xsl:variable>
 			<xsl:for-each select="xalan:nodeset($hidden_bibitems)//item">
-				<xsl:if test="not(preceding-sibling::item[text() = current()/text()])"> <!-- unique bibitems -->
+				<xsl:if test="not(preceding-sibling::item[@id = current()/@id])"> <!-- unique bibitems -->
 					<xsl:value-of select="."/>
 					<xsl:text>&#xa;</xsl:text>
 					<xsl:text>&#xa;</xsl:text>
