@@ -2187,9 +2187,20 @@
 	</xsl:template>
 	
 	<xsl:template match="sc">
-		<xsl:text>[smallcap]#</xsl:text>
-		<xsl:apply-templates />
-		<xsl:text>#</xsl:text>
+		<xsl:variable name="prev_text" select="preceding-sibling::node()[self::text()]"/>
+		<xsl:variable name="prev_text_last_char" select="substring($prev_text, string-length($prev_text))"/>
+		<xsl:choose>
+			<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('\w', $prev_text_last_char) = 'true'">
+				<xsl:text>+++&lt;smallcap&gt;+++</xsl:text>
+				<xsl:apply-templates />
+				<xsl:text>+++&lt;/smallcap&gt;+++</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text>[smallcap]#</xsl:text>
+				<xsl:apply-templates />
+				<xsl:text>#</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="ext-link">
