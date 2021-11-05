@@ -25,6 +25,13 @@
 	<xsl:param name="semantic">false</xsl:param>
 	<xsl:variable name="semantic_" select="normalize-space($semantic)"/>
 	
+	<xsl:variable name="type_xml">
+		<xsl:choose>
+			<xsl:when test="$semantic_ = 'true'">semantic</xsl:when>
+			<xsl:otherwise>presentation</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	
 	<xsl:variable name="organization">
 		<xsl:choose>
 			<xsl:when test="/standard/front/nat-meta/@originator = 'BSI' or /standard/front/iso-meta/secretariat = 'BSI'">BSI</xsl:when>
@@ -48,6 +55,7 @@
 		</xsl:choose>
 	</xsl:variable>
 	
+	<xsl:variable name="xml_collection_result_namespace">http://metanorma.org</xsl:variable>
 	<xsl:variable name="xml_result_namespace">https://www.metanorma.org/ns/<xsl:value-of select="$_typestandard"/></xsl:variable>
 
 	<xsl:variable name="nat_meta_only">
@@ -61,16 +69,66 @@
 					<xsl:apply-templates select="front"/>
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:element name="{$_typestandard}-standard">
-						<xsl:apply-templates />
-						<xsl:if test="body/sec[@sec-type = 'norm-refs'] or back/ref-list">
-							<bibliography>
-								<xsl:apply-templates select="body/sec[@sec-type = 'norm-refs']" mode="bibliography"/>
-								<xsl:apply-templates select="back/ref-list" mode="bibliography"/>
-							</bibliography>
-						 </xsl:if>
-					 <xsl:apply-templates select="//sec[@sec-type = 'index'] | //back/sec[@id = 'ind']" mode="index"/>
-					</xsl:element>
+					
+					<xsl:choose>
+						<xsl:when test=".//sub-part"> <!-- multiple documents in one xml -->
+							<metanorma-collection>
+								<bibdata type="collection">
+									<fetched></fetched>
+									<docidentifier type="bsi">bsidocs</docidentifier>
+								</bibdata>
+								<!-- first document -->
+								<doc-container id="doc000000000">
+									<xsl:element name="{$_typestandard}-standard">
+										<xsl:attribute name="type"><xsl:value-of select="$type_xml"/></xsl:attribute>
+										<xsl:apply-templates />
+										<xsl:if test="body/sub-part[1]/body/sec[@sec-type = 'norm-refs'] or back/ref-list">
+											<bibliography>
+												<xsl:apply-templates select="body/sub-part[1]/body/sec[@sec-type = 'norm-refs']" mode="bibliography"/>
+												<xsl:apply-templates select="body/sub-part[1]/back/ref-list" mode="bibliography"/>
+											</bibliography>
+										</xsl:if>
+										<xsl:apply-templates select="body/sub-part[1]//sec[@sec-type = 'index'] | body/sub-part[1]//back/sec[@id = 'ind']" mode="index"/>
+									</xsl:element>
+								</doc-container>
+								<!-- 2nd, 3rd, ... documents -->
+								<xsl:for-each select="body/sub-part[position() &gt; 1]">
+									<xsl:variable name="num" select="position()"/>
+									<doc-container id="{format-number($num, 'doc000000000')}">
+										<xsl:element name="{$_typestandard}-standard">
+											<xsl:attribute name="type"><xsl:value-of select="$type_xml"/></xsl:attribute>
+											<xsl:if test="body/*[not(self::sub-part)]">
+												<preface>
+													<xsl:apply-templates select="body/*[not(self::sub-part)]"/>
+												</preface>
+											</xsl:if>
+											<!-- sections -->
+											<xsl:apply-templates select="body/sub-part/*"/>
+											<xsl:if test=".//body/sec[@sec-type = 'norm-refs'] or back/ref-list">
+												<bibliography>
+													<xsl:apply-templates select=".//body/sec[@sec-type = 'norm-refs']" mode="bibliography"/>
+													<xsl:apply-templates select=".//back/ref-list" mode="bibliography"/>
+												</bibliography>
+											</xsl:if>
+										</xsl:element>
+									</doc-container>
+								</xsl:for-each>
+							</metanorma-collection>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:element name="{$_typestandard}-standard">
+								<xsl:attribute name="type"><xsl:value-of select="$type_xml"/></xsl:attribute>
+								<xsl:apply-templates />
+								<xsl:if test="body/sec[@sec-type = 'norm-refs'] or back/ref-list">
+									<bibliography>
+										<xsl:apply-templates select="body/sec[@sec-type = 'norm-refs']" mode="bibliography"/>
+										<xsl:apply-templates select="back/ref-list" mode="bibliography"/>
+									</bibliography>
+								</xsl:if>
+								<xsl:apply-templates select="//sec[@sec-type = 'index'] | //back/sec[@id = 'ind']" mode="index"/>
+							</xsl:element>
+						</xsl:otherwise>
+					</xsl:choose>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -89,8 +147,8 @@
 		<xsl:variable name="mathml_namespace">http://www.w3.org/1998/Math/MathML</xsl:variable>
 		<xsl:variable name="unknown_elements">
 			<xsl:for-each select="xalan:nodeset($xml_result)//*">
-				<xsl:if test="namespace::*[. != $xml_result_namespace and . != $xml_namespace and . != $mathml_namespace]">
-					<element>
+				<xsl:if test="namespace::*[. != $xml_result_namespace and . != $xml_namespace and . != $mathml_namespace and . != $xml_collection_result_namespace]">
+					<element namespace="{namespace::*}">
 						<xsl:for-each select="ancestor-or-self::*">
 							<xsl:value-of select="local-name()"/><xsl:if test="position() != last()">/</xsl:if>
 						</xsl:for-each>
@@ -1828,10 +1886,6 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	<xsl:template match="sub-part">
-		<xsl:apply-templates />
-	</xsl:template>
-	
 	<!-- Bibliography processing -->
 	<xsl:template match="body/sec[@sec-type = 'norm-refs']" mode="bibliography">
 		<references id="{@id}" normative="true">
@@ -1906,6 +1960,45 @@
 	</xsl:template>
 	
 	
+	<!-- =========================== -->
+	<!-- sub-part processing         -->
+	<!-- =========================== -->
+	
+	<xsl:template match="sub-part">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="body[sub-part]">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="body/sub-part[position() &gt; 1]" priority="2"/> <!-- ignore sub-parts for first document processing -->
+	<xsl:template match="sub-part">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="sub-part/title[normalize-space() = '']"/>
+	
+	<xsl:template match="body/graphic" priority="2"/>
+	
+	<xsl:template match="sub-part//sec[label = 'Foreword']">
+		<foreword>
+			<xsl:copy-of select="@id"/>
+			<xsl:apply-templates/>
+		</foreword>
+	</xsl:template>
+	
+	<xsl:template match="sub-part//sec[label = 'Introduction']">
+		<introduction>
+			<xsl:copy-of select="@id"/>
+			<xsl:apply-templates/>
+		</introduction>
+	</xsl:template>
+	
+	<!-- =========================== -->
+	<!-- END sub-part processing         -->
+	<!-- =========================== -->
+	
 	<xsl:template name="split">
 		<xsl:param name="pText" select="."/>
 		<xsl:param name="sep" select="'/'"/>
@@ -1941,7 +2034,17 @@
 	</xsl:template>
 	
 	<xsl:template match="*[namespace-uri()='']" mode="setNamespace">
-		<xsl:element name="{name()}" namespace="{$xml_result_namespace}">
+		<xsl:variable name="ns">
+			<xsl:choose>
+				<xsl:when test="ancestor-or-self::*[local-name() = concat($_typestandard, '-standard')]">
+					<xsl:value-of select="$xml_result_namespace"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$xml_collection_result_namespace"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:element name="{name()}" namespace="{$ns}">
 			<xsl:copy-of select="@*"/>
 			<xsl:apply-templates mode="setNamespace"/>
 		</xsl:element>
