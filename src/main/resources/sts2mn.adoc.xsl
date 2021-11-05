@@ -4729,9 +4729,11 @@
 				</xsl:attribute>
 			</xsl:if>
 			
-			<xsl:if test="normalize-space(@content-type = 'standard' and starts-with(label, '['))">
-				<xsl:attribute name="addTextToReference">true</xsl:attribute>
-			</xsl:if>
+			
+			<xsl:attribute name="addTextToReference">
+				<xsl:value-of select="normalize-space(@content-type = 'standard' and starts-with(label, '['))"/>
+			</xsl:attribute>
+			
 			
 			<xsl:apply-templates select="node()" mode="ref_fix"/>
 		</xsl:copy>
