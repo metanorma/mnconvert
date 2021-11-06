@@ -1778,7 +1778,37 @@
 		<xsl:text>[.source]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&lt;&lt;</xsl:text>
-		<xsl:apply-templates />
+			<xsl:variable name="result_parts_">
+				<xsl:apply-templates />
+			</xsl:variable>
+			
+			<xsl:variable name="result_parts">
+				<xsl:for-each select="xalan:nodeset($result_parts_)/item[1]">
+					<item>
+						<xsl:value-of select="."/>
+					</item>
+				</xsl:for-each>
+				<xsl:for-each select="xalan:nodeset($result_parts_)/*[self::locality or self::localityContinue]">
+					<xsl:copy>
+						<xsl:value-of select="."/>
+					</xsl:copy>
+				</xsl:for-each>
+				<xsl:for-each select="xalan:nodeset($result_parts_)/item[position() &gt; 1]">
+					<item>
+						<xsl:value-of select="."/>
+					</item>
+				</xsl:for-each>
+			</xsl:variable>
+			<xsl:for-each select="xalan:nodeset($result_parts)/*[normalize-space() != '']">
+				<xsl:value-of select="."/>
+				<xsl:if test="position() != last()">
+					<xsl:choose>
+						<xsl:when test="following-sibling::*[1][self::localityContinue]"></xsl:when>
+						<xsl:otherwise>,</xsl:otherwise>
+					</xsl:choose>
+				</xsl:if>
+			</xsl:for-each>
+			
 		<xsl:text>&gt;&gt;</xsl:text>
 		
 		<xsl:variable name="isModified" select="contains(normalize-space(.), ' modified')"/>
@@ -1866,6 +1896,11 @@
 									<xsl:value-of select="java:toLowerCase(java:java.lang.String.new($item_text))"/>
 								</locality>
 							</xsl:when>
+							<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^(Box(\s|\h)+)[0-9]+$', normalize-space($item_text)) = 'true'"> <!-- Example: Box 8 -->
+								<locality>
+									<xsl:text>locality:box=</xsl:text><xsl:value-of select="java:replaceAll(java:java.lang.String.new($item_text),'^(Box(\s|\h)+)([0-9]+)$','$3')"/>
+								</locality>
+							</xsl:when>
 							<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^[0-9]+(\.[0-9]+)*$', normalize-space($item_text)) = 'true'"> <!-- Example: 3.23 or 3.2.4 -->
 								<locality>
 									<xsl:text>clause </xsl:text><xsl:value-of select="$item_text"/>
@@ -1892,27 +1927,7 @@
 			</xsl:for-each>
 		</xsl:variable>
 		
-		<xsl:variable name="result_parts">
-			<xsl:for-each select="xalan:nodeset($result_parts_)/item[1]">
-				<item>
-					<xsl:value-of select="."/>
-				</item>
-			</xsl:for-each>
-			<xsl:for-each select="xalan:nodeset($result_parts_)/locality">
-				<item>
-					<xsl:value-of select="."/>
-				</item>
-			</xsl:for-each>
-			<xsl:for-each select="xalan:nodeset($result_parts_)/item[position() &gt; 1]">
-				<item>
-					<xsl:value-of select="."/>
-				</item>
-			</xsl:for-each>
-		</xsl:variable>
-		<xsl:for-each select="xalan:nodeset($result_parts)/*">
-			<xsl:value-of select="."/>
-			<xsl:if test="position() != last()">,</xsl:if>
-		</xsl:for-each>
+		<xsl:copy-of select="$result_parts_"/>
 	</xsl:template>
 	
 
@@ -1923,10 +1938,19 @@
 	
 	<xsl:template match="tbx:source/bold | tbx:source/bold2" priority="2">
 		<xsl:choose>
-			<xsl:when test="contains(preceding-sibling::node(), 'definition')"><xsl:text>=</xsl:text></xsl:when>
-			<xsl:otherwise><xsl:text>clause </xsl:text></xsl:otherwise>
+			<xsl:when test="contains(preceding-sibling::node(), 'definition')">
+				<localityContinue>
+					<xsl:text>=</xsl:text>
+					<xsl:apply-templates />
+				</localityContinue>
+			</xsl:when>
+			<xsl:otherwise>
+				<locality>
+					<xsl:text>clause </xsl:text>
+					<xsl:apply-templates />
+				</locality>
+			</xsl:otherwise>
 		</xsl:choose>
-		<xsl:apply-templates />
 	</xsl:template>
 	<xsl:template match="tbx:source/bold/xref[@ref-type = 'sec'] | tbx:source/bold2/xref[@ref-type = 'sec']" priority="2">
 		<xsl:apply-templates />
