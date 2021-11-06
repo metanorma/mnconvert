@@ -1783,7 +1783,7 @@
 			</xsl:variable>
 			
 			<xsl:variable name="result_parts">
-				<xsl:for-each select="xalan:nodeset($result_parts_)/item[1]">
+				<xsl:for-each select="xalan:nodeset($result_parts_)/node()[1]">
 					<item>
 						<xsl:value-of select="."/>
 					</item>
@@ -1793,13 +1793,13 @@
 						<xsl:value-of select="."/>
 					</xsl:copy>
 				</xsl:for-each>
-				<xsl:for-each select="xalan:nodeset($result_parts_)/item[position() &gt; 1]">
+				<xsl:for-each select="xalan:nodeset($result_parts_)/node()[position() &gt; 1 and not(self::locality or self::localityContinue)]">
 					<item>
 						<xsl:value-of select="."/>
 					</item>
 				</xsl:for-each>
 			</xsl:variable>
-			<xsl:for-each select="xalan:nodeset($result_parts)/*[normalize-space() != '']">
+			<xsl:for-each select="xalan:nodeset($result_parts)/node()[normalize-space() != '']">
 				<xsl:value-of select="."/>
 				<xsl:if test="position() != last()">
 					<xsl:choose>
@@ -1959,7 +1959,7 @@
 		
 	<xsl:template match="tbx:source/xref[@ref-type = 'fn']" priority="3">
 		<!-- to do -->
-		<xsl:apply-templates />
+		<!-- <xsl:apply-templates /> -->
 	</xsl:template>
 	
 	<xsl:template match="tbx:source/text()[last()]" name="source_text_modified" priority="2">
