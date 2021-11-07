@@ -64,7 +64,16 @@
 			
 			<xsl:variable name="addTextToReference" select="normalize-space(@content-type = 'standard' and starts-with(label, '['))"/>
 			
-			<ref id="{@id}" std-ref="{$text}" addTextToReference="{$addTextToReference}"/>
+			<xsl:variable name="referenceText">
+				<xsl:variable name="std-ref_">
+					<xsl:apply-templates select="std/std-ref" mode="references"/>
+				</xsl:variable>
+				<xsl:value-of select="translate($std-ref_, '&#x2011;', '-')"/>
+			</xsl:variable>
+			
+			<ref id="{@id}" std-ref="{$text}" addTextToReference="{$addTextToReference}">
+				<xsl:value-of select="normalize-space($referenceText)"/>
+			</ref>
 			
 			<xsl:variable name="isDated">
 				<xsl:choose>
@@ -73,7 +82,9 @@
 				</xsl:choose>
 			</xsl:variable>
 			<xsl:if test="$isDated = 'true'">
-				<ref id="{@id}" std-ref="{substring-before($text, ':')}" addTextToReference="{$addTextToReference}"/>
+				<ref id="{@id}" std-ref="{substring-before($text, ':')}" addTextToReference="{$addTextToReference}">
+					<xsl:value-of select="normalize-space($referenceText)"/>
+				</ref>
 			</xsl:if>
 		</xsl:for-each>
 	</xsl:variable>
@@ -3138,6 +3149,20 @@
 		</xsl:if>
 		
 		<xsl:if test="normalize-space($unique) = 'false'">
+			<xsl:message>WARNING: Repeated reference - <xsl:copy-of select="."/></xsl:message>
+		</xsl:if>
+		
+		<xsl:variable name="uniqueReferenceText">
+			<xsl:variable name="std-ref">
+				<xsl:variable name="std-ref_">
+					<xsl:apply-templates select="std/std-ref" mode="references"/>
+				</xsl:variable>
+				<xsl:value-of select="translate($std-ref_, '&#x2011;', '-')"/>
+			</xsl:variable>
+			<xsl:if test="count($refs/ref[text() = normalize-space($std-ref)]) &gt; 1">false</xsl:if>
+		</xsl:variable>
+		
+		<xsl:if test="normalize-space($uniqueReferenceText) = 'false'">
 			<xsl:message>WARNING: Repeated reference - <xsl:copy-of select="."/></xsl:message>
 		</xsl:if>
 		
