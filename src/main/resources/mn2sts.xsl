@@ -1403,7 +1403,7 @@
 	</xsl:template>
 	<xsl:template match="bibitem[position() &gt; 1][ancestor::references[@normative='true']]" priority="2"/>
 	
-	<xsl:variable name="count_non_normative_references" select="count(//references[not(@normative='true')])"/>
+	<xsl:variable name="count_non_normative_references" select="count($xml//references[not(@normative='true')])"/>
 	
 	<xsl:template match="bibitem" name="bibitem">
 		<!-- <xsl:variable name="current_id">
@@ -1438,9 +1438,18 @@
 				<xsl:otherwise>
 					<std>
 						<xsl:variable name="urn" select="docidentifier[@type = 'URN']"/>
-						<xsl:if test="normalize-space($urn) != ''">
-							<xsl:attribute name="std-id"><xsl:value-of select="$urn"/></xsl:attribute>
-						</xsl:if>
+						<xsl:variable name="docidentifier_URN" select="$bibitems_URN/bibitem[@id = $id]/urn"/>
+						<xsl:choose>
+							<xsl:when test="$docidentifier_URN != ''">
+								<xsl:attribute name="std-id">
+									<xsl:value-of select="$docidentifier_URN"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:when test="normalize-space($urn) != ''">
+								<xsl:attribute name="std-id"><xsl:value-of select="$urn"/></xsl:attribute>
+							</xsl:when>
+						</xsl:choose>
+						
 						<xsl:if test="eref/@citeas">
 							<xsl:attribute name="type">
 								<xsl:call-template name="setDatedUndatedType">
@@ -2054,10 +2063,18 @@
 	</xsl:template>
 	
 	<xsl:variable name="bibitems_URN_">
-		<xsl:for-each select="//bibitem[docidentifier[@type = 'URN']]">
+		<xsl:for-each select="$xml//bibitem[docidentifier[@type = 'URN']]">
 			<bibitem>
 				<xsl:copy-of select="@id"/>
-				<urn><xsl:value-of select="docidentifier[@type = 'URN']"/></urn>
+				<xsl:variable name="urn_" select="docidentifier[@type = 'URN']"/>
+				<!-- remove URN urn: at start -->
+				<xsl:variable name="urn__" select="java:replaceAll(java:java.lang.String.new($urn_),'^(URN )?(urn:)?','')"/>
+				<!-- remove :stage-xx.yy -->
+				<xsl:variable name="urn" select="java:replaceAll(java:java.lang.String.new($urn__),':stage-\d+\.\d+','')"/>
+				<!-- remove :ed-z -->
+				<!-- <xsl:variable name="urn" select="java:replaceAll(java:java.lang.String.new($urn___),':ed-\d+','')"/> -->
+				
+				<urn><xsl:value-of select="$urn"/></urn>
 			</bibitem>
 		</xsl:for-each>
 	</xsl:variable>
@@ -2085,10 +2102,19 @@
 			<xsl:variable name="reference" select="@bibitemid"/>
 			<!-- <xsl:variable name="docidentifier_URN" select="//*[local-name() = 'bibitem'][@id = $reference]/*[local-name() = 'docidentifier'][@type = 'URN']"/> -->
 			<xsl:variable name="docidentifier_URN" select="$bibitems_URN/bibitem[@id = $reference]/urn"/>
+			
 			<xsl:attribute name="std-id">
 				<xsl:choose>
 					<xsl:when test="$docidentifier_URN != ''">
 						<xsl:value-of select="$docidentifier_URN"/>
+						<!-- add localities -->
+						<xsl:for-each select="localityStack/locality">
+							<xsl:choose>
+								<xsl:when test="@type = 'annex' or @type = 'clause'">:clause:<xsl:value-of select="referenceFrom"/></xsl:when>
+								<!-- table
+								locality:definition -->
+							</xsl:choose>
+						</xsl:for-each>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:choose>
@@ -2102,7 +2128,7 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:attribute>
-      
+			
 			<std-ref>
 				
 				<xsl:choose>
