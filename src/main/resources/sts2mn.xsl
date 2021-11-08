@@ -1727,8 +1727,10 @@
 	<!-- ========================== -->
 	<xsl:template match="fig">
 		<figure id="{@id}">
-			<xsl:apply-templates />
+			<!-- <xsl:apply-templates /> -->
+			<xsl:apply-templates select="*[not(self::array or self::non-normative-note)]"/>
 		</figure>
+		<xsl:apply-templates select="*[self::array or self::non-normative-note]"/>
 	</xsl:template>
 	
 	<xsl:template match="fig/caption">
@@ -1767,6 +1769,15 @@
 	
 	<xsl:template match="graphic/caption/title">
 		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="graphic[preceding-sibling::*[1][self::graphic] or following-sibling::*[1][self::graphic] and parent::fig]">
+		<figure>
+			<xsl:if test="$semantic = 'false'">
+				<name><xsl:number format="a)"/></name>
+			</xsl:if>
+			<xsl:call-template name="graphic"/>
+		</figure>
 	</xsl:template>
 	
 	<xsl:template match="graphic | inline-graphic" name="graphic">

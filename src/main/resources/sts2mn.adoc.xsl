@@ -2472,7 +2472,7 @@
 			</xsl:when>
 			<!-- description of math symbols marked up as definitions list -->
 			<xsl:when test="count(table/col) + count(table/colgroup/col) = 2 and 
-			@content-type = 'fig-index' and 
+			(@content-type = 'fig-index' or @content-type = 'figure-index') and 
 			preceding-sibling::*[1][starts-with(text(), 'where')] and
 			preceding-sibling::*[2][self::disp-formula]">
 				<xsl:apply-templates mode="dl"/>
@@ -2616,7 +2616,7 @@
 			<xsl:text>[%unnumbered]&#xa;</xsl:text>
 		</xsl:if>
 		
-		<xsl:if test="parent::array/@content-type = 'fig-index' and parent::array/label">
+		<xsl:if test="(parent::array/@content-type = 'fig-index' or parent::array/@content-type = 'figure-index') and parent::array/label">
 			<xsl:text>.</xsl:text>
 			<xsl:value-of select="parent::array/label"/>
 			<xsl:text>&#xa;</xsl:text>
@@ -2724,7 +2724,7 @@
 			</xsl:if>
 			<xsl:if test="ancestor::table-wrap/@content-type = 'ace-table' or 
 					(ancestor::table-wrap and preceding-sibling::*[1][self::table]) or
-					parent::array/@content-type = 'fig-index'">
+					(parent::array/@content-type = 'fig-index' or parent::array/@content-type = 'figure-index')">
 				<option>unnumbered</option>
 			</xsl:if>
 		</xsl:variable>
@@ -3238,10 +3238,12 @@
 		<xsl:apply-templates select="caption/title" mode="fig-group-title"/>
 		<xsl:text>====</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:apply-templates/>		
+		<!-- <xsl:apply-templates/> -->
+		<xsl:apply-templates select="*[not(self::array or self::non-normative-note)]"/>
 		<xsl:text>====</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>&#xa;</xsl:text>		
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:apply-templates select="*[self::array or self::non-normative-note]"/>
 	</xsl:template>
 	
 	<xsl:template match="fig[graphic[caption] or count(graphic) &gt;= 2]/caption/title" priority="2"/>
