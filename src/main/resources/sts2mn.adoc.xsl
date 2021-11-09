@@ -1796,7 +1796,13 @@
 			<xsl:variable name="result_parts">
 				<xsl:for-each select="xalan:nodeset($result_parts_)/node()[1]">
 					<item>
-						<xsl:value-of select="."/>
+						<xsl:variable name="reference">
+							<xsl:call-template name="getReference">
+								<xsl:with-param name="stdid" select="normalize-space(.)"/>
+							</xsl:call-template>
+						</xsl:variable>
+						<!-- reference=<xsl:value-of select="$reference"/><xsl:text>&#xa;</xsl:text> -->
+						<xsl:if test="normalize-space($reference) = ''">hidden_bibitem_</xsl:if><xsl:value-of select="."/>
 					</item>
 				</xsl:for-each>
 				<xsl:for-each select="xalan:nodeset($result_parts_)/*[self::locality or self::localityContinue]">
