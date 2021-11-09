@@ -1748,7 +1748,7 @@
 		<xsl:param name="stdid"/>
 		<xsl:param name="locality"/>
 		<!-- @stdid and @stdid_option attributes were added in linearize.xsl -->
-		<xsl:variable name="ref_" select="//ref[@stdid = $stdid or @stdid_option = $stdid]"/>
+		<xsl:variable name="ref_" select="$updated_xml//ref[@stdid = $stdid or @stdid_option = $stdid or @id = $stdid]"/>
 		<xsl:variable name="ref" select="xalan:nodeset($ref_)"/>
 		<xsl:variable name="ref_by_stdid" select="normalize-space($ref/@id)"/> <!-- find ref by id -->
 		<xsl:value-of select="$ref_by_stdid"/>
