@@ -43,7 +43,8 @@
 	
 	<xsl:variable name="organization">
 		<xsl:choose>
-			<xsl:when test="/standard/front/nat-meta/@originator = 'BSI' or /standard/front/nat-meta/@originator = 'PAS' or /standard/front/iso-meta/secretariat = 'BSI'">BSI</xsl:when>
+			<xsl:when test="/standard/front/nat-meta/std-ident/originator = 'PAS'">PAS</xsl:when>
+			<xsl:when test="/standard/front/nat-meta/@originator = 'BSI' or /standard/front/iso-meta/secretariat = 'BSI'">BSI</xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="/standard/front/*/doc-ident/sdo"/>
 			</xsl:otherwise>
@@ -215,15 +216,11 @@
 					<xsl:call-template name="insertTaskImageList"/>
 					
 					<xsl:for-each select="xalan:nodeset($documents)/*">
-						<xsl:variable name="doctype">
-							<xsl:apply-templates select=".//nat-meta/std-ident/doc-type | .//iso-meta/std-ident/doc-type | .//std-meta/std-ident/doc-type"/>
-						</xsl:variable>
-						<xsl:if test="contains($doctype,'publicly-available-specification')"> <!-- PAS -->
+						<xsl:if test="$organization = 'PAS'">
 							<redirect:write file="{$taskCopyImagesFilename}">
 								<xsl:text>copyimage::</xsl:text><xsl:call-template name="getCoverPageImage"/><xsl:text>&#xa;</xsl:text>
 							</redirect:write>
 						</xsl:if>
-						
 					</xsl:for-each>
 					<redirect:close file="{$taskCopyImagesFilename}"/>
 					
@@ -567,7 +564,7 @@
 		<xsl:apply-templates select="custom-meta-group/custom-meta[meta-name = 'ISBN']/meta-value"/>
 		
 		<xsl:choose>
-			<xsl:when test="$organization = 'BSI'">
+			<xsl:when test="$organization = 'BSI' or $organization = 'PAS'">
 				<xsl:variable name="data">
 					<xsl:for-each select="comm-ref[normalize-space() != '']">
 						<item>Committee reference <xsl:value-of select="."/></item> <!-- Example: Committee reference DEF/1 -->
@@ -768,7 +765,7 @@
 	<xsl:template match="title-wrap[ancestor::front or ancestor::adoption-front]/text()"/>
 	<xsl:template match="title-wrap[ancestor::front or ancestor::adoption-front]">	
 		<xsl:choose>
-			<xsl:when test="$organization = 'BSI'">
+			<xsl:when test="$organization = 'BSI' or $organization = 'PAS'">
 				
 				<!-- priority: get intro and compl from separate field -->
 				<xsl:variable name="titles">
@@ -903,11 +900,12 @@
 		<xsl:text></xsl:text>
 	</xsl:template>
 	
+	
 	<xsl:template match="std-ident[ancestor::front or ancestor::adoption-front]/doc-type[normalize-space(.) != '']">
 		<xsl:variable name="value" select="java:toLowerCase(java:java.lang.String.new(.))"/>
 		<!-- https://www.niso-sts.org/TagLibrary/niso-sts-TL-1-0-html/element/doc-type.html -->
 		<xsl:choose>
-			<xsl:when test="$organization = 'BSI'">
+			<xsl:when test="$organization = 'BSI' or $organization = 'PAS'">
 				<xsl:variable name="originator" select=" normalize-space(ancestor::std-ident/originator)"/>
 				<xsl:choose>
 					<xsl:when test="starts-with($originator, 'BS') and $value = 'standard'">standard</xsl:when>
@@ -2300,7 +2298,7 @@
 	<xsl:template match="ext-link">
 		
 		<xsl:choose>
-			<xsl:when test="$organization = 'BSI'">
+			<xsl:when test="$organization = 'BSI' or $organization = 'PAS'">
 				<xsl:value-of select="translate(@xlink:href, '&#x2011;', '-')"/> <!-- non-breaking hyphen minus -->
 			</xsl:when>
 			<xsl:otherwise>
@@ -2472,7 +2470,7 @@
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 		<xsl:choose>
-			<xsl:when test="count(table/col) + count(table/colgroup/col) = 2 and $organization != 'BSI'">
+			<xsl:when test="count(table/col) + count(table/colgroup/col) = 2 and $organization != 'BSI' and $organization != 'PAS'">
 				<xsl:if test="@content-type = 'figure-index' and label">*<xsl:value-of select="label"/>*&#xa;&#xa;</xsl:if>
 				<xsl:apply-templates mode="dl"/>
 			</xsl:when>
@@ -4099,6 +4097,11 @@
 					<image><xsl:value-of select="$image"/></image>
 				</xsl:if>
 			</xsl:for-each>
+			
+			<xsl:if test="$organization = 'PAS'">
+				<image>image::<xsl:call-template name="getCoverPageImage"/><xsl:text>&#xa;</xsl:text></image>
+				<image>image::toc_image.png<xsl:text>&#xa;</xsl:text></image>
+			</xsl:if>
 		</xsl:variable>
 		
 		<xsl:if test="xalan:nodeset($imageList)//image">
@@ -4110,7 +4113,6 @@
 			</redirect:write>
 		</xsl:if>
 	</xsl:template>
-	
 	
 	<xsl:template match="/" mode="sub-part">
 		<xsl:param name="doc-number"/>
