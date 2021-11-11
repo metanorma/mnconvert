@@ -55,42 +55,6 @@
 			
 	<xsl:variable name="path" select="java:replaceAll(java:java.lang.String.new($path_),'#lang',$language)"/>
 	
-	<xsl:variable name="regex_refid_replacement" select="'( |&#xA0;|:|\+|/|\-|\(|\)|–|‑)'"/>
-	
-	<xsl:variable name="refs_">
-		<xsl:for-each select="//ref">
-			<xsl:variable name="text_" select="concat(std/std-ref, std/italic/std-ref, std/bold/std-ref, std/italic2/std-ref, std/bold2/std-ref)"/>
-			<!-- <xsl:variable name="text" select="translate($text_, ' &#xA0;:+/', '_____')"/> -->
-			<xsl:variable name="text" select="java:replaceAll(java:java.lang.String.new($text_), $regex_refid_replacement, '_')"/>
-			
-			<xsl:variable name="addTextToReference" select="normalize-space(@content-type = 'standard' and starts-with(label, '['))"/>
-			
-			<xsl:variable name="referenceText">
-				<xsl:variable name="std-ref_">
-					<xsl:apply-templates select="std/std-ref" mode="references"/>
-				</xsl:variable>
-				<xsl:value-of select="translate($std-ref_, '&#x2011;', '-')"/>
-			</xsl:variable>
-			
-			<ref id="{@id}" std-ref="{$text}" addTextToReference="{$addTextToReference}">
-				<xsl:value-of select="normalize-space($referenceText)"/>
-			</ref>
-			
-			<xsl:variable name="isDated">
-				<xsl:choose>
-					<xsl:when test="string-length($text) - string-length(translate($text, ':', '')) = 1">true</xsl:when>
-					<xsl:otherwise>false</xsl:otherwise>
-				</xsl:choose>
-			</xsl:variable>
-			<xsl:if test="$isDated = 'true'">
-				<ref id="{@id}" std-ref="{substring-before($text, ':')}" addTextToReference="{$addTextToReference}">
-					<xsl:value-of select="normalize-space($referenceText)"/>
-				</ref>
-			</xsl:if>
-		</xsl:for-each>
-	</xsl:variable>
-	<xsl:variable name="refs" select="xalan:nodeset($refs_)"/>
-	
 	<xsl:variable name="sdo">
 		<xsl:choose>
 			<xsl:when test="normalize-space(//standard/front/*/doc-ident/sdo) != ''">
@@ -171,6 +135,47 @@
 	</xsl:variable>
 	
 	<xsl:variable name="updated_xml" select="xalan:nodeset($ref_fix)"/>
+	
+	<xsl:variable name="regex_refid_replacement" select="'( |&#xA0;|:|\+|/|\-|\(|\)|–|‑)'"/>
+	
+	<xsl:variable name="refs_">
+		<xsl:for-each select="$updated_xml//ref">
+			<xsl:variable name="text_" select="concat(std/std-ref, std/italic/std-ref, std/bold/std-ref, std/italic2/std-ref, std/bold2/std-ref)"/>
+			<!-- <xsl:variable name="text" select="translate($text_, ' &#xA0;:+/', '_____')"/> -->
+			<xsl:variable name="text" select="java:replaceAll(java:java.lang.String.new($text_), $regex_refid_replacement, '_')"/>
+			
+			<xsl:variable name="referenceText">
+				<xsl:variable name="std-ref_">
+					<xsl:apply-templates select="std/std-ref" mode="references"/>
+				</xsl:variable>
+				<xsl:value-of select="translate($std-ref_, '&#x2011;', '-')"/>
+			</xsl:variable>
+			
+			<ref id="{@id}" std-ref="{$text}" addTextToReference="{@addTextToReference}">
+				<xsl:if test="not(@id)">
+					<xsl:attribute name="id"><xsl:value-of select="$text"/></xsl:attribute>
+				</xsl:if>
+				<xsl:value-of select="normalize-space($referenceText)"/>
+			</ref>
+			
+			<!-- <xsl:variable name="isDated">
+				<xsl:choose>
+					<xsl:when test="string-length($text) - string-length(translate($text, ':', '')) = 1">true</xsl:when>
+					<xsl:otherwise>false</xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
+			<xsl:if test="$isDated = 'true'">
+				<xsl:variable name="std-ref_no_date" select="substring-before($text, ':')"/>
+				<ref id="{@id}" std-ref="{$std-ref_no_date}" addTextToReference="{@addTextToReference}">
+					<xsl:if test="not(@id)">
+						<xsl:attribute name="id"><xsl:value-of select="$std-ref_no_date"/></xsl:attribute>
+					</xsl:if>
+					<xsl:value-of select="normalize-space($referenceText)"/>
+				</ref>
+			</xsl:if> -->
+		</xsl:for-each>
+	</xsl:variable>
+	<xsl:variable name="refs" select="xalan:nodeset($refs_)"/>
 	
 	<xsl:template match="/">
 	
