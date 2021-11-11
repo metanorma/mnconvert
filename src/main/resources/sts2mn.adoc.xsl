@@ -1585,9 +1585,9 @@
 		<xsl:variable name="clause" select="substring-after(@std-id, ':clause:')"/>
 		<xsl:variable name="locality">
 			<xsl:choose>
-				<xsl:when test="$clause != '' and translate(substring($clause, 1, 1), '0123456789', '') = ''">,clause=<xsl:value-of select="$clause"/></xsl:when>
-				<xsl:when test="$clause != ''">,annex=<xsl:value-of select="$clause"/></xsl:when>
-				<xsl:when test="not(@std-id)">
+				<xsl:when test="$clause != '' and translate(substring($clause, 1, 1), '0123456789', '') = ''"><locality>clause=<xsl:value-of select="$clause"/></locality></xsl:when>
+				<xsl:when test="$clause != ''"><locality>annex=<xsl:value-of select="$clause"/></locality></xsl:when>
+				<xsl:when test="not(@std-id) or $clause = ''">
 					<!-- get text -->
 					<xsl:variable name="std_text_">
 						<xsl:choose>
@@ -1654,20 +1654,20 @@
 					<xsl:choose>
 						<!-- <xsl:when test="contains($std_text_lc, 'clause') or contains($std_text_lc, 'annex') or contains($std_text_lc, 'table') or contains($std_text_lc, 'section')"> -->
 						<xsl:when test="starts-with($std_text_lc, 'clause') or starts-with($std_text_lc, 'annex') or starts-with($std_text_lc, 'table') or starts-with($std_text_lc, 'section')">
-							<xsl:text>,</xsl:text>
+							<!-- <xsl:text>,</xsl:text> -->
 							<xsl:variable name="pairs" select="translate($std_text_lc, ' ', '=')"/>
-							<xsl:value-of select="$pairs"/>
+							<locality><xsl:value-of select="$pairs"/></locality>
 							<!-- <xsl:value-of select="java:toLowerCase(java:java.lang.String.new(substring-before($pair, '=')))"/>
 							<xsl:text>=</xsl:text>
 							<xsl:variable name="localityDestination" select="substring-after($pair, '=')"/>
 							<xsl:value-of select="$localityDestination"/> -->
 						</xsl:when>
 						<xsl:when test="contains($std_text_lc, 'clause') or contains($std_text_lc, 'annex') or contains($std_text_lc, 'table') or contains($std_text_lc, 'section')">
-							<xsl:text>,</xsl:text>
+							<!-- <xsl:text>,</xsl:text> -->
 							<xsl:variable name="pairs" select="translate($std_text_lc, ' ', '=')"/>
 							<xsl:choose>
-								<xsl:when test="translate(substring($pairs, 1, 1), '0123456789', '') = ''">clause=<xsl:value-of select="$pairs"/></xsl:when>
-								<xsl:otherwise>annex=<xsl:value-of select="$pairs"/>></xsl:otherwise>
+								<xsl:when test="translate(substring($pairs, 1, 1), '0123456789', '') = ''"><locality>clause=<xsl:value-of select="$pairs"/></locality></xsl:when>
+								<xsl:otherwise><locality>annex=<xsl:value-of select="$pairs"/></locality></xsl:otherwise>
 							</xsl:choose>
 						</xsl:when>
 						<xsl:otherwise>
@@ -1681,9 +1681,10 @@
 								<xsl:variable name="item_text" select="java:replaceAll(java:java.lang.String.new(.),'^(.*?),?$','$1')"/> <!-- remove trailing comma -->
 								<xsl:choose>
 									<xsl:when test="normalize-space($item_text) = ''"><!-- skip --></xsl:when>
-									<xsl:when test="translate(substring($item_text, 1, 1), '0123456789', '') = ''">,clause=<xsl:value-of select="$item_text"/></xsl:when>
+									<xsl:when test="translate(substring($item_text, 1, 1), '0123456789', '') = ''"><locality>clause=<xsl:value-of select="$item_text"/></locality></xsl:when>
 									<xsl:when test="$item_text = 'and' or $item_text = ','"><!-- skip --></xsl:when>
-									<xsl:otherwise>,annex=<xsl:value-of select="java:toUpperCase(java:java.lang.String.new($item_text))"/></xsl:otherwise>
+									<xsl:when test="contains($item_text, 'series') or contains($item_text, '(all') or contains($item_text, 'parts')"><not_locality><xsl:value-of select="$item_text"/></not_locality></xsl:when>
+									<xsl:otherwise><locality>annex=<xsl:value-of select="java:toUpperCase(java:java.lang.String.new($item_text))"/></locality></xsl:otherwise>
 								</xsl:choose>
 							</xsl:for-each>
 						</xsl:otherwise>
@@ -1709,7 +1710,10 @@
 			<xsl:otherwise> <!-- put id of current std -->
 				<xsl:text>hidden_bibitem_</xsl:text>
 				<xsl:value-of select="@stdid"/>
-				<xsl:value-of select="$locality"/>
+				<!-- <xsl:value-of select="$locality"/> -->
+				<xsl:for-each select="xalan:nodeset($locality)/locality">
+					<xsl:text>,</xsl:text><xsl:value-of select="."/>
+				</xsl:for-each>
 				<!-- if there isn't in References, then display name -->
 				<xsl:text>,</xsl:text><xsl:value-of select=".//std-ref/text()"/>
 			</xsl:otherwise>
@@ -1727,10 +1731,17 @@
 		<xsl:variable name="ref_by_stdid" select="normalize-space($ref/@id)"/> <!-- find ref by id -->
 		<xsl:value-of select="$ref_by_stdid"/>
 		<xsl:if test="$ref_by_stdid != ''">
-			<xsl:value-of select="$locality"/>
-			<xsl:if test="$ref/@addTextToReference = 'true'">
+			<!-- <xsl:value-of select="$locality"/> -->
+			<xsl:variable name="locality_" select="xalan:nodeset($locality)"/>
+			<xsl:for-each select="$locality_/locality">
+				<xsl:text>,</xsl:text><xsl:value-of select="."/>
+			</xsl:for-each>
+			<xsl:if test="$ref/@addTextToReference = 'true' or $locality_/not_locality">
 				<xsl:text>,</xsl:text>
 				<xsl:value-of select=".//std-ref/text()"/>
+				<xsl:for-each select="$locality_/not_locality">
+					<xsl:text> </xsl:text><xsl:value-of select="."/>
+				</xsl:for-each>
 			</xsl:if>
 		</xsl:if>
 	</xsl:template>
