@@ -1608,7 +1608,7 @@
 					<!-- DEBUG: std_text_='<xsl:value-of select="$std_text_"/>' -->
 					
 					<!-- remove leading comma -->
-					<xsl:variable name="std_text" select="normalize-space(java:replaceAll(java:java.lang.String.new($std_text_),'^,?(.*)$','$1'))"/>
+					<xsl:variable name="std_text" select="normalize-space(java:replaceAll(java:java.lang.String.new($std_text_),'^:?—?,?(.*)$','$1'))"/>
 					<!-- replace ' to ' to '-' -->
 					<xsl:variable name="std_text1" select="java:replaceAll(java:java.lang.String.new($std_text),' to [cC]lause ','-')"/>
 					<xsl:variable name="std_text2" select="java:replaceAll(java:java.lang.String.new($std_text1),' to [aA]nnex ','-')"/>
@@ -1623,12 +1623,13 @@
 					<xsl:variable name="std_text9" select="java:replaceAll(java:java.lang.String.new($std_text8),'( and | or )[sS]ection',',section')"/>
 					
 					<!-- replace  'Xxxxx' to 'xxxxx' -->
-					<xsl:variable name="std_text10" select="java:replaceAll(java:java.lang.String.new($std_text9),'[aA]nnex','annex')"/>
-					<xsl:variable name="std_text11" select="java:replaceAll(java:java.lang.String.new($std_text10),'[tT]able','table')"/>
-					<xsl:variable name="std_text12" select="java:replaceAll(java:java.lang.String.new($std_text11),'[cC]lause','clause')"/>
-					<xsl:variable name="std_text13" select="java:replaceAll(java:java.lang.String.new($std_text12),'[sS]ection','section')"/>
+					<xsl:variable name="std_text10" select="java:replaceAll(java:java.lang.String.new($std_text9),'[aA]nnexes','annex')"/>
+					<xsl:variable name="std_text11" select="java:replaceAll(java:java.lang.String.new($std_text10),'[aA]nnex','annex')"/>
+					<xsl:variable name="std_text12" select="java:replaceAll(java:java.lang.String.new($std_text11),'[tT]able','table')"/>
+					<xsl:variable name="std_text13" select="java:replaceAll(java:java.lang.String.new($std_text12),'[cC]lause','clause')"/>
+					<xsl:variable name="std_text14" select="java:replaceAll(java:java.lang.String.new($std_text13),'[sS]ection','section')"/>
 					
-					<xsl:variable name="std_text_lc_" select="$std_text13"/>
+					<xsl:variable name="std_text_lc_" select="$std_text14"/>
 					
 					<xsl:variable name="std_text_lc">
 						<xsl:choose>
@@ -1670,6 +1671,11 @@
 								<xsl:otherwise><locality>annex=<xsl:value-of select="$pairs"/></locality></xsl:otherwise>
 							</xsl:choose>
 						</xsl:when>
+						<xsl:when test="contains($std_text_lc, 'definition')">
+							<xsl:variable name="pairs" select="translate($std_text_lc, ' ', '=')"/>
+							<locality>locality:<xsl:value-of select="$pairs"/></locality>
+						</xsl:when>
+						<xsl:when test="not(.//std-ref)"></xsl:when> <!-- <std std-id="ISO 13485:2016" type="dated">ISO 13485:2016</std> -->
 						<xsl:otherwise>
 							<xsl:variable name="parts">
 								<xsl:call-template name="split">
@@ -1682,7 +1688,7 @@
 								<xsl:choose>
 									<xsl:when test="normalize-space($item_text) = ''"><!-- skip --></xsl:when>
 									<xsl:when test="translate(substring($item_text, 1, 1), '0123456789', '') = ''"><locality>clause=<xsl:value-of select="$item_text"/></locality></xsl:when>
-									<xsl:when test="$item_text = 'and' or $item_text = ','"><!-- skip --></xsl:when>
+									<xsl:when test="$item_text = 'and' or $item_text = ',' or $item_text = ':—'"><!-- skip --></xsl:when>
 									<xsl:when test="contains($item_text, 'series') or contains($item_text, '(all') or contains($item_text, 'parts')"><not_locality><xsl:value-of select="$item_text"/></not_locality></xsl:when>
 									<xsl:otherwise><locality>annex=<xsl:value-of select="java:toUpperCase(java:java.lang.String.new($item_text))"/></locality></xsl:otherwise>
 								</xsl:choose>
@@ -1715,7 +1721,10 @@
 					<xsl:text>,</xsl:text><xsl:value-of select="."/>
 				</xsl:for-each>
 				<!-- if there isn't in References, then display name -->
-				<xsl:text>,</xsl:text><xsl:value-of select=".//std-ref/text()"/>
+				<xsl:variable name="std-ref_text" select=".//std-ref/text()"/>
+				<xsl:if test="normalize-space($std-ref_text) != ''">
+					<xsl:text>,</xsl:text><xsl:value-of select="$std-ref_text"/>
+				</xsl:if>
 			</xsl:otherwise>
 		</xsl:choose>
 		
