@@ -1276,6 +1276,7 @@
 			<xsl:otherwise>
 				<xsl:variable name="sec_type">
 					<xsl:choose>
+						<xsl:when test="@type"><xsl:value-of select="@type"/></xsl:when>
 						<xsl:when test="$name = 'introduction'">intro</xsl:when>
 						<xsl:when test="$name = 'foreword'">foreword</xsl:when>
 						<!-- <xsl:when test="not(preceding-sibling::*) and $name != 'foreword'">titlepage</xsl:when> -->

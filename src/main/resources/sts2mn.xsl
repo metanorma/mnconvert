@@ -959,6 +959,9 @@
 		</xsl:variable>
 		<xsl:element name="{$name}">
 			<xsl:copy-of select="@id"/>
+			<xsl:if test="ancestor::front and $sec_type != ''">
+				<xsl:attribute name="type"><xsl:value-of select="$sec_type"/></xsl:attribute>
+			</xsl:if>
 			<xsl:apply-templates />
 		</xsl:element>
 	</xsl:template>

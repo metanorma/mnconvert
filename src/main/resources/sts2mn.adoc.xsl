@@ -4043,14 +4043,22 @@
 	</xsl:template>
 	
 	<xsl:template name="setIdOrType">
-		<xsl:if test="parent::front and not(@sec-type = 'foreword')">
-			<xsl:text>[.preface</xsl:text>
-			<xsl:if test="@sec-type = 'amendment'">
-			<xsl:text>,type=corrigenda</xsl:text>
+		<xsl:if test="parent::front">
+			<xsl:if test="not(@sec-type = 'foreword')">
+				<xsl:text>[.preface</xsl:text>
+				<xsl:choose>
+					<xsl:when test="@sec-type = 'amendment'">
+						<xsl:text>,type=corrigenda</xsl:text>
+					</xsl:when>
+					<xsl:when test="@sec-type">
+						<xsl:text>,type=</xsl:text><xsl:value-of select="@sec-type"/>
+					</xsl:when>
+				</xsl:choose>
+				<xsl:text>]</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
 			</xsl:if>
-			<xsl:text>]</xsl:text>
-			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
+		
 		<xsl:if test="normalize-space(@id) != '' or @sec-type">
 			<xsl:text>[[</xsl:text>
 				<xsl:choose>
