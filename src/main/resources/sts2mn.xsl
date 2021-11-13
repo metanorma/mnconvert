@@ -1101,6 +1101,15 @@
 			</xsl:choose>
 		</xsl:variable>
 		<xsl:element name="{$element_name}">
+			<xsl:variable name="termType" select="normalize-space(../tbx:termType/@value)"/>
+			<xsl:if test="$termType != ''">
+				<xsl:attribute name="type">
+					<xsl:choose>
+						<xsl:when test="$termType = 'variant'">full</xsl:when>
+						<xsl:otherwise><xsl:value-of select="$termType"/></xsl:otherwise> <!-- Example: abbreviation -->
+					</xsl:choose>
+				</xsl:attribute>
+			</xsl:if>
 			<xsl:apply-templates />
 		</xsl:element>
 	</xsl:template>
@@ -1108,6 +1117,8 @@
 	<xsl:template match="tbx:normativeAuthorization"/>
 	
 	<xsl:template match="tbx:partOfSpeech"/>
+	
+	<xsl:template match="tbx:termType"/>
 	
 	<!-- ======================== -->
 	<!-- END Terms, definitions -->
@@ -1944,7 +1955,8 @@
 		</sourcecode>
 	</xsl:template>
 	
-	<xsl:template match="styled-content | tbx:termType">
+	<!-- copy element in comment -->
+	<xsl:template match="styled-content">
 		<!-- copy opening tag with attributes -->
 		<xsl:text disable-output-escaping="yes">&lt;!--STS: &lt;</xsl:text><xsl:value-of select="name()"/>
 		<xsl:for-each select="@*">

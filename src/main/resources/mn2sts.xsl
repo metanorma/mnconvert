@@ -1856,6 +1856,15 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:if>
+			<xsl:if test="@type">
+				<xsl:variable name="value">
+					<xsl:choose>
+						<xsl:when test="@type = 'full'">variant</xsl:when>
+						<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<tbx:termType value="{$value}"/>
+			</xsl:if>
 		</tbx:tig>
 	</xsl:template>
 	

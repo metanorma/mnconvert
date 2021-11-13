@@ -1329,6 +1329,19 @@
 				<xsl:text>]</xsl:text>
 			</xsl:otherwise>			
 		</xsl:choose>
+		<xsl:apply-templates select="../tbx:termType" mode="term"/>
+	</xsl:template>
+	
+	<xsl:template match="tbx:termType" mode="term">
+		<xsl:text>&#xa;&#xa;</xsl:text>
+		<xsl:text>[%metadata]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>type:: </xsl:text>
+		<xsl:choose>
+			<xsl:when test="@value = 'variant'">full</xsl:when>
+			<xsl:otherwise><xsl:value-of select="@value"/></xsl:otherwise> <!-- Example: abbreviation -->
+		</xsl:choose>
+		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="tbx:term/text()">
