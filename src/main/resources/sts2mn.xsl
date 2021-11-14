@@ -1572,6 +1572,11 @@
 		</li>
 	</xsl:template>
 	
+	<xsl:variable name="regexListItemLabel" select="'^((([0-9]|[a-z]|[A-Z])+(\)|\.))(\s|\h)+)(.*)'"/>
+	<xsl:template match="list-item[not(label)]//node()[self::text()][normalize-space() != ''][1]" priority="2">
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regexListItemLabel, '$6')"/> <!-- get last group from regexListItemLabel, i.e. list item text without label-->
+	</xsl:template>
+	
 	<xsl:template match="label"/>
 	
 	<xsl:template match="xref">
