@@ -1401,6 +1401,10 @@
 				<xsl:text>&#xa;</xsl:text>
 			</xsl:when>
 			<xsl:otherwise> <!-- usual paragraph -->
+				<xsl:if test="@specific-use = 'indent' and not(ancestor::list)">
+					<xsl:text>[align=indent]</xsl:text>
+					<xsl:text>&#xa;</xsl:text>
+				</xsl:if>
 				<xsl:apply-templates />
 				<xsl:text>&#xa;</xsl:text>
 				<xsl:variable name="isLastPinCommentary" select="preceding-sibling::p[starts-with(normalize-space(), 'COMMENTARY ON') and 

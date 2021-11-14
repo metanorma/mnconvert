@@ -1341,6 +1341,12 @@
 		</xsl:element>
 	</xsl:template>
 	
+	<xsl:template match="p/@specific-use">
+		<xsl:if test=". = 'indent'">
+			<xsl:attribute name="align"><xsl:value-of select="."/></xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+	
 	<xsl:template match="title">
 		<xsl:element name="{local-name()}">
 			<xsl:apply-templates select="@*"/>

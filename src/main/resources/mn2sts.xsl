@@ -1906,7 +1906,15 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	<xsl:template match="p/@align"/>
+	<xsl:template match="p/@align[. = 'indent']" priority="2">
+		<xsl:attribute name="specific-use"><xsl:value-of select="."/></xsl:attribute>
+	</xsl:template>
+	
+	<xsl:template match="p/@align[. = 'left']" priority="2"/>
+	
+	<xsl:template match="p/@align">
+		<xsl:attribute name="align"><xsl:value-of select="@align"/></xsl:attribute>
+	</xsl:template>
 	
 	<xsl:template match="*[self::p or self::ul or self::ol]/@id">
 		<xsl:variable name="p_id" select="."/>
