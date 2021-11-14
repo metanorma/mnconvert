@@ -1273,7 +1273,6 @@
 		<xsl:value-of select="$level"/><xsl:text> </xsl:text>
 		<!-- <xsl:call-template name="setId"/> --><!-- [[ ]] -->
 		<xsl:apply-templates select=".//tbx:term" mode="term"/>	
-		<xsl:call-template name="addIndexTerms"/>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:apply-templates />
@@ -1316,6 +1315,9 @@
 		<xsl:choose>
 			<xsl:when test="position() = 1">
 				<xsl:apply-templates />
+				<xsl:for-each select="ancestor::tbx:termEntry">
+					<xsl:call-template name="addIndexTerms"/>
+				</xsl:for-each>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:text>&#xa;</xsl:text>
