@@ -1401,11 +1401,16 @@
 				<xsl:text>&#xa;</xsl:text>
 			</xsl:when>
 			<xsl:otherwise> <!-- usual paragraph -->
+				<xsl:variable name="p_text">
+					<xsl:apply-templates />
+				</xsl:variable>
 				<xsl:if test="@specific-use = 'indent' and not(ancestor::list)">
-					<xsl:text>[align=indent]</xsl:text>
-					<xsl:text>&#xa;</xsl:text>
+					<xsl:if test="substring($p_text, 1, 2) != '. ' and substring($p_text, 1, 2) != '* '"> <!-- if it is not a list --> 
+						<xsl:text>[align=indent]</xsl:text>
+						<xsl:text>&#xa;</xsl:text>
+					</xsl:if>
 				</xsl:if>
-				<xsl:apply-templates />
+				<xsl:value-of select="$p_text"/>
 				<xsl:text>&#xa;</xsl:text>
 				<xsl:variable name="isLastPinCommentary" select="preceding-sibling::p[starts-with(normalize-space(), 'COMMENTARY ON') and 
 							(starts-with(normalize-space(.//italic/text()), 'COMMENTARY ON') or starts-with(normalize-space(.//italic2/text()), 'COMMENTARY ON'))] and
