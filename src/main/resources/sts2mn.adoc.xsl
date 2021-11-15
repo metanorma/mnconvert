@@ -26,6 +26,8 @@
 	
 	<xsl:param name="imagesdir" select="'images'"/>
 	
+	<xsl:param name="self_testing">false</xsl:param> <!-- true false -->
+	
 	<!-- false --> <!-- true, for new features -->
 	<xsl:variable name="demomode">
 		<xsl:choose>
@@ -139,74 +141,84 @@
 	<xsl:variable name="regex_refid_replacement" select="'( |&#xA0;|:|\+|/|\-|\(|\)|–|‑)'"/>
 	
 	<xsl:variable name="refs_">
-		<xsl:for-each select="$updated_xml//ref">
-			<xsl:copy>
-				<xsl:copy-of select="@*"/>
-			</xsl:copy>
-		</xsl:for-each>
+		<xsl:if test="$self_testing = 'false'">
+			<xsl:for-each select="$updated_xml//ref">
+				<xsl:copy>
+					<xsl:copy-of select="@*"/>
+				</xsl:copy>
+			</xsl:for-each>
+		</xsl:if>
 	</xsl:variable>
 		
 	<xsl:variable name="refs" select="xalan:nodeset($refs_)"/>
 	
 	<xsl:template match="/">
 	
-		<!-- <redirect:write file="{$outpath}/{$docfile_name}.linearized.xml">
-			<xsl:copy-of select="$linearized_xml"/>
-		</redirect:write>
-		<xsl:message>Linearized xml saved.</xsl:message> -->
-  
-		<xsl:for-each select="$updated_xml">
-	
-			<xsl:choose>
-				<xsl:when test=".//sub-part"> <!-- multiple documents in one xml -->
-					<xsl:variable name="xml">
-						<xsl:copy-of select="."/>
-					</xsl:variable>
-					
-					<!-- create separate document for each  sub-part -->
-					<xsl:variable name="documents">
-						<xsl:for-each select="standard/body/sub-part">
-						
-							<xsl:variable name="number"><xsl:number/></xsl:variable>
+		<xsl:choose>
+			<xsl:when test="$self_testing = 'true'">
+				<xsl:call-template name="self_testing"/>
+			</xsl:when>
+			<xsl:otherwise>
+			
+				<!-- <redirect:write file="{$outpath}/{$docfile_name}.linearized.xml">
+					<xsl:copy-of select="$linearized_xml"/>
+				</redirect:write>
+				<xsl:message>Linearized xml saved.</xsl:message> -->
+			
+				<xsl:for-each select="$updated_xml">
+			
+					<xsl:choose>
+						<xsl:when test=".//sub-part"> <!-- multiple documents in one xml -->
+							<xsl:variable name="xml">
+								<xsl:copy-of select="."/>
+							</xsl:variable>
 							
-							<xsl:apply-templates select="xalan:nodeset($xml)" mode="sub-part">
-								<xsl:with-param name="doc-number" select="number($number)"/>
-							</xsl:apply-templates>
+							<!-- create separate document for each  sub-part -->
+							<xsl:variable name="documents">
+								<xsl:for-each select="standard/body/sub-part">
+								
+									<xsl:variable name="number"><xsl:number/></xsl:variable>
+									
+									<xsl:apply-templates select="xalan:nodeset($xml)" mode="sub-part">
+										<xsl:with-param name="doc-number" select="number($number)"/>
+									</xsl:apply-templates>
+									
+								</xsl:for-each>
+							</xsl:variable>
 							
-						</xsl:for-each>
-					</xsl:variable>
-					
-					<!-- process each document separately -->
-					<xsl:for-each select="xalan:nodeset($documents)/*"> 
-						<xsl:apply-templates select="."/>
-					</xsl:for-each>
-					
-					<!-- create document.yml file -->
-					<redirect:write file="{$outpath}/{$docfile_name}.yml">
-						<xsl:call-template name="insertCollectionData">
-							<xsl:with-param name="documents" select="$documents"/>
-						</xsl:call-template>
-					</redirect:write>
-					
-					<redirect:open file="{$taskCopyImagesFilename}"/>
-					<xsl:call-template name="insertTaskImageList"/>
-					
-					<xsl:for-each select="xalan:nodeset($documents)/*">
-						<xsl:if test="$organization = 'PAS'">
-							<redirect:write file="{$taskCopyImagesFilename}">
-								<xsl:text>copyimage::</xsl:text><xsl:call-template name="getCoverPageImage"/><xsl:text>&#xa;</xsl:text>
+							<!-- process each document separately -->
+							<xsl:for-each select="xalan:nodeset($documents)/*"> 
+								<xsl:apply-templates select="."/>
+							</xsl:for-each>
+							
+							<!-- create document.yml file -->
+							<redirect:write file="{$outpath}/{$docfile_name}.yml">
+								<xsl:call-template name="insertCollectionData">
+									<xsl:with-param name="documents" select="$documents"/>
+								</xsl:call-template>
 							</redirect:write>
-						</xsl:if>
-					</xsl:for-each>
-					<redirect:close file="{$taskCopyImagesFilename}"/>
-					
-				</xsl:when>
-				<xsl:otherwise><!-- no sub-part elements -->
-					<xsl:apply-templates />
-					<xsl:call-template name="insertTaskImageList"/>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:for-each>
+							
+							<redirect:open file="{$taskCopyImagesFilename}"/>
+							<xsl:call-template name="insertTaskImageList"/>
+							
+							<xsl:for-each select="xalan:nodeset($documents)/*">
+								<xsl:if test="$organization = 'PAS'">
+									<redirect:write file="{$taskCopyImagesFilename}">
+										<xsl:text>copyimage::</xsl:text><xsl:call-template name="getCoverPageImage"/><xsl:text>&#xa;</xsl:text>
+									</redirect:write>
+								</xsl:if>
+							</xsl:for-each>
+							<redirect:close file="{$taskCopyImagesFilename}"/>
+							
+						</xsl:when>
+						<xsl:otherwise><!-- no sub-part elements -->
+							<xsl:apply-templates />
+							<xsl:call-template name="insertTaskImageList"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:for-each>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="adoption">
@@ -4905,5 +4917,287 @@
 		
 		<xsl:value-of select="$text"/>
 	</xsl:template>
+	
+	<!-- =============== -->
+	<!-- self-testing -->
+	<!-- =============== -->
+	<xsl:template name="self_testing">
+		<xsl:call-template name="self_testing_termsource"/>
+	</xsl:template>
+	
+	<xsl:template name="self_testing_termsource">
+
+		<xsl:variable name="data">
+			<item>
+				<source>
+					<tbx:source>Waste Framework Directive [<xref rid="biblref_1" ref-type="bibr">1</xref>]</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;biblref_1,Waste Framework Directive &gt;&gt;</xsl:text>
+				</destination>
+			</item>
+			
+			<item>
+				<source>
+					<tbx:source>ISO 15270, modified</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_ISO_15270,ISO 15270&gt;&gt;,</xsl:text>
+				</destination>
+			</item>
+			
+			<item>
+				<source>
+					<tbx:source>BS EN ISO 14001:2004,<bold>
+					<xref rid="sec_3.6" ref-type="sec">3.6</xref>
+					</bold>, modified</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_BS_EN_ISO_14001_2004,clause 3.6,BS EN ISO 14001:2004&gt;&gt;,</xsl:text>
+				</destination>
+			</item>
+			
+			<item>
+				<source>
+					<tbx:source>BS EN ISO 14001:2004,<bold>
+							<xref rid="sec_3.7" ref-type="sec">3.7</xref>
+						</bold>
+					</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_BS_EN_ISO_14001_2004,clause 3.7,BS EN ISO 14001:2004&gt;&gt;</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source>
+					<tbx:source>BS 8888:2008</tbx:source></source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_BS_8888_2008,BS 8888:2008&gt;&gt;</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source>
+					<tbx:source>ISO 9000:2005,<bold>3.4.1</bold>, modified</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_ISO_9000_2005,clause 3.4.1,ISO 9000:2005&gt;&gt;,</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source>
+					<tbx:source>PAS 91:2013 Construction prequalification questionnaires</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_PAS_91_2013_Construction_prequalification_questionnaires,PAS 91:2013 Construction prequalification questionnaires&gt;&gt;</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source>
+					<tbx:source>Quoted from PD 25222:2011 Business continuity management – Guidance on supply chain continuity</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_Quoted_from_PD_25222_2011_Business_continuity_management___Guidance_on_supply_chain_continuity,Quoted from PD 25222:2011 Business continuity management – Guidance on supply chain continuity&gt;&gt;</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source>
+					<tbx:source>BS ISO 10007:2003,<bold>3.6</bold></tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_BS_ISO_10007_2003,clause 3.6,BS ISO 10007:2003&gt;&gt;</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source>
+					<tbx:source>BS EN 1900:1998,<bold>3.3.1</bold>, modified</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_BS_EN_1900_1998,clause 3.3.1,BS EN 1900:1998&gt;&gt;,</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source>
+					<tbx:source>ISO 16642:2017, 3.22, modified – new terms “concept entry” and “entry” added, synonym “TE” deleted, preferred term now is “concept entry” instead of “terminological entry”, Note 1 to entry deleted.</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_ISO_16642_2017,clause 3.22,ISO 16642:2017&gt;&gt;,new terms “concept entry” and “entry” added, synonym “TE” deleted, preferred term now is “concept entry” instead of “terminological entry”, Note 1 to entry deleted.</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source>
+					<tbx:source>CEN/CENELEC Internal Regulations, Part 2:2015, definition<bold>2.14</bold>[<xref rid="biblref_1" ref-type="bibr">1</xref>]</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;biblref_1,locality:definition=2.14,CEN/CENELEC Internal Regulations,Part 2:2015&gt;&gt;</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source>
+					<tbx:source>BS EN ISO 9000:2005, definition<bold>3.6.1</bold>, modified</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_BS_EN_ISO_9000_2005,locality:definition=3.6.1,BS EN ISO 9000:2005&gt;&gt;,</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source>
+					<tbx:source>ISO/IEC Guide 2:2004, definition<bold>1.7</bold>[<xref rid="biblref_2" ref-type="bibr">2</xref>]</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;biblref_2,locality:definition=1.7,ISO/IEC Guide 2:2004&gt;&gt;</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source><tbx:source>BS ISO 26000:2010, definition<bold>2.2</bold></tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_BS_ISO_26000_2010,locality:definition=2.2,BS ISO 26000:2010&gt;&gt;</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source>
+					<tbx:source>ISO 9000:2015, 3.6.15, modified by using the term “entity” instead of “object” and by replacing Notes 1 and 2 to entry with the new Notes 1 to 4 to entry.</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_ISO_9000_2015,clause 3.6.15,ISO 9000:2015&gt;&gt;,by using the term “entity” instead of “object” and by replacing Notes 1 and 2 to entry with the new Notes 1 to 4 to entry.</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source>
+					<tbx:source>ISO 9000:2015, 3.5.1</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_ISO_9000_2015,clause 3.5.1,ISO 9000:2015&gt;&gt;</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source>
+					<tbx:source>Oxford English Dictionary, modified</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_Oxford_English_Dictionary,Oxford English Dictionary&gt;&gt;,</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source>
+					<tbx:source>
+						<std>
+							<std-ref>BS 5839‑1:2013<?doi https://doi.org/10.3403/00862786U?>
+							</std-ref>
+						</std>, <bold>3.12</bold>
+					</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_BS_5839_1_2013,clause 3.12,BS 5839‑1:2013&gt;&gt;</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source>
+					<tbx:source>BS 9999:2017,<bold>3.91</bold>, modified – note added</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_BS_9999_2017,clause 3.91,BS 9999:2017&gt;&gt;,note added</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source>
+					<tbx:source>GHTF/SG1/N055:2009, 5.2</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_GHTF_SG1_N055_2009,clause 5.2,GHTF/SG1/N055:2009&gt;&gt;</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source>
+					<tbx:source>GHTF/SG5/N4:2010, Clause 4</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_GHTF_SG5_N4_2010,clause 4,GHTF/SG5/N4:2010&gt;&gt;</xsl:text>
+				</destination>
+			</item>
+
+			<item>
+				<source>
+					<tbx:source>ISO 9000:2005<xref ref-type="fn" rid="fn_2">
+						<sup>2</sup>
+					</xref>
+					<fn id="fn_2">
+						<label>2</label>
+						<p>Superseded by ISO 9000:2015.</p>
+					</fn>, 3.4.2, modified</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_ISO_9000_2005,clause 3.4.2,ISO 9000:2005, footnote:[Superseded by ISO 9000:2015.]&gt;&gt;,</xsl:text>
+				</destination>
+			</item>
+
+		</xsl:variable>
+	
+		<xsl:for-each select="xalan:nodeset($data)//item">
+			<xsl:variable name="result">
+				<xsl:apply-templates select="source"/>
+			</xsl:variable>
+			<xsl:call-template name="print_difference">
+				<xsl:with-param name="result" select="$result"/>
+				<xsl:with-param name="destination" select="destination"/>
+			</xsl:call-template>
+		</xsl:for-each>
+	
+	</xsl:template>
+	
+	<xsl:template name="print_difference">
+		<xsl:param name="result"/>
+		<xsl:param name="destination"/>
+		<xsl:if test="normalize-space($result) != normalize-space(destination)">
+			<xsl:message>There is difference between result and expected result:</xsl:message>
+			<xsl:message>Result: <xsl:value-of select="normalize-space($result)"/></xsl:message>
+			<xsl:message>Expected: <xsl:value-of select="normalize-space($destination)"/></xsl:message>
+		</xsl:if>
+	</xsl:template>
+	
+	<!-- =============== -->
+	<!-- END self-testing -->
+	<!-- =============== -->
 	
 </xsl:stylesheet>
