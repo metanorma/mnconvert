@@ -1605,7 +1605,31 @@
 		<xsl:if test="bold2[std-ref]">**</xsl:if>
 		
 		<xsl:text>&lt;&lt;</xsl:text>
-		<xsl:call-template name="insertStd" />
+		
+			<xsl:variable name="model_std_">
+				<xsl:call-template name="build_sts_model_std"/>
+			</xsl:variable>
+			<xsl:variable name="model_std" select="xalan:nodeset($model_std_)"/>
+		
+			<!-- put reference -->
+			<xsl:value-of select="$model_std/reference"/>
+			
+			<!-- put locality (-ies) -->
+			<xsl:for-each select="$model_std/locality[normalize-space() != '']">
+				<xsl:text>,</xsl:text>
+				<xsl:value-of select="."/>
+			</xsl:for-each>
+			
+			<!-- put reference text -->
+			<xsl:for-each select="$model_std/referenceText[normalize-space() != '']">
+				<xsl:text>,</xsl:text>
+				<xsl:value-of select="."/>
+			</xsl:for-each>
+			<xsl:for-each select="$model_std/not_locality">
+				<xsl:text> </xsl:text><xsl:value-of select="."/>
+			</xsl:for-each>
+			
+	
 		<xsl:text>&gt;&gt;</xsl:text>
 		
 		<xsl:if test="italic[std-ref]">_</xsl:if>
@@ -1616,155 +1640,6 @@
 		<xsl:value-of select="$space_after"/>
 	</xsl:template>
 	
-	<xsl:template name="insertStd">
-		
-		<xsl:variable name="clause" select="substring-after(@std-id, ':clause:')"/>
-		<xsl:variable name="locality">
-			<xsl:choose>
-				<xsl:when test="$clause != '' and translate(substring($clause, 1, 1), '0123456789', '') = ''"><locality>clause=<xsl:value-of select="$clause"/></locality></xsl:when>
-				<xsl:when test="$clause != ''"><locality>annex=<xsl:value-of select="$clause"/></locality></xsl:when>
-				<xsl:when test="not(@std-id) or $clause = ''">
-					<!-- get text -->
-					<xsl:variable name="std_text_">
-						<xsl:choose>
-							<xsl:when test=".//std-ref">
-								<xsl:variable name="text">
-									<xsl:for-each select=".//std-ref/following-sibling::node()">
-										<xsl:value-of select="translate(., '&#xa0;', ' ')"/>
-									</xsl:for-each>
-								</xsl:variable>
-								<xsl:value-of select="normalize-space(translate($text, '&#xa0;', ' '))"/>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:value-of select="normalize-space(translate(., '&#xa0;', ' '))"/>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:variable>
-					
-					<!-- DEBUG: std_text_='<xsl:value-of select="$std_text_"/>' -->
-					
-					<!-- remove leading comma -->
-					<xsl:variable name="std_text" select="normalize-space(java:replaceAll(java:java.lang.String.new($std_text_),'^:?—?,?(.*)$','$1'))"/>
-					<!-- replace ' to ' to '-' -->
-					<xsl:variable name="std_text1" select="java:replaceAll(java:java.lang.String.new($std_text),' to [cC]lause ','-')"/>
-					<xsl:variable name="std_text2" select="java:replaceAll(java:java.lang.String.new($std_text1),' to [aA]nnex ','-')"/>
-					<xsl:variable name="std_text3" select="java:replaceAll(java:java.lang.String.new($std_text2),' to [tT]able ','-')"/>
-					<xsl:variable name="std_text4" select="java:replaceAll(java:java.lang.String.new($std_text3),' to [sS]ection ','-')"/>
-					<xsl:variable name="std_text5" select="java:replaceAll(java:java.lang.String.new($std_text4),' to ','-')"/>
-					
-					<!-- replace ' and|or Xxxxx ' to 'xxxxx' -->
-					<xsl:variable name="std_text6" select="java:replaceAll(java:java.lang.String.new($std_text5),'( and | or )[cC]lause',',clause')"/>
-					<xsl:variable name="std_text7" select="java:replaceAll(java:java.lang.String.new($std_text6),'( and | or )[aA]nnex',',annex')"/>
-					<xsl:variable name="std_text8" select="java:replaceAll(java:java.lang.String.new($std_text7),'( and | or )[tT]able',',table')"/>
-					<xsl:variable name="std_text9" select="java:replaceAll(java:java.lang.String.new($std_text8),'( and | or )[sS]ection',',section')"/>
-					
-					<!-- replace  'Xxxxx' to 'xxxxx' -->
-					<xsl:variable name="std_text10" select="java:replaceAll(java:java.lang.String.new($std_text9),'[aA]nnexes','annex')"/>
-					<xsl:variable name="std_text11" select="java:replaceAll(java:java.lang.String.new($std_text10),'[aA]nnex','annex')"/>
-					<xsl:variable name="std_text12" select="java:replaceAll(java:java.lang.String.new($std_text11),'[tT]able','table')"/>
-					<xsl:variable name="std_text13" select="java:replaceAll(java:java.lang.String.new($std_text12),'[cC]lause','clause')"/>
-					<xsl:variable name="std_text14" select="java:replaceAll(java:java.lang.String.new($std_text13),'[sS]ection','section')"/>
-					
-					<xsl:variable name="std_text_lc_" select="$std_text14"/>
-					
-					<xsl:variable name="std_text_lc">
-						<xsl:choose>
-							<xsl:when test="starts-with($std_text_lc_, 'annex')">
-								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),' and | or ',',annex ')"/>
-							</xsl:when>
-							<xsl:when test="starts-with($std_text_lc_, 'table')">
-								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),' and | or ',',table ')"/>
-							</xsl:when>
-							<xsl:when test="starts-with($std_text_lc_, 'clause')">
-								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),' and | or ',',clause ')"/>
-							</xsl:when>
-							<xsl:when test="starts-with($std_text_lc_, 'section')">
-								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),' and | or ',',section ')"/>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:value-of select="$std_text_lc_"/>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:variable>
-					
-					<!-- DEBUG:std_text_lc='<xsl:value-of select="$std_text_lc"/>' -->
-					<xsl:choose>
-						<!-- <xsl:when test="contains($std_text_lc, 'clause') or contains($std_text_lc, 'annex') or contains($std_text_lc, 'table') or contains($std_text_lc, 'section')"> -->
-						<xsl:when test="starts-with($std_text_lc, 'clause') or starts-with($std_text_lc, 'annex') or starts-with($std_text_lc, 'table') or starts-with($std_text_lc, 'section')">
-							<!-- <xsl:text>,</xsl:text> -->
-							<xsl:variable name="pairs" select="translate($std_text_lc, ' ', '=')"/>
-							<locality><xsl:value-of select="$pairs"/></locality>
-							<!-- <xsl:value-of select="java:toLowerCase(java:java.lang.String.new(substring-before($pair, '=')))"/>
-							<xsl:text>=</xsl:text>
-							<xsl:variable name="localityDestination" select="substring-after($pair, '=')"/>
-							<xsl:value-of select="$localityDestination"/> -->
-						</xsl:when>
-						<xsl:when test="contains($std_text_lc, 'clause') or contains($std_text_lc, 'annex') or contains($std_text_lc, 'table') or contains($std_text_lc, 'section')">
-							<!-- <xsl:text>,</xsl:text> -->
-							<xsl:variable name="pairs" select="translate($std_text_lc, ' ', '=')"/>
-							<xsl:choose>
-								<xsl:when test="translate(substring($pairs, 1, 1), '0123456789', '') = ''"><locality>clause=<xsl:value-of select="$pairs"/></locality></xsl:when>
-								<xsl:otherwise><locality>annex=<xsl:value-of select="$pairs"/></locality></xsl:otherwise>
-							</xsl:choose>
-						</xsl:when>
-						<xsl:when test="contains($std_text_lc, 'definition')">
-							<xsl:variable name="pairs" select="translate($std_text_lc, ' ', '=')"/>
-							<locality>locality:<xsl:value-of select="$pairs"/></locality>
-						</xsl:when>
-						<xsl:when test="not(.//std-ref)"></xsl:when> <!-- <std std-id="ISO 13485:2016" type="dated">ISO 13485:2016</std> -->
-						<xsl:otherwise>
-							<xsl:variable name="parts">
-								<xsl:call-template name="split">
-									<xsl:with-param name="pText" select="$std_text_lc"/>
-									<xsl:with-param name="sep" select="' '"/>
-								</xsl:call-template>
-							</xsl:variable>
-							<xsl:for-each select="xalan:nodeset($parts)//item">
-								<xsl:variable name="item_text" select="java:replaceAll(java:java.lang.String.new(.),'^(.*?),?$','$1')"/> <!-- remove trailing comma -->
-								<xsl:choose>
-									<xsl:when test="normalize-space($item_text) = ''"><!-- skip --></xsl:when>
-									<xsl:when test="translate(substring($item_text, 1, 1), '0123456789', '') = ''"><locality>clause=<xsl:value-of select="$item_text"/></locality></xsl:when>
-									<xsl:when test="$item_text = 'and' or $item_text = ',' or $item_text = ':—'"><!-- skip --></xsl:when>
-									<xsl:when test="contains($item_text, 'series') or contains($item_text, '(all') or contains($item_text, 'parts')"><not_locality><xsl:value-of select="$item_text"/></not_locality></xsl:when>
-									<xsl:otherwise><locality>annex=<xsl:value-of select="java:toUpperCase(java:java.lang.String.new($item_text))"/></locality></xsl:otherwise>
-								</xsl:choose>
-							</xsl:for-each>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:when>
-			</xsl:choose>
-		</xsl:variable>
-		
-		<xsl:variable name="reference">
-			<xsl:call-template name="getReference">
-				<xsl:with-param name="stdid" select="current()/@stdid"/>
-				<xsl:with-param name="locality" select="$locality"/>
-			</xsl:call-template>
-		</xsl:variable>
-		
-		<xsl:choose>
-			<!-- <xsl:when test="xalan:nodeset($ref_by_stdid)/*"> --> <!-- if references in References found, then put id of those reference -->
-			<xsl:when test="$reference != ''"> <!-- if references in References found, then put id of those reference -->
-				<!-- <xsl:value-of select="xalan:nodeset($ref_by_stdid)/@id"/> -->
-				<xsl:value-of select="$reference"/>
-				<!-- <xsl:value-of select="$locality"/> -->
-			</xsl:when>
-			<xsl:otherwise> <!-- put id of current std -->
-				<xsl:text>hidden_bibitem_</xsl:text>
-				<xsl:value-of select="@stdid"/>
-				<!-- <xsl:value-of select="$locality"/> -->
-				<xsl:for-each select="xalan:nodeset($locality)/locality">
-					<xsl:text>,</xsl:text><xsl:value-of select="."/>
-				</xsl:for-each>
-				<!-- if there isn't in References, then display name -->
-				<xsl:variable name="std-ref_text" select=".//std-ref/text()"/>
-				<xsl:if test="normalize-space($std-ref_text) != ''">
-					<xsl:text>,</xsl:text><xsl:value-of select="$std-ref_text"/>
-				</xsl:if>
-			</xsl:otherwise>
-		</xsl:choose>
-		
-	</xsl:template>
 	
 	
 	<xsl:template name="getReference">
@@ -1775,8 +1650,7 @@
 		<xsl:variable name="ref" select="xalan:nodeset($ref_)"/>
 		<xsl:variable name="ref_by_stdid" select="normalize-space($ref/@id)"/> <!-- find ref by id -->
 		<xsl:value-of select="$ref_by_stdid"/>
-		<xsl:if test="$ref_by_stdid != ''">
-			<!-- <xsl:value-of select="$locality"/> -->
+		<!-- <xsl:if test="$ref_by_stdid != ''">
 			<xsl:variable name="locality_" select="xalan:nodeset($locality)"/>
 			<xsl:for-each select="$locality_/locality">
 				<xsl:text>,</xsl:text><xsl:value-of select="."/>
@@ -1788,7 +1662,7 @@
 					<xsl:text> </xsl:text><xsl:value-of select="."/>
 				</xsl:for-each>
 			</xsl:if>
-		</xsl:if>
+		</xsl:if> -->
 	</xsl:template>
 	
 	<xsl:template match="std-id-group"/>
@@ -1816,224 +1690,52 @@
 	<!-- tbx:source processing -->
 	<!-- ================= -->
 	<xsl:template match="tbx:source">
+	
+		<xsl:variable name="model_term_source_">
+			<xsl:call-template name="build_sts_model_term_source"/>
+		</xsl:variable>
+		<xsl:variable name="model_term_source" select="xalan:nodeset($model_term_source_)"/>
+	
+		<!-- <xsl:for-each select="$model_term_source/*">
+			<xsl:value-of select="local-name()"/>=<xsl:value-of select="."/><xsl:text>&#xa;</xsl:text>
+		</xsl:for-each> -->
+	
 		<xsl:text>[.source]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&lt;&lt;</xsl:text>
-			<xsl:variable name="result_parts_">
-				<xsl:apply-templates />
-			</xsl:variable>
 			
-			<xsl:variable name="result_parts">
-				<xsl:for-each select="xalan:nodeset($result_parts_)/node()[1]">
-					<item>
-						<xsl:variable name="reference">
-							<xsl:call-template name="getReference">
-								<xsl:with-param name="stdid" select="normalize-space(.)"/>
-							</xsl:call-template>
-						</xsl:variable>
-						<!-- reference=<xsl:value-of select="$reference"/><xsl:text>&#xa;</xsl:text> -->
-						<xsl:if test="normalize-space($reference) = ''">hidden_bibitem_</xsl:if><xsl:value-of select="."/>
-					</item>
-				</xsl:for-each>
-				<xsl:for-each select="xalan:nodeset($result_parts_)/*[self::locality or self::localityContinue]">
-					<xsl:copy>
-						<!-- <xsl:value-of select="."/> -->
-						<!-- remove comma at end -->
-						<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),',$','')"/>
-					</xsl:copy>
-				</xsl:for-each>
-				<xsl:for-each select="xalan:nodeset($result_parts_)/node()[position() &gt; 1 and not(self::locality or self::localityContinue)]">
-					<item>
-						<xsl:value-of select="."/>
-					</item>
-				</xsl:for-each>
+			<!-- put reference -->
+			<xsl:variable name="term_source_reference" select="$model_term_source/reference"/>
+			<xsl:variable name="reference">
+				<xsl:call-template name="getReference_std">
+					<xsl:with-param name="stdid" select="normalize-space($term_source_reference)"/>
+				</xsl:call-template>
 			</xsl:variable>
-			<xsl:for-each select="xalan:nodeset($result_parts)/node()[normalize-space() != '']">
+			<!-- <xsl:if test="normalize-space($reference) = ''">hidden_bibitem_</xsl:if> --><xsl:value-of select="$term_source_reference"/>
+			
+			<!-- put locality (-ies) -->
+			<xsl:for-each select="$model_term_source/*[self::locality or self::localityContinue][normalize-space() != '']">
+				<xsl:if test="self::locality"><xsl:text>,</xsl:text></xsl:if>
+				<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),',$','')"/> <!-- remove comma at end -->
+			</xsl:for-each>
+			
+			<!-- put reference text -->
+			<xsl:for-each select="$model_term_source/referenceText[normalize-space() != '']">
+				<xsl:text>,</xsl:text>
 				<xsl:value-of select="."/>
-				<xsl:if test="position() != last()">
-					<xsl:choose>
-						<xsl:when test="following-sibling::*[1][self::localityContinue]"></xsl:when>
-						<xsl:otherwise>,</xsl:otherwise>
-					</xsl:choose>
-				</xsl:if>
 			</xsl:for-each>
 			
 		<xsl:text>&gt;&gt;</xsl:text>
 		
-		<xsl:variable name="isModified" select="contains(normalize-space(.), ' modified')"/>
-		<xsl:if test="$isModified = 'true'">
-			<xsl:text>,</xsl:text>
-			<xsl:value-of select="java:replaceAll(java:java.lang.String.new(substring-after(normalize-space(.), ' modified')), '^(\s|\h)*(-|–)?(\s|\h)*','')"/>
-		</xsl:if>
+		<!-- put modified text (or just indication, i.e. comma ',') -->
+		<xsl:for-each select="$model_term_source/modified">
+			<xsl:value-of select="."/>
+		</xsl:for-each>
 		
 		<xsl:text>&#xa;&#xa;</xsl:text>
 		
 	</xsl:template>
-
 	
-	<xsl:template match="tbx:source/text()" priority="3">
-	
-		<xsl:variable name="isFirstText" select="not(preceding-sibling::node())"/>
-	
-		<xsl:variable name="modified_text">, modified</xsl:variable>
-		
-		<!-- remove modified text -->
-		<xsl:variable name="text">
-			<xsl:choose>
-				<xsl:when test="contains(., $modified_text)">
-					<xsl:value-of select="substring-before(., $modified_text)"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="."/>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		
-		<xsl:variable name="source_parts_">
-			<xsl:call-template name="split">
-				<xsl:with-param name="pText" select="$text"/>
-				<xsl:with-param name="sep" select="','"/>
-			</xsl:call-template>
-		</xsl:variable>
-		
-		<xsl:variable name="source_parts" select="xalan:nodeset($source_parts_)"/>
-		
-		<xsl:variable name="xref_bibr_rid" select="following-sibling::xref[@ref-type='bibr']/@rid"/>
-		
-		<xsl:variable name="is_next_xref_bibr" select="normalize-space(following-sibling::*[1][self::xref[@ref-type='bibr']] and 1 = 1)"/>
-		<xsl:variable name="is_prev_xref_bibr" select="normalize-space(preceding-sibling::*[1][self::xref[@ref-type='bibr']] and 1 = 1)"/>
-		
-		<xsl:variable name="result_parts_">
-			<xsl:for-each select="$source_parts//item">
-				<xsl:variable name="item_text">
-					<xsl:choose>
-						<!-- remove [ before xref -->
-						<xsl:when test="position() = last() and $is_next_xref_bibr = 'true' and substring(., string-length(.)) = '['">
-							<xsl:value-of select="substring(., 1, string-length(.) - 1)"/>
-						</xsl:when>
-						<!-- remove ] after xref -->
-						<xsl:when test="position() = 1 and $is_prev_xref_bibr = 'true' and starts-with(., ']')">
-							<xsl:value-of select="substring(., 2)"/>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:value-of select="."/>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:variable>
-				<xsl:choose>
-					<xsl:when test="$isFirstText = 'true' and position() = 1">
-						
-						<xsl:choose>
-							<!-- get xref/@rid (reference to bibliography) as reference, if exists -->
-							<xsl:when test="normalize-space($xref_bibr_rid) != ''">
-								<item><xsl:value-of select="$xref_bibr_rid"/></item>
-								<!-- <xsl:text>,</xsl:text> -->
-								<item><xsl:value-of select="$item_text"/></item>
-							</xsl:when>
-							<xsl:otherwise>
-								<!-- <xsl:variable name="first_text" select="$source_parts/item[1]"/> -->
-								<xsl:call-template name="getStdRef">
-									<xsl:with-param name="text" select="$item_text"/>
-								</xsl:call-template>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:choose>
-							<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^(Clause(\s|\h)+)[0-9]+(\.[0-9]+)*$', normalize-space($item_text)) = 'true'"> <!-- Example: Clause 4 -->
-								<locality>
-									<xsl:value-of select="java:toLowerCase(java:java.lang.String.new($item_text))"/>
-								</locality>
-							</xsl:when>
-							<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^(Box(\s|\h)+)[0-9]+$', normalize-space($item_text)) = 'true'"> <!-- Example: Box 8 -->
-								<locality>
-									<xsl:text>locality:box=</xsl:text><xsl:value-of select="java:replaceAll(java:java.lang.String.new($item_text),'^(Box(\s|\h)+)([0-9]+)$','$3')"/>
-								</locality>
-							</xsl:when>
-							<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^[0-9]+(\.[0-9]+)*$', normalize-space($item_text)) = 'true'"> <!-- Example: 3.23 or 3.2.4 -->
-								<locality>
-									<xsl:text>clause </xsl:text><xsl:value-of select="$item_text"/>
-								</locality>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:choose>
-									<xsl:when test="$item_text = 'definition'">
-										<locality>
-											<xsl:text>locality:</xsl:text>
-											<xsl:value-of select="$item_text"/>
-										</locality>
-									</xsl:when>
-									<xsl:otherwise>
-										<item>
-											<xsl:value-of select="$item_text"/>
-										</item>
-									</xsl:otherwise>
-								</xsl:choose>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:for-each>
-		</xsl:variable>
-		
-		<xsl:copy-of select="$result_parts_"/>
-	</xsl:template>
-	
-
-	<xsl:template match="tbx:source/std" priority="2">
-		<xsl:call-template name="insertStd"/>
-	</xsl:template>
-	
-	
-	<xsl:template match="tbx:source/bold | tbx:source/bold2" priority="2">
-		<xsl:choose>
-			<xsl:when test="contains(preceding-sibling::node(), 'definition')">
-				<localityContinue>
-					<xsl:text>=</xsl:text>
-					<xsl:apply-templates />
-				</localityContinue>
-			</xsl:when>
-			<xsl:otherwise>
-				<locality>
-					<xsl:text>clause </xsl:text>
-					<xsl:apply-templates />
-				</locality>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>
-	<xsl:template match="tbx:source/bold/xref[@ref-type = 'sec'] | tbx:source/bold2/xref[@ref-type = 'sec']" priority="2">
-		<xsl:apply-templates />
-	</xsl:template>
-	<xsl:template match="tbx:source/xref[@ref-type = 'bibr']" priority="2" />
-		
-	<xsl:template match="tbx:source/xref[@ref-type = 'fn']" priority="3">
-		<!-- to do -->
-		<!-- <xsl:apply-templates /> -->
-	</xsl:template>
-	
-	<xsl:template match="tbx:source/text()[last()]" name="source_text_modified" priority="2">
-	</xsl:template>
-	
-	<xsl:template match="tbx:source/text()" mode="source_text_modified">
-		<xsl:call-template name="source_text_modified"/>
-	</xsl:template>
-	
-	
-	<xsl:template match="@*|node()" mode="tbx_source_simplify">
-		<xsl:copy>
-			<xsl:apply-templates select="@*|node()" mode="tbx_source_simplify"/>		
-		</xsl:copy>
-	</xsl:template>
-
-	<xsl:template match="text()" priority="2" mode="tbx_source_simplify"> <!-- [starts-with(., ', modified') or starts-with(., ' modified')] -->
-		<xsl:choose>
-			<xsl:when test="contains(., ', modified')"><xsl:value-of select="substring-before(., ', modified')"/></xsl:when>
-			<xsl:when test="contains(., 'modified')"><xsl:value-of select="substring-before(., 'modified')"/></xsl:when>
-			<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>
-
-	<xsl:template match="xref[@ref-type = 'bibr']" mode="tbx_source_simplify"/>
 	<!-- ================= -->
 	<!-- END tbx:source processing -->
 	<!-- ================= -->
@@ -2435,7 +2137,7 @@
 		<xsl:text>]</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="fn">
+	<xsl:template match="fn" name="fn">
 		<xsl:text> footnote:[</xsl:text>
 			<xsl:apply-templates />
 		<xsl:text>]</xsl:text>
@@ -3976,70 +3678,6 @@
 	<!-- ===================== -->	
 	<!-- ===================== -->	
 	
-	<xsl:template name="getStdRef">
-		<xsl:param name="text" select="."/>
-		<!-- <xsl:variable name="std-ref" select="java:replaceAll(java:java.lang.String.new($text),'- -','—')"/> -->
-		<xsl:variable name="std-ref">
-			<xsl:call-template name="getNormalizedId">
-				<xsl:with-param name="id" select="$text"/>
-			</xsl:call-template>
-		</xsl:variable>
-		
-		<!-- refs=<xsl:for-each select="xalan:nodeset($refs)//ref">
-			stdid_option=<xsl:value-of select="@stdid_option"/><xsl:text>&#xa;</xsl:text>
-		</xsl:for-each> -->
-		
-		<!-- std-ref=<xsl:value-of select="$std-ref"/><xsl:text>&#xa;</xsl:text> -->
-		<!-- <xsl:variable name="ref1" select="//ref[std/std-ref = $std-ref]/@id"/> -->
-		<xsl:variable name="ref1_" select="$refs//ref[@stdid_option = $std-ref]"/>				
-		<xsl:variable name="ref1" select="xalan:nodeset($ref1_)"/>				
-		<!-- ref1=<xsl:value-of select="$ref1"/><xsl:text>&#xa;</xsl:text> -->
-		<!-- <xsl:variable name="ref2" select="//ref[starts-with(std/std-ref, concat($std-ref, ' '))]/@id"/> -->
-		<xsl:variable name="ref2_" select="$refs//ref[starts-with(@stdid_option, concat($std-ref, ' '))]"/>
-		<xsl:variable name="ref2" select="xalan:nodeset($ref2_)"/>
-		<!-- ref2=<xsl:value-of select="$ref2"/><xsl:text>&#xa;</xsl:text> -->
-		
-		<xsl:variable name="ref3_" select="$refs//ref[@stdid_option = $std-ref]/@stdid_option"/>				
-		<xsl:variable name="ref3" select="xalan:nodeset($ref3_)"/>				
-		
-		<xsl:choose>
-			<xsl:when test="$ref1/@id != ''">
-				<item><xsl:value-of select="$ref1/@id"/></item>
-				
-				<xsl:if test="$ref1/@addTextToReference = 'true'">
-					<!-- if reference to standard and bibitem is numbered, for example: [1] -->
-					<!-- <xsl:text>,</xsl:text> -->
-					<item><xsl:value-of select="$text"/></item>
-				</xsl:if>
-			</xsl:when>
-			<xsl:when test="$ref2/@id != ''">
-				<item><xsl:value-of select="$ref2/@id"/></item>
-				
-				<xsl:if test="$ref2/@addTextToReference = 'true'">
-					<!-- if reference to standard and bibitem is numbered, for example: [1] -->
-					<!-- <xsl:text>,</xsl:text> -->
-					<item><xsl:value-of select="$text"/></item>
-				</xsl:if>
-			</xsl:when>
-			<xsl:when test="$ref3/@stdid_option != ''">
-				<item><xsl:value-of select="$ref3/@stdid_option"/></item>
-				
-				<xsl:if test="$ref3/@addTextToReference = 'true'">
-					<!-- if reference to standard and bibitem is numbered, for example: [1] -->
-					<!-- <xsl:text>,</xsl:text> -->
-					<item><xsl:value-of select="$text"/></item>
-				</xsl:if>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:if test="$std-ref != $text">
-					<item>
-						<xsl:value-of select="$std-ref"/>
-					</item><!-- , -->
-				</xsl:if>
-				<item><xsl:value-of select="$text"/></item>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>
 	
 	<xsl:template name="getUpdatedRef">
 		<xsl:param name="text"/>
@@ -5199,5 +4837,7 @@
 	<!-- =============== -->
 	<!-- END self-testing -->
 	<!-- =============== -->
+	
+	<xsl:include href="sts2mn.common.xsl"/>
 	
 </xsl:stylesheet>
