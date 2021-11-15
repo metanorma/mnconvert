@@ -8,6 +8,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.file.Files;
@@ -18,6 +19,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -193,6 +195,7 @@ public class STS2MN_XsltConverter extends XsltConverter {
             } else { // internal xsl
                 srcXSL = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), "sts2mn.xsl"));
             }
+            
             transformer = factory.newTransformer(srcXSL);
             transformer.setParameter("split-bibdata", isSplitBibdata);
             transformer.setParameter("imagesdir", imagesDir);
@@ -235,8 +238,10 @@ public class STS2MN_XsltConverter extends XsltConverter {
                 srcXSL = new StreamSource(fileXSL);
             } else { // internal xsl
                 srcXSL = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), "sts2mn.adoc.xsl"));
+                // for xsl:include processing (load xsl from jar)
+                factory.setURIResolver(new XSLT_ResourceResolver());
             }
-            
+
             transformer = factory.newTransformer(srcXSL);
             transformer.setParameter("split-bibdata", isSplitBibdata);
             transformer.setParameter("docfile_name", bibdataFileName);
