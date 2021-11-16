@@ -194,6 +194,8 @@ public class STS2MN_XsltConverter extends XsltConverter {
                 srcXSL = new StreamSource(fileXSL);
             } else { // internal xsl
                 srcXSL = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), "sts2mn.xsl"));
+                // for xsl:include processing (load xsl from jar)
+                factory.setURIResolver(new XSLT_ResourceResolver());
             }
             
             transformer = factory.newTransformer(srcXSL);
