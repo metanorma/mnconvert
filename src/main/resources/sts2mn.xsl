@@ -226,19 +226,30 @@
 			<xsl:if test="/standard/front/iso-meta">
 				<boilerplate>
 					<copyright-statement>
-						
-							<clause>
-								<p id="boilerplate-year">© <xsl:value-of select="/standard/front/iso-meta/permissions/copyright-holder"/><xsl:text> </xsl:text><xsl:value-of select="/standard/front/iso-meta/permissions/copyright-year"/></p>
-								<p id="boilerplate-message"><xsl:apply-templates select="/standard/front/iso-meta/permissions/copyright-statement" mode="bibdata"/></p>
-							</clause>
-						
+						<clause>
+							<xsl:choose>
+								<xsl:when test="$organization = 'BSI'">
+									<p id="boilerplate-year">© <xsl:value-of select="/standard/front/iso-meta/permissions/copyright-holder"/><xsl:text> </xsl:text><xsl:value-of select="/standard/front/iso-meta/permissions/copyright-year"/></p>
+									<p id="boilerplate-message"><xsl:apply-templates select="/standard/front/iso-meta/permissions/copyright-statement" mode="bibdata"/></p>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:for-each select="/standard/front/iso-meta/permissions/copyright-statement">
+										<p>
+											<xsl:copy-of select="@id"/>
+											<xsl:apply-templates mode="bibdata"/>
+										</p>
+									</xsl:for-each>
+								</xsl:otherwise>
+							</xsl:choose>
 						<!-- <xsl:if test="/standard/front/nat-meta">
 							<clause>
 								<p id="boilerplate-year">© <xsl:value-of select="/standard/front/nat-meta/permissions/copyright-holder"/><xsl:text> </xsl:text><xsl:value-of select="/standard/front/nat-meta/permissions/copyright-year"/></p>
 								<p id="boilerplate-message"><xsl:apply-templates select="/standard/front/nat-meta/permissions/copyright-statement" mode="bibdata"/></p>
 							</clause>
 						</xsl:if> -->
+						</clause>
 					</copyright-statement>
+					<xsl:apply-templates select="/standard/front/iso-meta/permissions/license" mode="bibdata"/>
 				</boilerplate>
 			</xsl:if>
 			<xsl:if test="sec or notes">
@@ -362,7 +373,9 @@
 		<xsl:if test="std-ident/doc-type or comm-ref or ics or std-ident or doc-ident/release-version or secretariat">
 			<ext>
 				<xsl:apply-templates select="std-ident/doc-type" mode="bibdata"/>
-
+				
+				<xsl:apply-templates select="custom-meta-group/custom-meta[meta-name = 'horizontal']" mode="bibdata"/>
+				
 				<xsl:apply-templates select="comm-ref" mode="bibdata"/>
 				
 				<xsl:apply-templates select="ics" mode="bibdata"/>			
@@ -465,6 +478,7 @@
 															iso-meta/permissions/copyright-statement |
 															nat-meta/permissions/copyright-statement |
 															reg-meta/permissions/copyright-statement |
+															iso-meta/permissions/license |
 															iso-meta/std-ident/doc-type |
 															nat-meta/std-ident/doc-type |
 															reg-meta/std-ident/doc-type |
@@ -633,7 +647,7 @@
   
   
 	<xsl:template match="iso-meta/std-ref[@type='dated'] | nat-meta/std-ref[@type='dated'] | reg-meta/std-ref[@type='dated']" mode="bibdata">
-		<docidentifier type="iso">
+		<docidentifier type="ISO">
 			<xsl:apply-templates mode="bibdata"/>
 		</docidentifier>
 		<xsl:variable name="language_" select="substring(//*[contains(local-name(), '-meta')]/doc-ident/language,1,1)"/> <!-- iso-meta -->
@@ -690,9 +704,15 @@
 	<xsl:template match="iso-meta/doc-ident/sdo | nat-meta/doc-ident/sdo | reg-meta/doc-ident/sdo" mode="bibdata">
 		<contributor>
 			<role type="author"/>
-			<organization>				
-				<abbreviation>
+			<organization>
+				<xsl:variable name="abbreviation">
 					<xsl:apply-templates mode="bibdata"/>
+				</xsl:variable>
+				<xsl:call-template name="organization_name_by_abbreviation">
+					<xsl:with-param name="abbreviation" select="$abbreviation"/>
+				</xsl:call-template>
+				<abbreviation>
+					<xsl:value-of select="$abbreviation"/>
 				</abbreviation>
 			</organization>
 		</contributor>
@@ -703,8 +723,14 @@
 		<contributor>
 			<role type="publisher"/>
 				<organization>
-					<abbreviation>
+					<xsl:variable name="abbreviation">
 						<xsl:apply-templates mode="bibdata"/>
+					</xsl:variable>
+					<xsl:call-template name="organization_name_by_abbreviation">
+						<xsl:with-param name="abbreviation" select="$abbreviation"/>
+					</xsl:call-template>
+					<abbreviation>
+						<xsl:value-of select="$abbreviation"/>
 					</abbreviation>
 				</organization>
 		</contributor>
@@ -718,9 +744,18 @@
 	
 	<xsl:template match="iso-meta/std-ident/version | nat-meta/std-ident/version | reg-meta/std-ident/version" mode="bibdata">
 		<version>
-			<xsl:apply-templates mode="bibdata"/>
-			<!-- <revision-date>
-			</revision-date> -->
+			<xsl:variable name="version"><xsl:apply-templates mode="bibdata"/></xsl:variable>
+			<xsl:choose>
+				<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$', normalize-space(.)) = 'true'">
+					<revision-date>
+						<xsl:value-of select="$version"/>
+					</revision-date>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$version"/>
+				</xsl:otherwise>
+			</xsl:choose>
+			
 		</version>
 	</xsl:template>
 	
@@ -732,29 +767,59 @@
 		
 	<xsl:template match="iso-meta/doc-ident/release-version | nat-meta/doc-ident/release-version | reg-meta/doc-ident/release-version" mode="bibdata">
 		<xsl:variable name="value" select="java:toUpperCase(java:java.lang.String.new(.))"/>
+		
+		<xsl:variable name="custom-meta_stage" select="normalize-space(../../custom-meta-group/custom-meta[meta-name = 'stage']/meta-value)"/>
+		<xsl:variable name="custom-meta_stage_abbreviation" select="normalize-space(../../custom-meta-group/custom-meta[meta-name = 'stage_abbreviation']/meta-value)"/>
 		<xsl:variable name="stage">
 			<xsl:choose>
+				<xsl:when test="$custom-meta_stage != ''">
+					<xsl:value-of select="$custom-meta_stage"/>
+				</xsl:when>
 				<xsl:when test="$value = 'WD'">20</xsl:when>
 				<xsl:when test="$value = 'CD'">30</xsl:when>
 				<xsl:when test="$value = 'DIS'">40</xsl:when>
 				<xsl:when test="$value = 'FDIS'">50</xsl:when>
-				<xsl:when test="$value = 'IS'">60</xsl:when>				
+				<xsl:when test="$value = 'IS'">60</xsl:when>
+				<xsl:when test="$value = 'PPUB'">60</xsl:when>
 			</xsl:choose>
 		</xsl:variable>
+		<xsl:variable name="custom-meta_substage" select="normalize-space(../../custom-meta-group/custom-meta[meta-name = 'substage']/meta-value)"/>
+		<xsl:variable name="custom-meta_substage_abbreviation" select="normalize-space(../../custom-meta-group/custom-meta[meta-name = 'substage_abbreviation']/meta-value)"/>
 		<xsl:variable name="substage">
 			<xsl:choose>
+				<xsl:when test="$custom-meta_substage != ''">
+					<xsl:value-of select="$custom-meta_substage"/>
+				</xsl:when>
 				<xsl:when test="$value = 'WD' or $value = 'CD' or $value = 'DIS' or $value = 'FDIS'">00</xsl:when>
-				<xsl:when test="$value = 'IS'">60</xsl:when>				
+				<xsl:when test="$value = 'IS'">60</xsl:when>
+				<xsl:when test="$value = 'PPUB'">60</xsl:when>
 			</xsl:choose>
 		</xsl:variable>
 		<status>
 			<stage>
 				<xsl:attribute name="abbreviation">
-					<xsl:apply-templates mode="bibdata"/>
+					<xsl:choose>
+						<xsl:when test="$custom-meta_stage_abbreviation != ''">
+							<xsl:value-of select="$custom-meta_stage_abbreviation"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:apply-templates mode="bibdata"/>
+						</xsl:otherwise>
+					</xsl:choose>
 				</xsl:attribute>
 				<xsl:value-of select="$stage"/>
 			</stage>
 			<substage>
+				<xsl:attribute name="abbreviation">
+					<xsl:choose>
+						<xsl:when test="$custom-meta_substage_abbreviation != ''">
+							<xsl:value-of select="$custom-meta_substage_abbreviation"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:apply-templates mode="bibdata"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:attribute>
 				<xsl:value-of select="$substage"/>
 			</substage>
 		</status>		
@@ -806,8 +871,14 @@
 							</name>
 						</xsl:when>
 						<xsl:otherwise>
-							<abbreviation>
+							<xsl:variable name="abbreviation">
 								<xsl:apply-templates mode="bibdata"/>
+							</xsl:variable>
+							<xsl:call-template name="organization_name_by_abbreviation">
+								<xsl:with-param name="abbreviation" select="$abbreviation"/>
+							</xsl:call-template>
+							<abbreviation>
+								<xsl:value-of select="$abbreviation"/>
 							</abbreviation>
 						</xsl:otherwise>
 					</xsl:choose>
@@ -913,6 +984,16 @@
 				<partnumber><xsl:value-of select="../std-ident/part-number"/></partnumber>
 			</xsl:if>
 		</structuredidentifier>		
+	</xsl:template>
+	
+	<xsl:template match="custom-meta-group/custom-meta[meta-name = 'horizontal']" mode="bibdata">
+		<horizontal><xsl:value-of select="meta-value"/></horizontal>
+	</xsl:template>
+	
+	<xsl:template match="permissions/license" mode="bibdata">
+		<legal-statement>
+			<xsl:apply-templates/>
+		</legal-statement>
 	</xsl:template>
 	
 	<xsl:template match="@*" mode="bibdata">
@@ -1043,7 +1124,9 @@
 	</xsl:template>
 	
 	<xsl:template match="term-sec/label" mode="term_sec_label">
-		<name><xsl:apply-templates /></name>
+		<xsl:if test="$type_xml = 'presentation'">
+			<name><xsl:apply-templates /></name>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="tbx:langSet">
@@ -1100,18 +1183,35 @@
 				<xsl:otherwise>preferred</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-		<xsl:element name="{$element_name}">
-			<xsl:variable name="termType" select="normalize-space(../tbx:termType/@value)"/>
-			<xsl:if test="$termType != ''">
-				<xsl:attribute name="type">
-					<xsl:choose>
-						<xsl:when test="$termType = 'variant'">full</xsl:when>
-						<xsl:otherwise><xsl:value-of select="$termType"/></xsl:otherwise> <!-- Example: abbreviation -->
-					</xsl:choose>
-				</xsl:attribute>
-			</xsl:if>
-			<xsl:apply-templates />
-		</xsl:element>
+		<xsl:choose>
+			<xsl:when test="$type_xml = 'semantic'">
+				<xsl:element name="{$element_name}">
+					<expression>
+						<name>
+							<xsl:call-template name="createTermElement"/>
+						</name>
+					</expression>
+				</xsl:element>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:element name="{$element_name}">
+					<xsl:call-template name="createTermElement"/>
+				</xsl:element>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template name="createTermElement">
+		<xsl:variable name="termType" select="normalize-space(../tbx:termType/@value)"/>
+		<xsl:if test="$termType != ''">
+			<xsl:attribute name="type">
+				<xsl:choose>
+					<xsl:when test="$termType = 'variant'">full</xsl:when>
+					<xsl:otherwise><xsl:value-of select="$termType"/></xsl:otherwise> <!-- Example: abbreviation -->
+				</xsl:choose>
+			</xsl:attribute>
+		</xsl:if>
+		<xsl:apply-templates />
 	</xsl:template>
 	
 	<xsl:template match="tbx:normativeAuthorization"/>
@@ -1137,10 +1237,26 @@
 	</xsl:template>
 	
 	<xsl:template match="non-normative-note">
-		<note>
+		<xsl:variable name="name">
 			<xsl:apply-templates select="label" mode="note_label" />
-			<xsl:apply-templates />
-		</note>
+		</xsl:variable>
+		
+		<xsl:variable name="name_lc" select="normalize-space(java:toLowerCase(java:java.lang.String.new($name)))"/>
+		<xsl:choose>
+			<xsl:when test="$name_lc = 'warning' or $name_lc = 'caution'">
+				<admonition type="{$name_lc}">
+					<xsl:copy-of select="@id"/>
+					<xsl:apply-templates />
+				</admonition>
+			</xsl:when>
+			<xsl:otherwise>
+				<note>
+					<xsl:apply-templates select="label" mode="note_label" />
+					<xsl:apply-templates />
+				</note>
+			</xsl:otherwise>
+		</xsl:choose>
+		
 	</xsl:template>
 	
 	<xsl:template match="non-normative-note/label" mode="note_label">
@@ -1209,6 +1325,7 @@
 	
 	<xsl:template match="def-list">
 		<dl>
+			<xsl:copy-of select="@id"/>
 			<xsl:apply-templates />
 		</dl>
 	</xsl:template>
@@ -1350,7 +1467,7 @@
 	<xsl:template match="title">
 		<xsl:element name="{local-name()}">
 			<xsl:apply-templates select="@*"/>
-			<xsl:if test="$semantic_ = 'false'">
+			<xsl:if test="$type_xml = 'presentation'">
 				<xsl:variable name="label" select="parent::sec/label"/>
 				<xsl:variable name="calculated_level">
 					<xsl:value-of select="string-length($label) - string-length(translate($label, '.', '')) + 1"/>
@@ -1398,7 +1515,7 @@
 	</xsl:template>
 	
 	<xsl:template match="label" mode="label">
-		<xsl:if test="$semantic_ = 'false'">
+		<xsl:if test="$type_xml = 'presentation'">
 			<xsl:apply-templates/><tab/>
 		</xsl:if>
 	</xsl:template>
@@ -1634,6 +1751,7 @@
 	
 	<xsl:template match="non-normative-example">
 		<example>
+			<xsl:copy-of select="@id"/>
 			<xsl:apply-templates />
 		</example>
 	</xsl:template>
@@ -1798,7 +1916,7 @@
 	
 	<xsl:template match="graphic[preceding-sibling::*[1][self::graphic] or following-sibling::*[1][self::graphic] and parent::fig]">
 		<figure>
-			<xsl:if test="$semantic = 'false'">
+			<xsl:if test="$type_xml = 'presentation'">
 				<name><xsl:number format="a)"/></name>
 			</xsl:if>
 			<xsl:call-template name="graphic"/>
@@ -1902,7 +2020,7 @@
 			</xsl:choose>
 		</xsl:variable>
 		<xsl:choose>
-			<xsl:when test="$semantic_ = 'true' and (@content-type = 'term' and (local-name(//*[@id = $target]) = 'term-sec' or local-name(//*[@id = $target]) = 'termEntry'))">
+			<xsl:when test="$type_xml = 'semantic' and (@content-type = 'term' and (local-name(//*[@id = $target]) = 'term-sec' or local-name(//*[@id = $target]) = 'termEntry'))">
 				<xsl:variable name="term_real" select="//*[@id = $target]//tbx:term[1]"/>
 				<concept>
 					<refterm><xsl:value-of select="$term_real"/></refterm>
@@ -2036,6 +2154,13 @@
 	<!-- END sub-part processing         -->
 	<!-- =========================== -->
 	
+	<xsl:template match="license-p">
+		<clause>
+			<xsl:copy-of select="@id"/>
+			<xsl:apply-templates/>
+		</clause>
+	</xsl:template>
+	
 	<xsl:template name="split">
 		<xsl:param name="pText" select="."/>
 		<xsl:param name="sep" select="'/'"/>
@@ -2093,6 +2218,13 @@
 	
 	<xsl:template match="processing-instruction()" mode="setNamespace">
 		<xsl:copy-of select="."/>
+	</xsl:template>
+	
+	<xsl:template name="organization_name_by_abbreviation">
+		<xsl:param name="abbreviation"/>
+		<xsl:choose>
+			<xsl:when test="$abbreviation = 'IEC'"><name>International Electrotechnical Commission</name></xsl:when>
+		</xsl:choose>
 	</xsl:template>
 	
 </xsl:stylesheet>

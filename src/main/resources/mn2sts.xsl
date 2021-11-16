@@ -508,7 +508,9 @@
 			
 			<xsl:apply-templates select="preface/clause[@type = 'front_notes']" mode="front_notes"/>
 			
-			<xsl:call-template name="insert_publication_info"/>
+			<xsl:if test="$organization = 'BSI'">
+				<xsl:call-template name="insert_publication_info"/>
+			</xsl:if>
 			
 			<xsl:apply-templates select="preface" mode="front_preface"/>
 		</front>
@@ -935,12 +937,15 @@
 				<xsl:apply-templates select="/*/boilerplate/license-statement"/>
 			</permissions>
 			
-			<xsl:if test="docidentifier[@type = 'ISBN']">
+			<xsl:if test="docidentifier[@type = 'ISBN'] or
+								ext/horizontal or
+								status/stage or 
+								status/substage">
 				<custom-meta-group>
-					<custom-meta>
-						<meta-name>ISBN</meta-name>
-						<meta-value><xsl:value-of select="docidentifier[@type = 'ISBN']"/></meta-value>
-					</custom-meta>
+					<xsl:apply-templates select="docidentifier[@type = 'ISBN']" mode="custom_meta"/>
+					<xsl:apply-templates select="ext/horizontal" mode="custom_meta"/>
+					<xsl:apply-templates select="status/stage" mode="custom_meta"/>
+					<xsl:apply-templates select="status/substage" mode="custom_meta"/>
 				</custom-meta-group>
 			</xsl:if>
 			
@@ -1118,6 +1123,41 @@
 		</std-ref>
 	</xsl:template>
 	
+	<!-- =============== -->
+	<!-- custom-meta -->
+	<!-- =============== -->
+	<xsl:template match="docidentifier[@type = 'ISBN']" mode="custom_meta">
+		<custom-meta>
+			<meta-name>ISBN</meta-name>
+			<meta-value><xsl:value-of select="."/></meta-value>
+		</custom-meta>
+	</xsl:template>
+	
+	<xsl:template match="ext/horizontal" mode="custom_meta">
+		<custom-meta>
+			<meta-name>horizontal</meta-name>
+			<meta-value><xsl:value-of select="."/></meta-value>
+		</custom-meta>
+	</xsl:template>
+	
+	<xsl:template match="status/stage | status/substage" mode="custom_meta">
+		<custom-meta>
+			<meta-name><xsl:value-of select="local-name()"/></meta-name>
+			<meta-value><xsl:value-of select="."/></meta-value>
+		</custom-meta>
+		<xsl:if test="@abbreviation">
+			<custom-meta>
+				<meta-name><xsl:value-of select="local-name()"/>_abbreviation</meta-name>
+				<meta-value><xsl:value-of select="@abbreviation"/></meta-value>
+			</custom-meta>
+		</xsl:if>
+	</xsl:template>
+	
+	
+	<!-- =============== -->
+	<!-- END custom-meta -->
+	<!-- =============== -->
+	
 
 	<!-- skip processed ^ attributes  and stop -->
 	<xsl:template match="bibdata/ext/structuredidentifier/project-number/@part |
@@ -1165,7 +1205,8 @@
 																ext/editorialgroup/workgroup |
 																bibdata/relation |
 																bibdata/relation/bibitem |
-																coverimages"
+																coverimages |
+																ext/horizontal"
 																mode="front_check"/>
 
 	<!-- skip processed structure and deep down -->
@@ -1196,6 +1237,7 @@
 		<xsl:value-of select="."/>
 	</xsl:template>
 	
+	
 	<xsl:template match="boilerplate/copyright-statement">
 		<xsl:apply-templates/>
 	</xsl:template>
@@ -1209,8 +1251,11 @@
 	</xsl:template>
 	<xsl:template match="boilerplate/copyright-statement//p"  priority="1">
 		<xsl:variable name="id" select="normalize-space(@id)"/>
-		<xsl:if test="$id != 'boilerplate-year'">
+		<xsl:if test="$id != 'boilerplate-year' or $organization != 'BSI'">
 			<copyright-statement>
+				<xsl:if test="$format = 'NISO'">
+					<xsl:copy-of select="@id"/>
+				</xsl:if>
 				<xsl:apply-templates/>
 			</copyright-statement>
 		</xsl:if>
@@ -1351,6 +1396,7 @@
 					<xsl:number format="_1" count="references[not(@normative='true')]"/>
 				</xsl:if>
 			</xsl:attribute>
+			<xsl:copy-of select="@id"/>
 			<!-- <xsl:apply-templates select="*[local-name() = 'title'][1]" mode="back"/> -->
 			
 			<xsl:apply-templates/>
@@ -2029,6 +2075,7 @@
 		<xsl:variable name="ancestor_clause_id" select="ancestor::clause[1]/@id"/>
 		<xsl:variable name="ancestor_table_id" select="ancestor::table[1]/@id"/>
 		<non-normative-example>
+			<xsl:copy-of select="@id"/>
 			<label>
 				<xsl:text>EXAMPLE</xsl:text>
 				<xsl:choose>
@@ -2629,6 +2676,7 @@
 					<xsl:call-template name="create_array"/>
 				</p> -->
 				<def-list>
+					<xsl:copy-of select="@id"/>
 					<xsl:if test="preceding-sibling::*[1][self::title][contains(normalize-space(), 'Abbrev')]">
 						<xsl:attribute name="type">abbreviations</xsl:attribute>
 					</xsl:if>
@@ -2688,7 +2736,7 @@
 	
 	<xsl:template match="dd" mode="dl"/>
 	<xsl:template match="dd" mode="dd">
-		<p><xsl:apply-templates /></p>
+		<p><xsl:copy-of select="p[1]/@id"/><xsl:apply-templates /></p>
 	</xsl:template>
 	
 	<!-- =============================== -->
