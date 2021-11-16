@@ -1699,8 +1699,13 @@
 		</smallcap>
 	</xsl:template>
 	
-	<xsl:template match="std">
-		<xsl:if test="parent::ref and ancestor::ref-list and @std-id"><!-- Bibliography section -->
+	<!-- ===================== -->
+	<!-- std processing        -->
+	<!-- ===================== -->
+	
+	<!-- std in Bibliography section -->
+	<xsl:template match="std[parent::ref and ancestor::ref-list]" priority="2">
+		<xsl:if test="@std-id">
 			<docidentifier type="URN"><xsl:value-of select="@std-id"/></docidentifier>
 		</xsl:if>
 		<eref type="inline" citeas="{std-ref}">
@@ -1715,6 +1720,47 @@
 			<xsl:apply-templates />
 		</eref>
 	</xsl:template>
+	
+	<!-- std in body -->
+	<xsl:template match="std" name="std">
+		
+		<xsl:variable name="model_std_">
+			<xsl:call-template name="build_sts_model_std"/>
+		</xsl:variable>
+		<xsl:variable name="model_std" select="xalan:nodeset($model_std_)"/>
+		<!-- <std_model><xsl:copy-of select="$model_std_"/></std_model> -->
+		
+		<!-- put reference -->
+		<eref type="inline" bibitemid="{$model_std/reference}" citeas="{$model_std/referenceText[normalize-space() != ''][1]}">
+			<!-- put locality (-ies) -->
+			<xsl:if test="$model_std/*[self::locality][normalize-space() != ''] and not(parent::ref and ancestor::ref-list)">
+				<localityStack>
+					<xsl:for-each select="$model_std/*[self::locality][normalize-space() != '']">
+						<locality>
+							<xsl:attribute name="type">
+								<xsl:value-of select="substring-before(., '=')"/>
+							</xsl:attribute>
+							<referenceFrom>
+								<xsl:value-of select="substring-after(., '=')"/>
+							</referenceFrom>
+						</locality>
+					</xsl:for-each>
+				</localityStack>
+			</xsl:if>
+			<!-- put reference text -->
+			<xsl:for-each select="$model_std/referenceText[normalize-space() != '']">
+				<xsl:value-of select="."/>
+				<xsl:if test="following-sibling::referenceText[normalize-space() != '']">
+					<xsl:text>,</xsl:text>
+				</xsl:if>
+			</xsl:for-each>
+			<xsl:for-each select="$model_std/not_locality">
+				<xsl:text> </xsl:text><xsl:value-of select="."/>
+			</xsl:for-each>
+			<xsl:apply-templates select=".//processing-instruction()"/>
+		</eref>
+	</xsl:template>
+	
 	<xsl:template match="std/std-ref">
 		<xsl:apply-templates />
 	</xsl:template>
@@ -1722,16 +1768,18 @@
 	<!-- move italic, bold formatting outside std -->
 	<xsl:template match="std[italic]" priority="2">
 		<em>
-			<eref type="inline" citeas="{italic/std-ref}">
+			<!-- <eref type="inline" citeas="{italic/std-ref}">
 				<xsl:apply-templates />
-			</eref>
+			</eref> -->
+			<xsl:call-template name="std"/>
 		</em>
 	</xsl:template>
 	<xsl:template match="std[bold]" priority="2">
 		<strong>
-			<eref type="inline" citeas="{bold/std-ref}">
+			<!-- <eref type="inline" citeas="{bold/std-ref}">
 				<xsl:apply-templates />
-			</eref>
+			</eref> -->
+			<xsl:call-template name="std"/>
 		</strong>
 	</xsl:template>
 	<xsl:template match="std/italic | std/bold" priority="2">
@@ -1740,6 +1788,9 @@
 	<xsl:template match="std/italic/std-ref | std/bold/std-ref"> <!--  priority="2"/> -->
 		<xsl:apply-templates />
 	</xsl:template>
+	<!-- ===================== -->
+	<!-- END std processing -->
+	<!-- ===================== -->
 	
 	<xsl:template match="list">
 		<xsl:choose>
