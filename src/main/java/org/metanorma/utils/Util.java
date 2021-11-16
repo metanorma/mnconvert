@@ -236,7 +236,12 @@ public class Util {
         DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder builder = fact.newDocumentBuilder();
-            Document doc = builder.parse(inputXmlFile);
+            Document doc;
+            if (inputXmlFile.toLowerCase().startsWith("http") || inputXmlFile.toLowerCase().startsWith("www.")) {
+                doc = builder.parse(inputXmlFile);
+            } else {
+                doc = builder.parse(new FileInputStream(inputXmlFile));
+            }
             Node node = doc.getDocumentElement();
             String root = node.getNodeName();
             if (root.endsWith("-standard") || root.equals("metanorma-collection")) {
