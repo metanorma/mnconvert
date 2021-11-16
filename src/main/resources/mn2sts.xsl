@@ -1917,6 +1917,7 @@
 	<xsl:template match="expression | expression/name" priority="2">
 		<xsl:apply-templates/>
 	</xsl:template>
+	<xsl:template match="*[self::expression or self::preferred or self::admitted or self::deprecates or self::domain]/text()[normalize-space() = ''] | expression/name/text()[normalize-space() = '']" priority="2"/>
 	
 	<xsl:template match="p" name="p">
 		<!-- <xsl:if test="$debug = 'true'">

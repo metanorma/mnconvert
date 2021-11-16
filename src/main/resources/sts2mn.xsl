@@ -1243,7 +1243,7 @@
 		
 		<xsl:variable name="name_lc" select="normalize-space(java:toLowerCase(java:java.lang.String.new($name)))"/>
 		<xsl:choose>
-			<xsl:when test="$name_lc = 'warning' or $name_lc = 'caution'">
+			<xsl:when test="$name_lc != '' and not(starts-with($name_lc, 'note'))">
 				<admonition type="{$name_lc}">
 					<xsl:copy-of select="@id"/>
 					<xsl:apply-templates />
