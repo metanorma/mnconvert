@@ -25,6 +25,10 @@
 	<xsl:param name="semantic">false</xsl:param>
 	<xsl:variable name="semantic_" select="normalize-space($semantic)"/>
 	
+	<xsl:param name="self_testing">false</xsl:param> <!-- true false -->
+	
+	<xsl:variable name="OUTPUT_FORMAT">xml</xsl:variable> <!-- don't change it -->
+	
 	<xsl:variable name="type_xml">
 		<xsl:choose>
 			<xsl:when test="$semantic_ = 'true'">semantic</xsl:when>
@@ -62,119 +66,139 @@
 		<xsl:if test="/standard/front/nat-meta and not(/standard/front/iso-meta) and not(/standard/front/reg-meta)">true</xsl:if>
 	</xsl:variable>
 
-	<xsl:template match="/*">	
-		<xsl:variable name="xml_result_">
-			<xsl:choose>
-				<xsl:when test="$split-bibdata = 'true'">
-					<xsl:apply-templates select="front"/>
-				</xsl:when>
-				<xsl:otherwise>
-					
-					<xsl:choose>
-						<xsl:when test=".//sub-part"> <!-- multiple documents in one xml -->
-							<metanorma-collection>
-								<bibdata type="collection">
-									<fetched></fetched>
-									<docidentifier type="bsi">bsidocs</docidentifier>
-								</bibdata>
-								<!-- first document -->
-								<doc-container id="doc000000000">
-									<xsl:element name="{$_typestandard}-standard">
-										<xsl:attribute name="type"><xsl:value-of select="$type_xml"/></xsl:attribute>
-										<xsl:apply-templates />
-										<xsl:if test="body/sub-part[1]/body/sec[@sec-type = 'norm-refs'] or back/ref-list">
-											<bibliography>
-												<xsl:apply-templates select="body/sub-part[1]/body/sec[@sec-type = 'norm-refs']" mode="bibliography"/>
-												<xsl:apply-templates select="body/sub-part[1]/back/ref-list" mode="bibliography"/>
-											</bibliography>
-										</xsl:if>
-										<xsl:apply-templates select="body/sub-part[1]//sec[@sec-type = 'index'] | body/sub-part[1]//back/sec[@id = 'ind']" mode="index"/>
-									</xsl:element>
-								</doc-container>
-								<!-- 2nd, 3rd, ... documents -->
-								<xsl:for-each select="body/sub-part[position() &gt; 1]">
-									<xsl:variable name="num" select="position()"/>
-									<doc-container id="{format-number($num, 'doc000000000')}">
+	<xsl:variable name="ref_fix">
+		<xsl:apply-templates select="/" mode="ref_fix"/>
+	</xsl:variable>
+	
+	<xsl:variable name="updated_xml" select="xalan:nodeset($ref_fix)"/>
+
+	<xsl:variable name="refs_">
+		<xsl:if test="$self_testing = 'false'">
+			<xsl:for-each select="$updated_xml//ref">
+				<xsl:copy>
+					<xsl:copy-of select="@*"/>
+				</xsl:copy>
+			</xsl:for-each>
+		</xsl:if>
+	</xsl:variable>
+	<xsl:variable name="refs" select="xalan:nodeset($refs_)"/>
+
+	<xsl:template match="/"> <!-- /* -->
+	
+		<xsl:for-each select="$updated_xml/*">
+	
+			<xsl:variable name="xml_result_">
+				<xsl:choose>
+					<xsl:when test="$split-bibdata = 'true'">
+						<xsl:apply-templates select="front"/>
+					</xsl:when>
+					<xsl:otherwise>
+						
+						<xsl:choose>
+							<xsl:when test=".//sub-part"> <!-- multiple documents in one xml -->
+								<metanorma-collection>
+									<bibdata type="collection">
+										<fetched></fetched>
+										<docidentifier type="bsi">bsidocs</docidentifier>
+									</bibdata>
+									<!-- first document -->
+									<doc-container id="doc000000000">
 										<xsl:element name="{$_typestandard}-standard">
 											<xsl:attribute name="type"><xsl:value-of select="$type_xml"/></xsl:attribute>
-											<xsl:if test="body/*[not(self::sub-part)]">
-												<preface>
-													<xsl:apply-templates select="body/*[not(self::sub-part)]"/>
-												</preface>
-											</xsl:if>
-											<!-- sections -->
-											<xsl:apply-templates select="body/sub-part/*"/>
-											<xsl:if test=".//body/sec[@sec-type = 'norm-refs'] or back/ref-list">
+											<xsl:apply-templates />
+											<xsl:if test="body/sub-part[1]/body/sec[@sec-type = 'norm-refs'] or back/ref-list">
 												<bibliography>
-													<xsl:apply-templates select=".//body/sec[@sec-type = 'norm-refs']" mode="bibliography"/>
-													<xsl:apply-templates select=".//back/ref-list" mode="bibliography"/>
+													<xsl:apply-templates select="body/sub-part[1]/body/sec[@sec-type = 'norm-refs']" mode="bibliography"/>
+													<xsl:apply-templates select="body/sub-part[1]/back/ref-list" mode="bibliography"/>
 												</bibliography>
 											</xsl:if>
+											<xsl:apply-templates select="body/sub-part[1]//sec[@sec-type = 'index'] | body/sub-part[1]//back/sec[@id = 'ind']" mode="index"/>
 										</xsl:element>
 									</doc-container>
-								</xsl:for-each>
-							</metanorma-collection>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:element name="{$_typestandard}-standard">
-								<xsl:attribute name="type"><xsl:value-of select="$type_xml"/></xsl:attribute>
-								<xsl:apply-templates />
-								<xsl:if test="body/sec[@sec-type = 'norm-refs'] or back/ref-list">
-									<bibliography>
-										<xsl:apply-templates select="body/sec[@sec-type = 'norm-refs']" mode="bibliography"/>
-										<xsl:apply-templates select="back/ref-list" mode="bibliography"/>
-									</bibliography>
-								</xsl:if>
-								<xsl:apply-templates select="//sec[@sec-type = 'index'] | //back/sec[@id = 'ind']" mode="index"/>
-							</xsl:element>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
+									<!-- 2nd, 3rd, ... documents -->
+									<xsl:for-each select="body/sub-part[position() &gt; 1]">
+										<xsl:variable name="num" select="position()"/>
+										<doc-container id="{format-number($num, 'doc000000000')}">
+											<xsl:element name="{$_typestandard}-standard">
+												<xsl:attribute name="type"><xsl:value-of select="$type_xml"/></xsl:attribute>
+												<xsl:if test="body/*[not(self::sub-part)]">
+													<preface>
+														<xsl:apply-templates select="body/*[not(self::sub-part)]"/>
+													</preface>
+												</xsl:if>
+												<!-- sections -->
+												<xsl:apply-templates select="body/sub-part/*"/>
+												<xsl:if test=".//body/sec[@sec-type = 'norm-refs'] or back/ref-list">
+													<bibliography>
+														<xsl:apply-templates select=".//body/sec[@sec-type = 'norm-refs']" mode="bibliography"/>
+														<xsl:apply-templates select=".//back/ref-list" mode="bibliography"/>
+													</bibliography>
+												</xsl:if>
+											</xsl:element>
+										</doc-container>
+									</xsl:for-each>
+								</metanorma-collection>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:element name="{$_typestandard}-standard">
+									<xsl:attribute name="type"><xsl:value-of select="$type_xml"/></xsl:attribute>
+									<xsl:apply-templates />
+									<xsl:if test="body/sec[@sec-type = 'norm-refs'] or back/ref-list">
+										<bibliography>
+											<xsl:apply-templates select="body/sec[@sec-type = 'norm-refs']" mode="bibliography"/>
+											<xsl:apply-templates select="back/ref-list" mode="bibliography"/>
+										</bibliography>
+									</xsl:if>
+									<xsl:apply-templates select="//sec[@sec-type = 'index'] | //back/sec[@id = 'ind']" mode="index"/>
+								</xsl:element>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
+			
+			<xsl:variable name="xml_result">
+				<xsl:apply-templates select="xalan:nodeset($xml_result_)" mode="setNamespace"/>
+			</xsl:variable>
+			<xsl:copy-of select="$xml_result"/>
+			
+			
+			<!-- ======================= -->
+			<!-- non-processed element checking -->
+			<!-- ======================= -->
+			
+			<xsl:variable name="xml_namespace">http://www.w3.org/XML/1998/namespace</xsl:variable>
+			<xsl:variable name="mathml_namespace">http://www.w3.org/1998/Math/MathML</xsl:variable>
+			<xsl:variable name="unknown_elements">
+				<xsl:for-each select="xalan:nodeset($xml_result)//*">
+					<xsl:if test="namespace::*[. != $xml_result_namespace and . != $xml_namespace and . != $mathml_namespace and . != $xml_collection_result_namespace]">
+						<element namespace="{namespace::*}">
+							<xsl:for-each select="ancestor-or-self::*">
+								<xsl:value-of select="local-name()"/><xsl:if test="position() != last()">/</xsl:if>
+							</xsl:for-each>
+						</element>
+					</xsl:if>
+				</xsl:for-each>
+			</xsl:variable>
 		
-		<xsl:variable name="xml_result">
-			<xsl:apply-templates select="xalan:nodeset($xml_result_)" mode="setNamespace"/>
-		</xsl:variable>
-		<xsl:copy-of select="$xml_result"/>
-		
-		
-		<!-- ======================= -->
-		<!-- non-processed element checking -->
-		<!-- ======================= -->
-		
-		<xsl:variable name="xml_namespace">http://www.w3.org/XML/1998/namespace</xsl:variable>
-		<xsl:variable name="mathml_namespace">http://www.w3.org/1998/Math/MathML</xsl:variable>
-		<xsl:variable name="unknown_elements">
-			<xsl:for-each select="xalan:nodeset($xml_result)//*">
-				<xsl:if test="namespace::*[. != $xml_result_namespace and . != $xml_namespace and . != $mathml_namespace and . != $xml_collection_result_namespace]">
-					<element namespace="{namespace::*}">
-						<xsl:for-each select="ancestor-or-self::*">
-							<xsl:value-of select="local-name()"/><xsl:if test="position() != last()">/</xsl:if>
-						</xsl:for-each>
-					</element>
+			<xsl:for-each select="xalan:nodeset($unknown_elements)/*">
+				<xsl:if test="position() = 1">
+					<xsl:text disable-output-escaping="yes">&lt;!-- </xsl:text>
+					<xsl:text>&#xa;Non-processed elements found:&#xa;</xsl:text></xsl:if>
+				<xsl:if test="not(preceding-sibling::*/text() = current()/text())">
+					<xsl:value-of select="normalize-space()"/><xsl:text>&#xa;</xsl:text>
+				</xsl:if>
+				<xsl:if test="position() = last()">
+					<xsl:text disable-output-escaping="yes"> --&gt;</xsl:text>
 				</xsl:if>
 			</xsl:for-each>
-		</xsl:variable>
-	
-		<xsl:for-each select="xalan:nodeset($unknown_elements)/*">
-			<xsl:if test="position() = 1">
-				<xsl:text disable-output-escaping="yes">&lt;!-- </xsl:text>
-				<xsl:text>&#xa;Non-processed elements found:&#xa;</xsl:text></xsl:if>
-			<xsl:if test="not(preceding-sibling::*/text() = current()/text())">
-				<xsl:value-of select="normalize-space()"/><xsl:text>&#xa;</xsl:text>
-			</xsl:if>
-			<xsl:if test="position() = last()">
-				<xsl:text disable-output-escaping="yes"> --&gt;</xsl:text>
-			</xsl:if>
+			<!-- ======================= -->
+			<!-- ======================= -->
+			
+			<!-- create task.copyImages.adoc -->
+			<xsl:call-template name="insertTaskImageList"/>
+		
 		</xsl:for-each>
-		<!-- ======================= -->
-		<!-- ======================= -->
-		
-		<!-- create task.copyImages.adoc -->
-		<xsl:call-template name="insertTaskImageList"/>
-		
-		
 	</xsl:template>
 
 	<!-- ============= -->
@@ -1276,8 +1300,62 @@
 	</xsl:template>
 	
 	<xsl:template match="tbx:source">
+	
+		<xsl:variable name="model_term_source_">
+			<xsl:call-template name="build_sts_model_term_source"/>
+		</xsl:variable>
+		<!-- <xsl:copy-of select="$model_term_source_"/> -->
+		<xsl:variable name="model_term_source" select="xalan:nodeset($model_term_source_)"/>
+	
 		<termsource>
-			<origin citeas="{.}"/>
+			<xsl:if test="$model_term_source/modified">
+				<xsl:attribute name="status">modified</xsl:attribute>
+			</xsl:if>
+			
+			<!-- put reference -->
+			<xsl:variable name="term_source_reference" select="$model_term_source/reference"/>
+			<xsl:variable name="reference">
+				<xsl:call-template name="getReference_std">
+					<xsl:with-param name="stdid" select="normalize-space($term_source_reference)"/>
+				</xsl:call-template>
+			</xsl:variable>
+			
+			<origin bibitemid="{$term_source_reference}" type="inline" citeas="{$model_term_source/referenceText[1]}">
+				<!-- put locality (-ies) -->
+				<xsl:if test="$model_term_source/*[self::locality or self::localityContinue][normalize-space() != '']">
+					<localityStack>
+						<xsl:for-each select="$model_term_source/*[self::locality][normalize-space() != '']">
+							<locality>
+								<xsl:attribute name="type">
+									<xsl:value-of select="substring-before(., ' ')"/>
+								</xsl:attribute>
+								<referenceFrom>
+									<xsl:value-of select="substring-after(., ' ')"/>
+									<xsl:value-of select="following-sibling::*[1][self::localityContinue]"/>
+								</referenceFrom>
+							</locality>
+						</xsl:for-each>
+					</localityStack>
+				</xsl:if>
+				<!-- put reference text -->
+				<xsl:for-each select="$model_term_source/referenceText[normalize-space() != '']">
+					<xsl:value-of select="."/>
+					<xsl:if test="following-sibling::referenceText[normalize-space() != '']">
+						<xsl:text>,</xsl:text>
+					</xsl:if>
+				</xsl:for-each>
+			</origin>
+			<!-- put modified text (or just indication, i.e. comma ',') -->
+			<xsl:if test="$model_term_source/modified">
+				<modification>
+					<xsl:for-each select="$model_term_source/modified">
+						<p>
+							<xsl:if test="normalize-space() != ','"><xsl:value-of select="."/></xsl:if>
+						</p>
+					</xsl:for-each>
+				</modification>
+			</xsl:if>
+
 		</termsource>
 	</xsl:template>
 	
@@ -1787,7 +1865,7 @@
 	
 	<xsl:template match="table-wrap-foot/fn"/>
 	
-	<xsl:template match="fn">
+	<xsl:template match="fn" name="fn">
 		<fn>
 			<xsl:attribute name="reference">
 				<xsl:value-of select="preceding-sibling::xref[@rid = current()/@id]//text()"/>
@@ -2273,5 +2351,7 @@
 			<xsl:when test="$abbreviation = 'IEC'"><name>International Electrotechnical Commission</name></xsl:when>
 		</xsl:choose>
 	</xsl:template>
+	
+	<xsl:include href="sts2mn.common.xsl"/>
 	
 </xsl:stylesheet>
