@@ -251,7 +251,6 @@
 					</xsl:when>
 					<!-- <xsl:when test="(self::table or self::figure) and not(contains(name, '&#8212; '))"/> -->
 					<xsl:when test="(self::table or self::figure) and not(ancestor::sections or ancestor::annex or ancestor::preface)" />
-					
 					<xsl:otherwise>
 						<xsl:variable name="section_">
 							<xsl:call-template name="getSection">
@@ -277,13 +276,14 @@
 			
 			<xsl:variable name="parent">
 				<xsl:choose>
-					<xsl:when test="ancestor::annex and not($name = 'figure' or $name = 'table' or $name = 'annex' or $name = 'fn')">annex</xsl:when>
+					<xsl:when test="ancestor::annex and not($name = 'figure' or $name = 'table' or $name = 'annex' or $name = 'fn' or $name = 'formula')">annex</xsl:when>
 					<xsl:otherwise><xsl:value-of select="$name"/></xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
 			
 			<xsl:variable name="section_prefix">
 				<xsl:if test="($name = 'clause' or $name = 'terms') and $section != '' and not(contains($section, '.'))">Clause </xsl:if> <!-- first level clause -->
+				<xsl:if test="$name = 'formula' and $organization = 'IEC'">Equation </xsl:if>
 			</xsl:variable>
 			
 			<xsl:variable name="section_bolded" select="($name = 'clause' or $name = 'terms') and $section != ''"/>
@@ -1652,7 +1652,7 @@
 					<xsl:apply-templates select="docidentifier"/>
 					<xsl:apply-templates select="title" mode="mixed_citation"/>
 				</xsl:when>
-				<xsl:otherwise>
+				<xsl:when test="@type = 'standard'">
 					<std>
 						<xsl:variable name="urn" select="docidentifier[@type = 'URN']"/>
 						<xsl:variable name="docidentifier_URN" select="$bibitems_URN/bibitem[@id = $id]/urn"/>
@@ -1727,10 +1727,13 @@
 							</xsl:otherwise>
 						</xsl:choose>
 					</std>
+				</xsl:when>
+				<xsl:otherwise> <!-- reference to non-standard (article, book, etc. ) -->
+					<mixed-citation>
+						<xsl:apply-templates />
+					</mixed-citation>
 				</xsl:otherwise>
 			</xsl:choose>
-			
-			
 			
 		</ref>
 		
@@ -1753,6 +1756,10 @@
 		<mixed-citation><xsl:apply-templates/></mixed-citation>
 	</xsl:template>
 	
+	<xsl:template match="bibitem[not(@type = 'standard')]/formattedref" priority="2">
+		<xsl:apply-templates/>
+	</xsl:template>
+	<xsl:template match="bibitem[not(@type = 'standard')]/text()[normalize-space() = '']" priority="2"/> <!-- linearization -->
 	<xsl:template match="bibitem/formattedref">
 		<title><xsl:apply-templates/></title>
 	</xsl:template>
@@ -2714,6 +2721,7 @@
 				<xsl:when test="$parent = 'annex'">app</xsl:when>
 				<xsl:when test="$parent = 'fn'">fn</xsl:when>
 				<xsl:when test="$parent = 'bibitem'">bibr</xsl:when>
+				<xsl:when test="$parent = 'formula'">disp-formula</xsl:when>
 				<xsl:otherwise>sec</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -3274,6 +3282,15 @@
 				<xsl:value-of select="$id"/>
 			</xsl:attribute> -->
 			<xsl:copy-of select="../@id"/>
+			
+			<xsl:if test="$isSemanticXML = 'true' and not(name)">
+				<xsl:variable name="formula_id" select="../@id"/>
+				<xsl:variable name="section" select="$elements//element[@source_id = $formula_id]/@section"/>
+				<xsl:if test="$section != '' and not(unnumbered=  'true')">
+					<label><xsl:value-of select="$section"/></label>
+				</xsl:if>
+			</xsl:if>
+			
 			<xsl:apply-templates />
 		</disp-formula>
 		<xsl:if test="parent::th[strong]">
@@ -3468,6 +3485,13 @@
 		<xsl:variable name="section">
 			<xsl:choose>
 				<xsl:when test="self::dl"><xsl:number format="a" level="any"/></xsl:when>
+				<xsl:when test="self::formula and ancestor::sections"><xsl:number format="(1)" level="any"/></xsl:when>
+				<xsl:when test="self::formula and ancestor::annex">
+					<xsl:variable name="root_element_id" select="generate-id(ancestor::annex)"/>
+					<xsl:number format="A" level="any" count="annex"/>
+					<xsl:text>.</xsl:text>
+					<xsl:number format="1" level="any" count="formula[ancestor::*[generate-id() = $root_element_id] and not(@unnumbered = 'true')]"/>
+				</xsl:when>
 				<xsl:when test="self::bibitem and ancestor::references[@normative='true']">norm_ref_<xsl:number/></xsl:when>
 				<xsl:when test="self::bibitem">ref_<xsl:number/></xsl:when>
 				<xsl:when test="ancestor::bibliography">
