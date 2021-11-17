@@ -15,7 +15,7 @@
 	<!-- std model processing -->
 	<!-- ================= -->
 	
-	<!-- build term's source model:
+	<!-- build std model:
 			reference - link to bibliography item
 			referenceText - text for displaying (if it's difference from bibliography item text)
 			locality - example: clause=2.5

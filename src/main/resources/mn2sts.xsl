@@ -2077,10 +2077,15 @@
 			<xsl:message>DEBUG: termsource processing <xsl:value-of select="parent::*/*[local-name() = 'name']"/></xsl:message>
 		</xsl:if> -->
 		<tbx:source>
-			<xsl:value-of select="origin/@citeas"/>
+			<xsl:apply-templates />
+			<!-- <xsl:value-of select="origin/@citeas"/>
 			<xsl:apply-templates select="origin/localityStack"/>
-			<xsl:apply-templates select="modification"/>
+			<xsl:apply-templates select="modification"/> -->
 		</tbx:source>
+	</xsl:template>
+	
+	<xsl:template match="origin">
+		<xsl:call-template name="eref"/>
 	</xsl:template>
 	
 	<xsl:template match="localityStack">
@@ -2101,10 +2106,16 @@
 	</xsl:template>
 	
 	<xsl:template match="modification">
-		<xsl:text>, modified — </xsl:text>
-		<xsl:apply-templates />
+		<xsl:text>, modified</xsl:text>
+		<xsl:variable name="modification_text">
+			<xsl:apply-templates />
+		</xsl:variable>
+		<xsl:if test="normalize-space($modification_text) != ''">
+			<xsl:text> — </xsl:text>
+			<xsl:copy-of select="$modification_text"/>
+		</xsl:if>
 	</xsl:template>
-	
+	<xsl:template match="modification/text()[normalize-space() = '']"/> <!-- linearization -->
 	
 	<!-- <xsl:template match="*[local-name() = 'termexample'] | *[local-name() = 'termnote'] | *[local-name() = 'termsource']"/> -->
 	
@@ -2427,7 +2438,7 @@
 	<!-- ======================-->
 	<!-- eref processing -->
 	<!-- ===================== -->
-	<xsl:template match="eref">
+	<xsl:template match="eref" name="eref">
 	
 		<xsl:variable name="model_eref_">
 			<xsl:call-template name="build_metanorma_model_eref"/>
