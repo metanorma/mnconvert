@@ -371,6 +371,8 @@
 		
 		<standard xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:tbx="urn:iso:std:iso:30042:ed-1" xmlns:xlink="http://www.w3.org/1999/xlink">
 			
+			<!-- <debug><xsl:copy-of select="$xml"/></debug> -->
+			
 			<xsl:call-template name="insertFront"/>
 			
 			<xsl:call-template name="insertBody"/>
@@ -1003,17 +1005,19 @@
 					<xsl:call-template name="put_copyright_holder"/>
 					<xsl:if test="/*/boilerplate/copyright-statement/clause/p">
 						<license>
-							<license-p><xsl:apply-templates select="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-message']/node()"/></license-p>
-							<license-p>
-								<address>
-									<addr-line>
-										<xsl:for-each select="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-name' or @id = 'boilerplate-address']">
-											<xsl:apply-templates />
-											<xsl:if test="position() != last()">, </xsl:if>
-										</xsl:for-each>
-									</addr-line>
-								</address>
-							</license-p>
+							<license-p><xsl:apply-templates select="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-message' or not(starts-with(@id, 'boilerplate-'))]/node()"/></license-p>
+							<xsl:if test="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-name' or @id = 'boilerplate-address']">
+								<license-p>
+									<address>
+										<addr-line>
+											<xsl:for-each select="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-name' or @id = 'boilerplate-address']">
+												<xsl:apply-templates />
+												<xsl:if test="position() != last()">, </xsl:if>
+											</xsl:for-each>
+										</addr-line>
+									</address>
+								</license-p>
+							</xsl:if>
 						</license>
 					</xsl:if>
 				</xsl:if>
@@ -1652,25 +1656,61 @@
 					<std>
 						<xsl:variable name="urn" select="docidentifier[@type = 'URN']"/>
 						<xsl:variable name="docidentifier_URN" select="$bibitems_URN/bibitem[@id = $id]/urn"/>
-						<xsl:choose>
-							<xsl:when test="$docidentifier_URN != ''">
-								<xsl:attribute name="std-id">
-									<xsl:value-of select="$docidentifier_URN"/>
-								</xsl:attribute>
-							</xsl:when>
-							<xsl:when test="normalize-space($urn) != ''">
-								<xsl:attribute name="std-id"><xsl:value-of select="$urn"/></xsl:attribute>
-							</xsl:when>
-						</xsl:choose>
 						
-						<xsl:if test="eref/@citeas">
-							<xsl:attribute name="type">
-								<xsl:call-template name="setDatedUndatedType">
-									<xsl:with-param name="value" select="eref/@citeas"/>
-								</xsl:call-template>
-							</xsl:attribute>
+						<!-- Example of resulted xml: <std-id std-id-link-type="urn" std-id-type="undated">urn:iec:std:iec:62391-1::::</std-id>
+						  <std-ref>IEC&#160;62391&#8211;1</std-ref> -->
+						
+						<xsl:if test="$organization = 'IEC'">
+							<xsl:variable name="docidentifier" select="docidentifier[not(@type = 'metanorma' or @type = 'URN')][1]"/>
+							<std-id>
+								<xsl:attribute name="std-id-link-type">
+									<xsl:choose>
+										<xsl:when test="$docidentifier_URN != ''">urn</xsl:when>
+										<xsl:otherwise>internal-pub-id</xsl:otherwise>
+									</xsl:choose>
+								</xsl:attribute>
+								<xsl:attribute name="std-id-type">
+									<xsl:variable name="value">
+										<xsl:choose>
+											<xsl:when test="$docidentifier_URN != ''"><xsl:value-of select="$docidentifier_URN"/></xsl:when>
+											<xsl:otherwise><xsl:value-of select="$docidentifier"/></xsl:otherwise>
+										</xsl:choose>
+									</xsl:variable>
+									<xsl:call-template name="setDatedUndatedType">
+										<xsl:with-param name="value" select="$value"/>
+									</xsl:call-template>
+								</xsl:attribute>
+								<xsl:choose>
+									<xsl:when test="$docidentifier_URN != ''">
+										<xsl:value-of select="$docidentifier_URN"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="$docidentifier"/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</std-id>
 						</xsl:if>
 						
+						<xsl:if test="$organization != 'IEC'">
+							<xsl:choose>
+								<xsl:when test="$docidentifier_URN != ''">
+									<xsl:attribute name="std-id">
+										<xsl:value-of select="$docidentifier_URN"/>
+									</xsl:attribute>
+								</xsl:when>
+								<xsl:when test="normalize-space($urn) != ''">
+									<xsl:attribute name="std-id"><xsl:value-of select="$urn"/></xsl:attribute>
+								</xsl:when>
+							</xsl:choose>
+							
+							<xsl:if test="eref/@citeas">
+								<xsl:attribute name="type">
+									<xsl:call-template name="setDatedUndatedType">
+										<xsl:with-param name="value" select="eref/@citeas"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</xsl:if>
+						</xsl:if>
 						
 						<xsl:if test="docidentifier[not(@type = 'metanorma' or @type = 'URN')]">
 							<std-ref><xsl:value-of select="docidentifier[not(@type = 'metanorma' or @type = 'URN')]"/></std-ref>
@@ -1702,8 +1742,10 @@
 		<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="bibitem/title" priority="2">
-		<xsl:text>, </xsl:text>
+	<xsl:template match="bibitem/title" priority="2">	
+		<xsl:if test="$organization != 'IEC'">
+			<xsl:text>, </xsl:text>
+		</xsl:if>
 		<title><xsl:apply-templates/></title>
 	</xsl:template>
 	
@@ -2339,70 +2381,219 @@
 	</xsl:variable>
 	<xsl:variable name="bibitems_URN" select="xalan:nodeset($bibitems_URN_)"/>
 		
+	<!-- ======================-->
+	<!-- eref processing -->
+	<!-- ===================== -->
 	<xsl:template match="eref">
-		<xsl:variable name="citeas_" select="java:replaceAll(java:java.lang.String.new(@citeas),'--','—')"/>
-		<xsl:variable name="citeas">
-			<xsl:choose>
-				<!-- if citeas enclosed in [ ], then remove it -->
-				<xsl:when test="starts-with($citeas_, '[') and substring($citeas_, string-length($citeas_)) = ']'">
-					<xsl:value-of select="substring($citeas_, 2, string-length($citeas_) - 2)"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="$citeas_"/>
-				</xsl:otherwise>
-			</xsl:choose>
+	
+		<xsl:variable name="model_eref_">
+			<xsl:call-template name="build_metanorma_model_eref"/>
 		</xsl:variable>
-		<std>
-			<xsl:attribute name="type">
-				<xsl:call-template name="setDatedUndatedType">
-					<xsl:with-param name="value" select="$citeas"/>
-				</xsl:call-template>
-			</xsl:attribute>
-			<xsl:variable name="reference" select="@bibitemid"/>
-			<!-- <xsl:variable name="docidentifier_URN" select="//*[local-name() = 'bibitem'][@id = $reference]/*[local-name() = 'docidentifier'][@type = 'URN']"/> -->
-			<xsl:variable name="docidentifier_URN" select="$bibitems_URN/bibitem[@id = $reference]/urn"/>
+		<xsl:variable name="model_eref" select="xalan:nodeset($model_eref_)"/>
+	
+		<xsl:if test="$organization = 'IEC'">
 			
-			<xsl:attribute name="std-id">
-				<xsl:choose>
-					<xsl:when test="$docidentifier_URN != ''">
-						<xsl:value-of select="$docidentifier_URN"/>
-						<!-- add localities -->
-						<xsl:for-each select="localityStack/locality">
+			<!-- Example of resulted xml:
+			<std>
+				<std-id std-id-link-type="urn" std-id-type="dated">urn:iec:std:iec:62391-1:2015-10:::#con-3.8</std-id>
+				<std-ref>IEC 62391–1:2015, 3.8</std-ref>
+			</std>
+			-->
+			<xsl:variable name="docidentifier_URN" select="normalize-space($bibitems_URN/bibitem[@id = current()/@bibitemid]/urn)"/>
+			<!-- <bibitems_URN><xsl:copy-of select="$bibitems_URN"/></bibitems_URN> -->
+			<std>
+				<std-id>
+					<xsl:attribute name="std-id-link-type">
+						<xsl:choose>
+							<xsl:when test="$docidentifier_URN != ''">urn</xsl:when>
+							<xsl:otherwise>internal-pub-id</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+					<xsl:attribute name="std-id-type">
+						<xsl:variable name="value">
 							<xsl:choose>
-								<xsl:when test="@type = 'annex' or @type = 'clause'">:clause:<xsl:value-of select="referenceFrom"/></xsl:when>
-								<!-- table
-								locality:definition -->
+								<xsl:when test="$docidentifier_URN != ''"><xsl:value-of select="$docidentifier_URN"/></xsl:when>
+								<xsl:otherwise><xsl:value-of select="@citeas"/></xsl:otherwise>
 							</xsl:choose>
-						</xsl:for-each>
+						</xsl:variable>
+						<xsl:call-template name="setDatedUndatedType">
+							<xsl:with-param name="value" select="$value"/>
+						</xsl:call-template>
+					</xsl:attribute>
+					<xsl:choose>
+						<xsl:when test="$docidentifier_URN != ''">
+							<xsl:value-of select="$docidentifier_URN"/>
+							<xsl:for-each select="localityStack/locality[1]">
+								<xsl:text>#</xsl:text>
+								<xsl:choose>
+									<xsl:when test="@type = 'clause'">sec</xsl:when>
+									<xsl:when test="@type = 'annex'">anx</xsl:when>
+									<xsl:otherwise><xsl:value-of select="substring(@type,1,3)"/></xsl:otherwise>
+								</xsl:choose>
+								<xsl:text>-</xsl:text>
+								<xsl:value-of select="referenceFrom"/>
+							</xsl:for-each>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$model_eref/reference"/>
+						</xsl:otherwise>
+					</xsl:choose>
+					
+				</std-id>
+				<std-ref><xsl:value-of select="$model_eref/referenceText"/></std-ref>
+			</std>
+		
+		</xsl:if>
+	
+	
+		<xsl:if test="$organization != 'IEC'">
+	
+			<xsl:variable name="citeas_" select="java:replaceAll(java:java.lang.String.new(@citeas),'--','—')"/>
+			<xsl:variable name="citeas">
+				<xsl:choose>
+					<!-- if citeas enclosed in [ ], then remove it -->
+					<xsl:when test="starts-with($citeas_, '[') and substring($citeas_, string-length($citeas_)) = ']'">
+						<xsl:value-of select="substring($citeas_, 2, string-length($citeas_) - 2)"/>
 					</xsl:when>
 					<xsl:otherwise>
+						<xsl:value-of select="$citeas_"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
+			<std>
+				<xsl:attribute name="type">
+					<xsl:call-template name="setDatedUndatedType">
+						<xsl:with-param name="value" select="$citeas"/>
+					</xsl:call-template>
+				</xsl:attribute>
+				<xsl:variable name="reference" select="@bibitemid"/>
+				<!-- <xsl:variable name="docidentifier_URN" select="//*[local-name() = 'bibitem'][@id = $reference]/*[local-name() = 'docidentifier'][@type = 'URN']"/> -->
+				<xsl:variable name="docidentifier_URN" select="$bibitems_URN/bibitem[@id = $reference]/urn"/>
+				
+				<xsl:attribute name="std-id">
+					<xsl:choose>
+						<xsl:when test="$docidentifier_URN != ''">
+							<xsl:value-of select="$docidentifier_URN"/>
+							<!-- add localities -->
+							<xsl:for-each select="localityStack/locality">
+								<xsl:choose>
+									<xsl:when test="@type = 'annex' or @type = 'clause'">:clause:<xsl:value-of select="referenceFrom"/></xsl:when>
+									<!-- table
+									locality:definition -->
+								</xsl:choose>
+							</xsl:for-each>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:choose>
+								<xsl:when test="starts-with($reference, 'hidden_bibitem_')">
+									<xsl:value-of select="substring-after($reference, 'hidden_bibitem_')"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="$reference"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:attribute>
+				
+				<std-ref>
+					
+					<xsl:choose>
+						<xsl:when test="$organization = 'BSI'">
+							<xsl:value-of select="translate($citeas, ' ', '&#xA0;')"/><!-- replace space to non-break space -->
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$citeas"/>
+						</xsl:otherwise>
+					</xsl:choose>
+					
+				</std-ref>
+				<xsl:apply-templates select="localityStack"/>
+			</std>
+		</xsl:if>
+	</xsl:template>
+	
+	<!-- build eref model:
+		reference - link to bibliography item
+		referenceText - text for displaying (if it's difference from bibliography item text)
+		locality - example: clause 2.5 -->
+	<xsl:template name="build_metanorma_model_eref"> <!-- eref context -->
+		<!-- Example: <eref type="inline" bibitemid="ISO6322-2" citeas="ISO 6322-2"/> -->
+		<!-- Semantic xml example: 
+		<eref type="inline" bibitemid="ISO7301" citeas="ISO 7301:2011">
+			<localityStack>
+				<locality type="table">
+					<referenceFrom>1</referenceFrom>
+				</locality>
+			</localityStack>
+		</eref> -->
+		<!-- Presentation xml example: 
+		<eref type="inline" bibitemid="ISO7301" citeas="ISO 7301:2011">
+			<localityStack>
+				<locality type="table">
+					<referenceFrom>1</referenceFrom>
+				</locality>
+			</localityStack>ISO 7301:2011, Table 1</eref> -->
+			
+		<!-- Semantic xml example:
+		<eref type="inline" bibitemid="ISO24333" citeas="ISO 24333:2009">
+			<localityStack>
+				<locality type="clause">
+					<referenceFrom>5</referenceFrom>
+				</locality>
+			</localityStack>
+		</eref> -->
+		<!-- Presentation xml example: 
+		<eref type="inline" bibitemid="ISO24333" citeas="ISO 24333:2009">
+			<localityStack>
+				<locality type="clause">
+					<referenceFrom>5</referenceFrom>
+				</locality>
+			</localityStack>ISO 24333:2009, Clause 5</eref> -->
+
+		<!-- Semantic xml example:		
+		<eref type="inline" bibitemid="ISO20483" citeas="ISO 20483:2013">
+			<localityStack>
+				<locality type="annex">
+					<referenceFrom>C</referenceFrom>
+				</locality>
+			</localityStack>
+		</eref> -->
+		<!-- Presentation xml example:
+		<eref type="inline" bibitemid="ISO20483" citeas="ISO 20483:2013">
+			<localityStack>
+				<locality type="annex">
+					<referenceFrom>C</referenceFrom>
+				</locality>
+			</localityStack>ISO 20483:2013, Annex C</eref> -->
+		
+		<reference><xsl:value-of select="@bibitemid"/></reference>
+		<referenceText>
+			<xsl:choose>
+				<xsl:when test="count(node()[not(self::localityStack)]) &gt; 0"><xsl:apply-templates /></xsl:when> <!-- for presentation xml -->
+				<xsl:otherwise> <!-- for semantic xml - build string with localities -->
+					<xsl:value-of select="@citeas"/>
+					<xsl:for-each select="localityStack/locality">
+						<xsl:text>, </xsl:text>
 						<xsl:choose>
-							<xsl:when test="starts-with($reference, 'hidden_bibitem_')">
-								<xsl:value-of select="substring-after($reference, 'hidden_bibitem_')"/>
-							</xsl:when>
+							<xsl:when test="@type = 'clause'"></xsl:when>
 							<xsl:otherwise>
-								<xsl:value-of select="$reference"/>
+								<xsl:call-template name="capitalize">
+									<xsl:with-param name="str" select="@type"/>
+								</xsl:call-template>
+								<xsl:text> </xsl:text>
 							</xsl:otherwise>
 						</xsl:choose>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:attribute>
-			
-			<std-ref>
-				
-				<xsl:choose>
-					<xsl:when test="$organization = 'BSI'">
-						<xsl:value-of select="translate($citeas, ' ', '&#xA0;')"/><!-- replace space to non-break space -->
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:value-of select="$citeas"/>
-					</xsl:otherwise>
-				</xsl:choose>
-				
-			</std-ref>
-			<xsl:apply-templates select="localityStack"/>
-		</std>
+						<xsl:value-of select="referenceFrom"/>
+					</xsl:for-each>
+				</xsl:otherwise>
+			</xsl:choose>
+		</referenceText>
 	</xsl:template>
+	<!-- ======================-->
+	<!-- END eref processing -->
+	<!-- ===================== -->
+	
 	
 	<xsl:template match="link">
     <xsl:choose>
@@ -3399,8 +3590,8 @@
 	<xsl:template name="setDatedUndatedType">
 		<xsl:param name="value"/>
 		<xsl:choose>
-			<xsl:when test="substring($value, string-length($value) - 4, 1) = ':' and translate(substring($value, string-length($value) - 3), '0123456789', '') = ''">dated</xsl:when>
-			<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^.*:\d{4}\D.*$', $value) = 'true'">dated</xsl:when>
+			<!-- <xsl:when test="substring($value, string-length($value) - 4, 1) = ':' and translate(substring($value, string-length($value) - 3), '0123456789', '') = ''">dated</xsl:when> -->
+			<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^.*\d:\d{4}\D.*$', $value) = 'true'">dated</xsl:when>
 			<xsl:otherwise>undated</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
