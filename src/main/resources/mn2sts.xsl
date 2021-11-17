@@ -1402,25 +1402,39 @@
 	</xsl:template>
 		
 	<xsl:template match="boilerplate/legal-statement">
-		<license specific-use="legal">
-			<xsl:for-each select="clause[1]/title">
-				<xsl:attribute name="xlink:title">
-					<xsl:value-of select="."/>
-				</xsl:attribute>
-			</xsl:for-each>
+		<xsl:if test="$organization = 'IEC'">
+			<!-- in foreword -->
 			<xsl:apply-templates/>
-		</license>	
+		</xsl:if>
+		<xsl:if test="$organization != 'IEC'">
+			<license specific-use="legal">
+				<xsl:for-each select="clause[1]/title">
+					<xsl:attribute name="xlink:title">
+						<xsl:value-of select="."/>
+					</xsl:attribute>
+				</xsl:for-each>
+				<xsl:apply-templates/>
+			</license>
+		</xsl:if>
 	</xsl:template>
+	<xsl:template match="boilerplate/legal-statement/text()[normalize-space() = '']"/>  <!-- linearization -->
 	<xsl:template match="boilerplate/legal-statement/clause/title" priority="1"/>
+	<xsl:template match="boilerplate/legal-statement/clause/text()[normalize-space() = '']"/>  <!-- linearization -->
 	<xsl:template match="boilerplate/legal-statement/clause" priority="1">
-		<license-p>
-			<xsl:if test="$format = 'NISO'">
-				<xsl:attribute name="id">
-					<xsl:call-template name="getId"/>
-				</xsl:attribute>
-			</xsl:if>
+		<xsl:if test="$organization = 'IEC'">
+			<!-- in foreword -->
 			<xsl:apply-templates/>
-		</license-p>
+		</xsl:if>
+		<xsl:if test="$organization != 'IEC'">
+			<license-p>
+				<xsl:if test="$format = 'NISO'">
+					<xsl:attribute name="id">
+						<xsl:call-template name="getId"/>
+					</xsl:attribute>
+				</xsl:if>
+				<xsl:apply-templates/>
+			</license-p>
+		</xsl:if>
 	</xsl:template>	
 	
 	<xsl:template match="boilerplate/license-statement">
@@ -1487,8 +1501,16 @@
 					<xsl:if test="$section != ''">
 						<label><xsl:value-of select="$section"/></label>
 					</xsl:if>
-
-					<xsl:apply-templates />
+					
+					<xsl:apply-templates select="title"/>
+					
+					<xsl:if test="$organization = 'IEC' and $name = 'foreword'">
+						<!-- put legal-statement in Foreword -->
+						<xsl:apply-templates select="/*/boilerplate/legal-statement"/>
+					</xsl:if>
+					
+					<xsl:apply-templates select="node()[not(self::title)]"/>
+					
 				</sec>
 			</xsl:otherwise>
 		</xsl:choose>
@@ -2028,7 +2050,19 @@
 		
 		<tbx:tig id="{$id}">
 			<tbx:term><xsl:apply-templates /></tbx:term>
-			<tbx:partOfSpeech value="noun"/>
+			<tbx:partOfSpeech>
+				<xsl:attribute name="value">
+					<xsl:choose>
+						<xsl:when test=".//grammar/isAdjective = 'true'">adj</xsl:when>
+						<xsl:when test=".//grammar/isAdverb = 'true'">adv</xsl:when>
+						<xsl:when test=".//grammar/isNoun = 'true'">noun</xsl:when>
+						<xsl:when test=".//grammar/isVerb = 'true'">verb</xsl:when>
+						<!-- <xsl:when test=".//grammar/isPreposition = 'true'">preposition</xsl:when>--> <!-- not supported in XSD -->
+						<!-- <xsl:when test=".//grammar/isParticiple = 'true'">participle</xsl:when> --><!-- not supported in XSD -->
+						<xsl:otherwise>noun</xsl:otherwise> <!-- default value -->
+					</xsl:choose>
+				</xsl:attribute>
+			</tbx:partOfSpeech>
 			<xsl:variable name="element_name" select="local-name()"/>
 			<xsl:variable name="normativeAuthorization">
 				<xsl:choose>
@@ -2039,16 +2073,18 @@
 			</xsl:variable>
 			<xsl:if test="normalize-space($normativeAuthorization) != ''">
 				<xsl:choose>
-					<xsl:when test="$element_name = 'preferred' and not(following-sibling::admitted or preceding-sibling::admitted or
+					<xsl:when test="$organization != 'IEC' and $element_name = 'preferred' and not(following-sibling::admitted or preceding-sibling::admitted or
 					following-sibling::deprecates or preceding-sibling::deprecates)"></xsl:when>
 					<xsl:otherwise>
 						<tbx:normativeAuthorization value="{$normativeAuthorization}"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:if>
-			<xsl:if test="@type">
+			<xsl:if test="@type or letter-symbol or $organization = 'IEC'">
 				<xsl:variable name="value">
 					<xsl:choose>
+						<xsl:when test="letter-symbol">symbol</xsl:when>
+						<xsl:when test="$organization = 'IEC' and (@type = 'full' or normalize-space(@type) = '')">fullForm</xsl:when>
 						<xsl:when test="@type = 'full'">variant</xsl:when>
 						<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
 					</xsl:choose>
@@ -2058,10 +2094,10 @@
 		</tbx:tig>
 	</xsl:template>
 	
-	<xsl:template match="expression | expression/name" priority="2">
+	<xsl:template match="grammar | grammar/* | grammar/*/text() | expression | expression/name | letter-symbol | letter-symbol/name" priority="2">
 		<xsl:apply-templates/>
 	</xsl:template>
-	<xsl:template match="*[self::expression or self::preferred or self::admitted or self::deprecates or self::domain]/text()[normalize-space() = ''] | expression/name/text()[normalize-space() = '']" priority="2"/>
+	<xsl:template match="*[self::expression or self::letter-symbol or self::preferred or self::admitted or self::deprecates or self::domain]/text()[normalize-space() = ''] | expression/name/text()[normalize-space() = '']" priority="2"/>
 	
 	<xsl:template match="p" name="p">
 		<!-- <xsl:if test="$debug = 'true'">
@@ -2138,12 +2174,13 @@
 	<xsl:template match="ol">
 		<list>
 			<xsl:apply-templates select="@*"/>
-			<xsl:attribute name="list-type">
+			<xsl:variable name="list-type">
 				<xsl:choose>
 					<!-- <xsl:when test="@type = 'arabic'">alpha-lower</xsl:when> -->
-					<xsl:when test="@type = 'arabic'">order</xsl:when>
+					<xsl:when test="@type = 'arabic' and not($organization = 'IEC')">order</xsl:when>
 					<xsl:otherwise>
 						<xsl:choose>
+							<xsl:when test="$organization = 'IEC' and normalize-space(@type) = ''">arabic</xsl:when>
 							<xsl:when test="normalize-space(@type) = ''">alpha-lower</xsl:when>
 							<xsl:when test="@type = 'alphabet'">alpha-lower</xsl:when>
 							<xsl:when test="@type = 'alphabet_upper'">alpha-upper</xsl:when>
@@ -2154,8 +2191,13 @@
 						</xsl:choose>
 					</xsl:otherwise>
 				</xsl:choose>
+			</xsl:variable>
+			<xsl:attribute name="list-type">
+				<xsl:value-of select="$list-type"/>
 			</xsl:attribute>
-			<xsl:apply-templates />
+			<xsl:apply-templates>
+				<xsl:with-param name="list-type" select="$list-type"/>
+			</xsl:apply-templates>
 		</list>
 		<xsl:for-each select="note">
 			<xsl:call-template name="note"/>
@@ -2163,10 +2205,12 @@
 	</xsl:template>
 	<xsl:template match="ol/@type"/>
 	<xsl:template match="ol/@start"/>
+	<xsl:template match="ol/text()[normalize-space() = '']"/> <!-- linearization -->
 
 	<xsl:template match="ul/note | ol/note" priority="2"/>
 	
 	<xsl:template match="li">
+		<xsl:param name="list-type"/>
 		<list-item>
 			<!-- <xsl:if test="@id">
 				<xsl:attribute name="id"><xsl:value-of select="@id"/></xsl:attribute>
@@ -2177,7 +2221,8 @@
 				<xsl:when test="local-name(..) = 'ul' and ../@type != 'simple'"><label>—</label></xsl:when>
 				
 				<xsl:when test="local-name(..) = 'ol'">
-					<xsl:variable name="type" select="parent::*/@type"/>
+					<!-- <xsl:variable name="type" select="parent::*/@type"/> -->
+					<xsl:variable name="type" select="$list-type"/>
 					<xsl:variable name="start_value">
 						<xsl:choose>
 							<xsl:when test="normalize-space(parent::*/@start) != ''">
@@ -2194,16 +2239,20 @@
 						<xsl:when test="$type = 'arabic'">
 							<label><xsl:number value="$start_value + $curr_value" format="1)"/></label>
 						</xsl:when>
-						<xsl:when test="$type = 'alphabet'">
+						<!-- <xsl:when test="$type = 'alphabet'"> -->
+						<xsl:when test="$type = 'alpha-lower'">
 							<label><xsl:number value="$start_value + $curr_value" format="a)" lang="en"/></label>
 						</xsl:when>
-						<xsl:when test="$type = 'alphabet_upper'">
+						<!-- <xsl:when test="$type = 'alphabet_upper'"> -->
+						<xsl:when test="$type = 'alpha-upper'">
 							<label><xsl:number value="$start_value + $curr_value" format="A)" lang="en"/></label>
 						</xsl:when>
-						<xsl:when test="$type = 'roman'">
+						<!-- <xsl:when test="$type = 'roman'"> -->
+						<xsl:when test="$type = 'roman-lower'">
 							<label><xsl:number value="$start_value + $curr_value" format="i)" lang="en"/></label>
 						</xsl:when>
-						<xsl:when test="$type = 'roman_upper'">
+						<!-- <xsl:when test="$type = 'roman_upper'"> -->
+						<xsl:when test="$type = 'roman-upper'">
 							<label><xsl:number value="$start_value + $curr_value" format="I)" lang="en"/></label>
 						</xsl:when>
 						<xsl:otherwise>
@@ -2357,7 +2406,7 @@
 	
 	<xsl:template match="link">
     <xsl:choose>
-      <xsl:when test="normalize-space() = ''">
+      <xsl:when test="normalize-space() = '' or $organization = 'IEC'">
         <uri><xsl:value-of select="@target"/></uri>
       </xsl:when>
       <xsl:otherwise>
