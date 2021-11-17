@@ -887,12 +887,39 @@
 			<content-language>
 				<xsl:apply-templates select="language" mode="front"/>
 			</content-language>
-			<std-ref type="dated">
+			
+			<xsl:variable name="docidentifier">
 				<xsl:apply-templates select="docidentifier[1]" mode="front"/>
-			</std-ref>
-			<std-ref type="undated">
-				<xsl:value-of select="substring-before(docidentifier, ':')"/>
-			</std-ref>
+			</xsl:variable>
+			
+			<xsl:variable name="docidentifier_type">
+				<xsl:call-template name="setDatedUndatedType">
+					<xsl:with-param name="value" select="$docidentifier"/>
+				</xsl:call-template>
+			</xsl:variable>
+			
+			<xsl:choose>
+				<xsl:when test="$docidentifier_type = 'dated'">
+					<std-ref type="dated">
+						<xsl:value-of select="$docidentifier"/>
+					</std-ref>
+					<std-ref type="undated">
+						<xsl:value-of select="substring-before($docidentifier, ':')"/>
+					</std-ref>
+				</xsl:when>
+				<xsl:otherwise> <!-- undated -->
+					<std-ref type="dated">
+						<xsl:value-of select="$docidentifier"/>
+						<xsl:variable name="revision_date">
+							<xsl:apply-templates select="version/revision-date" mode="front"/>
+						</xsl:variable>
+						<xsl:text>:</xsl:text><xsl:value-of select="substring($revision_date,1,4)"/>
+					</std-ref>
+					<std-ref type="undated">
+						<xsl:value-of select="$docidentifier"/>
+					</std-ref>
+				</xsl:otherwise>
+			</xsl:choose>
 			
 			<xsl:variable name="doc_ref">
 				<xsl:choose>
@@ -1032,10 +1059,18 @@
 				</xsl:if>
 			</permissions>
 			
+			<xsl:for-each select="uri">
+				<self-uri xlink:type="simple" xmlns:xlink="http://www.w3.org/1999/xlink">
+					<xsl:if test="@type">
+						<xsl:attribute name="content-type"><xsl:value-of select="@type"/></xsl:attribute>
+					</xsl:if>
+					<xsl:value-of select="."/>
+				</self-uri>
+			</xsl:for-each>
+			
 			<xsl:apply-templates select="/*/preface/abstract" mode="front_abstract"/>
 			
-			
-			
+
 			<xsl:if test="$organization = 'IEC'">
 				<xsl:if test="ext/price-code">
 					<custom-meta-group>
@@ -1341,7 +1376,8 @@
 																bibdata/relation/bibitem |
 																coverimages |
 																ext/horizontal |
-																ext/price-code"
+																ext/price-code |
+																bibdata/uri"
 																mode="front_check"/>
 
 	<!-- skip processed structure and deep down -->
