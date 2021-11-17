@@ -498,6 +498,7 @@
 					<!-- If //bibdata/relation[@type = 'adopted-from'] exists -->
 					<xsl:when test="bibdata/relation[@type = 'adopted-from']">nat-meta</xsl:when>
 					<xsl:when test="$organization = 'BSI'">nat-meta</xsl:when>
+					<xsl:when test="$organization = 'IEC'">std-meta</xsl:when>
 					<xsl:otherwise>iso-meta</xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
@@ -513,6 +514,7 @@
 			</xsl:if>
 			
 			<xsl:apply-templates select="preface" mode="front_preface"/>
+			
 		</front>
 	</xsl:template>
 	
@@ -648,7 +650,7 @@
 		
 		<!-- <iso-meta> -->
 		<xsl:element name="{$element_name}">
-			<xsl:if test="$element_name != 'iso-meta'">
+			<xsl:if test="$element_name != 'iso-meta' and $element_name != 'std-meta'">
 				<xsl:attribute name="originator">
 					<xsl:variable name="abbrev" select="contributor[role/@type='publisher']/organization/abbreviation"/>
 					<xsl:choose>
@@ -787,20 +789,38 @@
 				</title-wrap>
 			</xsl:for-each>
 			
-			<doc-ident>
-				<sdo>
-					<xsl:apply-templates select="contributor[role/@type='author']/organization/abbreviation" mode="front"/>
-				</sdo>
+			<!-- <part-number> -->
+			<xsl:variable name="part_number">
+				<xsl:apply-templates select="ext/structuredidentifier/partnumber | ext/structuredidentifier/project-number/@part" mode="front"/>
+			</xsl:variable>
+			
+			<xsl:if test="$element_name = 'std-meta'">
 				<proj-id>
+					<xsl:text>iec:proj:</xsl:text>
 					<xsl:apply-templates select="ext/structuredidentifier/project-number" mode="front"/>
+					<xsl:if test="normalize-space($part_number) != ''">:<xsl:value-of select="$part_number"/></xsl:if>
 				</proj-id>
-				<language>
-					<xsl:apply-templates select="language" mode="front"/>
-					</language>
 				<release-version>
-					<xsl:apply-templates select="status/stage/@abbreviation" mode="front"/>
+					<xsl:apply-templates select="ext/doctype" mode="front"/>
 				</release-version>
-			</doc-ident>
+			</xsl:if>
+			
+			<xsl:if test="$element_name != 'std-meta'">
+				<doc-ident>
+					<sdo>
+						<xsl:apply-templates select="contributor[role/@type='author']/organization/abbreviation" mode="front"/>
+					</sdo>
+					<proj-id>
+						<xsl:apply-templates select="ext/structuredidentifier/project-number" mode="front"/>
+					</proj-id>
+					<language>
+						<xsl:apply-templates select="language" mode="front"/>
+					</language>
+					<release-version>
+						<xsl:apply-templates select="status/stage/@abbreviation" mode="front"/>
+					</release-version>
+				</doc-ident>
+			</xsl:if>
 			
 			<std-ident>
 				<originator>
@@ -812,14 +832,13 @@
 				
 				<xsl:apply-templates select="ext/subdoctype" mode="front"/>
 				
-				<doc-number>					
+				<xsl:variable name="docnumber">
 					<xsl:apply-templates select="docnumber" mode="front"/>
+				</xsl:variable>
+				<doc-number>					
+					<xsl:value-of select="$docnumber"/>
 				</doc-number>
 				
-				<!-- <part-number> -->
-				<xsl:variable name="part_number">
-					<xsl:apply-templates select="ext/structuredidentifier/partnumber | ext/structuredidentifier/project-number/@part" mode="front"/>
-				</xsl:variable>
 				<xsl:if test="normalize-space($part_number) != ''">
 					<part-number>
 						<xsl:value-of select="$part_number"/>
@@ -829,11 +848,40 @@
 				<edition>
 					<xsl:apply-templates select="edition" mode="front"/>
 				</edition>
-				<version>
+				<xsl:variable name="revision_date">
 					<xsl:apply-templates select="version/revision-date" mode="front"/>
+				</xsl:variable>
+				<version>
+					<xsl:value-of select="$revision_date"/>
 				</version>
+				
+				<xsl:if test="$organization = 'IEC'">
+					<std-id-group>
+						<std-id originator="IEC" std-id-link-type="urn" std-id-type="dated">
+							<!-- urn:iec:std:iec:62830-8:2021-10::: -->
+							<xsl:text>urn:iec:std:iec:</xsl:text>
+							<xsl:value-of select="$docnumber"/>
+							<xsl:if test="normalize-space($part_number) != ''">-<xsl:value-of select="$part_number"/></xsl:if>
+							<xsl:if test="normalize-space($revision_date) != ''">:<xsl:value-of select="substring($revision_date,1,7)"/></xsl:if>
+							<xsl:text>:::</xsl:text>
+						</std-id>
+					</std-id-group>
+					
+					<xsl:if test="docidentifier[@type = 'ISBN']">
+						<isbn><xsl:value-of select="docidentifier[@type = 'ISBN']"/></isbn>
+					</xsl:if>
+					<!-- <suppl-type/>
+					<suppl-number/> -->
+				</xsl:if>
+				
 			</std-ident>
 			
+			<xsl:if test="$organization = 'IEC'">
+				<std-org>
+					<std-org-abbrev><xsl:value-of select="copyright/owner/organization/abbreviation"/></std-org-abbrev>
+				</std-org>
+			</xsl:if>
+
 			<content-language>
 				<xsl:apply-templates select="language" mode="front"/>
 			</content-language>
@@ -843,7 +891,8 @@
 			<std-ref type="undated">
 				<xsl:value-of select="substring-before(docidentifier, ':')"/>
 			</std-ref>
-			<doc-ref>
+			
+			<xsl:variable name="doc_ref">
 				<xsl:choose>
 					<xsl:when test="docidentifier[@type='iso-reference']">
 						<xsl:apply-templates select="docidentifier[@type='iso-reference'][last()]" mode="front"/>
@@ -852,7 +901,12 @@
 						<xsl:apply-templates select="docidentifier[@type='iso-with-lang']" mode="front"/>
 					</xsl:otherwise>
 				</xsl:choose>
-			</doc-ref>
+			</xsl:variable>
+			<xsl:if test="normalize-space($doc_ref) != ''">
+				<doc-ref>
+					<xsl:value-of select="$doc_ref"/>
+				</doc-ref>
+			</xsl:if>
 			
 			<!-- <release-date> -->
 			<xsl:variable name="release-date">
@@ -878,6 +932,14 @@
 				</xsl:otherwise>
 			</xsl:choose>
 			
+			<xsl:for-each select="date[not(@type='release')][normalize-space(on) != '']">
+				<!-- example: <meta-date type="stability-date">2024-12-31</meta-date> -->
+				<meta-date>
+					<xsl:copy-of select="@type"/>
+					<xsl:value-of select="on"/>
+				</meta-date>
+			</xsl:for-each>
+			
 			<xsl:variable name="related_comm_ref" select="relation[@type='related']/bibitem/docidentifier"/>
 			<xsl:variable name="related_comm_ref_text">Committee reference</xsl:variable>
 			<comm-ref>
@@ -891,10 +953,23 @@
 						<xsl:value-of select="ext/editorialgroup/technical-committee/@number"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:apply-templates select="copyright/owner/organization/abbreviation" mode="front"/>
-						<xsl:apply-templates select="ext/editorialgroup/technical-committee" mode="front"/>
-						<xsl:apply-templates select="ext/editorialgroup/subcommittee" mode="front"/>
-						<xsl:apply-templates select="ext/editorialgroup/workgroup" mode="front"/>
+						<xsl:variable name="abbreviation">
+							<xsl:apply-templates select="copyright/owner/organization/abbreviation" mode="front"/>
+						</xsl:variable>
+						<xsl:if test="$abbreviation != $organization">
+							<xsl:value-of select="$abbreviation"/><xsl:text>/</xsl:text>
+						</xsl:if>
+						<xsl:variable name="editorialgroup">
+							<item><xsl:apply-templates select="ext/editorialgroup/technical-committee" mode="front"/></item>
+							<item><xsl:apply-templates select="ext/editorialgroup/subcommittee" mode="front"/></item>
+							<item><xsl:apply-templates select="ext/editorialgroup/workgroup" mode="front"/></item>
+						</xsl:variable>
+						<xsl:for-each select="xalan:nodeset($editorialgroup)/item[normalize-space() != '']">
+							<xsl:value-of select="."/>
+							<xsl:if test="following-sibling::*[normalize-space() != '']">
+								<xsl:text>/</xsl:text>
+							</xsl:if>
+						</xsl:for-each>
 					</xsl:otherwise>
 				</xsl:choose>
 				
@@ -903,9 +978,15 @@
 										*[local-name() = 'ext']/*[local-name() = 'editorialgroup']/*[local-name() = 'technical-committee']/@number)"/>
  -->				
 			</comm-ref>
-			<secretariat>
+			
+			<xsl:variable name="secretariat">
 				<xsl:apply-templates select="ext/editorialgroup/secretariat" mode="front"/>
-			</secretariat>				
+			</xsl:variable>
+			<xsl:if test="normalize-space($secretariat) != ''">
+				<secretariat>
+					<xsl:value-of select="$secretariat"/>
+				</secretariat>
+			</xsl:if>
 			<!-- <ics> -->
 			<xsl:apply-templates select="ext/ics/code" mode="front"/>
 			
@@ -917,36 +998,60 @@
 			
 			
 			<permissions>
-				<!-- <copyright-statement>All rights reserved</copyright-statement> -->
-				<xsl:apply-templates select="/*/boilerplate/copyright-statement"/>
-				<copyright-year>
-					<xsl:apply-templates select="copyright/from" mode="front"/>
-				</copyright-year>
-				<copyright-holder>
-					<xsl:choose>
-						<xsl:when test="copyright/owner/organization/abbreviation">
-							<xsl:apply-templates select="copyright/owner/organization/abbreviation" mode="front"/>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:apply-templates select="copyright/owner/organization/name" mode="front"/>
-						</xsl:otherwise>
-					</xsl:choose>
+				<xsl:if test="$organization = 'IEC'">
+					<xsl:call-template name="put_copyright_year"/>
+					<xsl:call-template name="put_copyright_holder"/>
+					<xsl:if test="/*/boilerplate/copyright-statement/clause/p">
+						<license>
+							<license-p><xsl:apply-templates select="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-message']/node()"/></license-p>
+							<license-p>
+								<address>
+									<addr-line>
+										<xsl:for-each select="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-name' or @id = 'boilerplate-address']">
+											<xsl:apply-templates />
+											<xsl:if test="position() != last()">, </xsl:if>
+										</xsl:for-each>
+									</addr-line>
+								</address>
+							</license-p>
+						</license>
+					</xsl:if>
+				</xsl:if>
+				<xsl:if test="$organization != 'IEC'">
+					<!-- <copyright-statement>All rights reserved</copyright-statement> -->
+					<xsl:apply-templates select="/*/boilerplate/copyright-statement"/>
+					<xsl:call-template name="put_copyright_year"/>
+					<xsl:call-template name="put_copyright_holder"/>
 					
-				</copyright-holder>
-				<xsl:apply-templates select="/*/boilerplate/legal-statement"/>
-				<xsl:apply-templates select="/*/boilerplate/license-statement"/>
+					<xsl:apply-templates select="/*/boilerplate/legal-statement"/>
+					<xsl:apply-templates select="/*/boilerplate/license-statement"/>
+				</xsl:if>
 			</permissions>
 			
-			<xsl:if test="docidentifier[@type = 'ISBN'] or
-								ext/horizontal or
-								status/stage or 
-								status/substage">
-				<custom-meta-group>
-					<xsl:apply-templates select="docidentifier[@type = 'ISBN']" mode="custom_meta"/>
-					<xsl:apply-templates select="ext/horizontal" mode="custom_meta"/>
-					<xsl:apply-templates select="status/stage" mode="custom_meta"/>
-					<xsl:apply-templates select="status/substage" mode="custom_meta"/>
-				</custom-meta-group>
+			<xsl:apply-templates select="/*/preface/abstract" mode="front_abstract"/>
+			
+			
+			
+			<xsl:if test="$organization = 'IEC'">
+				<xsl:if test="ext/price-code">
+					<custom-meta-group>
+						<xsl:apply-templates select="ext/price-code" mode="custom_meta"/>
+					</custom-meta-group>
+				</xsl:if>
+			</xsl:if>
+			
+			<xsl:if test="$organization != 'IEC'">
+				<xsl:if test="docidentifier[@type = 'ISBN'] or
+									ext/horizontal or
+									status/stage or 
+									status/substage">
+					<custom-meta-group>
+						<xsl:apply-templates select="docidentifier[@type = 'ISBN']" mode="custom_meta"/>
+						<xsl:apply-templates select="ext/horizontal" mode="custom_meta"/>
+						<xsl:apply-templates select="status/stage" mode="custom_meta"/>
+						<xsl:apply-templates select="status/substage" mode="custom_meta"/>
+					</custom-meta-group>
+				</xsl:if>
 			</xsl:if>
 			
 			<xsl:if test="self::bibdata">
@@ -962,9 +1067,29 @@
 					<xsl:text>&#xa;===================================&#xa;</xsl:text>
 				</xsl:if>
 			</xsl:if>
-		<!-- </iso-meta> -->
+		<!-- </iso-meta> </nat-meta> </std-meta> --> 
 		</xsl:element>
 	</xsl:template>
+	
+	<xsl:template name="put_copyright_year">
+		<copyright-year>
+			<xsl:apply-templates select="copyright/from" mode="front"/>
+		</copyright-year>
+	</xsl:template>
+	<xsl:template name="put_copyright_holder">
+		<copyright-holder>
+			<xsl:choose>
+				<xsl:when test="copyright/owner/organization/abbreviation">
+					<xsl:apply-templates select="copyright/owner/organization/abbreviation" mode="front"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates select="copyright/owner/organization/name" mode="front"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</copyright-holder>
+	</xsl:template>
+	
+	
 	
 	<xsl:template match="@*|node()" mode="display_check">
 		<xsl:copy>
@@ -989,7 +1114,6 @@
 																ext/editorialgroup/subcommittee |
 																ext/editorialgroup/workgroup" mode="front">
 		<xsl:if test="normalize-space(@type) != '' or normalize-space(@number) != ''">
-			<xsl:text>/</xsl:text>
 			<xsl:choose>
 				<xsl:when test="normalize-space(@type) != ''">
 					<xsl:value-of select="@type"/>
@@ -1153,6 +1277,12 @@
 		</xsl:if>
 	</xsl:template>
 	
+	<xsl:template match="ext/price-code" mode="custom_meta">
+		<custom-meta>
+			<meta-name>price code</meta-name>
+			<meta-value>iec:<xsl:value-of select="."/></meta-value>
+		</custom-meta>
+	</xsl:template>
 	
 	<!-- =============== -->
 	<!-- END custom-meta -->
@@ -1206,7 +1336,8 @@
 																bibdata/relation |
 																bibdata/relation/bibitem |
 																coverimages |
-																ext/horizontal"
+																ext/horizontal |
+																ext/price-code"
 																mode="front_check"/>
 
 	<!-- skip processed structure and deep down -->
@@ -1261,8 +1392,14 @@
 		</xsl:if>
 	</xsl:template>
 	<xsl:template match="boilerplate/copyright-statement//p//br"  priority="1">
-		<xsl:value-of select="'&#x2028;'"/><!-- linebreak -->
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEC'"><xsl:text>, </xsl:text></xsl:when>
+			<xsl:otherwise><xsl:value-of select="'&#x2028;'"/><!-- linebreak --></xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>	
+	<xsl:template match="boilerplate/copyright-statement//p//text()"  priority="1">
+		<xsl:value-of select="normalize-space()"/>
+	</xsl:template>
 		
 	<xsl:template match="boilerplate/legal-statement">
 		<license specific-use="legal">
@@ -1311,8 +1448,15 @@
 		</license-p>
 	</xsl:template>
 	
+	<xsl:template match="preface/abstract" priority="2" mode="front_preface"/>
+	<xsl:template match="preface/abstract" mode="front_abstract">
+		<xsl:copy>
+			<xsl:copy-of select="@*"/>
+			<xsl:apply-templates />
+		</xsl:copy>
+	</xsl:template>
 	
-	<xsl:template match="preface/*" mode="front_preface">
+	<xsl:template match="preface/*[not(self::abstract)]" mode="front_preface">
 		<xsl:param name="skipIntroduction">true</xsl:param>
 		<xsl:variable name="name" select="local-name()"/>
 		<xsl:choose>
