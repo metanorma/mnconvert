@@ -1966,10 +1966,30 @@
 			</xsl:if>
 			<xsl:choose>
 				<xsl:when test="ancestor::foreword"></xsl:when>
-				<xsl:otherwise><label><xsl:value-of select="$section"/></label>			</xsl:otherwise>
+				<xsl:otherwise><label><xsl:value-of select="$section"/></label></xsl:otherwise>
 			</xsl:choose>
 			
-			<xsl:apply-templates>
+			<xsl:apply-templates select="title">
+				<xsl:with-param name="sectionNum" select="$sectionNum_"/>
+			</xsl:apply-templates>
+			
+			<xsl:if test="@change">
+				<editing-instruction>
+					<p>
+						<italic>
+							<xsl:choose>
+								<xsl:when test="@change = 'add'">Addition</xsl:when>
+								<xsl:when test="@change = 'modify'">Replacement</xsl:when>
+								<xsl:when test="@change = 'delete'">Deletion</xsl:when>
+								<xsl:otherwise><xsl:value-of select="@change"/></xsl:otherwise>
+							</xsl:choose>
+						<xsl:text>:</xsl:text>
+						</italic>
+					</p>
+				</editing-instruction>
+			</xsl:if>
+			
+			<xsl:apply-templates select="node()[not(self::title)]">
 				<xsl:with-param name="sectionNum" select="$sectionNum_"/>
 			</xsl:apply-templates>
 		</sec>
