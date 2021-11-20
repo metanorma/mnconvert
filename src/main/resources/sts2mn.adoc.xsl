@@ -519,6 +519,8 @@
 		<!-- :date: release 2020-01-01 -->
 		<xsl:apply-templates select="release-date"/>
 		
+		<!-- :uri: www.... -->
+		<xsl:apply-templates select="self-uri"/>
 		
 		<!-- :language: en -->
 		<xsl:apply-templates select="doc-ident/language"/>
@@ -742,6 +744,15 @@
 			<xsl:text>:date: release </xsl:text><xsl:value-of select="."/>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="self-uri">
+		<xsl:text>:</xsl:text>
+		<xsl:if test="@content-type">
+			<xsl:value-of select="@content-type"/><xsl:text>-</xsl:text>
+		</xsl:if>
+		<xsl:text>uri: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="doc-ident[ancestor::front or ancestor::adoption-front]/language[normalize-space(.) != '']">

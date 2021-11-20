@@ -312,6 +312,8 @@
 		<!-- title @type="main", "title-intro", type="title-main", type="title-part" -->
 		<xsl:apply-templates select="title-wrap" mode="bibdata"/>
 		
+		<xsl:apply-templates select="self-uri" mode="bibdata"/>
+		
 		<!-- docidentifier @type="iso", "iso-with-lang", "iso-reference" -->
 		<xsl:apply-templates select="std-ref[@type='dated']" mode="bibdata"/>	
 		<xsl:apply-templates select="doc-ref" mode="bibdata"/>	
@@ -575,8 +577,11 @@
 															nat-meta/std-ident/suppl-type |
 															reg-meta/std-ident/suppl-type |
 															std-meta/std-ident/suppl-type |
+															nat-meta/self-uri |
+															reg-meta/self-uri |
+															std-meta/self-uri |
 															front/notes |
-															front/sec" mode="bibdata_check"/>
+															front/sec " mode="bibdata_check"/>
 	
 	
 	<xsl:template match="iso-meta/doc-ident | nat-meta/doc-ident | reg-meta/doc-ident | std-meta/doc-ident |
@@ -1059,6 +1064,15 @@
 		<legal-statement>
 			<xsl:apply-templates/>
 		</legal-statement>
+	</xsl:template>
+	
+	<xsl:template match="self-uri" mode="bibdata">
+		<uri>
+			<xsl:if test="@content-type">
+				<xsl:attribute name="type"><xsl:value-of select="@content-type"/></xsl:attribute>
+			</xsl:if>
+			<xsl:value-of select="."/>
+		</uri>
 	</xsl:template>
 	
 	<xsl:template match="@*" mode="bibdata">
