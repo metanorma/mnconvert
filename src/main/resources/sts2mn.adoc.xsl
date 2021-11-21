@@ -1695,6 +1695,8 @@
 		<xsl:apply-templates />
 	</xsl:template>
 	
+	<xsl:template match="ref/std/std-id"/> <!-- for IEC -->
+	
 	
 	<!-- ================= -->
 	<!-- tbx:source processing -->
@@ -2200,7 +2202,7 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	<xsl:template match="mixed-citation">		
+	<xsl:template match="mixed-citation">
 		<xsl:text> </xsl:text><xsl:apply-templates/>
 	</xsl:template>
 		
@@ -2930,7 +2932,6 @@
 	
 	<xsl:template match="ref/std/std-ref"/>
 	
-	
 	<xsl:template match="ref/mixed-citation/std"/>
 	<xsl:template match="ref/mixed-citation/std" mode="references">
 		<!-- <xsl:text>,</xsl:text> -->
@@ -2938,6 +2939,10 @@
 	</xsl:template>
 	
 	<xsl:template match="ref/std//title">
+		<xsl:if test="not(contains(preceding-sibling::node()[1], ','))"> <!-- no comma before title in IEC -->
+			<xsl:text>, </xsl:text>
+			<xsl:apply-templates/>
+		</xsl:if>
 		<xsl:text>_</xsl:text>
 		<xsl:apply-templates/>
 		<xsl:text>_</xsl:text>
@@ -4670,7 +4675,37 @@
 					<xsl:text>&lt;&lt;hidden_bibitem_ISO_9000_2005,clause 3.4.2,ISO 9000:2005, footnote:[Superseded by ISO 9000:2015.]&gt;&gt;,</xsl:text>
 				</destination>
 			</item>
-
+			
+			<!-- for IEC format -->
+			<item>
+				<source>	
+					<tbx:source>
+						<std>
+						<std-id std-id-link-type="urn" std-id-type="dated">urn:iec:std:iec:62391-1:2015-10:::#con-3.8</std-id>
+						<std-ref>IEC 62391–1:2015</std-ref>, 3.8
+						</std>, modified<italic>–</italic>"capacitor" has been replaced by "supercapacitor" and the note has been omitted.</tbx:source>
+				</source>
+					<destination>
+						<xsl:text>[.source]&#xa;</xsl:text>
+						<xsl:text>&lt;&lt;hidden_bibitem_IEC_62391_1_2015,clause=3.8,IEC 62391–1:2015&gt;&gt;,"capacitor" has been replaced by "supercapacitor" and the note has been omitted.</xsl:text>
+					</destination>
+			</item>
+			
+			<item>
+				<source>
+					<tbx:source>
+						<std>
+						<std-id std-id-link-type="urn" std-id-type="dated">urn:iec:std:iec:62899-101:2019-10:::#con-3.133</std-id>
+						<std-ref>IEC 62899–101:2019</std-ref>, 3.133
+						</std>
+					</tbx:source>
+				</source>
+				<destination>
+					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>&lt;&lt;hidden_bibitem_IEC_62899_101_2019,clause=3.133,IEC 62899–101:2019&gt;&gt;</xsl:text>
+				</destination>
+			</item>
+			
 		</xsl:variable>
 	
 		<xsl:for-each select="xalan:nodeset($data)//item">

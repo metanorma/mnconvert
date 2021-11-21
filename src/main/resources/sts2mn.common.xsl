@@ -23,7 +23,16 @@
 	-->
 	<xsl:template name="build_sts_model_std">
 	
-		<xsl:variable name="clause" select="substring-after(@std-id, ':clause:')"/>
+		<xsl:variable name="clause">
+			<xsl:choose>
+				<xsl:when test="std-id"> <!-- for IEC -->
+					 <xsl:value-of select="substring-after(substring-after(std-id, '#'), '-')"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="substring-after(@std-id, ':clause:')"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
 		<xsl:variable name="locality">
 			<xsl:choose>
 				<xsl:when test="$clause != '' and translate(substring($clause, 1, 1), '0123456789', '') = ''"><locality>clause=<xsl:value-of select="$clause"/></locality></xsl:when>
@@ -140,11 +149,28 @@
 			</xsl:choose>
 		</xsl:variable>
 		
+		<!--
+		<xsl:message>DEBUG: std-id=<xsl:value-of select="std-id"/></xsl:message>
+		<xsl:message>DEBUG: $std-id=<xsl:value-of select="java:replaceAll(java:java.lang.String.new(std-id), '(#.*)?$','')"/></xsl:message>
+		-->
+		
 		<xsl:variable name="reference">
-			<xsl:call-template name="getReference_std">
-				<xsl:with-param name="stdid" select="current()/@stdid"/>
-				<xsl:with-param name="locality" select="$locality"/>
-			</xsl:call-template>
+			<xsl:choose>
+				<xsl:when test="std/std-id"> <!-- for IEC -->
+					<xsl:variable name="std-id" select="java:replaceAll(java:java.lang.String.new(std-id), '(#.*)?$','')"/>
+					<xsl:call-template name="getReference_std">
+						<xsl:with-param name="stdid" select="$std-id"/>
+						<xsl:with-param name="locality" select="$locality"/>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:call-template name="getReference_std">
+						<xsl:with-param name="stdid" select="current()/@stdid"/>
+						<xsl:with-param name="locality" select="$locality"/>
+					</xsl:call-template>
+				</xsl:otherwise>
+			</xsl:choose>
+			
 		</xsl:variable>
 		
 		<xsl:choose>
@@ -249,7 +275,7 @@
 		<!-- remove modified text -->
 		<xsl:variable name="text">
 			<xsl:choose>
-				<xsl:when test="contains(., $modified_text)">
+				<xsl:when test="contains(., $modified_text) or contains(preceding-sibling::text(), $modified_text)">
 					<xsl:value-of select="substring-before(., $modified_text)"/>
 				</xsl:when>
 				<xsl:otherwise>
@@ -495,9 +521,18 @@
 			<xsl:apply-templates select="@*" mode="ref_fix"/>
 			
 			<xsl:variable name="std-id">
-				<xsl:call-template name="getNormalizedId">
-					<xsl:with-param name="id" select="std/@std-id"/>
-				</xsl:call-template>
+				<xsl:choose>
+					<xsl:when test="std/std-id"> <!-- for IEC -->
+						<xsl:call-template name="getNormalizedId">
+							<xsl:with-param name="id" select="std/std-id"/>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:call-template name="getNormalizedId">
+							<xsl:with-param name="id" select="std/@std-id"/>
+						</xsl:call-template>
+					</xsl:otherwise>
+				</xsl:choose>
 			</xsl:variable>
 			
 			<xsl:variable name="std-ref">
@@ -583,14 +618,39 @@
 					</xsl:when>
 					<!-- if there is nested std-ref -->
 					<xsl:when test="normalize-space(.//std-ref) != ''">
+						<xsl:variable name="std_ref_text_" select="normalize-space(.//std-ref)"/>
+						<xsl:variable name="std_ref_text" select="normalize-space(java:replaceAll(java:java.lang.String.new($std_ref_text_),'(,.*)?$',''))"/> <!-- remove comma at end -->
 						<xsl:call-template name="getNormalizedId">
-							<xsl:with-param name="id" select="normalize-space(.//std-ref)"/>
+							<!-- <xsl:with-param name="id" select="normalize-space(.//std-ref)"/> -->
+							<xsl:with-param name="id" select="normalize-space($std_ref_text)"/>
 						</xsl:call-template>
 					</xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="ref_fix"/>
 		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="std[not(parent::ref)]/std-ref/text()[last()]" mode="ref_fix">
+		<xsl:choose>
+			<xsl:when test="contains(., ',')"> <!-- for IEC, comma in std-ref - locality -->
+				<xsl:value-of select="substring-before(., ',')"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="."/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	<xsl:template match="std[not(parent::ref)]/std-ref" mode="ref_fix" priority="2">
+		<xsl:copy>
+			<xsl:copy-of select="@*"/>
+			<!-- <xsl:copy-of select="."/> --> <!-- copy as-is -->
+			<xsl:apply-templates mode="ref_fix"/>
+		</xsl:copy>
+		<!-- move comma outside std-ref --> <!-- for IEC -->
+		<xsl:if test="contains(text()[last()], ',')"> <!-- for IEC, comma in std-ref - locality -->
+			<xsl:text>,</xsl:text><xsl:value-of select="substring-after(text()[last()], ',')"/>
+		</xsl:if>
 	</xsl:template>
 	<!-- ========================================= -->
 	<!-- END References fixing -->
