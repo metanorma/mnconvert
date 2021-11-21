@@ -3173,7 +3173,23 @@
 	</xsl:template>
 	
 	<xsl:template match="colgroup | thead | tfoot | tbody"/>
-	<xsl:template match="colgroup | thead | tfoot | tbody" mode="table">
+	
+	<xsl:template match="colgroup" mode="table">
+		<xsl:choose>
+			<xsl:when test="$organization = 'ISO'">
+				<!-- skip creation of element colgroup, just copy nested col -->
+				<xsl:apply-templates />
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:element name="{local-name()}">
+					<xsl:copy-of select="@*"/>
+					<xsl:apply-templates />
+				</xsl:element>	
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template match="thead | tfoot | tbody" mode="table">
 		<xsl:element name="{local-name()}">
 			<xsl:copy-of select="@*"/>
 			<xsl:apply-templates />
