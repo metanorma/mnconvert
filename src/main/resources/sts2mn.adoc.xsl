@@ -2941,7 +2941,6 @@
 	<xsl:template match="ref/std//title">
 		<xsl:if test="not(contains(preceding-sibling::node()[1], ','))"> <!-- no comma before title in IEC -->
 			<xsl:text>, </xsl:text>
-			<xsl:apply-templates/>
 		</xsl:if>
 		<xsl:text>_</xsl:text>
 		<xsl:apply-templates/>
