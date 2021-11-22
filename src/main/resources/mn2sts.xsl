@@ -2072,7 +2072,7 @@
 		<xsl:call-template name="ol"/>
 	</xsl:template>
 
-	<xsl:template match="verbaldefinition | nonverbalrepresentation">
+	<xsl:template match="verbaldefinition | verbal-definition | nonverbalrepresentation | non-verbal-representation">
 		<xsl:apply-templates />
 	</xsl:template>
 	
@@ -2241,6 +2241,7 @@
 			<xsl:when test="$parent_name = 'termexample' or 
 														$parent_name = 'definition'  or 
 														$parent_name = 'verbaldefinition'  or 
+														$parent_name = 'verbal-definition'  or 
 														$parent_name = 'termnote' or 
 														$parent_name = 'modification' or
 														$parent_name = 'dd'">
