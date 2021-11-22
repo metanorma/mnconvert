@@ -2130,6 +2130,12 @@
 					<xsl:with-param name="options" select="'noref,noital,linkmention'"/>
 				</xsl:call-template>
 			</xsl:when>
+			<xsl:when test="@ref-type = 'app' and ( 
+				(java:org.metanorma.utils.RegExHelper.matches('^Annex.*$', normalize-space(.)) = 'true' and
+				java:org.metanorma.utils.RegExHelper.matches('^Annex(\s|\h)+.{1}$', normalize-space(.)) = 'false') or
+				string-length(normalize-space(.)) = 1)"> <!-- if text isn't `Annex X`, i.e. 'Annexes A', or 'C' -->
+				<xsl:text>&lt;&lt;</xsl:text><xsl:value-of select="$rid"/>,<xsl:value-of select="."/><xsl:text>&gt;&gt;</xsl:text>
+			</xsl:when>
 			<xsl:otherwise> <!-- example: ref-type="sec" "table" "app" -->
 				<xsl:text>&lt;&lt;</xsl:text><xsl:value-of select="$rid"/><xsl:text>&gt;&gt;</xsl:text>
 			</xsl:otherwise>
