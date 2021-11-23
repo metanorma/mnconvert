@@ -821,6 +821,9 @@
 					<release-version>
 						<xsl:apply-templates select="status/stage/@abbreviation" mode="front"/>
 					</release-version>
+					<xsl:if test="$element_name = 'iso-meta'">
+						<xsl:call-template name="generateURN"/>
+					</xsl:if>
 				</doc-ident>
 			</xsl:if>
 			
@@ -2813,17 +2816,22 @@
 		<italic><xsl:apply-templates /></italic>
 	</xsl:template>
 
+	<xsl:template match="strong/br">
+		<xsl:text disable-output-escaping="yes">&lt;/bold&gt;</xsl:text>
+		<break/>
+		<xsl:text disable-output-escaping="yes">&lt;bold&gt;</xsl:text>
+	</xsl:template>
+
 	<xsl:template match="br">
 		<break/>
 	</xsl:template>
-	
 	
 	<xsl:template match="th[strong][br[parent::strong]]/node()[1][self::text()]">
 		<xsl:text disable-output-escaping="yes">&lt;bold&gt;</xsl:text>
 		<xsl:value-of select="."/>
 	</xsl:template>
 	
-	<xsl:template match="th[strong]/br[parent::strong]">
+	<xsl:template match="th[strong]/br[parent::strong]" priority="2">
 		<xsl:text disable-output-escaping="yes">&lt;/bold&gt;</xsl:text>
 		<break/>
 		<xsl:text disable-output-escaping="yes">&lt;bold&gt;</xsl:text>
@@ -3610,6 +3618,58 @@
 		</xsl:choose>
 	</xsl:template>
 
+	<xsl:template name="generateURN">
+		<xsl:param name="sdo">ISO</xsl:param>
+		<xsl:variable name="items_">
+			<xsl:choose>
+				<xsl:when test="$sdo = 'ISO'">
+					<item>iso:std</item>
+					<!-- publisher(s) -->
+					<item>
+						<xsl:for-each select="contributor[role/@type = 'author']/organization/abbreviation">
+							<xsl:value-of select="java:toLowerCase(java:java.lang.String.new(.))"/>
+							<xsl:if test="position() != last()">-</xsl:if>
+						</xsl:for-each>
+					</item>
+					<!-- non 'is' doctype -->
+					<item>
+						<xsl:variable name="doctype" select="java:toLowerCase(java:java.lang.String.new(ext/doctype))"/>
+						<xsl:choose>
+							<xsl:when test="$doctype = 'is' or $doctype = 'international-standard'"></xsl:when>
+							<xsl:when test="$doctype = 'technical-report'">tr</xsl:when>
+							<xsl:when test="$doctype = 'technical-corrigendum'">tc</xsl:when>
+							<xsl:when test="$doctype = 'technical-specification'">ts</xsl:when>
+							<xsl:when test="$doctype = 'amendment'">amd</xsl:when>
+							<xsl:when test="$doctype = 'directive'">dir</xsl:when>
+							<xsl:otherwise><xsl:value-of select="$doctype"/></xsl:otherwise>
+						</xsl:choose>
+					</item>
+					<!-- docnumber -->
+					<item><xsl:value-of select="docnumber"/></item>
+					<!-- part number -->
+					<item>
+						<xsl:variable name="part_number" select="ext/structuredidentifier/partnumber | ext/structuredidentifier/project-number/@part"/>
+						<xsl:if test="normalize-space($part_number) != ''">-<xsl:value-of select="$part_number"/></xsl:if>
+					</item>
+					<!-- edition -->
+					<item>ed-<xsl:value-of select="edition"/></item>
+					<!-- version -->
+					<item>v1</item> <!-- To do: https://github.com/metanorma/mn-samples-bsi/issues/22 -->
+					<!-- language -->
+					<item><xsl:value-of select="language"/></item>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="items" select="xalan:nodeset($items_)"/>
+		<xsl:if test="count($items/item[normalize-space() != '']) &gt; 0">
+			<urn>
+				<xsl:for-each select="$items/item[normalize-space() != '']">
+					<xsl:value-of select="normalize-space(.)"/>
+					<xsl:if test="position() != last()">:</xsl:if>
+				</xsl:for-each>
+			</urn>
+		</xsl:if>
+	</xsl:template>
 
 	<xsl:template name="getLevel">
 		<xsl:variable name="level_total" select="count(ancestor::*)"/>

@@ -482,7 +482,7 @@
 	</xsl:template>
 	
 	<xsl:template name="getMetaBibFilename">
-		<xsl:variable name="name1" select="java:replaceAll(java:java.lang.String.new(std-ref[@type = 'undated']), '(\s|\h)', '-')"/>
+		<xsl:variable name="name1" select="java:replaceAll(java:java.lang.String.new(std-ref[@type = 'undated']), '(\s|\h|/|‑)', '-')"/>
 		<xsl:value-of select="java:toLowerCase(java:java.lang.String.new($name1))"/><xsl:text>.</xsl:text><xsl:value-of select="$docfile_ext"/>
 	</xsl:template>
 	
@@ -505,6 +505,8 @@
 		<xsl:apply-templates select="std-ident"/> <!-- * -> iso-meta -->
 		<!-- :docnumber: 8601 -->
 		<xsl:apply-templates select="std-ident/doc-number"/>		
+		<!-- :publisher: ISO;IEC -->
+		<xsl:apply-templates select="std-ident/originator"/>
 		<!-- :partnumber: 1 -->
 		<xsl:apply-templates select="std-ident/part-number"/>		
 		<!-- :edition: 1 -->
@@ -535,7 +537,16 @@
 		<xsl:variable name="doctype">
 			<xsl:apply-templates select="std-ident/doc-type"/>		
 		</xsl:variable>
-		<xsl:text>:doctype: </xsl:text><xsl:value-of select="$doctype"/>
+		<xsl:text>:doctype: </xsl:text>
+			<xsl:choose>
+				<xsl:when test="$doctype = 'TR' or $doctype = 'tr'">technical-report</xsl:when>
+				<xsl:when test="$doctype = 'TC' or $doctype = 'tc'">technical-corrigendum</xsl:when>
+				<xsl:when test="$doctype = 'TS' or $doctype = 'ts'">technical-specification</xsl:when>
+				<xsl:when test="$doctype = 'AMD' or $doctype = 'amd'">amendment</xsl:when>
+				<xsl:when test="$doctype = 'DIR' or $doctype = 'dir'">directive</xsl:when>
+				<xsl:when test="$doctype = 'IS' or $doctype = 'is'">international-standard</xsl:when>
+				<xsl:otherwise><xsl:value-of select="$doctype"/></xsl:otherwise>
+			</xsl:choose>
 		<xsl:text>&#xa;</xsl:text>
 		
 		<!-- :docstage: 60
@@ -671,6 +682,13 @@
 	<xsl:template match="std-ident[ancestor::front or ancestor::adoption-front]/doc-number[normalize-space(.) != '']">
 		<xsl:text>:docnumber: </xsl:text><xsl:call-template name="getDocNumber"/>
 		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="std-ident[ancestor::front or ancestor::adoption-front]/originator[normalize-space(.) != '']">
+		<xsl:if test="contains(., '/')">
+			<xsl:text>:publisher: </xsl:text><xsl:value-of select="translate(., '/', ';')"/>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 	</xsl:template>
 
 	<xsl:template name="getDocNumber">
