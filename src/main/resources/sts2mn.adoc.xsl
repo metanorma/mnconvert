@@ -3901,6 +3901,11 @@
 	
 	
 	<xsl:template match="processing-instruction()[contains(., 'Page_Break')] | processing-instruction()[contains(., 'Page-Break')]">
+		<xsl:if test="ancestor::table">
+			<xsl:text>&#xa;&#xa;</xsl:text>
+			<xsl:text>+++&lt;pagebreak/&gt;+++</xsl:text>
+			<xsl:text>&#xa;&#xa;</xsl:text>
+		</xsl:if>
 		<xsl:if test="not(ancestor::table)"> <!-- Conversion gap: <?Para Page_Break?> between table's rows https://github.com/metanorma/mn-samples-bsi/issues/47 -->
 			<xsl:text>&#xa;&#xa;</xsl:text>
 			<xsl:text>&lt;&lt;&lt;</xsl:text>
