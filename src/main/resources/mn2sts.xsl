@@ -2347,7 +2347,16 @@
 			</xsl:if> -->
 			<xsl:copy-of select="@id"/>
 			<xsl:choose>
-				<xsl:when test="local-name(..) = 'ul' and (../@type = 'bullet' or normalize-space(../@type) = '')"><label>•</label></xsl:when>
+				<xsl:when test="local-name(..) = 'ul' and (../@type = 'bullet' or normalize-space(../@type) = '')">
+					<xsl:choose>
+						<xsl:when test="$organization = 'ISO'">
+							<label>—</label>
+						</xsl:when>
+						<xsl:otherwise>
+							<label>•</label>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
 				<xsl:when test="local-name(..) = 'ul' and ../@type != 'simple'"><label>—</label></xsl:when>
 				
 				<xsl:when test="local-name(..) = 'ol'">
@@ -2746,19 +2755,27 @@
 	
 	
 	<xsl:template match="link">
-    <xsl:choose>
-      <xsl:when test="normalize-space() = '' or $organization = 'IEC'">
-        <uri><xsl:value-of select="@target"/></uri>
-      </xsl:when>
-      <xsl:otherwise>
-        <ext-link xlink:type="simple">
-          <xsl:attribute name="xlink:href">
-            <xsl:value-of select="@target"/>
-          </xsl:attribute>
-          <xsl:apply-templates />
-        </ext-link>
-      </xsl:otherwise>
-    </xsl:choose>
+		<xsl:choose>
+			<xsl:when test="normalize-space() = '' or $organization = 'IEC'">
+				<uri><xsl:value-of select="@target"/></uri>
+			</xsl:when>
+			<xsl:otherwise>
+				<ext-link>
+					<xsl:choose>
+						<xsl:when test="$organization = 'ISO'">
+							<xsl:attribute name="ext-link-type">uri</xsl:attribute>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:attribute name="xlink:type">simple</xsl:attribute>
+						</xsl:otherwise>
+					</xsl:choose>
+					<xsl:attribute name="xlink:href">
+						<xsl:value-of select="@target"/>
+					</xsl:attribute>
+					<xsl:apply-templates />
+				</ext-link>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="strong">
