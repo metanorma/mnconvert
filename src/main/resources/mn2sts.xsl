@@ -3090,6 +3090,9 @@
 			<xsl:if test="$orientation = 'landscape'">
 				<xsl:attribute name="orientation"><xsl:value-of select="$orientation"/></xsl:attribute>
 			</xsl:if>
+			<xsl:if test="$wrap-element = 'table-wrap'">
+				<xsl:attribute name="position">float</xsl:attribute>
+			</xsl:if>
 			<xsl:variable name="label">
 				<xsl:choose>
 					<xsl:when test="ancestor::amend/autonumber[@type = 'table']">
