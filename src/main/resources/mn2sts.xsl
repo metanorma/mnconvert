@@ -3090,8 +3090,35 @@
 			<xsl:if test="$orientation = 'landscape'">
 				<xsl:attribute name="orientation"><xsl:value-of select="$orientation"/></xsl:attribute>
 			</xsl:if>
+			
+			<xsl:variable name="isKeyTable" select="normalize-space(preceding-sibling::*[1][self::figure] and (name/text() = 'Key' or name/text() = 'Table &#160;&#8212; Key'))"/>
+			
+			<xsl:variable name="isWhereTable" select="normalize-space(preceding-sibling::*[1][self::stem] or (preceding-sibling::*[1][self::p][text() = 'where:'] and preceding-sibling::*[2][self::stem]))"/>
+			
 			<xsl:if test="$wrap-element = 'table-wrap'">
-				<xsl:attribute name="position">float</xsl:attribute>
+				<xsl:if test="ancestor::preface">
+					<xsl:choose>
+						<xsl:when test="starts-with(preceding-sibling::*[self::title]/text(), 'Amendments')">
+							<xsl:attribute name="content-type">ace-table</xsl:attribute>
+						</xsl:when>
+						<xsl:when test="not(label) and not(caption)">
+							<xsl:attribute name="content-type">informal-table</xsl:attribute>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:if>
+				<xsl:if test="not(ancestor::preface and starts-with(preceding-sibling::*[self::title]/text(), 'Amendments'))">
+					<xsl:attribute name="position">float</xsl:attribute>
+				</xsl:if>
+				<!-- https://github.com/metanorma/mn-samples-bsi/issues/39 -->
+				<!-- <xsl:if test="starts-with(title/text(), 'Relationship between') or starts-with(title/text(), 'Correspondence between')">
+					norm-refs
+				</xsl:if> -->
+				<xsl:if test="$isWhereTable = 'true'">
+					<xsl:attribute name="content-type">formula-index</xsl:attribute>
+				</xsl:if>
+				<xsl:if test="$isKeyTable = 'true'">
+					<xsl:attribute name="content-type">fig-index</xsl:attribute>
+				</xsl:if>
 			</xsl:if>
 			<xsl:variable name="label">
 				<xsl:choose>
@@ -3099,6 +3126,7 @@
 						<xsl:value-of select="ancestor::amend/autonumber[@type = 'table']/text()"/>
 					</xsl:when>
           <xsl:when test="ancestor::figure"></xsl:when>
+					<xsl:when test="$isKeyTable = 'true'">Key</xsl:when>
 					<xsl:otherwise>
 						<xsl:value-of select="$section"/>
 					</xsl:otherwise>
@@ -3109,7 +3137,9 @@
 					<xsl:value-of select="$label"/>
 				</label>
 			</xsl:if>
-			<xsl:apply-templates select="name" mode="table"/>				
+			<xsl:if test="$isKeyTable = 'false' and $isWhereTable = 'false'">
+				<xsl:apply-templates select="name" mode="table"/>
+			</xsl:if>
 			<table>
 				<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered')]"/>
 				<xsl:apply-templates select="@width"/>
@@ -3245,7 +3275,7 @@
 		</xsl:variable>
 		<xsl:variable name="id" select="$elements//element[@source_id = $current_id]/@id"/> -->
 		<xsl:choose>
-			<xsl:when test="preceding-sibling::*[1][self::figure]">
+			<xsl:when test="preceding-sibling::*[1][self::figure] or preceding-sibling::*[1][self::stem]">
 				<xsl:call-template name="create_array"/>
 			</xsl:when>
 			<xsl:otherwise>
@@ -3266,10 +3296,16 @@
 
 	<xsl:template name="create_array">
 		<!-- <xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable> -->
+		<xsl:if test="preceding-sibling::*[1][self::stem]">
+			<p>where:</p>
+		</xsl:if>
 		<array> <!-- id="{$id}" -->
 			<xsl:copy-of select="@id"/>
 			<xsl:if test="preceding-sibling::*[1][self::figure]">
 				<xsl:attribute name="content-type">figure-index</xsl:attribute>
+			</xsl:if>
+			<xsl:if test="preceding-sibling::*[1][self::stem]">
+				<xsl:attribute name="content-type">formula-index</xsl:attribute>
 			</xsl:if>
 			<xsl:if test="@key = 'true'">
 				<label>Key</label>
