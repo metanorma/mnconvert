@@ -379,7 +379,7 @@
 			
 			<xsl:call-template name="insertBack"/>
 						
-			<xsl:if test="$debug = 'true'">
+			<xsl:if test="$debug = 'true1'">
 				<xsl:text disable-output-escaping="yes">&lt;!-- </xsl:text>
 				<xsl:value-of select="count($elements//element)"/>
 				<xsl:copy-of select="$elements"/>
@@ -829,7 +829,9 @@
 			
 			<std-ident>
 				<originator>
-					<xsl:apply-templates select="contributor[role/@type='publisher']/organization/abbreviation" mode="front"/>
+					<xsl:apply-templates select="contributor[role/@type='publisher']/organization/abbreviation" mode="front">
+						<xsl:with-param name="short">true</xsl:with-param>
+					</xsl:apply-templates>
 				</originator>
 				<doc-type>
 					<xsl:apply-templates select="ext/doctype" mode="front"/>
@@ -927,8 +929,8 @@
 			
 			<xsl:variable name="doc_ref">
 				<xsl:choose>
-					<xsl:when test="docidentifier[@type='iso-reference']">
-						<xsl:apply-templates select="docidentifier[@type='iso-reference'][last()]" mode="front"/>
+					<xsl:when test="docidentifier[@type='iso-reference' or @type = 'BS']">
+						<xsl:apply-templates select="docidentifier[@type='iso-reference' or @type = 'BS'][last()]" mode="front"/>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:apply-templates select="docidentifier[@type='iso-with-lang']" mode="front"/>
@@ -941,21 +943,28 @@
 				</doc-ref>
 			</xsl:if>
 			
+			<xsl:if test="$organization = 'BSI'">
+				<xsl:for-each select="date[not(@type='release')][normalize-space(on) != '']">
+					<xsl:apply-templates select="on" mode="front"/>
+				</xsl:for-each>
+			</xsl:if>
+			
 			<!-- <release-date> -->
-			<xsl:variable name="release-date">
+			<xsl:variable name="release-date_">
 				<dates>
 					<xsl:apply-templates select="date[@type='release']/on" mode="front"/>
 				</dates>
 			</xsl:variable>
+			<xsl:variable name="release-date" select="xalan:nodeset($release-date_)"/>
 			
 			<xsl:choose>				
 				<xsl:when test="$format = 'NISO'">
-					<xsl:copy-of select="xalan:nodeset($release-date)/dates/*"/>
+					<xsl:copy-of select="$release-date/dates/*"/>
 				</xsl:when>
 				<xsl:otherwise><!-- get last date for ISO format (allows only one release-date  -->
 					<xsl:choose>
-						<xsl:when test="count(xalan:nodeset($release-date)/dates/*) &gt; 1">
-							<xsl:copy-of select="xalan:nodeset($release-date)/dates/*[last()]"/>
+						<xsl:when test="count($release-date/dates/*) &gt; 1">
+							<xsl:copy-of select="$release-date/dates/*[last()]"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<!-- mandatory element for ISO -->
@@ -965,13 +974,15 @@
 				</xsl:otherwise>
 			</xsl:choose>
 			
-			<xsl:for-each select="date[not(@type='release')][normalize-space(on) != '']">
-				<!-- example: <meta-date type="stability-date">2024-12-31</meta-date> -->
-				<meta-date>
-					<xsl:copy-of select="@type"/>
-					<xsl:value-of select="on"/>
-				</meta-date>
-			</xsl:for-each>
+			<xsl:if test="$organization = 'ISO' or $organization = 'IEC'">
+				<xsl:for-each select="date[not(@type='release')][normalize-space(on) != '']">
+					<!-- example: <meta-date type="stability-date">2024-12-31</meta-date> -->
+					<meta-date>
+						<xsl:copy-of select="@type"/>
+						<xsl:value-of select="on"/>
+					</meta-date>
+				</xsl:for-each>
+			</xsl:if>
 			
 			<xsl:variable name="related_comm_ref" select="relation[@type='related']/bibitem/docidentifier"/>
 			<xsl:variable name="related_comm_ref_text">Committee reference</xsl:variable>
@@ -1015,7 +1026,7 @@
 			<xsl:variable name="secretariat">
 				<xsl:apply-templates select="ext/editorialgroup/secretariat" mode="front"/>
 			</xsl:variable>
-			<xsl:if test="normalize-space($secretariat) != ''">
+			<xsl:if test="normalize-space($secretariat) != '' or $organization = 'BSI'">
 				<secretariat>
 					<xsl:value-of select="$secretariat"/>
 				</secretariat>
@@ -1031,36 +1042,46 @@
 			
 			
 			<permissions>
-				<xsl:if test="$organization = 'IEC'">
-					<xsl:call-template name="put_copyright_year"/>
-					<xsl:call-template name="put_copyright_holder"/>
-					<xsl:if test="/*/boilerplate/copyright-statement/clause/p">
-						<license>
-							<license-p><xsl:apply-templates select="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-message' or not(starts-with(@id, 'boilerplate-'))]/node()"/></license-p>
-							<xsl:if test="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-name' or @id = 'boilerplate-address']">
-								<license-p>
-									<address>
-										<addr-line>
-											<xsl:for-each select="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-name' or @id = 'boilerplate-address']">
-												<xsl:apply-templates />
-												<xsl:if test="position() != last()">, </xsl:if>
-											</xsl:for-each>
-										</addr-line>
-									</address>
-								</license-p>
-							</xsl:if>
-						</license>
-					</xsl:if>
-				</xsl:if>
-				<xsl:if test="$organization != 'IEC'">
-					<!-- <copyright-statement>All rights reserved</copyright-statement> -->
-					<xsl:apply-templates select="/*/boilerplate/copyright-statement"/>
-					<xsl:call-template name="put_copyright_year"/>
-					<xsl:call-template name="put_copyright_holder"/>
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'">
+						<xsl:call-template name="put_copyright_year"/>
+						<xsl:call-template name="put_copyright_holder"/>
+						<xsl:if test="/*/boilerplate/copyright-statement/clause/p">
+							<license>
+								<license-p><xsl:apply-templates select="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-message' or not(starts-with(@id, 'boilerplate-'))]/node()"/></license-p>
+								<xsl:if test="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-name' or @id = 'boilerplate-address']">
+									<license-p>
+										<address>
+											<addr-line>
+												<xsl:for-each select="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-name' or @id = 'boilerplate-address']">
+													<xsl:apply-templates />
+													<xsl:if test="position() != last()">, </xsl:if>
+												</xsl:for-each>
+											</addr-line>
+										</address>
+									</license-p>
+								</xsl:if>
+							</license>
+						</xsl:if>
+					</xsl:when>
+					<xsl:when test="$organization = 'BSI'">
+						<xsl:call-template name="put_copyright_year"/>
+						<xsl:call-template name="put_copyright_holder">
+							<xsl:with-param name="from">name</xsl:with-param>
+						</xsl:call-template>
+					</xsl:when>
 					
-					<xsl:apply-templates select="/*/boilerplate/legal-statement"/>
-					<xsl:apply-templates select="/*/boilerplate/license-statement"/>
-				</xsl:if>
+					<xsl:otherwise> <!-- not IEC and not BSI -->
+						<!-- <copyright-statement>All rights reserved</copyright-statement> -->
+						<xsl:apply-templates select="/*/boilerplate/copyright-statement"/>
+						<xsl:call-template name="put_copyright_year"/>
+						<xsl:call-template name="put_copyright_holder"/>
+						
+						<xsl:apply-templates select="/*/boilerplate/legal-statement"/>
+						<xsl:apply-templates select="/*/boilerplate/license-statement"/>
+						
+					</xsl:otherwise>
+				</xsl:choose>
 			</permissions>
 			
 			<xsl:for-each select="uri">
@@ -1075,27 +1096,36 @@
 			<xsl:apply-templates select="/*/preface/abstract" mode="front_abstract"/>
 			
 
-			<xsl:if test="$organization = 'IEC'">
-				<xsl:if test="ext/price-code">
-					<custom-meta-group>
-						<xsl:apply-templates select="ext/price-code" mode="custom_meta"/>
-					</custom-meta-group>
-				</xsl:if>
-			</xsl:if>
+			<xsl:choose>
+				<xsl:when test="$organization = 'IEC'">
+					<xsl:if test="ext/price-code">
+						<custom-meta-group>
+							<xsl:apply-templates select="ext/price-code" mode="custom_meta"/>
+						</custom-meta-group>
+					</xsl:if>
+				</xsl:when>
+				<xsl:when test="$organization = 'BSI'">
+					<xsl:if test="docidentifier[@type = 'ISBN']">
+						<custom-meta-group>
+							<xsl:apply-templates select="docidentifier[@type = 'ISBN']" mode="custom_meta"/>
+						</custom-meta-group>
+					</xsl:if>
+				</xsl:when>
+				<xsl:otherwise> <!-- non IEC, BSI -->
+					<xsl:if test="docidentifier[@type = 'ISBN'] or
+										ext/horizontal or
+										status/stage or 
+										status/substage">
+						<custom-meta-group>
+							<xsl:apply-templates select="docidentifier[@type = 'ISBN']" mode="custom_meta"/>
+							<xsl:apply-templates select="ext/horizontal" mode="custom_meta"/>
+							<xsl:apply-templates select="status/stage" mode="custom_meta"/>
+							<xsl:apply-templates select="status/substage" mode="custom_meta"/>
+						</custom-meta-group>
+					</xsl:if>
+				</xsl:otherwise>
+			</xsl:choose>
 			
-			<xsl:if test="$organization != 'IEC'">
-				<xsl:if test="docidentifier[@type = 'ISBN'] or
-									ext/horizontal or
-									status/stage or 
-									status/substage">
-					<custom-meta-group>
-						<xsl:apply-templates select="docidentifier[@type = 'ISBN']" mode="custom_meta"/>
-						<xsl:apply-templates select="ext/horizontal" mode="custom_meta"/>
-						<xsl:apply-templates select="status/stage" mode="custom_meta"/>
-						<xsl:apply-templates select="status/substage" mode="custom_meta"/>
-					</custom-meta-group>
-				</xsl:if>
-			</xsl:if>
 			
 			<xsl:if test="self::bibdata">
 				<!-- check non-processed elements in bibdata -->
@@ -1120,8 +1150,12 @@
 		</copyright-year>
 	</xsl:template>
 	<xsl:template name="put_copyright_holder">
+		<xsl:param name="from"/>
 		<copyright-holder>
 			<xsl:choose>
+				<xsl:when test="$from = 'name'">
+					<xsl:apply-templates select="copyright/owner/organization/name" mode="front"/>
+				</xsl:when>
 				<xsl:when test="copyright/owner/organization/abbreviation">
 					<xsl:apply-templates select="copyright/owner/organization/abbreviation" mode="front"/>
 				</xsl:when>
@@ -1183,7 +1217,7 @@
 					<xsl:value-of select="."/>
 				</release-date>
 			</xsl:when>
-			<xsl:when test="position() = 1 and ../@type = 'published' and ../following-sibling::date/@type = 'published' ">
+			<xsl:when test="../@type = 'published'"> <!-- position() = 1 and  and ../following-sibling::date/@type = 'published'  -->
 				<pub-date>
 					<xsl:if test="$organization = 'BSI'">
 						<xsl:attribute name="pub-type">PUBL</xsl:attribute>
@@ -1288,6 +1322,14 @@
 			</xsl:attribute>
 			<xsl:apply-templates mode="front"/>
 		</std-ref>
+	</xsl:template>
+	
+	<xsl:template match="contributor/organization/abbreviation" mode="front">
+		<xsl:param name="short">false</xsl:param>
+		<xsl:choose>
+			<xsl:when test=". = 'BSI' and $short = 'true'">BS</xsl:when>
+			<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<!-- =============== -->
@@ -3455,6 +3497,7 @@
 			<xsl:copy-of select="@id"/>
 			<!-- <xsl:copy-of select="@mimetype"/> -->
 			<xsl:apply-templates select="@*"/>
+			<!-- https://github.com/metanorma/mn-samples-bsi/issues/25 -->
 			<!-- <xsl:processing-instruction name="isoimg-id">
 				<xsl:value-of select="@src"/>
 			</xsl:processing-instruction> -->
