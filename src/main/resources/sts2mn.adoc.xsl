@@ -1779,19 +1779,22 @@
 		</xsl:if>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:variable name="list-type">
-			<xsl:apply-templates select="@list-type"/>
+			<xsl:apply-templates select="@list-type">
+				<xsl:with-param name="force">true</xsl:with-param>
+			</xsl:apply-templates>
 		</xsl:variable>
 		
 		<!-- https://www.metanorma.org/author/topics/document-format/text/#ordered-lists: 
 		commented due: The start attribute for ordered lists is only allowed by certain Metanorma flavors, such as BIPM.
 		-->
-		<!-- <xsl:variable name="start">
+		<xsl:variable name="start">
 			<xsl:call-template name="getListStartValue"/>
 		</xsl:variable>
-		<xsl:if test="$start != '' and $start != '1'">
-			<xsl:text>[start=</xsl:text><xsl:value-of select="$start"/><xsl:text>]</xsl:text>
-			<xsl:text>&#xa;</xsl:text>
-		</xsl:if> -->
+		<xsl:if test="$start != '' and $start != '1' and preceding-sibling::*[1][self::p]">
+			<!-- <xsl:text>[start=</xsl:text><xsl:value-of select="$start"/><xsl:text>]</xsl:text> -->
+			<xsl:text>+++&lt;?list_start </xsl:text><xsl:value-of select="$start"/><xsl:text>?&gt;&lt;?list_type </xsl:text><xsl:value-of select="$list-type"/><xsl:text>?&gt;+++</xsl:text>
+			<xsl:text>&#xa;&#xa;</xsl:text>
+		</xsl:if>
 		
 		<xsl:apply-templates/>
 		
@@ -1807,9 +1810,11 @@
 	</xsl:template>
 	
 	<xsl:template match="list/@list-type">
+		<xsl:param name="force">false</xsl:param>
 		<xsl:variable name="first_label" select="translate(..//label[1], ').', '')"/>
 		<xsl:variable name="listtype">
 			<xsl:choose>
+				<xsl:when test="$force = 'true' and . = 'alpha-lower'">loweralpha</xsl:when>
 				<xsl:when test=". = 'alpha-lower'"></xsl:when> <!-- loweralpha --> <!-- https://github.com/metanorma/sts2mn/issues/22: on list don't need to be specified because it is default MN-BSI style -->
 				<xsl:when test=". = 'alpha-upper'">upperalpha</xsl:when>
 				<xsl:when test=". = 'roman-lower'">lowerroman</xsl:when>
@@ -1829,6 +1834,9 @@
 			<xsl:text>]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if> -->
+		<xsl:if test="$force = 'true' and $listtype != ''">
+			<xsl:value-of select="$listtype"/>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template name="getListStartValue">
