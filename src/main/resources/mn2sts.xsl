@@ -2346,20 +2346,31 @@
 	<xsl:template match="ol" name="ol">
 		<list>
 			<xsl:apply-templates select="@*"/>
+			
+			<!-- Example: <?list-type loweralpha?> -->
+			<xsl:variable name="processing_instruction_type" select="normalize-space(preceding-sibling::*[1]/processing-instruction('list-type'))"/>
+			
+			<xsl:variable name="type">
+				<xsl:choose>
+					<xsl:when test="normalize-space($processing_instruction_type) != ''"><xsl:value-of select="$processing_instruction_type"/></xsl:when>
+					<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
+			
 			<xsl:variable name="list-type">
 				<xsl:choose>
 					<!-- <xsl:when test="@type = 'arabic'">alpha-lower</xsl:when> -->
-					<xsl:when test="@type = 'arabic' and not($organization = 'IEC')">order</xsl:when>
+					<xsl:when test="$type = 'arabic' and not($organization = 'IEC')">order</xsl:when>
 					<xsl:otherwise>
 						<xsl:choose>
-							<xsl:when test="$organization = 'IEC' and normalize-space(@type) = ''">arabic</xsl:when>
-							<xsl:when test="normalize-space(@type) = ''">alpha-lower</xsl:when>
-							<xsl:when test="@type = 'alphabet'">alpha-lower</xsl:when>
-							<xsl:when test="@type = 'alphabet_upper'">alpha-upper</xsl:when>
-							<xsl:when test="@type = 'roman'">roman-lower</xsl:when>
-							<xsl:when test="@type = 'roman_upper'">roman-upper</xsl:when>
-							<xsl:when test="@type = 'arabic'">arabic</xsl:when>
-							<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
+							<xsl:when test="$organization = 'IEC' and normalize-space($type) = ''">arabic</xsl:when>
+							<xsl:when test="normalize-space($type) = ''">alpha-lower</xsl:when>
+							<xsl:when test="$type = 'alphabet'">alpha-lower</xsl:when>
+							<xsl:when test="$type = 'alphabet_upper'">alpha-upper</xsl:when>
+							<xsl:when test="$type = 'roman'">roman-lower</xsl:when>
+							<xsl:when test="$type = 'roman_upper'">roman-upper</xsl:when>
+							<xsl:when test="$type = 'arabic'">arabic</xsl:when>
+							<xsl:otherwise><xsl:value-of select="$type"/></xsl:otherwise>
 						</xsl:choose>
 					</xsl:otherwise>
 				</xsl:choose>
@@ -2404,10 +2415,17 @@
 				<xsl:when test="local-name(..) = 'ol'">
 					<!-- <xsl:variable name="type" select="parent::*/@type"/> -->
 					<xsl:variable name="type" select="$list-type"/>
+					
+					<!-- Example: <?list-start 2?> -->
+					<xsl:variable name="processing_instruction_start" select="normalize-space(parent::*/preceding-sibling::*[1]/processing-instruction('list-start'))"/>
+					
 					<xsl:variable name="start_value">
 						<xsl:choose>
 							<xsl:when test="normalize-space(parent::*/@start) != ''">
 								<xsl:value-of select="number(parent::*/@start) - 1"/><!-- if start="3" then start_value=2 + xsl:number(1) = 3 -->
+							</xsl:when>
+							<xsl:when test="$processing_instruction_start != ''">
+								<xsl:value-of select="number($processing_instruction_start) - 1"/><!-- if start="3" then start_value=2 + xsl:number(1) = 3 -->
 							</xsl:when>
 							<xsl:otherwise>0</xsl:otherwise>
 						</xsl:choose>
