@@ -424,6 +424,7 @@
 				<xsl:variable name="section_name">
 					<xsl:value-of select="@sec-type"/>
 					<xsl:if test="not(@sec-type)"><xsl:value-of select="@id"/></xsl:if>
+					<xsl:if test="not(@sec-type) and not(@id)"><xsl:value-of select="local-name()"/></xsl:if>
 				</xsl:variable>
 				<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 				<xsl:variable name="filename">
@@ -1121,6 +1122,15 @@
 		</redirect:write>
 	</xsl:template>
 	
+	<xsl:template match="body[count(*) = 1]/sec[@sec-type = 'scope']" priority="3">
+		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
+		<redirect:write file="{$outpath}/{$docfile}">
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:call-template name="setId"/>
+			<xsl:apply-templates />
+		</redirect:write>
+	</xsl:template>
+	
 	<!-- ======================== -->
 	<!-- Normative references -->
 	<!-- ======================== -->
@@ -1195,7 +1205,7 @@
 	<!-- ======================== -->
 	
 	
-	<xsl:template match="body/sec">
+	<xsl:template match="body/sec | body[count(*) = 1]/sec[@sec-type = 'scope']/sec">
 		<xsl:variable name="sec_number_" select="format-number(label, '00')" />
 		<xsl:variable name="sec_number">
 			<xsl:choose>
