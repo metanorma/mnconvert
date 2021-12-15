@@ -1802,7 +1802,15 @@
 		</xsl:variable>
 		<xsl:if test="$start != '' and $start != '1' and preceding-sibling::*[1][self::p]">
 			<!-- <xsl:text>[start=</xsl:text><xsl:value-of select="$start"/><xsl:text>]</xsl:text> -->
-			<xsl:text>+++&lt;?list_start </xsl:text><xsl:value-of select="$start"/><xsl:text>?&gt;&lt;?list_type </xsl:text><xsl:value-of select="$list-type"/><xsl:text>?&gt;+++</xsl:text>
+			<xsl:call-template name="insertPI">
+				<xsl:with-param name="name">list_start</xsl:with-param>
+				<xsl:with-param name="value" select="$start"/>
+			</xsl:call-template>
+			<xsl:call-template name="insertPI">
+				<xsl:with-param name="name">list_type</xsl:with-param>
+				<xsl:with-param name="value" select="$list-type"/>
+			</xsl:call-template>
+			<!-- <xsl:text>+++&lt;?list_start </xsl:text><xsl:value-of select="$start"/><xsl:text>?&gt;&lt;?list_type </xsl:text><xsl:value-of select="$list-type"/><xsl:text>?&gt;+++</xsl:text> -->
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</xsl:if>
 		
@@ -2932,6 +2940,7 @@
 			</xsl:if>
 			
 			<xsl:apply-templates/>
+			
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:variable>
@@ -4435,7 +4444,6 @@
 	<!-- ========================================= -->
 	
 	
-	
 	<xsl:template name="trimSpaces">
 		<xsl:param name="text" select="."/>
 		
@@ -4466,6 +4474,13 @@
 		<xsl:variable name="text" select="java:replaceAll(java:java.lang.String.new($text_righttrim),'\s{2,}',' ')"/>
 		
 		<xsl:value-of select="$text"/>
+	</xsl:template>
+	
+	<!-- add XML processing instruction -->
+	<xsl:template name="insertPI">
+		<xsl:param name="name"/>
+		<xsl:param name="value"/>
+		<xsl:text>+++&lt;?</xsl:text><xsl:value-of select="$name"/><xsl:text> </xsl:text><xsl:value-of select="$value"/><xsl:text>?&gt;+++</xsl:text>
 	</xsl:template>
 	
 	<!-- =============== -->

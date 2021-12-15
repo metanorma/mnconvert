@@ -2524,7 +2524,7 @@
 	</xsl:template>
 	
 	<xsl:variable name="bibitems_URN_">
-		<xsl:for-each select="$xml//bibitem[docidentifier[@type = 'URN']]">
+		<xsl:for-each select="$xml//bibitem[docidentifier]"> <!-- [@type = 'URN'] -->
 			<bibitem>
 				<xsl:copy-of select="@id"/>
 				<xsl:variable name="urn_" select="docidentifier[@type = 'URN']"/>
@@ -2536,6 +2536,13 @@
 				<!-- <xsl:variable name="urn" select="java:replaceAll(java:java.lang.String.new($urn___),':ed-\d+','')"/> -->
 				
 				<urn><xsl:value-of select="$urn"/></urn>
+				<docidentifier>
+					<xsl:value-of select="docidentifier[not(@type = 'metanorma')][1]"/>
+					<xsl:if test="starts-with(@id, 'hidden_bibitem_')">
+						<xsl:text> </xsl:text>
+						<xsl:value-of select="translate(docnumber, '&#xa0;&#8209;', ' -')"/>
+					</xsl:if>
+				</docidentifier>
 			</bibitem>
 		</xsl:for-each>
 	</xsl:variable>
@@ -2551,9 +2558,10 @@
 		</xsl:variable>
 		<xsl:variable name="model_eref" select="xalan:nodeset($model_eref_)"/>
 	
-	
 		<xsl:variable name="docidentifier_URN" select="normalize-space($bibitems_URN/bibitem[@id = current()/@bibitemid]/urn)"/>
 		
+		<xsl:variable name="docidentifier" select="normalize-space($bibitems_URN/bibitem[@id = current()/@bibitemid]/docidentifier)"/>
+		<!-- bibitems_URN=<xsl:copy-of select="$bibitems_URN"/> -->
 		<xsl:variable name="value">
 			<xsl:choose>
 				<xsl:when test="$docidentifier_URN != ''"><xsl:value-of select="$docidentifier_URN"/></xsl:when>
@@ -2648,6 +2656,9 @@
 								</xsl:choose>
 							</xsl:for-each>
 						</xsl:when>
+						<xsl:when test="$docidentifier != ''">
+							<xsl:value-of select="$docidentifier"/>
+						</xsl:when>
 						<xsl:otherwise>
 							<xsl:choose>
 								<xsl:when test="starts-with($model_eref/reference, 'hidden_bibitem_')">
@@ -2723,10 +2734,27 @@
 					</xsl:call-template>
 				</xsl:attribute>
 				<xsl:variable name="reference" select="@bibitemid"/>
-				<xsl:variable name="docidentifier_URN" select="$bibitems_URN/bibitem[@id = $reference]/urn"/>
 				
 				<xsl:attribute name="std-id">
-					<xsl:value-of select="$reference"/>
+					<xsl:choose>
+						<xsl:when test="$docidentifier_URN != ''">
+							<xsl:value-of select="$docidentifier_URN"/>
+							<!-- add localities -->
+							<xsl:for-each select="localityStack/locality">
+								<xsl:choose>
+									<xsl:when test="@type = 'annex' or @type = 'clause'">:clause:<xsl:value-of select="referenceFrom"/></xsl:when>
+									<!-- table
+									locality:definition -->
+								</xsl:choose>
+							</xsl:for-each>
+						</xsl:when>
+						<xsl:when test="$docidentifier != ''">
+							<xsl:value-of select="$docidentifier"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$reference"/>
+						</xsl:otherwise>
+					</xsl:choose>
 				</xsl:attribute>
 				
 				<std-ref>
