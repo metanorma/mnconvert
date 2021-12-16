@@ -2219,7 +2219,10 @@
 			</xsl:for-each>
 		</xsl:variable>
 		
-		<tbx:tig id="{$id}">
+		<tbx:tig>
+			<xsl:if test="normalize-space($id) != ''">
+				<xsl:attribute name="id"><xsl:value-of select="$id"/></xsl:attribute>
+			</xsl:if>
 			<tbx:term><xsl:apply-templates /></tbx:term>
 			<tbx:partOfSpeech>
 				<xsl:attribute name="value">
@@ -3054,7 +3057,29 @@
     </xsl:element>
   </xsl:template>
   
-  
+	<!-- ============== -->
+	<!-- boxed-text -->
+	<!-- ============== -->
+	<xsl:template match="table[starts-with(@id, 'boxed-text_') and @unnumbered = 'true']" priority="2">
+		<boxed-text>
+			<xsl:apply-templates />
+		</boxed-text>
+	</xsl:template>
+	<xsl:template match="*[self::tbody or self::tr][ancestor::table[starts-with(@id, 'boxed-text_') and @unnumbered = 'true']]" priority="2">
+		<xsl:apply-templates />
+	</xsl:template>
+	<xsl:template match="td[ancestor::table[starts-with(@id, 'boxed-text_') and @unnumbered = 'true']]" priority="2">
+		<xsl:choose>
+			<xsl:when test="not(p)">
+				<p><xsl:apply-templates/></p>
+			</xsl:when>
+			<xsl:otherwise><xsl:apply-templates/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	<!-- ============== -->
+	<!-- END boxed-text -->
+	<!-- ============== -->
+	
 	<!-- need to be tested (find original NISO) -->
 	<xsl:template match="callout">
 		<xref ref-type="other" rid="{@target}">

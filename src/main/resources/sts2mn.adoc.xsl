@@ -3475,6 +3475,20 @@
 		<xsl:value-of select="$space_after"/>
 	</xsl:template>
 	
+	<xsl:template match="boxed-text">
+		<xsl:text>[[boxed-text_</xsl:text><xsl:number level="any"/><xsl:text>]]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>[%unnumbered]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>|===</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:apply-templates />
+		<xsl:text>|===</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
 	<xsl:template name="split">
 		<xsl:param name="pText" select="."/>
 		<xsl:param name="sep" select="'/'"/>

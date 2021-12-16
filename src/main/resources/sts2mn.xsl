@@ -2351,6 +2351,20 @@
 		</clause>
 	</xsl:template>
 	
+	<xsl:template match="boxed-text">
+		<table unnumbered="true">
+			<xsl:attribute name="id">
+				<xsl:text>boxed-text_</xsl:text>
+				<xsl:number level="any"/>
+			</xsl:attribute>
+			<tbody>
+				<tr>
+					<td valign="top" align="left"><xsl:apply-templates/></td>
+				</tr>
+			</tbody>
+		</table>
+	</xsl:template>
+	
 	<xsl:template name="split">
 		<xsl:param name="pText" select="."/>
 		<xsl:param name="sep" select="'/'"/>
