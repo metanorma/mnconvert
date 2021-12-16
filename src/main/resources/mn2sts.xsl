@@ -2629,9 +2629,8 @@
 						<xsl:value-of select="."/>
 					</xsl:for-each>
 					
-					</std-ref>
+				</std-ref>
 			</std>
-		
 		</xsl:if>
 	
 	
@@ -2680,7 +2679,9 @@
 							<xsl:value-of select="$model_eref/referenceText"/>
 						</xsl:otherwise>
 					</xsl:choose>
+					<xsl:copy-of select="following-sibling::node()[1][self::processing-instruction('doi')]"/>
 				</std-ref>
+				
 				<xsl:if test="$model_eref/locality">
 					<xsl:text>, </xsl:text>
 					<xsl:for-each select="$model_eref/locality">
@@ -2766,6 +2767,8 @@
 		
 	</xsl:template>
 	
+  <xsl:template match="processing-instruction('doi')"/>
+  
 	<!-- build eref model:
 		reference - link to bibliography item
 		referenceText - text for displaying (if it's difference from bibliography item text)

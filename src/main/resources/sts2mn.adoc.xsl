@@ -1675,6 +1675,14 @@
 		<xsl:if test="bold[std-ref]">*</xsl:if>
 		<xsl:if test="bold2[std-ref]">**</xsl:if>
 		
+		<!-- add Digital Object Identifier link -->
+		<xsl:if test=".//processing-instruction('doi')">
+			<xsl:call-template name="insertPI">
+				<xsl:with-param name="name">doi</xsl:with-param>
+				<xsl:with-param name="value" select=".//processing-instruction('doi')"/>
+			</xsl:call-template>
+		</xsl:if>
+		
 		<xsl:value-of select="$space_after"/>
 	</xsl:template>
 	
