@@ -855,11 +855,15 @@
 				<edition>
 					<xsl:apply-templates select="edition" mode="front"/>
 				</edition>
+				
 				<xsl:variable name="revision_date">
 					<xsl:apply-templates select="version/revision-date" mode="front"/>
 				</xsl:variable>
 				<version>
 					<xsl:value-of select="$revision_date"/>
+					<xsl:if test="normalize-space($revision_date) = ''">
+						<xsl:apply-templates select="version/draft" mode="front"/>
+					</xsl:if>
 				</version>
 				
 				<xsl:if test="$organization = 'IEC'">
@@ -1404,6 +1408,7 @@
 																edition |
 																version|
 																version/revision-date |
+																version/draft |
 																language |
 																docidentifier |
 																docidentifier[@type='iso-with-lang'] |

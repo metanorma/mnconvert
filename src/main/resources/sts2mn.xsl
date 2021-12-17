@@ -819,7 +819,9 @@
 					</revision-date>
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:value-of select="$version"/>
+					<draft>
+						<xsl:value-of select="$version"/>
+					</draft>
 				</xsl:otherwise>
 			</xsl:choose>
 			

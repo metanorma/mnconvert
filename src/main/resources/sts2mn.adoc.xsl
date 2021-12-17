@@ -512,6 +512,8 @@
 		<xsl:apply-templates select="std-ident/part-number"/>		
 		<!-- :edition: 1 -->
 		<xsl:apply-templates select="std-ident/edition"/>		
+		<!-- :draft: 2 -->
+		<xsl:apply-templates select="std-ident/version"/>
 		<!-- :copyright-year: 2019 -->
 		<xsl:apply-templates select="permissions/copyright-year"/>
 		
@@ -726,6 +728,11 @@
 	
 	<xsl:template match="std-ident[ancestor::front or ancestor::adoption-front]/edition[normalize-space(.) != '']">
 		<xsl:text>:edition: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="std-ident[ancestor::front or ancestor::adoption-front]/version[normalize-space(.) != '']">
+		<xsl:text>:draft: </xsl:text><xsl:value-of select="."/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
