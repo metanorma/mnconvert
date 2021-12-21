@@ -1944,6 +1944,7 @@
 																definitions">
 		<xsl:param name="sectionNum"/>
 		<xsl:param name="sectionNumSkew" select="0"/>
+		<xsl:param name="processFloatingTitle">false</xsl:param>
 		<xsl:if test="$debug = 'true'">
 			<xsl:message>DEBUG: <xsl:value-of select="local-name()"/><xsl:text> processing </xsl:text>
 				<xsl:choose>
@@ -2008,41 +2009,46 @@
 			</xsl:choose>
 		</xsl:variable>
 		
-		<sec id="{$id}">
-			<xsl:if test="normalize-space($sec_type) != ''">
-				<xsl:attribute name="sec-type">
-					<xsl:value-of select="$sec_type"/>
-				</xsl:attribute>
-			</xsl:if>
-			<xsl:choose>
-				<xsl:when test="ancestor::foreword"></xsl:when>
-				<xsl:otherwise><label><xsl:value-of select="$section"/></label></xsl:otherwise>
-			</xsl:choose>
-			
-			<xsl:apply-templates select="title">
-				<xsl:with-param name="sectionNum" select="$sectionNum_"/>
-			</xsl:apply-templates>
-			
-			<xsl:if test="@change">
-				<editing-instruction>
-					<p>
-						<italic>
-							<xsl:choose>
-								<xsl:when test="@change = 'add'">Addition</xsl:when>
-								<xsl:when test="@change = 'modify'">Replacement</xsl:when>
-								<xsl:when test="@change = 'delete'">Deletion</xsl:when>
-								<xsl:otherwise><xsl:value-of select="@change"/></xsl:otherwise>
-							</xsl:choose>
-						<xsl:text>:</xsl:text>
-						</italic>
-					</p>
-				</editing-instruction>
-			</xsl:if>
-			
-			<xsl:apply-templates select="node()[not(self::title)]">
-				<xsl:with-param name="sectionNum" select="$sectionNum_"/>
-			</xsl:apply-templates>
-		</sec>
+		<xsl:choose>
+			<xsl:when test="$processFloatingTitle = 'false' and preceding-sibling::p[1][@type = 'floating-title']"><!-- skip processing, see template for 'p' --></xsl:when>
+			<xsl:otherwise>
+				<sec id="{$id}">
+					<xsl:if test="normalize-space($sec_type) != ''">
+						<xsl:attribute name="sec-type">
+							<xsl:value-of select="$sec_type"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:choose>
+						<xsl:when test="ancestor::foreword"></xsl:when>
+						<xsl:otherwise><label><xsl:value-of select="$section"/></label></xsl:otherwise>
+					</xsl:choose>
+					
+					<xsl:apply-templates select="title">
+						<xsl:with-param name="sectionNum" select="$sectionNum_"/>
+					</xsl:apply-templates>
+					
+					<xsl:if test="@change">
+						<editing-instruction>
+							<p>
+								<italic>
+									<xsl:choose>
+										<xsl:when test="@change = 'add'">Addition</xsl:when>
+										<xsl:when test="@change = 'modify'">Replacement</xsl:when>
+										<xsl:when test="@change = 'delete'">Deletion</xsl:when>
+										<xsl:otherwise><xsl:value-of select="@change"/></xsl:otherwise>
+									</xsl:choose>
+								<xsl:text>:</xsl:text>
+								</italic>
+							</p>
+						</editing-instruction>
+					</xsl:if>
+					
+					<xsl:apply-templates select="node()[not(self::title)]">
+						<xsl:with-param name="sectionNum" select="$sectionNum_"/>
+					</xsl:apply-templates>
+				</sec>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 
@@ -2300,6 +2306,16 @@
 														$parent_name = 'dd'">
 				<xsl:if test="preceding-sibling::*[1][self::p]"><break /></xsl:if>
 				<xsl:apply-templates />
+			</xsl:when>
+			<xsl:when test="@type = 'floating-title'">
+				<!-- create parent element with floating title, for nested clauses (sec) -->
+				<sec>
+					<xsl:copy-of select="@id"/>
+					<title><xsl:apply-templates /></title>
+					<xsl:apply-templates select="following-sibling::*[preceding-sibling::p[1][@type = 'floating-title']]">
+						<xsl:with-param name="processFloatingTitle">true</xsl:with-param>
+					</xsl:apply-templates>
+				</sec>
 			</xsl:when>
 			<xsl:otherwise>
 				<p>

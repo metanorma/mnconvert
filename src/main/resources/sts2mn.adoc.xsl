@@ -3823,6 +3823,10 @@
 				</xsl:choose>
 			<xsl:text>]]</xsl:text>
 		</xsl:if>
+		<xsl:if test="title and not(label) and count(*) = count(title) + count(sec)">
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:text>[discrete]</xsl:text>
+		</xsl:if>
 		<xsl:if test="not(title) and label">
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:choose>

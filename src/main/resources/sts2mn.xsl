@@ -1156,6 +1156,12 @@
 	<xsl:template match="body//sec">
 		<xsl:choose>
 			<xsl:when test="$nat_meta_only = 'true' and @sec-type = 'intro'"></xsl:when> <!-- introduction added in preface tag, if $nat_meta_only = 'true' -->
+			<xsl:when test="$type_xml = 'semantic' and title and not(label) and count(*) = count(title) + count(sec)">
+				<p id="{@id}" type="floating-title">
+					<xsl:apply-templates select="title/node()"/>
+				</p>
+				<xsl:apply-templates select="node()[not(self::title)]"/>
+			</xsl:when>
 			<xsl:otherwise>
 				<clause id="{@id}">
 					<xsl:choose>
