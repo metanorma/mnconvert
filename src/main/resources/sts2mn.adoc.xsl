@@ -611,7 +611,7 @@
 		<!-- std-xref processing  -->
 		<!-- ==================== -->
 		<xsl:variable name="std-xref_types_">
-			<xsl:for-each select="std-xref">
+			<xsl:for-each select="std-xref[normalize-space() != '']">
 				<xsl:variable name="curr_type" select="java:toLowerCase(java:java.lang.String.new(@type))"/>
 				<xsl:if test="not(preceding-sibling::std-xref[java:toLowerCase(java:java.lang.String.new(@type)) = $curr_type])">
 					<item><xsl:value-of select="@type"/></item>
@@ -621,7 +621,7 @@
 		<xsl:variable name="std-xref_types" select="xalan:nodeset($std-xref_types_)"/>
 		
 		<xsl:variable name="std-xref_">
-			<xsl:for-each select="std-xref">
+			<xsl:for-each select="std-xref[normalize-space() != '']">
 				<xsl:copy-of select="."/>
 			</xsl:for-each>
 		</xsl:variable>
@@ -646,6 +646,7 @@
 					<xsl:when test="$curr_type = 'isPublishedFormatOf'">manifestation-of</xsl:when>
 					<xsl:when test="$curr_type = 'relatedDirective'">related-directive</xsl:when>
 					<xsl:when test="$curr_type = 'relatedMandate'">related-mandate</xsl:when>
+					<xsl:when test="$curr_type = 'commentOn'">comment-on</xsl:when>
 					<xsl:when test="java:toLowerCase(java:java.lang.String.new($curr_type)) = 'supersedes'">supersedes</xsl:when>
 					<xsl:when test="$curr_type = ''">related</xsl:when> <!-- (empty value) -->
 				</xsl:choose>
@@ -658,7 +659,7 @@
 			
 			<!-- EXAMPLE: `:informatively-cited-in: ISO 639;IEC 60050-112;W3C XML,Extensible Markup Language (XML)` -->
 			<xsl:for-each select="$std-xref/std-xref[java:toLowerCase(java:java.lang.String.new(@type)) = java:toLowerCase(java:java.lang.String.new($curr_type))]">
-				<xsl:value-of select="std-ref"/>
+				<xsl:value-of select="normalize-space(std-ref)"/>
 				<xsl:if test="position() != last()">;</xsl:if>
 			</xsl:for-each>
 			<xsl:text>&#xa;</xsl:text>
