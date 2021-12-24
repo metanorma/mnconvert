@@ -607,6 +607,66 @@
 		<!-- :secretariat: SAC -->
 		<xsl:apply-templates select="secretariat"/>
 		
+		<!-- ==================== -->
+		<!-- std-xref processing  -->
+		<!-- ==================== -->
+		<xsl:variable name="std-xref_types_">
+			<xsl:for-each select="std-xref">
+				<xsl:variable name="curr_type" select="java:toLowerCase(java:java.lang.String.new(@type))"/>
+				<xsl:if test="not(preceding-sibling::std-xref[java:toLowerCase(java:java.lang.String.new(@type)) = $curr_type])">
+					<item><xsl:value-of select="@type"/></item>
+				</xsl:if>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:variable name="std-xref_types" select="xalan:nodeset($std-xref_types_)"/>
+		
+		<xsl:variable name="std-xref_">
+			<xsl:for-each select="std-xref">
+				<xsl:copy-of select="."/>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:variable name="std-xref" select="xalan:nodeset($std-xref_)"/>
+		
+		<xsl:for-each select="$std-xref_types/item">
+			<xsl:variable name="curr_type" select="."/>
+			
+			<xsl:variable name="type">
+				<xsl:choose>
+					<xsl:when test="java:toLowerCase(java:java.lang.String.new($curr_type)) = 'revises'">revises</xsl:when>
+					<xsl:when test="java:toLowerCase(java:java.lang.String.new($curr_type)) = 'replaces'">replaces</xsl:when>
+					<xsl:when test="java:toLowerCase(java:java.lang.String.new($curr_type)) = 'amends'">amends</xsl:when>
+					<xsl:when test="java:toLowerCase(java:java.lang.String.new($curr_type)) = 'corrects'">corrects</xsl:when>
+					<xsl:when test="$curr_type = 'informativelyReferencedBy'">informatively-cited-in</xsl:when>
+					<xsl:when test="$curr_type = 'informativelyReferences'">informatively-cites</xsl:when>
+					<xsl:when test="$curr_type = 'normativelyReferencedBy'">normatively-cited-in</xsl:when>
+					<xsl:when test="$curr_type = 'normativelyReferences'">normatively-cites</xsl:when>
+					<xsl:when test="$curr_type = 'isIdenticalNationalStandardOf'">identical-adopted-from</xsl:when>
+					<xsl:when test="$curr_type = 'isModifiedNationalStandardOf'">modified-adopted-from</xsl:when>
+					<xsl:when test="$curr_type = 'isProgressionOf'">successor-of</xsl:when>
+					<xsl:when test="$curr_type = 'isPublishedFormatOf'">manifestation-of</xsl:when>
+					<xsl:when test="$curr_type = 'relatedDirective'">related-directive</xsl:when>
+					<xsl:when test="$curr_type = 'relatedMandate'">related-mandate</xsl:when>
+					<xsl:when test="java:toLowerCase(java:java.lang.String.new($curr_type)) = 'supersedes'">supersedes</xsl:when>
+					<xsl:when test="$curr_type = ''">related</xsl:when> <!-- (empty value) -->
+				</xsl:choose>
+			</xsl:variable>
+			
+			<!-- EXAMPLE: :informatively-cited-in: ISO 639;IEC 60050-112;W3C XML,Extensible Markup Language (XML) -->
+			<xsl:text>:</xsl:text>
+			<xsl:value-of select="$type"/>
+			<xsl:text>: </xsl:text>
+			
+			<!-- EXAMPLE: `:informatively-cited-in: ISO 639;IEC 60050-112;W3C XML,Extensible Markup Language (XML)` -->
+			<xsl:for-each select="$std-xref/std-xref[java:toLowerCase(java:java.lang.String.new(@type)) = java:toLowerCase(java:java.lang.String.new($curr_type))]">
+				<xsl:value-of select="std-ref"/>
+				<xsl:if test="position() != last()">;</xsl:if>
+			</xsl:for-each>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:for-each>
+		<!-- ==================== -->
+		<!-- END: std-xref processing  -->
+		<!-- ==================== -->
+		
 		<!-- relation bibitem -->
 		<xsl:if test="$include_iso_meta = 'true'">
 			<xsl:for-each select="ancestor::front/iso-meta">
