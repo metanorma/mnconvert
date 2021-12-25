@@ -681,4 +681,39 @@
 		<xsl:text>)</xsl:text> <xsl:value-of select="$text"/> -->
 	</xsl:template>
 	
+	<!-- =============================== -->
+	<!-- Relations (std-xref processing) -->
+	<!-- =============================== -->
+	<xsl:template name="getRelations">
+		<xsl:for-each select="std-xref[normalize-space() != '']">
+			<relation>
+				<xsl:attribute name="type">
+					<xsl:choose>
+						<xsl:when test="java:toLowerCase(java:java.lang.String.new(@type)) = 'revises'">revises</xsl:when>
+						<xsl:when test="java:toLowerCase(java:java.lang.String.new(@type)) = 'replaces'">replaces</xsl:when>
+						<xsl:when test="java:toLowerCase(java:java.lang.String.new(@type)) = 'amends'">amends</xsl:when>
+						<xsl:when test="java:toLowerCase(java:java.lang.String.new(@type)) = 'corrects'">corrects</xsl:when>
+						<xsl:when test="@type = 'informativelyReferencedBy'">informatively-cited-in</xsl:when>
+						<xsl:when test="@type = 'informativelyReferences'">informatively-cites</xsl:when>
+						<xsl:when test="@type = 'normativelyReferencedBy'">normatively-cited-in</xsl:when>
+						<xsl:when test="@type = 'normativelyReferences'">normatively-cites</xsl:when>
+						<xsl:when test="@type = 'isIdenticalNationalStandardOf'">identical-adopted-from</xsl:when>
+						<xsl:when test="@type = 'isModifiedNationalStandardOf'">modified-adopted-from</xsl:when>
+						<xsl:when test="@type = 'isProgressionOf'">successor-of</xsl:when>
+						<xsl:when test="@type = 'isPublishedFormatOf'">manifestation-of</xsl:when>
+						<xsl:when test="@type = 'relatedDirective'">related-directive</xsl:when>
+						<xsl:when test="@type = 'relatedMandate'">related-mandate</xsl:when>
+						<xsl:when test="@type = 'commentOn'">comment-on</xsl:when>
+						<xsl:when test="java:toLowerCase(java:java.lang.String.new(@type)) = 'supersedes'">supersedes</xsl:when>
+						<xsl:when test="@type = ''">related</xsl:when> <!-- (empty value) -->
+					</xsl:choose>
+				</xsl:attribute>
+				<xsl:value-of select="normalize-space(std-ref)"/>
+			</relation>
+		</xsl:for-each>
+	</xsl:template>
+	<!-- =============================== -->
+	<!-- END Relations (std-xref processing) -->
+	<!-- =============================== -->
+	
 </xsl:stylesheet>
