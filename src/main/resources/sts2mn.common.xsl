@@ -706,6 +706,7 @@
 						<xsl:when test="@type = 'commentOn'">comment-on</xsl:when>
 						<xsl:when test="java:toLowerCase(java:java.lang.String.new(@type)) = 'supersedes'">supersedes</xsl:when>
 						<xsl:when test="@type = ''">related</xsl:when> <!-- (empty value) -->
+						<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
 					</xsl:choose>
 				</xsl:attribute>
 				<xsl:value-of select="normalize-space(std-ref)"/>

@@ -346,7 +346,80 @@
 		<xsl:apply-templates select="release-version | doc-ident/release-version" mode="bibdata"/>
 		
 		<!-- relation bibitem -->
-		<xsl:apply-templates select="std-xref" mode="bibdata"/>
+		<!-- <xsl:apply-templates select="std-xref" mode="bibdata"/> -->
+		<!-- ==================== -->
+		<!-- std-xref processing  -->
+		<!-- ==================== -->
+		<xsl:variable name="relations_">
+			<xsl:call-template name="getRelations"/>
+		</xsl:variable>
+		<xsl:variable name="relations" select="xalan:nodeset($relations_)"/>
+		<xsl:for-each select="$relations/relation">
+			<relation>
+				<xsl:attribute name="type">
+					<xsl:choose>
+						<xsl:when test="@type = 'revises'">updates</xsl:when>
+						<xsl:when test="@type = 'replaces'">obsoletes</xsl:when>
+						<xsl:when test="@type = 'amends'">updates</xsl:when>
+						<xsl:when test="@type = 'corrects'">updates</xsl:when>
+						<xsl:when test="@type = 'informatively-cited-in'">isCitedIn</xsl:when>
+						<xsl:when test="@type = 'informatively-cites'">cites</xsl:when>
+						<xsl:when test="@type = 'normatively-cited-in'">isCitedIn</xsl:when>
+						<xsl:when test="@type = 'normatively-cites'">cites</xsl:when>
+						<xsl:when test="@type = 'identical-adopted-from'">adoptedFrom</xsl:when>
+						<xsl:when test="@type = 'modified-adopted-from'">adoptedFrom</xsl:when>
+						<xsl:when test="@type = 'successor-of'">successorOf</xsl:when>
+						<xsl:when test="@type = 'manifestation-of'">manifestationOf</xsl:when>
+						<xsl:when test="@type = 'related-directive'">related</xsl:when>
+						<xsl:when test="@type = 'related-mandate'">related</xsl:when>
+						<xsl:when test="@type = 'supersedes'">obsoletes</xsl:when>
+						<xsl:when test="@type = 'related'">related</xsl:when>
+					</xsl:choose>
+				</xsl:attribute>
+				<xsl:variable name="description">
+					<xsl:choose>
+						<xsl:when test="@type = 'revises'">revises</xsl:when>
+						<xsl:when test="@type = 'replaces'">replaces</xsl:when>
+						<xsl:when test="@type = 'amends'">amends</xsl:when>
+						<xsl:when test="@type = 'corrects'">corrects</xsl:when>
+						<xsl:when test="@type = 'informatively-cited-in'">informatively cited in</xsl:when>
+						<xsl:when test="@type = 'informatively-cites'">informatively cites</xsl:when>
+						<xsl:when test="@type = 'normatively-cited-in'">normatively cited in</xsl:when>
+						<xsl:when test="@type = 'normatively-cites'">normatively cites</xsl:when>
+						<xsl:when test="@type = 'identical-adopted-from'">identical adopted from</xsl:when>
+						<xsl:when test="@type = 'modified-adopted-from'">modified adopted from</xsl:when>
+						<xsl:when test="@type = 'successor-of'"></xsl:when>
+						<xsl:when test="@type = 'manifestation-of'"></xsl:when>
+						<xsl:when test="@type = 'related-directive'">related directive</xsl:when>
+						<xsl:when test="@type = 'related-mandate'">related mandate</xsl:when>
+						<xsl:when test="@type = 'supersedes'">supersedes</xsl:when>
+						<xsl:when test="@type = 'related'"></xsl:when>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:variable name="ext_doctype">
+					<xsl:choose>
+						<xsl:when test="@type = 'related-directive'">directive</xsl:when>
+						<xsl:when test="@type = 'related-mandate'">mandate</xsl:when>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:if test="normalize-space($description) != ''">
+					<description><xsl:value-of select="$description"/></description>
+				</xsl:if>
+				<bibitem>
+					<title>--</title>
+					<docidentifier><xsl:value-of select="."/></docidentifier>
+					<xsl:if test="normalize-space($ext_doctype) != ''">
+						<ext>
+							<doctype><xsl:value-of select="$ext_doctype"/></doctype>
+						</ext>
+					</xsl:if>
+				</bibitem>
+			</relation>
+		</xsl:for-each>
+		<!-- ==================== -->
+		<!-- END: std-xref processing  -->
+		<!-- ==================== -->
+		
 		<xsl:if test="$include_iso_meta = 'true'">
 			<xsl:for-each select="ancestor::front/iso-meta">
 				<relation type="adopted-from">
