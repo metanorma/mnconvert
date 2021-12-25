@@ -592,7 +592,13 @@
 	<!-- ================================== -->
 	<xsl:template name="insert_publication_info">
 			<sec id="sec_pub_info_nat" sec-type="publication_info">
-				<xsl:apply-templates select="boilerplate/copyright-statement/*" mode="publication_info"/>
+				<xsl:variable name="data">
+					<xsl:apply-templates select="boilerplate/copyright-statement/*" mode="publication_info"/>
+				</xsl:variable>
+				<xsl:if test="not(xalan:nodeset($data)/label)">
+					<label/>
+				</xsl:if>
+				<xsl:copy-of select="$data"/>
 				<xsl:apply-templates select="bibdata/docidentifier[@type = 'ISBN']" mode="publication_info"/>
 				
 				<xsl:if test="bibdata/ext/ics">
@@ -646,6 +652,9 @@
 	<!-- ================================== -->
 	<!-- END Publishing and copyright information block -->
 	<!-- ================================== -->
+	
+	<xsl:variable name="draft_comment_text">Draft for comment</xsl:variable>
+	<xsl:variable name="committee_ref_text">Committee reference</xsl:variable>
 	
 	<xsl:template match="bibdata | bibdata/relation[@type = 'adopted-from']/bibitem" mode="front">
 		<xsl:param name="element_name"/>
@@ -1040,9 +1049,9 @@
 			
 			<!-- std-xref -->
 			<!-- ignoring all instances of .//relation[@type = 'adopted-from']/bibitem -->
-			<xsl:apply-templates select="relation[@type != 'adopted-from' and @type != 'related']" mode="front" /><!-- adopted-from -> to standalone xxx-meta , related -> comm-ref  -->
+			<xsl:apply-templates select="relation[@type != 'adopted-from' and not(@type = 'related' and (starts-with(bibitem/docidentifier, $draft_comment_text) or starts-with(bibitem/docidentifier, $committee_ref_text)))]" mode="front" /><!-- adopted-from -> to standalone xxx-meta , related -> comm-ref  -->
 			
-			<xsl:apply-templates select="relation[@type = 'related'][starts-with(bibitem/docidentifier, 'Draft for comment')]" mode="front" />
+			<xsl:apply-templates select="relation[@type = 'related'][starts-with(bibitem/docidentifier, $draft_comment_text)]" mode="front" />
 			
 			
 			<permissions>
@@ -1268,7 +1277,7 @@
 	
 	<xsl:template match="*[self::bibdata or self::bibitem]/relation" mode="front">
 		<xsl:variable name="value" select="bibitem/docidentifier"/>
-		<xsl:variable name="draft_comment_text">Draft for comment</xsl:variable>
+		
 		<xsl:choose>
 			<xsl:when test="@type = 'related' and starts-with($value, $draft_comment_text)">
 				<!--
@@ -1307,26 +1316,53 @@
 				</std-xref>
 				-->
 				<std-xref>
-					<xsl:copy-of select="@*"/>
+					<xsl:attribute name="type">
+						<xsl:choose>
+							<xsl:when test="@type = 'updates' and description = 'revises'">revises</xsl:when>
+							<xsl:when test="@type = 'obsoletes' and description = 'replaces'">replaces</xsl:when>
+							<xsl:when test="@type = 'updates' and description = 'amends'">amends</xsl:when>
+							<xsl:when test="@type = 'updates' and description = 'corrects'">corrects</xsl:when>
+							<xsl:when test="@type = 'isCitedIn' and description = 'informatively cited in'">informativelyReferencedBy</xsl:when>
+							<xsl:when test="@type = 'cites' and description = 'informatively cites'">informativelyReferences</xsl:when>
+							<xsl:when test="@type = 'isCitedIn' and description = 'normatively cited in'">normativelyReferencedBy</xsl:when>
+							<xsl:when test="@type = 'cites' and description = 'normatively cites'">normativelyReferences</xsl:when>
+							<xsl:when test="@type = 'adoptedFrom' and description = 'identical adopted from'">isIdenticalNationalStandardOf</xsl:when>
+							<xsl:when test="@type = 'adoptedFrom' and description = 'modified adopted from'">isModifiedNationalStandardOf</xsl:when>
+							<xsl:when test="@type = 'successorOf'">isProgressionOf</xsl:when>
+							<xsl:when test="@type = 'manifestationOf'">isPublishedFormatOf</xsl:when>
+							<xsl:when test="@type = 'related' and bibitem/ext/doctype = 'directive' and description = 'related directive'">relatedDirective</xsl:when>
+							<xsl:when test="@type = 'related' and bibitem/ext/doctype = 'mandate' and description = 'related mandate'">relatedMandate</xsl:when>
+							<xsl:when test="@type = 'obsoletes' and description = 'supersedes'">supersedes</xsl:when>
+							<xsl:when test="@type = 'related'"></xsl:when>
+							<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
 					<xsl:apply-templates mode="front"/>
 				</std-xref>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
 	
-	
+	<xsl:template match="*[self::bibdata or self::bibitem]/relation[@type != 'adopted-from']/text()[normalize-space() = '']" mode="front"/>
 	
 	<xsl:template match="*[self::bibdata or self::bibitem]/relation[@type != 'adopted-from']/bibitem" mode="front">
 		<std-ref>
 			<xsl:copy-of select="@*"/>
 			<xsl:attribute name="type">
 				<xsl:call-template name="setDatedUndatedType">
-					<xsl:with-param name="value" select="."/>
+					<xsl:with-param name="value" select="docidentifier"/>
 				</xsl:call-template>
 			</xsl:attribute>
-			<xsl:apply-templates mode="front"/>
+			<xsl:variable name="text">
+				<xsl:apply-templates mode="front"/>
+			</xsl:variable>
+			<xsl:value-of select="normalize-space($text)"/>
 		</std-ref>
 	</xsl:template>
+	
+	<xsl:template match="*[self::bibdata or self::bibitem]/relation[@type != 'adopted-from']/bibitem/title[. = '--']" mode="front"/>
+	<xsl:template match="*[self::bibdata or self::bibitem]/relation[@type != 'adopted-from']/description" mode="front"/>
+	<xsl:template match="*[self::bibdata or self::bibitem]/relation[@type != 'adopted-from']/bibitem/ext" mode="front"/>
 	
 	<xsl:template match="contributor/organization/abbreviation" mode="front">
 		<xsl:param name="short">false</xsl:param>
@@ -1425,6 +1461,7 @@
 																ext/editorialgroup/workgroup |
 																bibdata/relation |
 																bibdata/relation/bibitem |
+																bibdata/relation/description |
 																coverimages |
 																ext/horizontal |
 																ext/price-code |
@@ -1589,9 +1626,9 @@
 					<xsl:attribute name="sec-type"><xsl:value-of select="$sec_type"/></xsl:attribute>
 					
 					<xsl:variable name="section" select="$elements//element[@source_id = current()/@id]/@section"/>
-					<xsl:if test="$section != ''">
+					<!-- <xsl:if test="$section != ''"> -->
 						<label><xsl:value-of select="$section"/></label>
-					</xsl:if>
+					<!-- </xsl:if> -->
 					
 					<xsl:apply-templates select="title"/>
 					
@@ -3110,7 +3147,8 @@
 	
 	<!-- https://github.com/metanorma/mn2sts/issues/8 -->
 	<xsl:template match="admonition">
-		<non-normative-note id="{@id}">
+		<non-normative-note>
+			<xsl:copy-of select="@id"/>
 			<label><xsl:value-of select="java:toUpperCase(java:java.lang.String.new(@type))"/></label>
 			<xsl:apply-templates />
 		</non-normative-note>
