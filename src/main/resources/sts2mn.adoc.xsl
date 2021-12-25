@@ -3864,7 +3864,12 @@
 				<xsl:otherwise>
 					<xsl:variable name="level">
 						<xsl:call-template name="getLevel">
-							<xsl:with-param name="addon">1</xsl:with-param>
+							<xsl:with-param name="addon">
+								<xsl:choose>
+									<xsl:when test="parent::*[title and not(label) and not(@sec-type) and count(*) = count(title) + count(sec)]">0</xsl:when><!-- parent sec has descrete title -->
+									<xsl:otherwise>1</xsl:otherwise>
+								</xsl:choose>
+							</xsl:with-param>
 						</xsl:call-template>
 					</xsl:variable>
 					<xsl:value-of select="$level"/>
