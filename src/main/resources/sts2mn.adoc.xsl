@@ -36,11 +36,11 @@
 			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '59752'">true</xsl:when>
 			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '36786'">true</xsl:when>
 			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '69315'">true</xsl:when>
-			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '62726'">true</xsl:when>
+			<!-- <xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '62726'">true</xsl:when>
 			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '72800'">true</xsl:when>
 			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '74716'">true</xsl:when>
 			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '68221'">true</xsl:when>
-			<xsl:when test="/standard/front/reg-meta/doc-ident/proj-id = '33079'">true</xsl:when>
+			<xsl:when test="/standard/front/reg-meta/doc-ident/proj-id = '33079'">true</xsl:when> -->
 			<xsl:otherwise>false</xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable> 
@@ -3883,10 +3883,12 @@
 				</xsl:choose>
 			<xsl:text>]]</xsl:text>
 		</xsl:if>
-		<xsl:if test="title and not(label) and not(@sec-type)"> <!--  and count(*) = count(title) + count(sec) -->
+		
+		<xsl:if test="title and not(label) and not(@sec-type) and not(ancestor::*[@sec-type]) and not(title = 'Index')"> <!--  and count(*) = count(title) + count(sec) -->
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:text>[discrete]</xsl:text>
 		</xsl:if>
+		
 		<xsl:if test="not(title) and label">
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:choose>
@@ -3898,7 +3900,7 @@
 						<xsl:call-template name="getLevel">
 							<xsl:with-param name="addon">
 								<xsl:choose>
-									<xsl:when test="parent::*[title and not(label) and not(@sec-type)]">0</xsl:when><!-- parent sec has descrete title --> <!--  and count(*) = count(title) + count(sec) -->
+									<xsl:when test="parent::*[title and not(label) and not(@sec-type) and not(ancestor::*[@sec-type]) and not(title = 'Index')]">0</xsl:when><!-- parent sec has descrete title --> <!--  and count(*) = count(title) + count(sec) -->
 									<xsl:otherwise>1</xsl:otherwise>
 								</xsl:choose>
 							</xsl:with-param>
