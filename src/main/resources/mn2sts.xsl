@@ -1334,6 +1334,7 @@
 							<xsl:when test="@type = 'related' and bibitem/ext/doctype = 'mandate' and description = 'related mandate'">relatedMandate</xsl:when>
 							<xsl:when test="@type = 'obsoletes' and description = 'supersedes'">supersedes</xsl:when>
 							<xsl:when test="@type = 'related'"></xsl:when>
+							<xsl:when test="@type = 'annotationOf'">commentOn</xsl:when>
 							<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
 						</xsl:choose>
 					</xsl:attribute>

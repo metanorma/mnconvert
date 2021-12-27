@@ -374,6 +374,7 @@
 						<xsl:when test="@type = 'related-mandate'">related</xsl:when>
 						<xsl:when test="@type = 'supersedes'">obsoletes</xsl:when>
 						<xsl:when test="@type = 'related'">related</xsl:when>
+						<xsl:when test="@type = 'annotation-of'">annotationOf</xsl:when>
 					</xsl:choose>
 				</xsl:attribute>
 				<xsl:variable name="description">
@@ -394,6 +395,7 @@
 						<xsl:when test="@type = 'related-mandate'">related mandate</xsl:when>
 						<xsl:when test="@type = 'supersedes'">supersedes</xsl:when>
 						<xsl:when test="@type = 'related'"></xsl:when>
+						<xsl:when test="@type = 'annotation-of'"></xsl:when>
 					</xsl:choose>
 				</xsl:variable>
 				<xsl:variable name="ext_doctype">

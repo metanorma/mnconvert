@@ -703,7 +703,7 @@
 						<xsl:when test="@type = 'isPublishedFormatOf'">manifestation-of</xsl:when>
 						<xsl:when test="@type = 'relatedDirective'">related-directive</xsl:when>
 						<xsl:when test="@type = 'relatedMandate'">related-mandate</xsl:when>
-						<xsl:when test="@type = 'commentOn'">comment-on</xsl:when>
+						<xsl:when test="@type = 'commentOn'">annotation-of</xsl:when>
 						<xsl:when test="java:toLowerCase(java:java.lang.String.new(@type)) = 'supersedes'">supersedes</xsl:when>
 						<xsl:when test="@type = ''">related</xsl:when> <!-- (empty value) -->
 						<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
