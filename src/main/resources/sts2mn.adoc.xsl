@@ -36,6 +36,11 @@
 			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '59752'">true</xsl:when>
 			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '36786'">true</xsl:when>
 			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '69315'">true</xsl:when>
+			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '62726'">true</xsl:when>
+			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '72800'">true</xsl:when>
+			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '74716'">true</xsl:when>
+			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '68221'">true</xsl:when>
+			<xsl:when test="/standard/front/reg-meta/doc-ident/proj-id = '33079'">true</xsl:when>
 			<xsl:otherwise>false</xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable> 
@@ -1804,7 +1809,9 @@
 			
 			<!-- put reference text -->
 			<xsl:for-each select="$model_term_source/referenceText[normalize-space() != '']">
-				<xsl:text>,</xsl:text>
+				<xsl:if test="not(starts-with(normalize-space(.), 'footnote:'))">
+					<xsl:text>,</xsl:text>
+				</xsl:if>
 				<xsl:value-of select="."/>
 			</xsl:for-each>
 			
@@ -2841,6 +2848,7 @@
 			<!-- insert hidden bibitem -->
 			<!-- ===================== -->
 			<xsl:variable name="hidden_bibitems">
+				<!-- std reference iteration -->
 				<xsl:for-each select="$updated_xml//std[not(parent::ref)][@stdid != '']">
 					<xsl:variable name="reference">
 						<xsl:call-template name="getReference">
@@ -2857,6 +2865,30 @@
 						</item>
 					</xsl:if>
 				</xsl:for-each>
+				<!-- END std reference iteration -->
+				
+				<!-- term source iteration -->
+				<xsl:for-each select="$updated_xml//tbx:source">
+					<xsl:variable name="model_term_source_">
+						<xsl:call-template name="build_sts_model_term_source"/>
+					</xsl:variable>
+					<xsl:variable name="model_term_source" select="xalan:nodeset($model_term_source_)"/>
+					<xsl:variable name="term_source_reference" select="$model_term_source/reference"/>
+					<xsl:if test="starts-with($term_source_reference, 'hidden_bibitem_')">
+						<item id="{$term_source_reference}">
+							<xsl:text>* [[[</xsl:text>
+							<xsl:value-of select="$term_source_reference"/>
+							<!-- put reference text -->
+							<xsl:for-each select="$model_term_source/referenceText[normalize-space() != ''][1]">
+								<xsl:text>,</xsl:text>
+								<xsl:value-of select="."/>
+							</xsl:for-each>
+							<xsl:text>]]]</xsl:text>
+						</item>
+					</xsl:if>
+				</xsl:for-each>
+				<!-- END term source iteration -->
+				
 			</xsl:variable>
 			<xsl:for-each select="xalan:nodeset($hidden_bibitems)//item">
 				<xsl:if test="not(preceding-sibling::item[@id = current()/@id])"> <!-- unique bibitems -->
@@ -3851,7 +3883,7 @@
 				</xsl:choose>
 			<xsl:text>]]</xsl:text>
 		</xsl:if>
-		<xsl:if test="title and not(label) and not(@sec-type) and count(*) = count(title) + count(sec)">
+		<xsl:if test="title and not(label) and not(@sec-type)"> <!--  and count(*) = count(title) + count(sec) -->
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:text>[discrete]</xsl:text>
 		</xsl:if>
@@ -3866,7 +3898,7 @@
 						<xsl:call-template name="getLevel">
 							<xsl:with-param name="addon">
 								<xsl:choose>
-									<xsl:when test="parent::*[title and not(label) and not(@sec-type) and count(*) = count(title) + count(sec)]">0</xsl:when><!-- parent sec has descrete title -->
+									<xsl:when test="parent::*[title and not(label) and not(@sec-type)]">0</xsl:when><!-- parent sec has descrete title --> <!--  and count(*) = count(title) + count(sec) -->
 									<xsl:otherwise>1</xsl:otherwise>
 								</xsl:choose>
 							</xsl:with-param>
