@@ -184,8 +184,8 @@
 			<xsl:otherwise> <!-- put id of current std -->
 				<xsl:choose>
 					<xsl:when test="@stdid">
-						<reference>
-							<xsl:text>hidden_bibitem_</xsl:text>
+						<reference hidden="true">
+							<!-- <xsl:text>hidden_bibitem_</xsl:text> -->
 							<xsl:value-of select="@stdid"/><xsl:text></xsl:text>
 						</reference>
 						<!-- if there isn't in References, then display name -->
@@ -470,15 +470,15 @@
 			<xsl:otherwise>
 				<xsl:choose>
 					<xsl:when test="$std-ref != $text">
-						<reference>
-							<xsl:text>hidden_bibitem_</xsl:text>
+						<reference hidden="true">
+							<!-- <xsl:text>hidden_bibitem_</xsl:text> -->
 							<xsl:value-of select="$std-ref"/>
 						</reference><!-- , -->
 						<referenceText><xsl:value-of select="$text"/></referenceText>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:text>hidden_bibitem_</xsl:text>
-						<reference><xsl:value-of select="$text"/></reference>
+						<!-- <xsl:text>hidden_bibitem_</xsl:text> -->
+						<reference hidden="true"><xsl:value-of select="$text"/></reference>
 						<xsl:if test="$OUTPUT_FORMAT = 'xml'">
 							<referenceText><xsl:value-of select="$text"/></referenceText>
 						</xsl:if>

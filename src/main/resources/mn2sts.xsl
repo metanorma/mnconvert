@@ -1734,7 +1734,7 @@
 	</xsl:template>
 	
 	
-	<xsl:template match="bibitem[starts-with(@id, 'hidden_bibitem_')]" priority="3"/>
+	<xsl:template match="bibitem[starts-with(@id, 'hidden_bibitem_')] | bibitem[@hidden = 'true']" priority="3"/>
 	
 	<xsl:template match="bibitem[1][ancestor::references[@normative='true']]" priority="2">
 		<ref-list content-type="norm-refs">
@@ -2600,7 +2600,8 @@
 				<urn><xsl:value-of select="$urn"/></urn>
 				<docidentifier>
 					<xsl:value-of select="docidentifier[not(@type = 'metanorma')][1]"/>
-					<xsl:if test="starts-with(@id, 'hidden_bibitem_')">
+					<!-- <xsl:if test="starts-with(@id, 'hidden_bibitem_')"> -->
+					<xsl:if test="@hidden = 'true'">
 						<xsl:text> </xsl:text>
 						<xsl:value-of select="translate(docnumber, '&#xa0;&#8209;', ' -')"/>
 					</xsl:if>
@@ -2721,14 +2722,15 @@
 							<xsl:value-of select="$docidentifier"/>
 						</xsl:when>
 						<xsl:otherwise>
-							<xsl:choose>
+							<xsl:value-of select="$model_eref/reference"/>
+							<!-- <xsl:choose>
 								<xsl:when test="starts-with($model_eref/reference, 'hidden_bibitem_')">
 									<xsl:value-of select="substring-after($model_eref/reference, 'hidden_bibitem_')"/>
 								</xsl:when>
 								<xsl:otherwise>
 									<xsl:value-of select="$model_eref/reference"/>
 								</xsl:otherwise>
-							</xsl:choose>
+							</xsl:choose> -->
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:attribute>
