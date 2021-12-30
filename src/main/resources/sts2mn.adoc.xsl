@@ -571,6 +571,8 @@
 		
 		<xsl:apply-templates select="custom-meta-group/custom-meta[meta-name = 'ISBN']/meta-value"/>
 		
+		<xsl:apply-templates select="custom-meta-group/custom-meta[meta-name = 'TOC Heading Level']/meta-value"/>
+		
 		<xsl:choose>
 			<xsl:when test="$organization = 'BSI' or $organization = 'PAS'">
 				<xsl:variable name="data">
@@ -1091,6 +1093,11 @@
 	
 	<xsl:template match="custom-meta-group/custom-meta[meta-name = 'ISBN']/meta-value">
 		<xsl:text>:isbn: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="custom-meta-group/custom-meta[meta-name = 'TOC Heading Level']/meta-value">
+		<xsl:text>:toclevels: </xsl:text><xsl:value-of select="."/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	

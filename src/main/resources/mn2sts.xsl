@@ -1108,36 +1108,41 @@
 			
 			<xsl:apply-templates select="/*/preface/abstract" mode="front_abstract"/>
 			
-
-			<xsl:choose>
-				<xsl:when test="$organization = 'IEC'">
-					<xsl:if test="ext/price-code">
-						<custom-meta-group>
-							<xsl:apply-templates select="ext/price-code" mode="custom_meta"/>
-						</custom-meta-group>
-					</xsl:if>
-				</xsl:when>
-				<xsl:when test="$organization = 'BSI'">
-					<xsl:if test="docidentifier[@type = 'ISBN']">
-						<custom-meta-group>
-							<xsl:apply-templates select="docidentifier[@type = 'ISBN']" mode="custom_meta"/>
-						</custom-meta-group>
-					</xsl:if>
-				</xsl:when>
-				<xsl:otherwise> <!-- non IEC, BSI -->
-					<xsl:if test="docidentifier[@type = 'ISBN'] or
-										ext/horizontal or
-										status/stage or 
-										status/substage">
-						<custom-meta-group>
+			<xsl:variable name="custom-meta-group_">
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'">
+						<xsl:apply-templates select="ext/price-code" mode="custom_meta"/>
+					</xsl:when>
+					<xsl:when test="$organization = 'BSI'">
+						<xsl:apply-templates select="docidentifier[@type = 'ISBN']" mode="custom_meta"/>
+					</xsl:when>
+					<xsl:otherwise> <!-- non IEC, BSI -->
+						<xsl:if test="docidentifier[@type = 'ISBN'] or
+											ext/horizontal or
+											status/stage or 
+											status/substage">
 							<xsl:apply-templates select="docidentifier[@type = 'ISBN']" mode="custom_meta"/>
 							<xsl:apply-templates select="ext/horizontal" mode="custom_meta"/>
 							<xsl:apply-templates select="status/stage" mode="custom_meta"/>
 							<xsl:apply-templates select="status/substage" mode="custom_meta"/>
-						</custom-meta-group>
-					</xsl:if>
-				</xsl:otherwise>
-			</xsl:choose>
+						</xsl:if>
+					</xsl:otherwise>
+				</xsl:choose>
+				
+				<xsl:choose>
+					<xsl:when test="../misc-container/presentation-metadata[name = 'HTML TOC Heading Levels']"><xsl:apply-templates select="../misc-container/presentation-metadata[name = 'HTML TOC Heading Levels']"/></xsl:when>
+					<xsl:when test="../misc-container/presentation-metadata[name = 'DOC TOC Heading Levels']"><xsl:apply-templates select="../misc-container/presentation-metadata[name = 'DOC TOC Heading Levels']"/></xsl:when>
+					<xsl:when test="../misc-container/presentation-metadata[name = 'TOC Heading Levels']"><xsl:apply-templates select="../misc-container/presentation-metadata[name = 'TOC Heading Levels']"/></xsl:when>
+				</xsl:choose>
+			</xsl:variable>
+			<xsl:variable name="custom-meta-group" select="xalan:nodeset($custom-meta-group_)"/>
+			
+			<xsl:if test="$custom-meta-group/custom-meta">
+				<custom-meta-group>
+					<xsl:copy-of select="$custom-meta-group"/>
+				</custom-meta-group>
+			</xsl:if>
+			
 			
 			
 			<xsl:if test="self::bibdata">
@@ -1407,6 +1412,15 @@
 		<custom-meta>
 			<meta-name>price code</meta-name>
 			<meta-value>iec:<xsl:value-of select="."/></meta-value>
+		</custom-meta>
+	</xsl:template>
+	
+	<xsl:template match="misc-container/presentation-metadata[name = 'TOC Heading Levels'] |
+						misc-container/presentation-metadata[name = 'HTML TOC Heading Levels'] |
+						misc-container/presentation-metadata[name = 'DOC TOC Heading Levels']">
+		<custom-meta>
+			<meta-name>TOC Heading Level</meta-name>
+			<meta-value><xsl:value-of select="value"/></meta-value>
 		</custom-meta>
 	</xsl:template>
 	
