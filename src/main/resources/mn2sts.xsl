@@ -2328,6 +2328,7 @@
 				</xsl:variable>
 				<tbx:termType value="{$value}"/>
 			</xsl:if>
+			<xsl:apply-templates select="field-of-application" mode="usageNote"/>
 		</tbx:tig>
 	</xsl:template>
 	
@@ -2335,6 +2336,11 @@
 		<xsl:apply-templates/>
 	</xsl:template>
 	<xsl:template match="*[self::expression or self::letter-symbol or self::preferred or self::admitted or self::deprecates or self::domain]/text()[normalize-space() = ''] | expression/name/text()[normalize-space() = '']" priority="2"/>
+	
+	<xsl:template match="field-of-application" priority="2"/>
+	<xsl:template match="field-of-application" priority="2" mode="usageNote">
+		<tbx:usageNote><xsl:apply-templates/></tbx:usageNote>
+	</xsl:template>
 	
 	<xsl:template match="p" name="p">
 		<!-- <xsl:if test="$debug = 'true'">

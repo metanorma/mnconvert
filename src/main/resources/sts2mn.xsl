@@ -1370,6 +1370,8 @@
 							<xsl:call-template name="createTermElement"/>
 						</name>
 					</expression>
+					<!-- Example: <field-of-application>in dependability</field-of-application> -->
+					<xsl:apply-templates select="../tbx:usageNote" mode="term"/>
 				</xsl:element>
 			</xsl:when>
 			<xsl:otherwise>
@@ -1398,6 +1400,13 @@
 	<xsl:template match="tbx:partOfSpeech"/>
 	
 	<xsl:template match="tbx:termType"/>
+	
+	<xsl:template match="tbx:usageNote"/>
+	<xsl:template match="tbx:usageNote" mode="term">
+		<field-of-application>
+			<xsl:apply-templates/>
+		</field-of-application>
+	</xsl:template>
 	
 	<!-- ======================== -->
 	<!-- END Terms, definitions -->

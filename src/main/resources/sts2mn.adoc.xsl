@@ -1370,6 +1370,7 @@
 		<xsl:value-of select="$level"/><xsl:text> </xsl:text>
 		<!-- <xsl:call-template name="setId"/> --><!-- [[ ]] -->
 		<xsl:apply-templates select=".//tbx:term" mode="term"/>	
+		<xsl:apply-templates select=".//tbx:usageNote" mode="term"/>	
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:apply-templates />
@@ -1468,6 +1469,16 @@
 	</xsl:template>
 	
 	<xsl:template match="tbx:tig"/>
+	
+	<xsl:template match="tbx:usageNote"/>
+	<xsl:template match="tbx:usageNote" mode="term">
+		<xsl:text>&#xa;&#xa;</xsl:text>
+		<xsl:text>[%metadata]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>field-of-application:: </xsl:text>
+		<xsl:apply-templates/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
 	
 	<xsl:template match="label"/>
 	
