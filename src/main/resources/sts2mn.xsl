@@ -1246,6 +1246,9 @@
 			<xsl:when test="$nat_meta_only = 'true' and @sec-type = 'intro'"></xsl:when> <!-- introduction added in preface tag, if $nat_meta_only = 'true' -->
 			<xsl:when test="title and not(label) and not(@sec-type) and not(ancestor::*[@sec-type]) and not(title = 'Index')">
 				<p id="{@id}" type="floating-title">
+					<xsl:call-template name="addTitleDepth">
+						<xsl:with-param name="label" select="sec[1]/label"/>
+					</xsl:call-template>
 					<xsl:apply-templates select="title/node()"/>
 				</p>
 				<xsl:apply-templates select="node()[not(self::title)]"/>
@@ -1270,6 +1273,24 @@
 				</clause>
 			</xsl:otherwise>
 		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template name="addTitleDepth">
+		<xsl:param name="label"/>
+		<xsl:if test="$type_xml = 'presentation'">
+			<xsl:variable name="calculated_level">
+				<xsl:value-of select="string-length($label) - string-length(translate($label, '.', '')) + 1"/>
+			</xsl:variable>
+			<xsl:variable name="level_">
+				<xsl:call-template name="getLevel">
+					<xsl:with-param name="calculated_level" select="$calculated_level"/>
+				</xsl:call-template>
+			</xsl:variable>
+			<xsl:variable name="level" select="normalize-space($level_)"/>
+			<xsl:if test="$level != '0'">
+				<xsl:attribute name="depth"><xsl:value-of select="$level"/></xsl:attribute>
+			</xsl:if>
+		</xsl:if>
 	</xsl:template>
 	
 	<!-- ======================== -->
@@ -1709,21 +1730,9 @@
 	<xsl:template match="title">
 		<xsl:element name="{local-name()}">
 			<xsl:apply-templates select="@*"/>
-			<xsl:if test="$type_xml = 'presentation'">
-				<xsl:variable name="label" select="parent::sec/label"/>
-				<xsl:variable name="calculated_level">
-					<xsl:value-of select="string-length($label) - string-length(translate($label, '.', '')) + 1"/>
-				</xsl:variable>
-				<xsl:variable name="level_">
-					<xsl:call-template name="getLevel">
-						<xsl:with-param name="calculated_level" select="$calculated_level"/>
-					</xsl:call-template>
-				</xsl:variable>
-				<xsl:variable name="level" select="normalize-space($level_)"/>
-				<xsl:if test="$level != '0'">
-					<xsl:attribute name="depth"><xsl:value-of select="$level"/></xsl:attribute>
-				</xsl:if>
-			</xsl:if>
+			<xsl:call-template name="addTitleDepth">
+				<xsl:with-param name="label" select="parent::sec/label"/>
+			</xsl:call-template>
 			<xsl:apply-templates select="parent::sec/label" mode="label"/>
 			<xsl:apply-templates />
 		</xsl:element>
