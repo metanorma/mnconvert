@@ -1377,9 +1377,13 @@
 	</xsl:template>
 	
 	<xsl:template match="title" name="title">
+		<xsl:variable name="ace_tag">
+			<xsl:apply-templates select="preceding-sibling::label/node()[1][self::named-content[@content-type = 'ace-tag']]"/>
+		</xsl:variable>
 		<xsl:choose>
 			<xsl:when test="parent::sec/@sec-type = 'foreword'">
 				<xsl:text>== </xsl:text>
+				<xsl:value-of select="$ace_tag"/>
 				<xsl:apply-templates />
 				<xsl:call-template name="addIndexTerms"/>
 				<xsl:text>&#xa;&#xa;</xsl:text>
@@ -1397,7 +1401,9 @@
 					</xsl:call-template>
 				</xsl:variable>				
 				<xsl:value-of select="$level"/>
-				<xsl:text> </xsl:text><xsl:apply-templates />
+				<xsl:text> </xsl:text>
+				<xsl:value-of select="$ace_tag"/>
+				<xsl:apply-templates />
 				<xsl:if test="not(ancestor::sec[@sec-type = 'norm-refs'])">
 					<xsl:call-template name="addIndexTerms"/>
 				</xsl:if>
@@ -1667,6 +1673,8 @@
 	
 	<xsl:template match="non-normative-note">
 		<xsl:text>NOTE: </xsl:text>
+		<!-- move ace-tag from start of label into start of note body -->
+		<xsl:apply-templates select="label/node()[1][self::named-content[@content-type = 'ace-tag']]"/>
 		<xsl:apply-templates/>
 		<xsl:choose>
 			<xsl:when test="parent::list-item and preceding-sibling::*[1][not(self::label)] and not(following-sibling::*)"></xsl:when>
