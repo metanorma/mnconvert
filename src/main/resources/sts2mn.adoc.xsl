@@ -653,6 +653,12 @@
 		<!-- :semantic-metadata-suppl-version: 2 -->
 		<xsl:apply-templates select="std-ident/suppl-version"/>
 		
+		<!-- :semantic-metadata-dor: 2019-10-27 -->
+		<!-- :semantic-metadata-dow: 2020-07-31 -->
+		<!-- :semantic-metadata-dop: 2020-07-31 -->
+		<!-- :semantic-metadata-doa: 2020-04-30 -->
+		<xsl:apply-templates select="meta-date"/>
+		
 		<!-- :semantic-metadata-wi-number: 00279004 -->
 		<xsl:apply-templates select="wi-number"/>
 		
@@ -1138,6 +1144,11 @@
 	
 	<xsl:template match="std-ident/suppl-version[normalize-space() != '']">
 		<xsl:text>:semantic-metadata-suppl-version: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="meta-date[normalize-space(@type) != '']">
+		<xsl:text>:semantic-metadata-</xsl:text><xsl:value-of select="java:toLowerCase(java:java.lang.String.new(@type))"/><xsl:text>: </xsl:text><xsl:value-of select="."/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	

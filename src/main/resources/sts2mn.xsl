@@ -832,6 +832,7 @@
 			<xsl:apply-templates select="std-ident/suppl-type" mode="bibdata"/>
 			<xsl:apply-templates select="std-ident/suppl-number" mode="bibdata"/>
 			<xsl:apply-templates select="std-ident/suppl-version" mode="bibdata"/>
+			<xsl:apply-templates select="meta-date" mode="bibdata"/>
 			<xsl:apply-templates select="wi-number" mode="bibdata"/>
 			<xsl:apply-templates select="release-version-id" mode="bibdata"/>
 			<xsl:apply-templates select="page-count" mode="bibdata"/>
@@ -874,6 +875,13 @@
 	<xsl:template match="std-ident/suppl-version[normalize-space() != '']" mode="bibdata">
 		<semantic-metadata>
 			<name>suppl-version</name>
+			<value><xsl:apply-templates mode="bibdata"/></value>
+		</semantic-metadata>
+	</xsl:template>
+	
+	<xsl:template match="meta-date[normalize-space(@type) != '']" mode="bibdata">
+		<semantic-metadata>
+			<name><xsl:value-of select="java:toLowerCase(java:java.lang.String.new(@type))"/></name>
 			<value><xsl:apply-templates mode="bibdata"/></value>
 		</semantic-metadata>
 	</xsl:template>

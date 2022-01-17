@@ -1001,6 +1001,16 @@
 				</xsl:for-each>
 			</xsl:if>
 			
+			<!-- 
+			<meta-date type="DOR">
+			<meta-date type="DOW">
+			<meta-date type="DOP">
+			<meta-date type="DOA"> -->
+			<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'dor']" mode="front"/>
+			<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'dow']" mode="front"/>
+			<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'dop']" mode="front"/>
+			<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'doa']" mode="front"/>
+			
 			<!-- <wi-number> -->
 			<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'wi-number']" mode="front"/>
 			
@@ -1460,6 +1470,10 @@
 		</suppl-version>
 	</xsl:template>
 	
+	<xsl:template match="misc-container/semantic-metadata[name = 'dor' or name = 'dow' or name = 'dop' or name = 'doa']" mode="front">
+		<meta-date type="{java:toUpperCase(java:java.lang.String.new(name))}"><xsl:value-of select="value"/></meta-date>
+	</xsl:template>
+	
 	<xsl:template match="misc-container/semantic-metadata[name = 'wi-number']" mode="front">
 		<wi-number>
 			<xsl:value-of select="value"/>
@@ -1537,6 +1551,10 @@
 																misc-container/semantic-metadata[name = 'suppl-type'] |
 																misc-container/semantic-metadata[name = 'suppl-number'] |
 																misc-container/semantic-metadata[name = 'suppl-version'] |
+																misc-container/semantic-metadata[name = 'dor'] |
+																misc-container/semantic-metadata[name = 'dow'] |
+																misc-container/semantic-metadata[name = 'dop'] |
+																misc-container/semantic-metadata[name = 'doa'] |
 																misc-container/semantic-metadata[name = 'wi-number'] |
 																misc-container/semantic-metadata[name = 'release-version-id'] |
 																misc-container/semantic-metadata[name = 'page-count']"
