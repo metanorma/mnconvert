@@ -642,6 +642,12 @@
 		<!-- END: std-xref processing  -->
 		<!-- ==================== -->
 		
+		
+		<!-- :{semantic|presentation}-metadata-proj-id: 72028 -->
+		<xsl:apply-templates select="doc-ident/proj-id"/>
+		
+		
+		
 		<!-- relation bibitem -->
 		<xsl:if test="$include_iso_meta = 'true'">
 			<xsl:for-each select="ancestor::front/iso-meta">
@@ -1098,6 +1104,12 @@
 	
 	<xsl:template match="custom-meta-group/custom-meta[meta-name = 'TOC Heading Level']/meta-value">
 		<xsl:text>:toclevels: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	
+	<xsl:template match="doc-ident/proj-id[normalize-space() != '']">
+		<xsl:text>:semantic-metadata-proj-id: </xsl:text><xsl:value-of select="."/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	

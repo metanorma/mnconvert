@@ -214,7 +214,7 @@
 						<xsl:with-param name="include_std_meta">true</xsl:with-param>
 					</xsl:call-template>
 			</bibdata>
-			<xsl:apply-templates select="custom-meta-group/custom-meta[meta-name = 'TOC Heading Level']/meta-value" mode="bibdata"/>	
+			<xsl:call-template name="processMetadata"/>
 		</xsl:for-each>
 		
 		<xsl:if test="not(nat-meta)">
@@ -226,7 +226,7 @@
 							<xsl:with-param name="include_std_meta">true</xsl:with-param>
 						</xsl:call-template>
 				</bibdata>
-				<xsl:apply-templates select="custom-meta-group/custom-meta[meta-name = 'TOC Heading Level']/meta-value" mode="bibdata"/>	
+				<xsl:call-template name="processMetadata"/>
 			</xsl:for-each>
 		
 			<xsl:if test="not(iso-meta)">
@@ -236,7 +236,7 @@
 								<xsl:with-param name="include_std_meta">true</xsl:with-param>
 							</xsl:call-template>
 					</bibdata>
-					<xsl:apply-templates select="custom-meta-group/custom-meta[meta-name = 'TOC Heading Level']/meta-value" mode="bibdata"/>	
+					<xsl:call-template name="processMetadata"/>
 				</xsl:for-each>
 				
 				<xsl:if test="not(reg-meta)">
@@ -244,7 +244,7 @@
 						<bibdata type="standard">
 								<xsl:call-template name="xxx-meta"/>
 						</bibdata>
-						<xsl:apply-templates select="custom-meta-group/custom-meta[meta-name = 'TOC Heading Level']/meta-value" mode="bibdata"/>	
+						<xsl:call-template name="processMetadata"/>
 					</xsl:for-each>
 				</xsl:if>
 			</xsl:if>
@@ -823,13 +823,30 @@
 		<docidentifier type="ISBN"><xsl:apply-templates mode="bibdata"/></docidentifier>
 	</xsl:template>
 	
+	<xsl:template name="processMetadata">
+		<xsl:variable name="misc-container">
+			<xsl:apply-templates select="custom-meta-group/custom-meta[meta-name = 'TOC Heading Level']/meta-value" mode="bibdata"/>	
+			<xsl:apply-templates select="doc-ident/proj-id" mode="bibdata"/>	
+		</xsl:variable>
+		<xsl:if test="xalan:nodeset($misc-container)/*">
+			<misc-container>
+				<xsl:copy-of select="$misc-container"/>
+			</misc-container>
+		</xsl:if>
+	</xsl:template>
+	
 	<xsl:template match="custom-meta-group/custom-meta[meta-name = 'TOC Heading Level']/meta-value" mode="bibdata">
-		<misc-container>
-		 <presentation-metadata>
-			 <name>TOC Heading Levels</name>
-			 <value><xsl:apply-templates mode="bibdata"/></value>
-		 </presentation-metadata>
-	 </misc-container>
+		<presentation-metadata>
+			<name>TOC Heading Levels</name>
+			<value><xsl:apply-templates mode="bibdata"/></value>
+		</presentation-metadata>
+	</xsl:template>
+	
+	<xsl:template match="doc-ident/proj-id" mode="bibdata">
+		<semantic-metadata>
+			<name>proj-id</name>
+			<value><xsl:apply-templates mode="bibdata"/></value>
+		</semantic-metadata>
 	</xsl:template>
 	
 	<xsl:template match="iso-meta/std-ident/doc-number | nat-meta/std-ident/doc-number | reg-meta/std-ident/doc-number | std-meta/std-ident/doc-number" mode="bibdata">

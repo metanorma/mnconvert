@@ -822,7 +822,8 @@
 						<xsl:apply-templates select="contributor[role/@type='author']/organization/abbreviation" mode="front"/>
 					</sdo>
 					<proj-id>
-						<xsl:apply-templates select="ext/structuredidentifier/project-number" mode="front"/>
+						<!-- <xsl:apply-templates select="ext/structuredidentifier/project-number" mode="front"/> -->
+						<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'proj-id']" mode="front"/>
 					</proj-id>
 					<language>
 						<xsl:apply-templates select="language" mode="front"/>
@@ -1422,6 +1423,10 @@
 			<meta-name>TOC Heading Level</meta-name>
 			<meta-value><xsl:value-of select="value"/></meta-value>
 		</custom-meta>
+	</xsl:template>
+	
+	<xsl:template match="misc-container/semantic-metadata[name = 'proj-id']" mode="front">
+		<xsl:value-of select="value"/>
 	</xsl:template>
 	
 	<!-- =============== -->
