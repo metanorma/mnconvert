@@ -432,6 +432,7 @@
 					<bibitem>
 						<xsl:call-template name="xxx-meta"/> <!-- process iso-meta -->
 					</bibitem>
+					<xsl:call-template name="processMetadata"/>
 				</relation>
 			</xsl:for-each>
 		</xsl:if>
@@ -444,6 +445,7 @@
 							<!-- <xsl:with-param name="originator" select="std-ident/originator"/> -->
 						</xsl:call-template>
 					</bibitem>
+					<xsl:call-template name="processMetadata"/>
 				</relation>
 			</xsl:for-each>
 		</xsl:if>
@@ -825,8 +827,10 @@
 	
 	<xsl:template name="processMetadata">
 		<xsl:variable name="misc-container">
-			<xsl:apply-templates select="custom-meta-group/custom-meta[meta-name = 'TOC Heading Level']/meta-value" mode="bibdata"/>	
-			<xsl:apply-templates select="doc-ident/proj-id" mode="bibdata"/>	
+			<xsl:apply-templates select="custom-meta-group/custom-meta[meta-name = 'TOC Heading Level']/meta-value" mode="bibdata"/>
+			<xsl:apply-templates select="doc-ident/proj-id" mode="bibdata"/>
+			<xsl:apply-templates select="wi-number" mode="bibdata"/>
+			<xsl:apply-templates select="release-version-id" mode="bibdata"/>
 		</xsl:variable>
 		<xsl:if test="xalan:nodeset($misc-container)/*">
 			<misc-container>
@@ -845,6 +849,20 @@
 	<xsl:template match="doc-ident/proj-id" mode="bibdata">
 		<semantic-metadata>
 			<name>proj-id</name>
+			<value><xsl:apply-templates mode="bibdata"/></value>
+		</semantic-metadata>
+	</xsl:template>
+	
+	<xsl:template match="wi-number" mode="bibdata">
+		<semantic-metadata>
+			<name>wi-number</name>
+			<value><xsl:apply-templates mode="bibdata"/></value>
+		</semantic-metadata>
+	</xsl:template>
+	
+	<xsl:template match="release-version-id" mode="bibdata">
+		<semantic-metadata>
+			<name>release-version-id</name>
 			<value><xsl:apply-templates mode="bibdata"/></value>
 		</semantic-metadata>
 	</xsl:template>
@@ -1013,6 +1031,7 @@
 	<xsl:template match="front/reg-meta" mode="bibdata">
 		<relation type="adopted-from">
 			<xsl:call-template name="xxx-meta"/>
+			<xsl:call-template name="processMetadata"/>
 		</relation>
 	</xsl:template>
 	

@@ -998,6 +998,10 @@
 				</xsl:for-each>
 			</xsl:if>
 			
+			<wi-number>
+				<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'wi-number']" mode="front"/>
+			</wi-number>
+			
 			<xsl:variable name="related_comm_ref" select="relation[@type='related']/bibitem/docidentifier"/>
 			<xsl:variable name="related_comm_ref_text">Committee reference</xsl:variable>
 			<comm-ref>
@@ -1054,6 +1058,9 @@
 			
 			<xsl:apply-templates select="relation[@type = 'related'][starts-with(bibitem/docidentifier, $draft_comment_text)]" mode="front" />
 			
+			<release-version-id>
+				<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'release-version-id']" mode="front"/>
+			</release-version-id>
 			
 			<permissions>
 				<xsl:choose>
@@ -1429,6 +1436,14 @@
 		<xsl:value-of select="value"/>
 	</xsl:template>
 	
+	<xsl:template match="misc-container/semantic-metadata[name = 'wi-number']" mode="front">
+		<xsl:value-of select="value"/>
+	</xsl:template>
+	
+	<xsl:template match="misc-container/semantic-metadata[name = 'release-version-id']" mode="front">
+		<xsl:value-of select="value"/>
+	</xsl:template>
+	
 	<!-- =============== -->
 	<!-- END custom-meta -->
 	<!-- =============== -->
@@ -1485,7 +1500,10 @@
 																coverimages |
 																ext/horizontal |
 																ext/price-code |
-																bibdata/uri"
+																bibdata/uri |
+																misc-container/semantic-metadata[name = 'proj-id'] |
+																misc-container/semantic-metadata[name = 'wi-number'] |
+																misc-container/semantic-metadata[name = 'release-version-id']"
 																mode="front_check"/>
 
 	<!-- skip processed structure and deep down -->
@@ -1502,7 +1520,8 @@
 																bibdata/copyright/owner/organization |
 																ext/editorialgroup |
 																ext/ics |
-																ext
+																ext |
+																misc-container
 																" mode="front_check">
 		<xsl:apply-templates mode="front_check"/>
 	</xsl:template>

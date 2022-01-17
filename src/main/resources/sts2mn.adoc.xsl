@@ -643,8 +643,14 @@
 		<!-- ==================== -->
 		
 		
-		<!-- :{semantic|presentation}-metadata-proj-id: 72028 -->
+		<!-- :semantic-metadata-proj-id: 72028 -->
 		<xsl:apply-templates select="doc-ident/proj-id"/>
+		
+		<!-- :semantic-metadata-wi-number: 00279004 -->
+		<xsl:apply-templates select="wi-number"/>
+		
+		<!-- :semantic-metadata-release-version-id: 29938632 -->
+		<xsl:apply-templates select="release-version-id"/>
 		
 		
 		
@@ -1112,6 +1118,18 @@
 		<xsl:text>:semantic-metadata-proj-id: </xsl:text><xsl:value-of select="."/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
+	
+	<xsl:template match="wi-number[normalize-space() != '']">
+		<xsl:text>:semantic-metadata-wi-number: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="release-version-id[normalize-space() != '']">
+		<xsl:text>:semantic-metadata-release-version-id: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	
 	
 	<!-- =========== -->
 	<!-- end bibdata (standard/front) -->
