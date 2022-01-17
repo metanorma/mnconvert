@@ -891,9 +891,12 @@
 					<xsl:if test="docidentifier[@type = 'ISBN']">
 						<isbn><xsl:value-of select="docidentifier[@type = 'ISBN']"/></isbn>
 					</xsl:if>
-					<!-- <suppl-type/>
-					<suppl-number/> -->
+
 				</xsl:if>
+				
+				<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'suppl-type']" mode="front"/>
+				<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'suppl-number']" mode="front"/>
+				<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'suppl-version']" mode="front"/>
 				
 			</std-ident>
 			
@@ -1439,6 +1442,24 @@
 		<xsl:value-of select="value"/>
 	</xsl:template>
 	
+	<xsl:template match="misc-container/semantic-metadata[name = 'suppl-type']" mode="front">
+		<suppl-type>
+			<xsl:value-of select="value"/>
+		</suppl-type>
+	</xsl:template>
+	
+	<xsl:template match="misc-container/semantic-metadata[name = 'suppl-number']" mode="front">
+		<suppl-number>
+			<xsl:value-of select="value"/>
+		</suppl-number>
+	</xsl:template>
+	
+	<xsl:template match="misc-container/semantic-metadata[name = 'suppl-version']" mode="front">
+		<suppl-version>
+			<xsl:value-of select="value"/>
+		</suppl-version>
+	</xsl:template>
+	
 	<xsl:template match="misc-container/semantic-metadata[name = 'wi-number']" mode="front">
 		<wi-number>
 			<xsl:value-of select="value"/>
@@ -1513,6 +1534,9 @@
 																ext/price-code |
 																bibdata/uri |
 																misc-container/semantic-metadata[name = 'proj-id'] |
+																misc-container/semantic-metadata[name = 'suppl-type'] |
+																misc-container/semantic-metadata[name = 'suppl-number'] |
+																misc-container/semantic-metadata[name = 'suppl-version'] |
 																misc-container/semantic-metadata[name = 'wi-number'] |
 																misc-container/semantic-metadata[name = 'release-version-id'] |
 																misc-container/semantic-metadata[name = 'page-count']"

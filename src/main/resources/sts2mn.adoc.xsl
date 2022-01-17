@@ -646,6 +646,13 @@
 		<!-- :semantic-metadata-proj-id: 72028 -->
 		<xsl:apply-templates select="doc-ident/proj-id"/>
 		
+		<!-- :semantic-metadata-suppl-type: RV -->
+		<xsl:apply-templates select="std-ident/suppl-type"/>
+		<!-- :semantic-metadata-suppl-number: 1 -->
+		<xsl:apply-templates select="std-ident/suppl-number"/>
+		<!-- :semantic-metadata-suppl-version: 2 -->
+		<xsl:apply-templates select="std-ident/suppl-version"/>
+		
 		<!-- :semantic-metadata-wi-number: 00279004 -->
 		<xsl:apply-templates select="wi-number"/>
 		
@@ -1114,9 +1121,23 @@
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
-	
 	<xsl:template match="doc-ident/proj-id[normalize-space() != '']">
 		<xsl:text>:semantic-metadata-proj-id: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="std-ident/suppl-type[normalize-space() != '']">
+		<xsl:text>:semantic-metadata-suppl-type: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="std-ident/suppl-number[normalize-space() != '']">
+		<xsl:text>:semantic-metadata-suppl-number: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="std-ident/suppl-version[normalize-space() != '']">
+		<xsl:text>:semantic-metadata-suppl-version: </xsl:text><xsl:value-of select="."/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	

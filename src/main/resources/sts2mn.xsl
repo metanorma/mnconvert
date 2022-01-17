@@ -829,6 +829,9 @@
 		<xsl:variable name="misc-container">
 			<xsl:apply-templates select="custom-meta-group/custom-meta[meta-name = 'TOC Heading Level']/meta-value" mode="bibdata"/>
 			<xsl:apply-templates select="doc-ident/proj-id" mode="bibdata"/>
+			<xsl:apply-templates select="std-ident/suppl-type" mode="bibdata"/>
+			<xsl:apply-templates select="std-ident/suppl-number" mode="bibdata"/>
+			<xsl:apply-templates select="std-ident/suppl-version" mode="bibdata"/>
 			<xsl:apply-templates select="wi-number" mode="bibdata"/>
 			<xsl:apply-templates select="release-version-id" mode="bibdata"/>
 			<xsl:apply-templates select="page-count" mode="bibdata"/>
@@ -850,6 +853,27 @@
 	<xsl:template match="doc-ident/proj-id[normalize-space() != '']" mode="bibdata">
 		<semantic-metadata>
 			<name>proj-id</name>
+			<value><xsl:apply-templates mode="bibdata"/></value>
+		</semantic-metadata>
+	</xsl:template>
+	
+	<xsl:template match="std-ident/suppl-type[normalize-space() != '']" mode="bibdata">
+		<semantic-metadata>
+			<name>suppl-type</name>
+			<value><xsl:apply-templates mode="bibdata"/></value>
+		</semantic-metadata>
+	</xsl:template>
+	
+	<xsl:template match="std-ident/suppl-number[normalize-space() != '']" mode="bibdata">
+		<semantic-metadata>
+			<name>suppl-number</name>
+			<value><xsl:apply-templates mode="bibdata"/></value>
+		</semantic-metadata>
+	</xsl:template>
+	
+	<xsl:template match="std-ident/suppl-version[normalize-space() != '']" mode="bibdata">
+		<semantic-metadata>
+			<name>suppl-version</name>
 			<value><xsl:apply-templates mode="bibdata"/></value>
 		</semantic-metadata>
 	</xsl:template>
