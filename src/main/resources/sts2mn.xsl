@@ -831,6 +831,7 @@
 			<xsl:apply-templates select="doc-ident/proj-id" mode="bibdata"/>
 			<xsl:apply-templates select="wi-number" mode="bibdata"/>
 			<xsl:apply-templates select="release-version-id" mode="bibdata"/>
+			<xsl:apply-templates select="page-count" mode="bibdata"/>
 		</xsl:variable>
 		<xsl:if test="xalan:nodeset($misc-container)/*">
 			<misc-container>
@@ -846,24 +847,31 @@
 		</presentation-metadata>
 	</xsl:template>
 	
-	<xsl:template match="doc-ident/proj-id" mode="bibdata">
+	<xsl:template match="doc-ident/proj-id[normalize-space() != '']" mode="bibdata">
 		<semantic-metadata>
 			<name>proj-id</name>
 			<value><xsl:apply-templates mode="bibdata"/></value>
 		</semantic-metadata>
 	</xsl:template>
 	
-	<xsl:template match="wi-number" mode="bibdata">
+	<xsl:template match="wi-number[normalize-space() != '']" mode="bibdata">
 		<semantic-metadata>
 			<name>wi-number</name>
 			<value><xsl:apply-templates mode="bibdata"/></value>
 		</semantic-metadata>
 	</xsl:template>
 	
-	<xsl:template match="release-version-id" mode="bibdata">
+	<xsl:template match="release-version-id[normalize-space() != '']" mode="bibdata">
 		<semantic-metadata>
 			<name>release-version-id</name>
 			<value><xsl:apply-templates mode="bibdata"/></value>
+		</semantic-metadata>
+	</xsl:template>
+	
+	<xsl:template match="page-count[normalize-space(@count) != '']" mode="bibdata">
+		<semantic-metadata>
+			<name>page-count</name>
+			<value><xsl:value-of select="@count"/></value>
 		</semantic-metadata>
 	</xsl:template>
 	

@@ -652,7 +652,8 @@
 		<!-- :semantic-metadata-release-version-id: 29938632 -->
 		<xsl:apply-templates select="release-version-id"/>
 		
-		
+		<!-- :semantic-metadata-page-count: 39 -->
+		<xsl:apply-templates select="page-count"/>
 		
 		<!-- relation bibitem -->
 		<xsl:if test="$include_iso_meta = 'true'">
@@ -1126,6 +1127,11 @@
 	
 	<xsl:template match="release-version-id[normalize-space() != '']">
 		<xsl:text>:semantic-metadata-release-version-id: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="page-count[normalize-space(@count) != '']">
+		<xsl:text>:semantic-metadata-page-count: </xsl:text><xsl:value-of select="@count"/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	

@@ -1052,6 +1052,11 @@
 			<!-- <ics> -->
 			<xsl:apply-templates select="ext/ics/code" mode="front"/>
 			
+			
+			<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'page-count']" mode="front"/>
+			
+			
+			
 			<!-- std-xref -->
 			<!-- ignoring all instances of .//relation[@type = 'adopted-from']/bibitem -->
 			<xsl:apply-templates select="relation[@type != 'adopted-from' and not(@type = 'related' and (starts-with(bibitem/docidentifier, $draft_comment_text) or starts-with(bibitem/docidentifier, $committee_ref_text)))]" mode="front" /><!-- adopted-from -> to standalone xxx-meta , related -> comm-ref  -->
@@ -1444,6 +1449,10 @@
 		<xsl:value-of select="value"/>
 	</xsl:template>
 	
+	<xsl:template match="misc-container/semantic-metadata[name = 'page-count']" mode="front">
+		<page-count count="{value}" />
+	</xsl:template>
+	
 	<!-- =============== -->
 	<!-- END custom-meta -->
 	<!-- =============== -->
@@ -1503,7 +1512,8 @@
 																bibdata/uri |
 																misc-container/semantic-metadata[name = 'proj-id'] |
 																misc-container/semantic-metadata[name = 'wi-number'] |
-																misc-container/semantic-metadata[name = 'release-version-id']"
+																misc-container/semantic-metadata[name = 'release-version-id'] |
+																misc-container/semantic-metadata[name = 'page-count']"
 																mode="front_check"/>
 
 	<!-- skip processed structure and deep down -->
