@@ -998,9 +998,8 @@
 				</xsl:for-each>
 			</xsl:if>
 			
-			<wi-number>
-				<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'wi-number']" mode="front"/>
-			</wi-number>
+			<!-- <wi-number> -->
+			<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'wi-number']" mode="front"/>
 			
 			<xsl:variable name="related_comm_ref" select="relation[@type='related']/bibitem/docidentifier"/>
 			<xsl:variable name="related_comm_ref_text">Committee reference</xsl:variable>
@@ -1063,9 +1062,8 @@
 			
 			<xsl:apply-templates select="relation[@type = 'related'][starts-with(bibitem/docidentifier, $draft_comment_text)]" mode="front" />
 			
-			<release-version-id>
-				<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'release-version-id']" mode="front"/>
-			</release-version-id>
+			<!-- <release-version-id> -->
+			<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'release-version-id']" mode="front"/>
 			
 			<permissions>
 				<xsl:choose>
@@ -1442,11 +1440,15 @@
 	</xsl:template>
 	
 	<xsl:template match="misc-container/semantic-metadata[name = 'wi-number']" mode="front">
-		<xsl:value-of select="value"/>
+		<wi-number>
+			<xsl:value-of select="value"/>
+		</wi-number>
 	</xsl:template>
 	
 	<xsl:template match="misc-container/semantic-metadata[name = 'release-version-id']" mode="front">
-		<xsl:value-of select="value"/>
+		<release-version-id>
+			<xsl:value-of select="value"/>
+		</release-version-id>
 	</xsl:template>
 	
 	<xsl:template match="misc-container/semantic-metadata[name = 'page-count']" mode="front">
