@@ -836,6 +836,7 @@
 			<xsl:apply-templates select="wi-number" mode="bibdata"/>
 			<xsl:apply-templates select="release-version-id" mode="bibdata"/>
 			<xsl:apply-templates select="page-count" mode="bibdata"/>
+			<xsl:apply-templates select="custom-meta-group/custom-meta[not(meta-name = 'TOC Heading Level' or meta-name = 'ISBN' or meta-name = 'horizontal')]" mode="bibdata"/>
 		</xsl:variable>
 		<xsl:if test="xalan:nodeset($misc-container)/*">
 			<misc-container>
@@ -904,6 +905,13 @@
 		<semantic-metadata>
 			<name>page-count</name>
 			<value><xsl:value-of select="@count"/></value>
+		</semantic-metadata>
+	</xsl:template>
+	
+	<xsl:template match="custom-meta-group/custom-meta[not(meta-name = 'TOC Heading Level' or meta-name = 'ISBN' or meta-name = 'horizontal')]" mode="bibdata">
+		<semantic-metadata>
+			<name><xsl:value-of select="translate(java:toLowerCase(java:java.lang.String.new(meta-name)), ' ', '-')"/></name>
+			<value><xsl:apply-templates select="meta-value" mode="bibdata"/></value>
 		</semantic-metadata>
 	</xsl:template>
 	

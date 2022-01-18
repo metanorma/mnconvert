@@ -668,6 +668,24 @@
 		<!-- :semantic-metadata-page-count: 39 -->
 		<xsl:apply-templates select="page-count"/>
 		
+		<!-- :semantic-metadata-upi: 000000000030044270 -->
+		<!-- :semantic-metadata-price-ref-pages: 39 -->
+		<!-- :semantic-metadata-published-logo: ISO/IEC -->
+		<!-- :semantic-metadata-generation-date: 2019-01-10 08:12:18 -->
+		<!-- :semantic-metadata-originator-identifier: 062726 -->
+		<!-- :semantic-metadata-colour-print: yes -->
+		<!-- :semantic-metadata-conversion-version: eXtyles3716 -->
+		<!-- :semantic-metadata-conversion-date: 2020-01-21 -->
+		<!-- :semantic-metadata-perinorm-id: 000000000030314082 -->
+		<!-- :semantic-metadata-version-history: Incorporating corrigendum January 2014, Incorporating corrigendum October 2014 -->
+		<!-- :semantic-metadata-wi-number: 00389013 -->
+		<!-- :semantic-metadata-release-version-id: 30878015 -->
+		<!-- :semantic-metadata-metadata-update: 2017-03-08 11:17:37 -->
+		<!-- :semantic-metadata-international: ISO 56003:2019(eqv) -->
+		<!-- :semantic-metadata-isoviennaagreement: (E): ISO-lead -->
+		<xsl:apply-templates select="custom-meta-group/custom-meta[not(meta-name = 'ISBN' or meta-name = 'TOC Heading Level')]"/>
+		
+		
 		<!-- relation bibitem -->
 		<xsl:if test="$include_iso_meta = 'true'">
 			<xsl:for-each select="ancestor::front/iso-meta">
@@ -1124,6 +1142,19 @@
 	
 	<xsl:template match="custom-meta-group/custom-meta[meta-name = 'TOC Heading Level']/meta-value">
 		<xsl:text>:toclevels: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="custom-meta-group/custom-meta[not(meta-name = 'ISBN' or meta-name = 'TOC Heading Level')]">
+		<xsl:if test="not(preceding-sibling::custom-meta[meta-name = current()/meta-name])">
+			<xsl:text>:semantic-metadata-</xsl:text><xsl:value-of select="translate(java:toLowerCase(java:java.lang.String.new(meta-name)), ' ', '-')"/><xsl:text>: </xsl:text><xsl:value-of select="meta-value"/>
+			<xsl:for-each select="following-sibling::custom-meta[meta-name = current()/meta-name]">
+			<xsl:text>, </xsl:text>
+			<xsl:if test="contains(meta-value, ',')">"</xsl:if>
+			<xsl:value-of select="meta-value"/>
+			<xsl:if test="contains(meta-value, ',')">"</xsl:if>
+			</xsl:for-each>
+		</xsl:if>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
