@@ -1513,6 +1513,18 @@
 		
 	</xsl:template>
 	
+	<!-- remove Section ... from start of title -->
+	<xsl:template match="title/node()[1][self::text()][java:org.metanorma.utils.RegExHelper.matches($regexSection, normalize-space()) = 'true']">
+		<xsl:choose>
+			<xsl:when test="parent::*[not(label) and not(@sec-type) and not(ancestor::*[@sec-type]) and not(title = 'Index')]">
+				<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regexSection,'$4')"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="."/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
 	<xsl:template match="tbx:term"/>
 	<xsl:template match="tbx:term" mode="term">
 		<xsl:choose>
@@ -4013,7 +4025,12 @@
 		
 		<xsl:if test="title and not(label) and not(@sec-type) and not(ancestor::*[@sec-type]) and not(title = 'Index')"> <!--  and count(*) = count(title) + count(sec) -->
 			<xsl:text>&#xa;</xsl:text>
-			<xsl:text>[discrete]</xsl:text>
+			<xsl:text>[discrete</xsl:text>
+				<xsl:if test="java:org.metanorma.utils.RegExHelper.matches($regexSection, normalize-space(title)) = 'true'">
+					<!-- section -->
+					<xsl:text>%section</xsl:text>
+				</xsl:if>
+			<xsl:text>]</xsl:text>
 		</xsl:if>
 		
 		<xsl:if test="not(title) and label">

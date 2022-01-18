@@ -2229,7 +2229,7 @@
 		</xsl:variable>
 		
 		<xsl:choose>
-			<xsl:when test="$processFloatingTitle = 'false' and preceding-sibling::p[1][@type = 'floating-title']"><!-- skip processing, see template for 'p' --></xsl:when>
+			<xsl:when test="$processFloatingTitle = 'false' and preceding-sibling::p[1][@type = 'floating-title' or @type = 'section-title']"><!-- skip processing, see template for 'p' --></xsl:when>
 			<xsl:otherwise>
 				<sec id="{$id}">
 					<xsl:if test="normalize-space($sec_type) != ''">
@@ -2532,12 +2532,12 @@
 				<xsl:if test="preceding-sibling::*[1][self::p]"><break /></xsl:if>
 				<xsl:apply-templates />
 			</xsl:when>
-			<xsl:when test="@type = 'floating-title'">
+			<xsl:when test="@type = 'floating-title' or @type = 'section-title'">
 				<!-- create parent element with floating title, for nested clauses (sec) -->
 				<sec>
 					<xsl:copy-of select="@id"/>
 					<title><xsl:apply-templates /></title>
-					<xsl:apply-templates select="following-sibling::*[preceding-sibling::p[1][@type = 'floating-title']]">
+					<xsl:apply-templates select="following-sibling::*[preceding-sibling::p[1][@type = 'floating-title' or @type = 'section-title']]">
 						<xsl:with-param name="processFloatingTitle">true</xsl:with-param>
 					</xsl:apply-templates>
 				</sec>
@@ -3960,7 +3960,9 @@
 	</xsl:template>
 	
 	<xsl:template match="title/@depth"/>
-	<xsl:template match="tab"/>
+	<xsl:template match="tab">
+		<xsl:if test="parent::*[self::p and @type = 'section-title']"><xsl:text>: </xsl:text></xsl:if> <!-- replace 'tab' to ': ' for 'Section x' -->
+	</xsl:template>
 	
 	<xsl:template match="amend">
 		<!-- <p id="{@id}"> -->
