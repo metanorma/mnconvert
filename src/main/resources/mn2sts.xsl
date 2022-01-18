@@ -1010,6 +1010,8 @@
 			<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'dow']" mode="front"/>
 			<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'dop']" mode="front"/>
 			<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'doa']" mode="front"/>
+			<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'vote-start']" mode="front"/>
+			<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'vote-end']" mode="front"/>
 			
 			<!-- <wi-number> -->
 			<xsl:apply-templates select="../misc-container/semantic-metadata[name = 'wi-number']" mode="front"/>
@@ -1173,6 +1175,7 @@
 				<!-- check non-processed elements in bibdata -->
 				<xsl:variable name="front_check">
 					<xsl:apply-templates mode="front_check"/>
+					<xsl:apply-templates select="../misc-container" mode="front_check"/>
 				</xsl:variable>
 
 				<xsl:if test="normalize-space($front_check) != '' or count(xalan:nodeset($front_check)/*) &gt; 0">
@@ -1473,6 +1476,9 @@
 	<xsl:template match="misc-container/semantic-metadata[name = 'dor' or name = 'dow' or name = 'dop' or name = 'doa']" mode="front">
 		<meta-date type="{java:toUpperCase(java:java.lang.String.new(name))}"><xsl:value-of select="value"/></meta-date>
 	</xsl:template>
+	<xsl:template match="misc-container/semantic-metadata[name = 'vote-start' or name = 'vote-end']" mode="front">
+		<meta-date type="{name}"><xsl:value-of select="value"/></meta-date>
+	</xsl:template>
 	
 	<xsl:template match="misc-container/semantic-metadata[name = 'wi-number']" mode="front">
 		<wi-number>
@@ -1555,6 +1561,8 @@
 																misc-container/semantic-metadata[name = 'dow'] |
 																misc-container/semantic-metadata[name = 'dop'] |
 																misc-container/semantic-metadata[name = 'doa'] |
+																misc-container/semantic-metadata[name = 'vote-start'] |
+																misc-container/semantic-metadata[name = 'vote-end'] |
 																misc-container/semantic-metadata[name = 'wi-number'] |
 																misc-container/semantic-metadata[name = 'release-version-id'] |
 																misc-container/semantic-metadata[name = 'page-count']"
@@ -3200,6 +3208,7 @@
       <xsl:choose>
         <xsl:when test="self::strong">bold</xsl:when>
         <xsl:when test="self::em">italic</xsl:when>
+        <xsl:otherwise><xsl:value-of select="local-name()"/></xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:element name="{$element}">
