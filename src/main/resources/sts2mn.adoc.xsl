@@ -31,19 +31,19 @@
 	<xsl:variable name="OUTPUT_FORMAT">adoc</xsl:variable> <!-- don't change it -->
 	
 	<!-- false --> <!-- true, for new features -->
-	<xsl:variable name="demomode">
+	<!-- <xsl:variable name="demomode">
 		<xsl:choose>
 			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '59752'">true</xsl:when>
 			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '36786'">true</xsl:when>
-			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '69315'">true</xsl:when>
+			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '69315'">true</xsl:when> -->
 			<!-- <xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '62726'">true</xsl:when>
 			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '72800'">true</xsl:when>
 			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '74716'">true</xsl:when>
 			<xsl:when test="/standard/front/iso-meta/doc-ident/proj-id = '68221'">true</xsl:when>
 			<xsl:when test="/standard/front/reg-meta/doc-ident/proj-id = '33079'">true</xsl:when> -->
-			<xsl:otherwise>false</xsl:otherwise>
+			<!-- <xsl:otherwise>false</xsl:otherwise>
 		</xsl:choose>
-	</xsl:variable> 
+	</xsl:variable>  -->
 	
 	<xsl:variable name="one_document_" select="count(//standard/front/*[contains(local-name(), '-meta')]) = 1"/>
 	<xsl:variable name="one_document" select="normalize-space($one_document_)"/>
@@ -247,12 +247,11 @@
 	
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
 	
-		<xsl:choose>
+		<!-- <xsl:choose>
 			<xsl:when test="$demomode = 'false'">
-				<redirect:write file="{$outpath}/{$docfile}">
-					<!-- index=<xsl:copy-of select="$index"/> -->
+				<redirect:write file="{$outpath}/{$docfile}"> -->
 					<!-- nat-meta -> iso-meta -> reg-meta -> std-meta -->
-					<xsl:for-each select="nat-meta">
+					<!-- <xsl:for-each select="nat-meta">
 						<xsl:call-template name="xxx-meta">
 							<xsl:with-param name="include_iso_meta">true</xsl:with-param>
 							<xsl:with-param name="include_reg_meta">true</xsl:with-param>
@@ -287,7 +286,7 @@
 					
 				</redirect:write>
 			</xsl:when>
-			<xsl:otherwise> <!-- demo mode -->
+			<xsl:otherwise> --> <!-- demo mode -->
 				
 				<xsl:for-each select="*[contains(local-name(), '-meta')]">
 					<xsl:variable name="docfile_bib">
@@ -414,8 +413,8 @@
 					
 				</xsl:for-each>
 					
-			</xsl:otherwise>
-		</xsl:choose>
+			<!-- </xsl:otherwise>
+		</xsl:choose> -->
 	
 		
 		
@@ -437,9 +436,9 @@
 				</xsl:variable>
 				
 				<xsl:choose>
-					<xsl:when test="$demomode = 'true' and $one_document = 'false' and ((contains(@id, '_nat') or title = 'National foreword'))"/> <!-- skip National Foreword and another National clause-->
-					<xsl:when test="$demomode = 'true' and $one_document = 'false' and ((contains(@id, '_euro') or title = 'European foreword'))"/> <!-- skip European Foreword and another European clauses -->
-					<xsl:when test="$demomode = 'true' and $one_document = 'false' and (not(contains(@id, '_nat') or title = 'National foreword' or contains(@id, '_euro') or title = 'European foreword'))"/> <!-- skip Foreword and another clauses -->
+					<xsl:when test="$one_document = 'false' and ((contains(@id, '_nat') or title = 'National foreword'))"/> <!-- skip National Foreword and another National clause--> <!-- $demomode = 'true' and  -->
+					<xsl:when test="$one_document = 'false' and ((contains(@id, '_euro') or title = 'European foreword'))"/> <!-- skip European Foreword and another European clauses --> <!-- $demomode = 'true' and  -->
+					<xsl:when test="$one_document = 'false' and (not(contains(@id, '_nat') or title = 'National foreword' or contains(@id, '_euro') or title = 'European foreword'))"/> <!-- skip Foreword and another clauses --> <!-- $demomode = 'true' and  -->
 					<xsl:otherwise>
 						<redirect:write file="{$outpath}/{$filename}">
 							<xsl:text>&#xa;</xsl:text>
@@ -2946,7 +2945,7 @@
 		</redirect:write>
 		
 		<xsl:choose>
-			<xsl:when test="$demomode = 'true' and $one_document = 'false' and starts-with(@id, 'sec_Z')"/> <!-- include:: created in national doc -->
+			<xsl:when test="$one_document = 'false' and starts-with(@id, 'sec_Z')"/> <!-- include:: created in national doc --> <!-- $demomode = 'true' and  -->
 			<xsl:otherwise>
 				<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
 				<redirect:write file="{$outpath}/{$docfile}">
@@ -4215,7 +4214,7 @@
 	
 	<xsl:template name="getDocFilename">
 		<xsl:choose>
-			<xsl:when test="$demomode = 'true' and $one_document = 'false'">
+			<xsl:when test="$one_document = 'false'"> <!-- $demomode = 'true' and  -->
 				<!-- iso-meta - reg-meta - nat-meta -->
 				<xsl:variable name="docfile_name_from_meta_">
 					<xsl:choose>
