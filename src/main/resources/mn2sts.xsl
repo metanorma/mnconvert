@@ -3493,6 +3493,11 @@
 				<xsl:if test="$isKeyTable = 'true'">
 					<xsl:attribute name="content-type">fig-index</xsl:attribute>
 				</xsl:if>
+				<xsl:variable name="processing_instruction_content_type" select="normalize-space(preceding-sibling::*[1]/processing-instruction('content-type'))"/>
+				<xsl:if test="$processing_instruction_content_type != ''">
+					<xsl:attribute name="content-type"><xsl:value-of select="$processing_instruction_content_type"/></xsl:attribute>
+				</xsl:if>
+				
 			</xsl:if>
 			<xsl:variable name="label">
 				<xsl:choose>

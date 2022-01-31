@@ -1745,6 +1745,11 @@
 	</xsl:template>
 	
 	<xsl:template match="table-wrap">
+	
+		<xsl:if test="@content-type = 'norm-refs'">
+			<p><xsl:processing-instruction name="content-type">norm-refs</xsl:processing-instruction></p>
+		</xsl:if>
+	
 		<xsl:apply-templates select="@orientation"/>
 		<!-- <xsl:apply-templates select="@*" /> -->
 		<xsl:apply-templates/>

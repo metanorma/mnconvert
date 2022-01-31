@@ -2543,6 +2543,13 @@
 	<!-- =============== -->
 	<xsl:template match="table-wrap">
 		<xsl:if test="preceding-sibling::node()[1][self::text()]"><xsl:text>&#xa;</xsl:text></xsl:if> <!-- if previous node is text, example: environment and requirements.<table-wrap id="tab_e" -->
+		<xsl:if test="@content-type = 'norm-refs'">
+			<xsl:call-template name="insertPI">
+				<xsl:with-param name="name">content-type</xsl:with-param>
+				<xsl:with-param name="value" select="'norm-refs'"/>
+			</xsl:call-template>
+			<xsl:text>&#xa;&#xa;</xsl:text>
+		</xsl:if>
 		<xsl:apply-templates select="@orientation"/>
 		<xsl:if test="not(@orientation)">
 			<xsl:apply-templates select="table/@width" mode="orientation"/>
