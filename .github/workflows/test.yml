@@ -37,6 +37,11 @@ jobs:
             ${{ runner.os }}-maven-
 
       - if: matrix.os == 'windows-latest'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+
+      - if: matrix.os == 'windows-latest'
         uses: nick-invision/retry@v1
         with:
           polling_interval_seconds: 5
