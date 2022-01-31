@@ -1989,14 +1989,21 @@
 		<xsl:if test="$start != '' and $start != '1' and preceding-sibling::*[1][self::p]">
 			<!-- <xsl:text>[start=</xsl:text><xsl:value-of select="$start"/><xsl:text>]</xsl:text> -->
 			<xsl:call-template name="insertPI">
-				<xsl:with-param name="name">list_start</xsl:with-param>
+				<xsl:with-param name="name">list-start</xsl:with-param>
 				<xsl:with-param name="value" select="$start"/>
 			</xsl:call-template>
 			<xsl:call-template name="insertPI">
-				<xsl:with-param name="name">list_type</xsl:with-param>
+				<xsl:with-param name="name">list-type</xsl:with-param>
 				<xsl:with-param name="value" select="$list-type"/>
 			</xsl:call-template>
 			<!-- <xsl:text>+++&lt;?list_start </xsl:text><xsl:value-of select="$start"/><xsl:text>?&gt;&lt;?list_type </xsl:text><xsl:value-of select="$list-type"/><xsl:text>?&gt;+++</xsl:text> -->
+			<xsl:text>&#xa;&#xa;</xsl:text>
+		</xsl:if>
+		<xsl:if test="$list-type = 'simple'">
+			<xsl:call-template name="insertPI">
+				<xsl:with-param name="name">list-type</xsl:with-param>
+				<xsl:with-param name="value" select="$list-type"/>
+			</xsl:call-template>
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</xsl:if>
 		
@@ -2018,6 +2025,7 @@
 		<xsl:variable name="first_label" select="translate(..//label[1], ').', '')"/>
 		<xsl:variable name="listtype">
 			<xsl:choose>
+				<xsl:when test="$force = 'true' and . = 'simple'">simple</xsl:when>
 				<xsl:when test="$force = 'true' and . = 'alpha-lower'">loweralpha</xsl:when>
 				<xsl:when test=". = 'alpha-lower'"></xsl:when> <!-- loweralpha --> <!-- https://github.com/metanorma/sts2mn/issues/22: on list don't need to be specified because it is default MN-BSI style -->
 				<xsl:when test=". = 'alpha-upper'">upperalpha</xsl:when>

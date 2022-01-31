@@ -2578,13 +2578,20 @@
 	<xsl:template match="ul" name="ul">
 		<list> 
 			<xsl:apply-templates select="@*"/>
-			<xsl:attribute name="list-type">
+			<xsl:variable name="processing_instruction_type" select="normalize-space(preceding-sibling::*[1]/processing-instruction('list-type'))"/>
+			<xsl:variable name="list-type">
 				<xsl:choose>
+						<xsl:when test="normalize-space($processing_instruction_type) = 'simple'">simple</xsl:when>
 						<xsl:when test="normalize-space(@type) = ''">bullet</xsl:when> <!-- even when <label>—</label> ! -->
 						<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
 					</xsl:choose>
+			</xsl:variable>
+			<xsl:attribute name="list-type">
+				<xsl:value-of select="$list-type"/>
 			</xsl:attribute>
-			<xsl:apply-templates />
+			<xsl:apply-templates>
+				<xsl:with-param name="list-type" select="$list-type"/>
+			</xsl:apply-templates>
 		</list>
 		<xsl:for-each select="note">
 			<xsl:call-template name="note"/>
@@ -2654,6 +2661,7 @@
 						<xsl:when test="$organization = 'ISO'">
 							<label>—</label>
 						</xsl:when>
+						<xsl:when test="$list-type = 'simple'"></xsl:when>
 						<xsl:otherwise>
 							<label>•</label>
 						</xsl:otherwise>

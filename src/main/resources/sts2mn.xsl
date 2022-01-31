@@ -2011,6 +2011,9 @@
 	<xsl:template match="list">
 		<xsl:choose>
 			<xsl:when test="@list-type = 'bullet' or @list-type = 'simple'">
+				<xsl:if test="@list-type = 'simple'">
+					<p><xsl:processing-instruction name="list-type">simple</xsl:processing-instruction></p>
+				</xsl:if>
 				<ul>
 					<xsl:apply-templates select="@*"/>
 					<xsl:apply-templates />
