@@ -3242,6 +3242,9 @@
 	<xsl:template match="fig-group/caption/title | fig/caption/title" mode="fig-group-title">
 		<xsl:text>.</xsl:text>
 		<xsl:apply-templates />
+		<xsl:for-each select="ancestor::fig[1]/p/named-content[@content-type='ace-tag']"> <!-- move ace-tag at the end of figure's title -->
+			<xsl:call-template name="ace-tag"/>
+		</xsl:for-each>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
@@ -3275,6 +3278,9 @@
 	<xsl:template match="fig/caption/title">
 		<xsl:text>.</xsl:text>
 		<xsl:apply-templates />
+		<xsl:for-each select="ancestor::fig[1]/p/named-content[@content-type='ace-tag']"> <!-- move ace-tag at the end of figure's title -->
+			<xsl:call-template name="ace-tag"/>
+		</xsl:for-each>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
@@ -3587,9 +3593,8 @@
 	<!-- =============== -->
 	<!-- End Definitions list (dl) -->
 	<!-- =============== -->
-	
-	<xsl:template match="named-content[@content-type = 'ace-tag'][contains(@specific-use, '_start') or contains(@specific-use, '_end')]" priority="2"><!-- start/end tag for corrections -->
-	
+	<xsl:template match="fig/p/named-content[@content-type = 'ace-tag']" priority="3"/>
+	<xsl:template match="named-content[@content-type = 'ace-tag'][contains(@specific-use, '_start') or contains(@specific-use, '_end')]" priority="2" name="ace-tag"><!-- start/end tag for corrections -->
 		<xsl:variable name="space_before"><xsl:if test="local-name(preceding-sibling::node()[1]) != '' or parent::std"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		<xsl:variable name="space_after"><xsl:if test="local-name(following-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		<xsl:value-of select="$space_before"/>
