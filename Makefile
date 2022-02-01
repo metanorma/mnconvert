@@ -41,6 +41,10 @@ endif
 
 all: target/$(JAR_FILE)
 
+checkVersion:
+	where make
+	make -v
+
 src/test/resources/iso-tc154-8601-1-en.mn.xml: tests/iso-8601-1/site/documents/iso-tc154-8601-1-en.xml
 	cp $< $@
 

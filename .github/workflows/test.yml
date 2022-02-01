@@ -62,6 +62,9 @@ jobs:
 #      - if: matrix.os != 'ubuntu-latest'
 #        run: gem install bundler metanorma-cli
 
+
+      - run: make checkVersion
+
       - run: make
 
       - run: make createJar
