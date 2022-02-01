@@ -3119,7 +3119,7 @@
 				</xsl:if>
 				
 				<xsl:variable name="referenceTitle">
-				
+					
 					<xsl:variable name="std-ref">
 						<xsl:variable name="std-ref_">
 							<xsl:apply-templates select="std/std-ref" mode="references"/>
@@ -3145,12 +3145,20 @@
 					</xsl:if>
 					<xsl:value-of select="$std-ref"/>
 					<xsl:value-of select="$mixed-citation"/>
-					
 				</xsl:variable>
 				
 				<xsl:if test="$referenceTitle != ''">
 					<xsl:text>,</xsl:text>
+					
+					<xsl:if test=".//named-content[@content-type='ace-tag']">
+						<xsl:text>path:(hyperlink,</xsl:text>
+					</xsl:if>
+					
 					<xsl:value-of select="translate($referenceTitle, '&#x2011;', '-')"/> <!-- non-breaking hyphen minus -->
+					
+					<xsl:if test=".//named-content[@content-type='ace-tag']">
+						<xsl:text>)</xsl:text>
+					</xsl:if>
 				</xsl:if>
 				
 				<xsl:text>]]]</xsl:text>
