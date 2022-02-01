@@ -6,7 +6,9 @@ SHELL ?= /bin/bash
 endif
 
 #JAR_VERSION := $(shell mvn -q -Dexec.executable="echo" -Dexec.args='$${project.version}' --non-recursive exec:exec -DforceStdout)
-JAR_VERSION := 1.14.0
+#JAR_VERSION := 1.14.0
+JAR_VERSION := $(shell mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+
 JAR_FILE := mnconvert-$(JAR_VERSION).jar
 
 SRCDIR := src/test/resources
