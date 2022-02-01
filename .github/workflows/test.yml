@@ -38,6 +38,12 @@ jobs:
             ${{ runner.os }}-maven-
 
       - if: matrix.os == 'windows-latest'
+        uses: actions/checkout@v2
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+
+      - if: matrix.os == 'windows-latest'
         uses: nick-invision/retry@v1
         with:
           polling_interval_seconds: 5
@@ -45,10 +51,6 @@ jobs:
           max_attempts: 3
           command: choco install --no-progress make gnuwin32-coreutils.install make curl yq wget
 
-      - if: matrix.os == 'windows-latest'
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.7
 
 
       - if: matrix.os == 'macos-latest'
