@@ -60,6 +60,7 @@ documents/%.mn.xml: src/test/resources/%.mn.xml
 	cp $< $@
 
 target/$(JAR_FILE):
+	echo $(OS)
 	echo $(SHELL)
 	echo $(JAR_VERSION)
 	mvn --settings settings.xml -DskipTests clean package shade:shade
