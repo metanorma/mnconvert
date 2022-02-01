@@ -70,6 +70,7 @@ target/$(JAR_FILE):
 	echo $(OS)
 	echo $(SHELL)
 	echo $(JAR_VERSION)
+	make -v
 	mvn --settings settings.xml -DskipTests clean package shade:shade
 
 testMN2STS: tests/mn-samples-iso/documents/international-standard/rice-en.cd.xml target/$(JAR_FILE)
