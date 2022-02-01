@@ -6,8 +6,8 @@ SHELL ?= /bin/bash
 endif
 
 #JAR_VERSION := $(shell mvn -q -Dexec.executable="echo" -Dexec.args='$${project.version}' --non-recursive exec:exec -DforceStdout)
-#JAR_VERSION := 1.14.0
-JAR_VERSION := $(shell mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+JAR_VERSION := 1.14.0
+#JAR_VERSION := $(shell mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
 
 JAR_FILE := mnconvert-$(JAR_VERSION).jar
 
@@ -36,7 +36,8 @@ else
   CMD_AND = ;
 endif
 
-all: target/$(JAR_FILE) documents documents.html
+all: target/$(JAR_FILE)
+# documents documents.html
 
 src/test/resources/iso-tc154-8601-1-en.mn.xml: tests/iso-8601-1/site/documents/iso-tc154-8601-1-en.xml
 	cp $< $@

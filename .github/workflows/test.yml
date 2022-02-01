@@ -62,6 +62,8 @@ jobs:
 #      - if: matrix.os != 'ubuntu-latest'
 #        run: gem install bundler metanorma-cli
 
+      - run: make
+
       - run: make testMN2STS
 
       - run: make testSTS2MN
