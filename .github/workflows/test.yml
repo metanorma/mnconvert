@@ -40,7 +40,7 @@ jobs:
       - if: matrix.os == 'windows-latest'
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.6
+          ruby-version: 2.7
 
       - if: matrix.os == 'windows-latest'
         uses: nick-invision/retry@v1
@@ -50,6 +50,8 @@ jobs:
           max_attempts: 3
           command: choco install --no-progress make gnuwin32-coreutils.install make curl yq wget
 
+      - if: matrix.os == 'windows-latest'
+          run:  echo $GITHUB_PATH & echo $GITHUB_PATH "C:\ProgramData\Chocolatey\bin\" > $GITHUB_PATH & echo $GITHUB_PATH
 
 
       - if: matrix.os == 'macos-latest'
@@ -61,8 +63,8 @@ jobs:
       - if: matrix.os == 'ubuntu-latest'
         run: sudo gem install bundler metanorma-cli
 
-      - if: matrix.os != 'ubuntu-latest'
-        run: gem install bundler metanorma-cli
+#      - if: matrix.os != 'ubuntu-latest'
+#        run: gem install bundler metanorma-cli
 
 
       - run: make checkVersion
