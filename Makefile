@@ -61,6 +61,9 @@ src/test/resources/iso-rice-en.cd.mn.xml: tests/mn-samples-iso/documents/interna
 documents/%.mn.xml: src/test/resources/%.mn.xml
 	cp $< $@
 
+createJar: target/$(JAR_FILE)
+	echo "Done!"
+
 target/$(JAR_FILE):
 	echo $(OS)
 	echo $(SHELL)
