@@ -5,7 +5,8 @@ else
 SHELL ?= /bin/bash
 endif
 
-JAR_VERSION := $(shell mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+#JAR_VERSION := $(shell mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+JAR_VERSION := 1.14.0
 
 JAR_FILE := mnconvert-$(JAR_VERSION).jar
 
