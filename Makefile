@@ -35,7 +35,9 @@ else
   CMD_AND = ;
 endif
 
-all: target/$(JAR_FILE) documents documents.html
+#all: target/$(JAR_FILE) documents documents.html
+
+all: createJar
 
 src/test/resources/iso-tc154-8601-1-en.mn.xml: tests/iso-8601-1/site/documents/iso-tc154-8601-1-en.xml
 	cp $< $@
