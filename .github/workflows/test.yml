@@ -75,6 +75,8 @@ jobs:
           event-type: metanorma/mnconvert
           client-payload: '{ "ref": "${{ github.ref }}" }'
 
+      - run: make
+
       - run: make mn2stsDTD_NISO
 
       - run: make mn2stsDTD_ISO
