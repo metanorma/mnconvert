@@ -60,6 +60,8 @@ documents/%.mn.xml: src/test/resources/%.mn.xml
 	cp $< $@
 
 target/$(JAR_FILE):
+	echo $(SHELL)
+	echo $(JAR_VERSION)
 	mvn --settings settings.xml -DskipTests clean package shade:shade
 
 testMN2STS: tests/mn-samples-iso/documents/international-standard/rice-en.cd.xml target/$(JAR_FILE)
