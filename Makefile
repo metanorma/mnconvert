@@ -37,7 +37,9 @@ endif
 
 #all: target/$(JAR_FILE) documents documents.html
 
-all: createJar
+#all: createJar
+
+all: target/$(JAR_FILE)
 
 src/test/resources/iso-tc154-8601-1-en.mn.xml: tests/iso-8601-1/site/documents/iso-tc154-8601-1-en.xml
 	cp $< $@
