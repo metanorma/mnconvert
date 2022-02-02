@@ -126,10 +126,11 @@ clean:
 publish: published
 published: documents.html documents.adoc xml2rfc.adoc
 	mkdir $@
-ifeq ($(OS),Windows_NT)
-	xcopy documents $@\ /E
-else
 	cp -a documents $@
-endif
+#ifeq ($(OS),Windows_NT)
+#	xcopy documents $@\ /E
+#else
+#	cp -a documents $@
+#endif
 
 .PHONY: all clean test deploy version publish mn2stsDTD_NISO mn2stsDTD_ISO
