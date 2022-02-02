@@ -88,11 +88,13 @@ documents.adoc: target/$(JAR_FILE) documents
 	java -jar $< ${SRCFILESTS} --output ${DESTMNADOC}
 
 xml2rfc.adoc: target/$(JAR_FILE) rfcsources documents
-ifeq ($(OS),Windows_NT)
-	for /r %%f in ($(SRCRFCDIR)/*.xml) do java -jar target/$(JAR_FILE) $(SRCRFCDIR)/%%~nxf --output $(DESTDIR)/%%~nf.adoc
-else
 	for f in $(SRCRFCDIR)/*.xml; do fout=$${f##*/}; java -jar target/$(JAR_FILE) $$f --output $(DESTDIR)/$${fout%.*}.adoc  ; done
-endif
+
+#ifeq ($(OS),Windows_NT)
+#	for /r %%f in ($(SRCRFCDIR)/*.xml) do java -jar target/$(JAR_FILE) $(SRCRFCDIR)/%%~nxf --output $(DESTDIR)/%%~nf.adoc
+#else
+#	for f in $(SRCRFCDIR)/*.xml; do fout=$${f##*/}; java -jar target/$(JAR_FILE) $$f --output $(DESTDIR)/$${fout%.*}.adoc  ; done
+#endif
 
 rfcsources:
 	wget -r -l 1 -nd -A ${SRCRFCMASK} -R rfc-*.xml -P ${SRCRFCDIR} https://www.rfc-editor.org/rfc/
