@@ -48,13 +48,13 @@ jobs:
           polling_interval_seconds: 5
           timeout_minutes: 5
           max_attempts: 3
-          command: choco install --no-progress make gnuwin32-coreutils.install make curl yq wget
+          command: choco install --no-progress make gnuwin32-coreutils.install curl yq wget
 
-      - if: matrix.os == 'windows-latest'
-        run: |
-         echo $GITHUB_PATH
-         echo $GITHUB_PATH "C:\ProgramData\Chocolatey\bin\" > $GITHUB_PATH
-         echo $GITHUB_PATH
+#      - if: matrix.os == 'windows-latest'
+#        run: |
+#         echo $GITHUB_PATH
+#         echo $GITHUB_PATH "C:\ProgramData\Chocolatey\bin\" > $GITHUB_PATH
+#         echo $GITHUB_PATH
 
 
       - if: matrix.os == 'macos-latest'

@@ -1,6 +1,6 @@
 #!make
 ifeq ($(OS),Windows_NT)
-SHELL := cmd
+#SHELL := cmd
 else
 SHELL ?= /bin/bash
 endif
