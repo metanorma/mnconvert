@@ -853,65 +853,46 @@
 	</xsl:template>
 	
 	<xsl:template match="doc-ident/proj-id[normalize-space() != '']" mode="bibdata">
-		<semantic-metadata>
-			<name>proj-id</name>
-			<value><xsl:apply-templates mode="bibdata"/></value>
-		</semantic-metadata>
+		<semantic-metadata><proj-id><xsl:apply-templates mode="bibdata"/></proj-id></semantic-metadata>
 	</xsl:template>
 	
 	<xsl:template match="std-ident/suppl-type[normalize-space() != '']" mode="bibdata">
-		<semantic-metadata>
-			<name>suppl-type</name>
-			<value><xsl:apply-templates mode="bibdata"/></value>
-		</semantic-metadata>
+		<semantic-metadata><suppl-type><xsl:apply-templates mode="bibdata"/></suppl-type></semantic-metadata>
 	</xsl:template>
 	
 	<xsl:template match="std-ident/suppl-number[normalize-space() != '']" mode="bibdata">
-		<semantic-metadata>
-			<name>suppl-number</name>
-			<value><xsl:apply-templates mode="bibdata"/></value>
-		</semantic-metadata>
+		<semantic-metadata><suppl-number><xsl:apply-templates mode="bibdata"/></suppl-number></semantic-metadata>
 	</xsl:template>
 	
 	<xsl:template match="std-ident/suppl-version[normalize-space() != '']" mode="bibdata">
-		<semantic-metadata>
-			<name>suppl-version</name>
-			<value><xsl:apply-templates mode="bibdata"/></value>
-		</semantic-metadata>
+		<semantic-metadata><suppl-version><xsl:apply-templates mode="bibdata"/></suppl-version></semantic-metadata>
 	</xsl:template>
 	
 	<xsl:template match="meta-date[normalize-space(@type) != '']" mode="bibdata">
 		<semantic-metadata>
-			<name><xsl:value-of select="java:toLowerCase(java:java.lang.String.new(@type))"/></name>
-			<value><xsl:apply-templates mode="bibdata"/></value>
+			<xsl:element name="{java:toLowerCase(java:java.lang.String.new(@type))}">
+				<xsl:apply-templates mode="bibdata"/>
+			</xsl:element>
 		</semantic-metadata>
 	</xsl:template>
 	
 	<xsl:template match="wi-number[normalize-space() != '']" mode="bibdata">
-		<semantic-metadata>
-			<name>wi-number</name>
-			<value><xsl:apply-templates mode="bibdata"/></value>
-		</semantic-metadata>
+		<semantic-metadata><wi-number><xsl:apply-templates mode="bibdata"/></wi-number></semantic-metadata>
 	</xsl:template>
 	
 	<xsl:template match="release-version-id[normalize-space() != '']" mode="bibdata">
-		<semantic-metadata>
-			<name>release-version-id</name>
-			<value><xsl:apply-templates mode="bibdata"/></value>
-		</semantic-metadata>
+		<semantic-metadata><release-version-id><xsl:apply-templates mode="bibdata"/></release-version-id></semantic-metadata>
 	</xsl:template>
 	
 	<xsl:template match="page-count[normalize-space(@count) != '']" mode="bibdata">
-		<semantic-metadata>
-			<name>page-count</name>
-			<value><xsl:value-of select="@count"/></value>
-		</semantic-metadata>
+		<semantic-metadata><page-count><xsl:value-of select="@count"/></page-count></semantic-metadata>
 	</xsl:template>
 	
 	<xsl:template match="custom-meta-group/custom-meta[not(meta-name = 'TOC Heading Level' or meta-name = 'ISBN' or meta-name = 'horizontal')]" mode="bibdata">
 		<semantic-metadata>
-			<name><xsl:value-of select="translate(java:toLowerCase(java:java.lang.String.new(meta-name)), ' ', '-')"/></name>
-			<value><xsl:apply-templates select="meta-value" mode="bibdata"/></value>
+			<xsl:element name="{translate(java:toLowerCase(java:java.lang.String.new(meta-name)), ' ', '-')}">
+				<xsl:apply-templates select="meta-value" mode="bibdata"/>
+			</xsl:element>
 		</semantic-metadata>
 	</xsl:template>
 	
