@@ -717,6 +717,7 @@
 	<!-- END Relations (std-xref processing) -->
 	<!-- =============================== -->
 	
-	<xsl:variable name="regexSection" select="'^Section(\s|\h)+[0-9]+(:|\-|\.)*(\s|\h)*(.*)$'"/>
+	<xsl:variable name="regexSectionTitle" select="'^Section(\s|\h)+[0-9]+(:|\-|\.)*(\s|\h)*(.*)$'"/>
+	<xsl:variable name="regexSectionLabel" select="'^Section(\s|\h)+[0-9]+$'"/>
 	
 </xsl:stylesheet>

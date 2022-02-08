@@ -1311,7 +1311,7 @@
 			<xsl:when test="$nat_meta_only = 'true' and @sec-type = 'intro'"></xsl:when> <!-- introduction added in preface tag, if $nat_meta_only = 'true' -->
 			<xsl:when test="title and not(label) and not(@sec-type) and not(ancestor::*[@sec-type]) and not(title = 'Index')">
 				<p id="{@id}" type="floating-title">
-					<xsl:if test="java:org.metanorma.utils.RegExHelper.matches($regexSection, normalize-space(title)) = 'true'">
+					<xsl:if test="java:org.metanorma.utils.RegExHelper.matches($regexSectionTitle, normalize-space(title)) = 'true' or java:org.metanorma.utils.RegExHelper.matches($regexSectionLabel, normalize-space(label)) = 'true'">
 						<!-- section -->
 						<xsl:attribute name="type">section-title</xsl:attribute>
 					</xsl:if>
