@@ -28,6 +28,8 @@
 	
 	<xsl:param name="self_testing">false</xsl:param> <!-- true false -->
 	
+	<xsl:key name="ids" match="*" use="@id"/> 
+	
 	<xsl:variable name="OUTPUT_FORMAT">adoc</xsl:variable> <!-- don't change it -->
 	
 	<!-- false --> <!-- true, for new features -->
@@ -1692,7 +1694,8 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-		<xsl:variable name="term_real" select="normalize-space(//*[@id = current()/@target]//tbx:term[1])"/>
+		<!-- <xsl:variable name="term_real" select="normalize-space(//*[@id = current()/@target]//tbx:term[1])"/> -->
+		<xsl:variable name="term_real" select="normalize-space(key('ids', current()/@target)//tbx:term[1])"/>
 		
 		<xsl:call-template name="insertTermReference">
 			<xsl:with-param name="term" select="$term_real"/>
@@ -2361,8 +2364,10 @@
 			<xsl:when test="@ref-type = 'other'">
 				<xsl:text>&lt;</xsl:text><xsl:value-of select="."/><xsl:text>&gt;</xsl:text>
 			</xsl:when>
-			<xsl:when test="@ref-type = 'sec' and local-name(//*[@id = current()/@rid]) = 'term-sec'"> <!-- <xref ref-type="sec" rid="sec_3.21"> link to term clause -->
-				<xsl:variable name="term_name" select="//*[@id = current()/@rid]//tbx:term[1]"/>
+			<!-- <xsl:when test="@ref-type = 'sec' and local-name(//*[@id = current()/@rid]) = 'term-sec'"> -->
+			<xsl:when test="@ref-type = 'sec' and local-name(key('ids', current()/@rid)) = 'term-sec'"> <!-- <xref ref-type="sec" rid="sec_3.21"> link to term clause -->
+				<!-- <xsl:variable name="term_name" select="//*[@id = current()/@rid]//tbx:term[1]"/> -->
+				<xsl:variable name="term_name" select="key('ids', current()/@rid)//tbx:term[1]"/>
 				
 				<!-- <xsl:variable name="term_name" select="java:toLowerCase(java:java.lang.String.new(translate($term_name_, ' ', '-')_))"/>				 -->
 				<!-- <xsl:text>&lt;&lt;</xsl:text>term-<xsl:value-of select="$term_name"/><xsl:text>&gt;&gt;</xsl:text> -->
@@ -3687,8 +3692,10 @@
 		</xsl:variable>
 		
 		<xsl:choose>
-			<xsl:when test="@content-type = 'term' and (local-name(//*[@id = $target]) = 'term-sec' or local-name(//*[@id = $target]) = 'termEntry')">
-				<xsl:variable name="term_real" select="//*[@id = $target]//tbx:term[1]"/>
+			<!-- <xsl:when test="@content-type = 'term' and (local-name(//*[@id = $target]) = 'term-sec' or local-name(//*[@id = $target]) = 'termEntry')"> -->
+			<xsl:when test="@content-type = 'term' and (local-name(key('ids', $target)) = 'term-sec' or local-name(key('ids', $target)) = 'termEntry')">
+				<!-- <xsl:variable name="term_real" select="//*[@id = $target]//tbx:term[1]"/> -->
+				<xsl:variable name="term_real" select="key('ids', $target)//tbx:term[1]"/>
 				<!-- <xsl:variable name="term_name" select="java:toLowerCase(java:java.lang.String.new(translate($term_name_, ' ', '-')))"/> -->
 				<!-- <xsl:text>term-</xsl:text><xsl:value-of select="$term_name"/>,<xsl:value-of select="."/> -->
 				
@@ -3750,28 +3757,34 @@
 		<xsl:param name="addon">0</xsl:param>
 		<xsl:param name="calculated_level">0</xsl:param>
 		
-		<xsl:variable name="level_total" select="count(ancestor::*)"/>
-		
-		<xsl:variable name="level_standard" select="count(ancestor::standard/ancestor::*)"/>
-		
-		<xsl:variable name="label" select="normalize-space(preceding-sibling::*[1][self::label])"/>
-		
 		<xsl:variable name="level_">
 			<xsl:choose>
 				<xsl:when test="$calculated_level != 0">
 					<xsl:value-of select="$calculated_level"/>
 				</xsl:when>
-				<xsl:when test="$label != ''">
-					<!-- level from the element 'label' - count '.' -->
-					<xsl:call-template name="getLevelFromLabel">
-						<xsl:with-param name="label" select="$label"/>
-					</xsl:call-template>
-				</xsl:when>
-				<xsl:when test="ancestor::app-group">
-					<xsl:value-of select="$level_total - $level_standard - 2"/>
-				</xsl:when>
 				<xsl:otherwise>
-					<xsl:value-of select="$level_total - $level_standard - 1"/>
+				
+					<xsl:variable name="level_total" select="count(ancestor::*)"/>
+		
+					<xsl:variable name="level_standard" select="count(ancestor::standard/ancestor::*)"/>
+					
+					<xsl:variable name="label" select="normalize-space(preceding-sibling::*[1][self::label])"/>
+				
+					<xsl:choose>
+						<xsl:when test="$label != ''">
+							<!-- level from the element 'label' - count '.' -->
+							<xsl:call-template name="getLevelFromLabel">
+								<xsl:with-param name="label" select="$label"/>
+							</xsl:call-template>
+						</xsl:when>
+						<xsl:when test="ancestor::app-group">
+							<xsl:value-of select="$level_total - $level_standard - 2"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$level_total - $level_standard - 1"/>
+						</xsl:otherwise>
+					</xsl:choose>
+					
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -3800,7 +3813,7 @@
 	<!-- level from the element 'label' - count '.' -->
 	<xsl:template name="getLevelFromLabel">
 		<xsl:param name="label" select="label"/>
-		<xsl:value-of  select="string-length($label) - string-length(translate($label, '.', '')) + 2"/>
+		<xsl:value-of select="string-length($label) - string-length(translate($label, '.', '')) + 2"/>
 	</xsl:template>
 	
 	<xsl:template name="getLevelListItem">
@@ -4642,9 +4655,13 @@
 		</xsl:copy>
 	</xsl:template>
 	
-	<xsl:template match="text()[following-sibling::*[1][self::xref]]" mode="remove_word_clause">
+	<!-- Remove 'Clause ' from text with '... Clause ' and next element 'xref' -->
+	<!-- Example: some text Clause <xref ...  -->
+	<xsl:template match="text()[contains(., 'Clause ')][following-sibling::*[1][self::xref]]" mode="remove_word_clause">
+		<xsl:message>text: <xsl:number level="any"/></xsl:message>
 		<xsl:variable name="xref_rid" select="following-sibling::*[1][self::xref]/@rid"/>
-		<xsl:variable name="is_clause_1stlevel_depth" select="count(//*[@id = $xref_rid]/parent::*[self::body or self::back]) &gt; 0"/>
+		<!-- <xsl:variable name="is_clause_1stlevel_depth" select="count(//*[@id = $xref_rid]/parent::*[self::body or self::back]) &gt; 0"/> -->
+		<xsl:variable name="is_clause_1stlevel_depth" select="count(key('ids', $xref_rid)/parent::*[self::body or self::back]) &gt; 0"/>
 		<xsl:variable name="clause_text_regex">Clause $</xsl:variable><!-- string ends on 'Clause ' -->
 		<xsl:choose>
 			<xsl:when test="$is_clause_1stlevel_depth = 'true'">
