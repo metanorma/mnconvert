@@ -3020,7 +3020,8 @@
 							<!-- <xsl:text>* [[[hidden_bibitem_</xsl:text> -->
 							<xsl:text>* [[[</xsl:text>
 							<xsl:value-of select="@stdid"/>
-							<xsl:text>,hidden(</xsl:text><xsl:value-of select=".//std-ref/text()"/>
+							<xsl:text>,hidden(</xsl:text>
+							<xsl:value-of select="translate(.//std-ref/text(), '&#xA0;‑', ' -')"/>
 							<xsl:text>)]]]</xsl:text>
 						</item>
 					</xsl:if>
@@ -3042,7 +3043,7 @@
 							<!-- put reference text -->
 							<xsl:for-each select="$model_term_source/referenceText[normalize-space() != ''][1]">
 								<xsl:text>,hidden(</xsl:text>
-								<xsl:value-of select="."/>
+								<xsl:value-of select="translate(., '&#xA0;‑', ' -')"/>
 							</xsl:for-each>
 							<xsl:text>)]]]</xsl:text>
 						</item>
