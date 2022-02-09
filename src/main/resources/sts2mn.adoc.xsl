@@ -3046,7 +3046,7 @@
 							<xsl:text>* [[[</xsl:text>
 							<xsl:value-of select="$term_source_reference"/>
 							<!-- put reference text -->
-							<xsl:for-each select="$model_term_source/referenceText[normalize-space() != ''][1]">
+							<xsl:for-each select="$model_term_source/referenceTextInBibliography[normalize-space() != ''][1]">
 								<xsl:text>,hidden(</xsl:text>
 								<xsl:value-of select="translate(., '&#xA0;‑', ' -')"/>
 							</xsl:for-each>

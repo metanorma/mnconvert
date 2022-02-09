@@ -468,22 +468,31 @@
 				</xsl:if>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:choose>
+				<reference hidden="true">
+					<xsl:value-of select="$std-ref"/>
+				</reference>
+				<referenceTextInBibliography><xsl:value-of select="$text"/></referenceTextInBibliography>
+				<xsl:if test="$OUTPUT_FORMAT = 'xml' or 
+					java:org.metanorma.utils.RegExHelper.matches('^(ISO|IEC|ITU|IETF|NIST|OGC|IEV|BS|BSI)(\s|\h).*', normalize-space($text)) = 'false'"> <!-- don't put reference text if it is reference to the standard -->
+					<referenceText><xsl:value-of select="$text"/></referenceText>
+				</xsl:if>
+				<!-- <xsl:choose>
 					<xsl:when test="$std-ref != $text">
 						<reference hidden="true">
-							<!-- <xsl:text>hidden_bibitem_</xsl:text> -->
 							<xsl:value-of select="$std-ref"/>
-						</reference><!-- , -->
-						<referenceText><xsl:value-of select="$text"/></referenceText>
+						</reference>
+						<referenceTextInBibliography><xsl:value-of select="$text"/></referenceTextInBibliography>
+						<xsl:if test="$OUTPUT_FORMAT = 'xml'">
+							<referenceText><xsl:value-of select="$text"/></referenceText>
+						</xsl:if>
 					</xsl:when>
 					<xsl:otherwise>
-						<!-- <xsl:text>hidden_bibitem_</xsl:text> -->
 						<reference hidden="true"><xsl:value-of select="$text"/></reference>
 						<xsl:if test="$OUTPUT_FORMAT = 'xml'">
 							<referenceText><xsl:value-of select="$text"/></referenceText>
 						</xsl:if>
 					</xsl:otherwise>
-				</xsl:choose>
+				</xsl:choose> -->
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
