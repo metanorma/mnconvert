@@ -1104,6 +1104,7 @@
 						</xsl:if>
 					</xsl:when>
 					<xsl:when test="$organization = 'BSI'">
+						<xsl:apply-templates select="../misc-container/semantic-metadata/copyright-statement"/>
 						<xsl:call-template name="put_copyright_year"/>
 						<xsl:call-template name="put_copyright_holder">
 							<xsl:with-param name="from">name</xsl:with-param>
@@ -1206,6 +1207,9 @@
 		</xsl:element>
 	</xsl:template>
 	
+	<xsl:template match="semantic-metadata/copyright-statement">
+		<copyright-statement><xsl:apply-templates/></copyright-statement>
+	</xsl:template>
 	<xsl:template name="put_copyright_year">
 		<copyright-year>
 			<xsl:apply-templates select="copyright/from" mode="front"/>
@@ -1646,7 +1650,8 @@
 																misc-container/semantic-metadata/version-history |
 																misc-container/semantic-metadata/metadata-update |
 																misc-container/semantic-metadata/international |
-																misc-container/semantic-metadata/isoviennaagreement"
+																misc-container/semantic-metadata/isoviennaagreement |
+																misc-container/semantic-metadata/copyright-statement"
 																mode="front_check"/>
 
 	<!-- skip processed structure and deep down -->

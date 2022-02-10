@@ -258,13 +258,13 @@
 							<xsl:choose>
 								<xsl:when test="$organization = 'BSI'">
 									<p id="boilerplate-year">© <xsl:value-of select="/standard/front/iso-meta/permissions/copyright-holder"/><xsl:text> </xsl:text><xsl:value-of select="/standard/front/iso-meta/permissions/copyright-year"/></p>
-									<p id="boilerplate-message"><xsl:apply-templates select="/standard/front/iso-meta/permissions/copyright-statement" mode="bibdata"/></p>
+									<p id="boilerplate-message"><xsl:apply-templates select="/standard/front/iso-meta/permissions/copyright-statement/node()" /></p>
 								</xsl:when>
 								<xsl:otherwise>
 									<xsl:for-each select="/standard/front/iso-meta/permissions/copyright-statement">
 										<p>
 											<xsl:copy-of select="@id"/>
-											<xsl:apply-templates mode="bibdata"/>
+											<xsl:apply-templates />
 										</p>
 									</xsl:for-each>
 								</xsl:otherwise>
@@ -837,6 +837,7 @@
 			<xsl:apply-templates select="release-version-id" mode="bibdata"/>
 			<xsl:apply-templates select="page-count" mode="bibdata"/>
 			<xsl:apply-templates select="custom-meta-group/custom-meta[not(meta-name = 'TOC Heading Level' or meta-name = 'ISBN' or meta-name = 'horizontal')]" mode="bibdata"/>
+			<xsl:apply-templates select="permissions/copyright-statement" mode="bibdata"/>
 		</xsl:variable>
 		<xsl:if test="xalan:nodeset($misc-container)/*">
 			<misc-container>
@@ -886,6 +887,10 @@
 	
 	<xsl:template match="page-count[normalize-space(@count) != '']" mode="bibdata">
 		<semantic-metadata><page-count><xsl:value-of select="@count"/></page-count></semantic-metadata>
+	</xsl:template>
+	
+	<xsl:template match="permissions/copyright-statement[normalize-space() != '']" mode="bibdata">
+		<semantic-metadata><copyright-statement><xsl:apply-templates mode="bibdata"/></copyright-statement></semantic-metadata>
 	</xsl:template>
 	
 	<xsl:template match="custom-meta-group/custom-meta[not(meta-name = 'TOC Heading Level' or meta-name = 'ISBN' or meta-name = 'horizontal')]" mode="bibdata">

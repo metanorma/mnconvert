@@ -686,6 +686,8 @@
 		<!-- :semantic-metadata-isoviennaagreement: (E): ISO-lead -->
 		<xsl:apply-templates select="custom-meta-group/custom-meta[not(meta-name = 'ISBN' or meta-name = 'TOC Heading Level')]"/>
 		
+		<!-- :semantic-metadata-copyright-statement:  All rights of exploitation in any form and ... -->
+		<xsl:apply-templates select="permissions/copyright-statement"/>
 		
 		<!-- relation bibitem -->
 		<xsl:if test="$include_iso_meta = 'true'">
@@ -1199,6 +1201,10 @@
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
+	<xsl:template match="permissions/copyright-statement">
+		<xsl:text>:semantic-metadata-copyright-statement: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
 	
 	
 	<!-- =========== -->
