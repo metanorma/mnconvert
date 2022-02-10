@@ -1815,7 +1815,16 @@
 					
 					<xsl:variable name="section" select="$elements//element[@source_id = current()/@id]/@section"/>
 					<!-- <xsl:if test="$section != ''"> -->
-						<label><xsl:value-of select="$section"/></label>
+						<xsl:choose>
+							<xsl:when test="title/node()[normalize-space() != ''][1][self::add]">
+								<xsl:call-template name="insert_label_styled-content-addition">
+									<xsl:with-param name="label" select="$section"/>
+								</xsl:call-template>
+							</xsl:when>
+							<xsl:otherwise>
+								<label><xsl:value-of select="$section"/></label>
+							</xsl:otherwise>
+						</xsl:choose>
 					<!-- </xsl:if> -->
 					
 					<xsl:apply-templates select="title"/>
@@ -2245,7 +2254,18 @@
 					</xsl:if>
 					<xsl:choose>
 						<xsl:when test="ancestor::foreword"></xsl:when>
-						<xsl:otherwise><label><xsl:value-of select="$section"/></label></xsl:otherwise>
+						<xsl:otherwise>
+							<xsl:choose>
+								<xsl:when test="title/node()[normalize-space() != ''][1][self::add]">
+									<xsl:call-template name="insert_label_styled-content-addition">
+										<xsl:with-param name="label" select="$section"/>
+									</xsl:call-template>
+								</xsl:when>
+								<xsl:otherwise>
+									<label><xsl:value-of select="$section"/></label>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:otherwise>
 					</xsl:choose>
 					
 					<xsl:apply-templates select="title">
@@ -2303,7 +2323,16 @@
 		</xsl:variable>
 
 		<term-sec id="sec_{$section}"><!-- id="{$current_id}" -->
-			<label><xsl:value-of select="$section"/></label>
+			<xsl:choose>
+				<xsl:when test="title/node()[normalize-space() != ''][1][self::add]">
+					<xsl:call-template name="insert_label_styled-content-addition">
+						<xsl:with-param name="label" select="$section"/>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:otherwise>
+					<label><xsl:value-of select="$section"/></label>
+				</xsl:otherwise>
+			</xsl:choose>
 			<tbx:termEntry id="{$current_id}">
 				<tbx:langSet xml:lang="en">
 					<xsl:apply-templates select="node()[not(self::termexample or self::termnote or self::termsource or 
@@ -2697,33 +2726,47 @@
 						<xsl:number/>
 					</xsl:variable>
 					
+					<xsl:variable name="list-item-label">
+						<xsl:choose>
+							<xsl:when test="$type = 'order' and not($organization = 'IEC')">
+								<xsl:number value="$start_value + $curr_value" format="1)"/>
+							</xsl:when>
+							<xsl:when test="$type = 'arabic'">
+								<xsl:number value="$start_value + $curr_value" format="1)"/>
+							</xsl:when>
+							<!-- <xsl:when test="$type = 'alphabet'"> -->
+							<xsl:when test="$type = 'alpha-lower'">
+								<xsl:number value="$start_value + $curr_value" format="a)" lang="en"/>
+							</xsl:when>
+							<!-- <xsl:when test="$type = 'alphabet_upper'"> -->
+							<xsl:when test="$type = 'alpha-upper'">
+								<xsl:number value="$start_value + $curr_value" format="A)" lang="en"/>
+							</xsl:when>
+							<!-- <xsl:when test="$type = 'roman'"> -->
+							<xsl:when test="$type = 'roman-lower'">
+								<xsl:number value="$start_value + $curr_value" format="i)" lang="en"/>
+							</xsl:when>
+							<!-- <xsl:when test="$type = 'roman_upper'"> -->
+							<xsl:when test="$type = 'roman-upper'">
+								<xsl:number value="$start_value + $curr_value" format="I)" lang="en"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:number value="$start_value + $curr_value" format="a)" lang="en"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+					
 					<xsl:choose>
-						<xsl:when test="$type = 'order' and not($organization = 'IEC')">
-							<label><xsl:number value="$start_value + $curr_value" format="1)"/></label>
-						</xsl:when>
-						<xsl:when test="$type = 'arabic'">
-							<label><xsl:number value="$start_value + $curr_value" format="1)"/></label>
-						</xsl:when>
-						<!-- <xsl:when test="$type = 'alphabet'"> -->
-						<xsl:when test="$type = 'alpha-lower'">
-							<label><xsl:number value="$start_value + $curr_value" format="a)" lang="en"/></label>
-						</xsl:when>
-						<!-- <xsl:when test="$type = 'alphabet_upper'"> -->
-						<xsl:when test="$type = 'alpha-upper'">
-							<label><xsl:number value="$start_value + $curr_value" format="A)" lang="en"/></label>
-						</xsl:when>
-						<!-- <xsl:when test="$type = 'roman'"> -->
-						<xsl:when test="$type = 'roman-lower'">
-							<label><xsl:number value="$start_value + $curr_value" format="i)" lang="en"/></label>
-						</xsl:when>
-						<!-- <xsl:when test="$type = 'roman_upper'"> -->
-						<xsl:when test="$type = 'roman-upper'">
-							<label><xsl:number value="$start_value + $curr_value" format="I)" lang="en"/></label>
+						<xsl:when test="*[1]/node()[normalize-space() != ''][1][self::add]">
+							<xsl:call-template name="insert_label_styled-content-addition">
+								<xsl:with-param name="label" select="$list-item-label"/>
+							</xsl:call-template>
 						</xsl:when>
 						<xsl:otherwise>
-							<label><xsl:number value="$start_value + $curr_value" format="a)" lang="en"/></label>
+							<label><xsl:value-of select="$list-item-label"/></label>
 						</xsl:otherwise>
 					</xsl:choose>
+					
 				</xsl:when>
 			</xsl:choose>
 			<xsl:apply-templates />
@@ -3409,7 +3452,16 @@
 			<xsl:variable name="current_id" select="@id"/>
 			<xsl:variable name="section" select="$elements//element[@source_id = $current_id]/@section"/>
 			<xsl:if test="$section != ''">
-				<label><xsl:value-of select="$section"/></label>
+				<xsl:choose>
+					<xsl:when test="title/node()[normalize-space() != ''][1][self::add]">
+						<xsl:call-template name="insert_label_styled-content-addition">
+							<xsl:with-param name="label" select="$section"/>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:otherwise>
+						<label><xsl:value-of select="$section"/></label>
+					</xsl:otherwise>
+				</xsl:choose>
 			</xsl:if>
 			<xsl:apply-templates/>
 		</sec>
@@ -4060,6 +4112,37 @@
 				</xsl:processing-instruction>
 			</xsl:otherwise>
 		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template match="add[not(contains(., 'ace-tag'))]">
+		<styled-content>
+			<xsl:choose>
+				<xsl:when test="ancestor::table">
+					<xsl:attribute name="style-type">addition</xsl:attribute>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:attribute name="style">addition</xsl:attribute>
+				</xsl:otherwise>
+			</xsl:choose>
+			<xsl:apply-templates/>
+		</styled-content>
+	</xsl:template>
+
+	<xsl:template name="insert_label_styled-content-addition">
+		<xsl:param name="label"/>
+		<label>
+			<styled-content>
+				<xsl:choose>
+					<xsl:when test="ancestor::table">
+						<xsl:attribute name="style-type">addition</xsl:attribute>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:attribute name="style">addition</xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>
+				<xsl:value-of select="$label"/>
+			</styled-content>
+		</label>
 	</xsl:template>
 
 	<xsl:template name="generateURN">

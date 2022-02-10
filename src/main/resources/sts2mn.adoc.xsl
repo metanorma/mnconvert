@@ -3744,6 +3744,14 @@
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
+	<xsl:template match="styled-content[@style = 'addition' or @style-type = 'addition']">
+		<xsl:variable name="space_before"><xsl:if test="local-name(preceding-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
+		<xsl:variable name="space_after"><xsl:if test="local-name(following-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
+		<xsl:value-of select="$space_before"/>
+		<xsl:text>add:[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
+		<xsl:value-of select="$space_after"/>
+	</xsl:template>
+	
 	<xsl:template name="split">
 		<xsl:param name="pText" select="."/>
 		<xsl:param name="sep" select="'/'"/>

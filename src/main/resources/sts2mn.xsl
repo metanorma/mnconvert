@@ -2561,6 +2561,10 @@
 		</table>
 	</xsl:template>
 	
+	<xsl:template match="styled-content[@style = 'addition' or @style-type = 'addition']">
+		<add><xsl:apply-templates/></add>
+	</xsl:template>
+	
 	<xsl:template name="split">
 		<xsl:param name="pText" select="."/>
 		<xsl:param name="sep" select="'/'"/>
