@@ -1654,6 +1654,10 @@
 						<xsl:text>&#xa;</xsl:text>
 					</xsl:if>
 				</xsl:if>
+				<xsl:if test="count(node()[normalize-space() != '']) = 1 and styled-content[@style='text-alignment: center']">
+					<xsl:text>[align=center]</xsl:text>
+						<xsl:text>&#xa;</xsl:text>
+				</xsl:if>
 				<xsl:value-of select="$p_text"/>
 				<xsl:text>&#xa;</xsl:text>
 				<xsl:variable name="isLastPinCommentary" select="preceding-sibling::p[starts-with(normalize-space(), 'COMMENTARY ON') and 

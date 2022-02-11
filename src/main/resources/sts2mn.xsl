@@ -1808,8 +1808,15 @@
 	<xsl:template match="p">
 		<xsl:element name="{local-name()}">
 			<xsl:apply-templates select="@*"/>
+			<xsl:if test="count(node()[normalize-space() != '']) = 1 and styled-content[@style='text-alignment: center']">
+				<xsl:apply-templates select="styled-content[@style='text-alignment: center']" mode="styled-content"/>
+			</xsl:if>
 			<xsl:apply-templates />
 		</xsl:element>
+	</xsl:template>
+	
+	<xsl:template match="styled-content[@style='text-alignment: center']" mode="styled-content">
+		<xsl:attribute name="align">center</xsl:attribute>
 	</xsl:template>
 	
 	<xsl:template match="p/@specific-use">
@@ -2506,6 +2513,10 @@
 			</xsl:otherwise>
 		</xsl:choose>
 		<xsl:text disable-output-escaping="yes">&gt;--&gt;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="p[count(node()[normalize-space() != '']) = 1]/styled-content[@style='text-alignment: center']">
+		<xsl:apply-templates />
 	</xsl:template>
 	
 	<xsl:template match="processing-instruction()[contains(., 'Page_Break')] | processing-instruction()[contains(., 'Page-Break')]">
