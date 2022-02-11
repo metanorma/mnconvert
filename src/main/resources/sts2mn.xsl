@@ -828,6 +828,7 @@
 	<xsl:template name="processMetadata">
 		<xsl:variable name="misc-container">
 			<xsl:apply-templates select="custom-meta-group/custom-meta[meta-name = 'TOC Heading Level']/meta-value" mode="bibdata"/>
+			<xsl:apply-templates select="(//list-item[not(ancestor::non-normative-note)][1]/label/styled-content/@style[contains(., 'color:')])[1]" mode="bibdata"/>
 			<xsl:apply-templates select="doc-ident/proj-id" mode="bibdata"/>
 			<xsl:apply-templates select="std-ident/suppl-type" mode="bibdata"/>
 			<xsl:apply-templates select="std-ident/suppl-number" mode="bibdata"/>
@@ -851,6 +852,17 @@
 			<name>TOC Heading Levels</name>
 			<value><xsl:apply-templates mode="bibdata"/></value>
 		</presentation-metadata>
+	</xsl:template>
+	
+	
+	<!-- :presentation-metadata-color-list-label: #009fe3 -->
+	<xsl:template match="list-item[not(ancestor::non-normative-note)]/label/styled-content/@style" mode="bibdata">
+		<xsl:variable name="value"><xsl:call-template name="getStyleColor"/></xsl:variable>
+		<xsl:if test="$value != ''">
+			<presentation-metadata>
+				<color-list-label><xsl:value-of select="$value"/></color-list-label>
+			</presentation-metadata>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="doc-ident/proj-id[normalize-space() != '']" mode="bibdata">

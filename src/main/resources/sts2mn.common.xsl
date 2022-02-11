@@ -729,4 +729,12 @@
 	<xsl:variable name="regexSectionTitle" select="'^Section(\s|\h)+[0-9]+(:|\-|\.)*(\s|\h)*(.*)$'"/>
 	<xsl:variable name="regexSectionLabel" select="'^Section(\s|\h)+[0-9]+$'"/>
 	
+	<xsl:template name="getStyleColor">
+		<xsl:variable name="value" select="normalize-space(substring-after(., 'color:'))"/>
+		<xsl:choose>
+			<xsl:when test="contains($value, ';')"><xsl:value-of select="substring-before($value, ';')"/></xsl:when>
+			<xsl:otherwise><xsl:value-of select="$value"/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
 </xsl:stylesheet>

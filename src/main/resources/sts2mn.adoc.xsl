@@ -644,6 +644,9 @@
 		<!-- ==================== -->
 		
 		
+		<!-- :presentation-metadata-color-list-label: #009fe3 -->
+		<xsl:apply-templates select="(//list-item[not(ancestor::non-normative-note)][1]/label/styled-content/@style[contains(., 'color:')])[1]" mode="presentation-metadata"/>
+		
 		<!-- :semantic-metadata-proj-id: 72028 -->
 		<xsl:apply-templates select="doc-ident/proj-id"/>
 		
@@ -1157,6 +1160,15 @@
 			<xsl:value-of select="meta-value"/>
 			<xsl:if test="contains(meta-value, ',')">"</xsl:if>
 			</xsl:for-each>
+		</xsl:if>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	
+	<xsl:template match="list-item[not(ancestor::non-normative-note)]/label/styled-content/@style" mode="presentation-metadata">
+		<xsl:variable name="value"><xsl:call-template name="getStyleColor"/></xsl:variable>
+		<xsl:if test="$value != ''">
+			<xsl:text>:presentation-metadata-color-list-label: </xsl:text><xsl:value-of select="$value"/>
 		</xsl:if>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
