@@ -2565,6 +2565,16 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:choose>
+					<xsl:when test="parent::li and (ancestor::note or ancestor::termnote) and $color-title != ''"> <!-- for PAS, list item text in the note -->
+						<p>
+							<italic>
+								<styled-content style="color:{$color-title};">
+									<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
+									<xsl:apply-templates />
+								</styled-content>
+							</italic>
+						</p>
+					</xsl:when>
 					<xsl:when test="$organization = 'BSI' and @align = 'center'">
 						<p>
 							<xsl:apply-templates select="@*[not(local-name() = 'align')]"/>
@@ -2684,10 +2694,12 @@
 	<xsl:template match="ul/note | ol/note" priority="2"/>
 	
 	
+	<xsl:variable name="color-title" select="//*[local-name() = 'presentation-metadata']/*[local-name() = 'color-title']"/>
 	<xsl:variable name="color-list-label" select="//*[local-name() = 'presentation-metadata']/*[local-name() = 'color-list-label']"/>
 	
 	<xsl:template match="li">
 		<xsl:param name="list-type"/>
+		<xsl:variable name="isNotePAS" select="(ancestor::note or ancestor::termnote) and $color-title != ''"/>
 		<list-item>
 			<!-- <xsl:if test="@id">
 				<xsl:attribute name="id"><xsl:value-of select="@id"/></xsl:attribute>
@@ -2704,6 +2716,8 @@
 							<xsl:call-template name="insert_label">
 								<xsl:with-param name="label">•</xsl:with-param>
 								<xsl:with-param name="color" select="$color-list-label"/>
+								<xsl:with-param name="isNotePAS" select="$isNotePAS"/>
+								<xsl:with-param name="colorNote" select="$color-title"/>
 							</xsl:call-template>
 						</xsl:otherwise>
 					</xsl:choose>
@@ -2712,6 +2726,8 @@
 					<xsl:call-template name="insert_label">
 						<xsl:with-param name="label">—</xsl:with-param>
 						<xsl:with-param name="color" select="$color-list-label"/>
+						<xsl:with-param name="isNotePAS" select="$isNotePAS"/>
+						<xsl:with-param name="colorNote" select="$color-title"/>
 					</xsl:call-template>
 					<!-- <label>—</label> -->
 				</xsl:when>
@@ -2772,11 +2788,15 @@
 						<xsl:with-param name="label" select="$list-item-label"/>
 						<xsl:with-param name="isAddition" select="count(*[1]/node()[normalize-space() != ''][1][self::add]) = 1"/>
 						<xsl:with-param name="color" select="$color-list-label"/>
+						<xsl:with-param name="isNotePAS" select="(ancestor::note or ancestor::termnote) and $color-title != ''"/>
+						<xsl:with-param name="colorNote" select="$color-title"/>
 					</xsl:call-template>
 			
 				</xsl:when>
 			</xsl:choose>
+			
 			<xsl:apply-templates />
+			
 		</list-item>
 	</xsl:template>
 	
@@ -4135,9 +4155,19 @@
 		<xsl:param name="label"/>
 		<xsl:param name="isAddition">false</xsl:param>
 		<xsl:param name="color"/>
-		<xsl:choose>
-			<xsl:when test="$isAddition = 'true' or $color != ''">
-				<label>
+		<xsl:param name="isNotePAS">false</xsl:param>
+		<xsl:param name="colorNote"/>
+		
+		<label>
+			<xsl:choose>
+				<xsl:when test="$isNotePAS = 'true'">
+					<italic>
+						<styled-content style="color:{$colorNote};">
+							<xsl:value-of select="$label"/>
+						</styled-content>
+					</italic>
+				</xsl:when>
+				<xsl:when test="$isAddition = 'true' or $color != ''">
 					<styled-content>
 						<xsl:variable name="styles_">
 							<xsl:if test="$isAddition = 'true' and not(ancestor::table)">
@@ -4172,12 +4202,12 @@
 						
 						<xsl:value-of select="$label"/>
 					</styled-content>
-				</label>
-			</xsl:when>
-			<xsl:otherwise>
-				<label><xsl:value-of select="$label"/></label>
-			</xsl:otherwise>
-		</xsl:choose>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$label"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</label>
 	</xsl:template>
 	
 	
