@@ -4058,6 +4058,18 @@
 		<xsl:if test="parent::*[self::p and @type = 'section-title']"><xsl:text>: </xsl:text></xsl:if> <!-- replace 'tab' to ': ' for 'Section x' -->
 	</xsl:template>
 	
+	<!-- special case -->
+	<xsl:variable name="annex_integral_part_text">(This annex forms an integral part of this </xsl:variable>
+	<xsl:template match="annex/title//text()[contains(., $annex_integral_part_text)]">
+		<xsl:value-of select="substring-before(., $annex_integral_part_text)"/>
+		<styled-content style-type="normal">
+			<xsl:value-of select="$annex_integral_part_text"/>
+			<xsl:value-of select="substring-before(substring-after(., $annex_integral_part_text), ')')"/>
+			<xsl:text>)</xsl:text>
+		</styled-content>
+		<xsl:value-of select="substring-after(substring-after(., $annex_integral_part_text), ')')"/>
+	</xsl:template>
+	
 	<xsl:template match="amend">
 		<!-- <p id="{@id}"> -->
 			<xsl:apply-templates />
