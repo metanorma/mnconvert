@@ -254,6 +254,8 @@
 			locality - example: clause 2.5
 			localityContinue - uses when locality number placed in another element than locality, for example, '=2.5'
 		-->
+	<xsl:variable name="adapted_from_text">Adapted from</xsl:variable>
+	 
 	<xsl:template name="build_sts_model_term_source">
 		<xsl:apply-templates />
 		<xsl:variable name="isModified" select="contains(normalize-space(.), ' modified')"/>
@@ -262,6 +264,10 @@
 				<xsl:text>,</xsl:text>
 				<xsl:value-of select="java:replaceAll(java:java.lang.String.new(substring-after(normalize-space(.), ' modified')), '^(\s|\h)*(-|–)?(\s|\h)*','')"/>
 			</modified>
+		</xsl:if>
+		<xsl:variable name="isAdapted" select="contains(normalize-space(.), $adapted_from_text)"/>
+		<xsl:if test="$isAdapted = 'true'">
+			<adapted/>
 		</xsl:if>
 	</xsl:template>
 	
@@ -272,14 +278,27 @@
 	
 		<xsl:variable name="modified_text">, modified</xsl:variable>
 		
+		<!-- remove 'Adapted from:' or 'Adapted from' text -->
+		<xsl:variable name="text_">
+			<xsl:choose>
+				<xsl:when test="contains(., concat($adapted_from_text, ':')) and $OUTPUT_FORMAT = 'adoc'">
+					<xsl:value-of select="normalize-space(substring-after(., concat($adapted_from_text, ':')))"/>
+				</xsl:when>
+				<xsl:when test="contains(., $adapted_from_text) and $OUTPUT_FORMAT = 'adoc'">
+					<xsl:value-of select="normalize-space(substring-after(., $adapted_from_text))"/>
+				</xsl:when>
+				<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
 		<!-- remove modified text -->
 		<xsl:variable name="text">
 			<xsl:choose>
-				<xsl:when test="contains(., $modified_text) or contains(preceding-sibling::text(), $modified_text)">
-					<xsl:value-of select="substring-before(., $modified_text)"/>
+				<xsl:when test="contains($text_, $modified_text) or contains(preceding-sibling::text(), $modified_text)">
+					<xsl:value-of select="substring-before($text_, $modified_text)"/>
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:value-of select="."/>
+					<xsl:value-of select="$text_"/>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>

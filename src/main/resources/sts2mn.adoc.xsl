@@ -1949,7 +1949,9 @@
 			<xsl:value-of select="local-name()"/>=<xsl:value-of select="."/><xsl:text>&#xa;</xsl:text>
 		</xsl:for-each> -->
 	
-		<xsl:text>[.source]</xsl:text>
+		<xsl:text>[.source</xsl:text>
+		<xsl:if test="$model_term_source/adapted">%adapted</xsl:if>
+		<xsl:text>]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&lt;&lt;</xsl:text>
 			
@@ -1969,12 +1971,19 @@
 			</xsl:for-each>
 			
 			<!-- put reference text -->
-			<xsl:for-each select="$model_term_source/referenceText[normalize-space() != '']">
-				<xsl:if test="not(starts-with(normalize-space(.), 'footnote:'))">
-					<xsl:text>,</xsl:text>
-				</xsl:if>
-				<xsl:value-of select="."/>
-			</xsl:for-each>
+			<xsl:variable name="referenceText">
+				<xsl:for-each select="$model_term_source/referenceText[normalize-space() != '']">
+					<xsl:if test="not(starts-with(normalize-space(.), 'footnote:'))">
+						<xsl:text>,</xsl:text>
+					</xsl:if>
+					<xsl:value-of select="."/>
+				</xsl:for-each>
+			</xsl:variable>
+			
+			<!-- if reference text is different than reference title in the Bibliography -->
+			<xsl:if test="not($refs//ref[@id = $term_source_reference or @stdid_option = $term_source_reference]/@referenceText = substring($referenceText,2))"> <!-- after comma -->
+				<xsl:value-of select="$referenceText"/>
+			</xsl:if>
 			
 		<xsl:text>&gt;&gt;</xsl:text>
 		
@@ -4843,7 +4852,7 @@
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_ISO_15270,ISO 15270&gt;&gt;,</xsl:text> -->
-					<xsl:text>&lt;&lt;ISO_15270,ISO 15270&gt;&gt;,</xsl:text>
+					<xsl:text>&lt;&lt;ISO_15270&gt;&gt;,</xsl:text> <!-- ,ISO 15270 -->
 				</destination>
 			</item>
 			
@@ -4856,7 +4865,7 @@
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_BS_EN_ISO_14001_2004,clause 3.6,BS EN ISO 14001:2004&gt;&gt;,</xsl:text> -->
-					<xsl:text>&lt;&lt;BS_EN_ISO_14001_2004,clause 3.6,BS EN ISO 14001:2004&gt;&gt;,</xsl:text>
+					<xsl:text>&lt;&lt;BS_EN_ISO_14001_2004,clause 3.6&gt;&gt;,</xsl:text> <!-- ,BS EN ISO 14001:2004 -->
 				</destination>
 			</item>
 			
@@ -4870,7 +4879,7 @@
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_BS_EN_ISO_14001_2004,clause 3.7,BS EN ISO 14001:2004&gt;&gt;</xsl:text> -->
-					<xsl:text>&lt;&lt;BS_EN_ISO_14001_2004,clause 3.7,BS EN ISO 14001:2004&gt;&gt;</xsl:text>
+					<xsl:text>&lt;&lt;BS_EN_ISO_14001_2004,clause 3.7&gt;&gt;</xsl:text> <!-- ,BS EN ISO 14001:2004 -->
 				</destination>
 			</item>
 
@@ -4880,7 +4889,7 @@
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_BS_8888_2008,BS 8888:2008&gt;&gt;</xsl:text> -->
-					<xsl:text>&lt;&lt;BS_8888_2008,BS 8888:2008&gt;&gt;</xsl:text>
+					<xsl:text>&lt;&lt;BS_8888_2008&gt;&gt;</xsl:text> <!-- ,BS 8888:2008 -->
 				</destination>
 			</item>
 
@@ -4891,7 +4900,7 @@
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_ISO_9000_2005,clause 3.4.1,ISO 9000:2005&gt;&gt;,</xsl:text> -->
-					<xsl:text>&lt;&lt;ISO_9000_2005,clause 3.4.1,ISO 9000:2005&gt;&gt;,</xsl:text>
+					<xsl:text>&lt;&lt;ISO_9000_2005,clause 3.4.1&gt;&gt;,</xsl:text> <!-- ,ISO 9000:2005 -->
 				</destination>
 			</item>
 
@@ -4924,7 +4933,7 @@
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_BS_ISO_10007_2003,clause 3.6,BS ISO 10007:2003&gt;&gt;</xsl:text> -->
-					<xsl:text>&lt;&lt;BS_ISO_10007_2003,clause 3.6,BS ISO 10007:2003&gt;&gt;</xsl:text>
+					<xsl:text>&lt;&lt;BS_ISO_10007_2003,clause 3.6&gt;&gt;</xsl:text> <!-- ,BS ISO 10007:2003 -->
 				</destination>
 			</item>
 
@@ -4935,7 +4944,7 @@
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_BS_EN_1900_1998,clause 3.3.1,BS EN 1900:1998&gt;&gt;,</xsl:text> -->
-					<xsl:text>&lt;&lt;BS_EN_1900_1998,clause 3.3.1,BS EN 1900:1998&gt;&gt;,</xsl:text>
+					<xsl:text>&lt;&lt;BS_EN_1900_1998,clause 3.3.1&gt;&gt;,</xsl:text> <!-- ,BS EN 1900:1998 -->
 				</destination>
 			</item>
 
@@ -4946,7 +4955,7 @@
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_ISO_16642_2017,clause 3.22,ISO 16642:2017&gt;&gt;,new terms “concept entry” and “entry” added, synonym “TE” deleted, preferred term now is “concept entry” instead of “terminological entry”, Note 1 to entry deleted.</xsl:text> -->
-					<xsl:text>&lt;&lt;ISO_16642_2017,clause 3.22,ISO 16642:2017&gt;&gt;,new terms “concept entry” and “entry” added, synonym “TE” deleted, preferred term now is “concept entry” instead of “terminological entry”, Note 1 to entry deleted.</xsl:text>
+					<xsl:text>&lt;&lt;ISO_16642_2017,clause 3.22&gt;&gt;,new terms “concept entry” and “entry” added, synonym “TE” deleted, preferred term now is “concept entry” instead of “terminological entry”, Note 1 to entry deleted.</xsl:text> <!-- ,ISO 16642:2017 -->
 				</destination>
 			</item>
 
@@ -4967,7 +4976,7 @@
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_BS_EN_ISO_9000_2005,locality:definition=3.6.1,BS EN ISO 9000:2005&gt;&gt;,</xsl:text> -->
-					<xsl:text>&lt;&lt;BS_EN_ISO_9000_2005,locality:definition=3.6.1,BS EN ISO 9000:2005&gt;&gt;,</xsl:text>
+					<xsl:text>&lt;&lt;BS_EN_ISO_9000_2005,locality:definition=3.6.1&gt;&gt;,</xsl:text> <!-- ,BS EN ISO 9000:2005 -->
 				</destination>
 			</item>
 
@@ -4987,7 +4996,7 @@
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_BS_ISO_26000_2010,locality:definition=2.2,BS ISO 26000:2010&gt;&gt;</xsl:text> -->
-					<xsl:text>&lt;&lt;BS_ISO_26000_2010,locality:definition=2.2,BS ISO 26000:2010&gt;&gt;</xsl:text>
+					<xsl:text>&lt;&lt;BS_ISO_26000_2010,locality:definition=2.2&gt;&gt;</xsl:text> <!-- ,BS ISO 26000:2010 -->
 				</destination>
 			</item>
 
@@ -4998,7 +5007,7 @@
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_ISO_9000_2015,clause 3.6.15,ISO 9000:2015&gt;&gt;,by using the term “entity” instead of “object” and by replacing Notes 1 and 2 to entry with the new Notes 1 to 4 to entry.</xsl:text> -->
-					<xsl:text>&lt;&lt;ISO_9000_2015,clause 3.6.15,ISO 9000:2015&gt;&gt;,by using the term “entity” instead of “object” and by replacing Notes 1 and 2 to entry with the new Notes 1 to 4 to entry.</xsl:text>
+					<xsl:text>&lt;&lt;ISO_9000_2015,clause 3.6.15&gt;&gt;,by using the term “entity” instead of “object” and by replacing Notes 1 and 2 to entry with the new Notes 1 to 4 to entry.</xsl:text> <!-- ,ISO 9000:2015 -->
 				</destination>
 			</item>
 
@@ -5009,7 +5018,7 @@
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_ISO_9000_2015,clause 3.5.1,ISO 9000:2015&gt;&gt;</xsl:text> -->
-					<xsl:text>&lt;&lt;ISO_9000_2015,clause 3.5.1,ISO 9000:2015&gt;&gt;</xsl:text>
+					<xsl:text>&lt;&lt;ISO_9000_2015,clause 3.5.1&gt;&gt;</xsl:text> <!-- ,ISO 9000:2015 -->
 				</destination>
 			</item>
 
@@ -5036,7 +5045,7 @@
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_BS_5839_1_2013,clause 3.12,BS 5839‑1:2013&gt;&gt;</xsl:text> -->
-					<xsl:text>&lt;&lt;BS_5839_1_2013,clause 3.12,BS 5839‑1:2013&gt;&gt;</xsl:text>
+					<xsl:text>&lt;&lt;BS_5839_1_2013,clause 3.12&gt;&gt;</xsl:text> <!-- ,BS 5839‑1:2013 -->
 				</destination>
 			</item>
 
@@ -5047,7 +5056,7 @@
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_BS_9999_2017,clause 3.91,BS 9999:2017&gt;&gt;,note added</xsl:text> -->
-					<xsl:text>&lt;&lt;BS_9999_2017,clause 3.91,BS 9999:2017&gt;&gt;,note added</xsl:text>
+					<xsl:text>&lt;&lt;BS_9999_2017,clause 3.91&gt;&gt;,note added</xsl:text> <!-- ,BS 9999:2017 -->
 				</destination>
 			</item>
 
@@ -5102,7 +5111,7 @@
 					<destination>
 						<xsl:text>[.source]&#xa;</xsl:text>
 						<!-- <xsl:text>&lt;&lt;hidden_bibitem_IEC_62391_1_2015,clause=3.8,IEC 62391–1:2015&gt;&gt;,"capacitor" has been replaced by "supercapacitor" and the note has been omitted.</xsl:text> -->
-						<xsl:text>&lt;&lt;IEC_62391_1_2015,clause=3.8,IEC 62391–1:2015&gt;&gt;,"capacitor" has been replaced by "supercapacitor" and the note has been omitted.</xsl:text>
+						<xsl:text>&lt;&lt;IEC_62391_1_2015,clause=3.8&gt;&gt;,"capacitor" has been replaced by "supercapacitor" and the note has been omitted.</xsl:text> <!-- ,IEC 62391–1:2015 -->
 					</destination>
 			</item>
 			
@@ -5118,7 +5127,7 @@
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_IEC_62899_101_2019,clause=3.133,IEC 62899–101:2019&gt;&gt;</xsl:text> -->
-					<xsl:text>&lt;&lt;IEC_62899_101_2019,clause=3.133,IEC 62899–101:2019&gt;&gt;</xsl:text>
+					<xsl:text>&lt;&lt;IEC_62899_101_2019,clause=3.133&gt;&gt;</xsl:text> <!-- ,IEC 62899–101:2019 -->
 				</destination>
 			</item>
 			
