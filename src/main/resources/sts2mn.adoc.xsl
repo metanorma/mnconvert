@@ -2678,7 +2678,9 @@
 		
 		<xsl:call-template name="insertTableProperties"/>
 		
-		<xsl:text>|===</xsl:text>
+		<xsl:call-template name="insertTableSeparator"/>
+		
+		<xsl:text>===</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:apply-templates />
 		<xsl:text>&#xa;</xsl:text>
@@ -2701,12 +2703,27 @@
 		<xsl:apply-templates select="../table-wrap-foot" mode="footer">
 			<xsl:with-param name="cols-count" select="$cols-count"/>
 		</xsl:apply-templates>
-		<xsl:text>|===</xsl:text>
+		<xsl:call-template name="insertTableSeparator"/>
+		<xsl:text>===</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<!-- move notes outside table -->
 		<xsl:apply-templates select="../table-wrap-foot/non-normative-note" />
 		
+	</xsl:template>
+	
+	<xsl:template name="insertTableSeparator">
+		<xsl:choose>
+			<xsl:when test="ancestor::table"><xsl:text>!</xsl:text></xsl:when> <!-- for nesting tables -->
+			<xsl:otherwise><xsl:text>|</xsl:text></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template name="insertCellSeparator">
+		<xsl:choose>
+			<xsl:when test="count(ancestor::table) &gt; 1"><xsl:text>!</xsl:text></xsl:when> <!-- for nesting tables -->
+			<xsl:otherwise><xsl:text>|</xsl:text></xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="table/@width" mode="table_header">
@@ -2826,7 +2843,7 @@
 		<xsl:call-template name="spanProcessing"/>
 		<xsl:call-template name="alignmentProcessing"/>
 		<xsl:call-template name="complexFormatProcessing"/>
-		<xsl:text>|</xsl:text>
+		<xsl:call-template name="insertCellSeparator"/>
 		<xsl:apply-templates />
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
@@ -2835,7 +2852,7 @@
 		<xsl:call-template name="spanProcessing"/>		
 		<xsl:call-template name="alignmentProcessing"/>
 		<xsl:call-template name="complexFormatProcessing"/>
-		<xsl:text>|</xsl:text>
+		<xsl:call-template name="insertCellSeparator"/>
 		<xsl:choose>
 			<xsl:when test="position() = last() and normalize-space() = '' and not(*)"></xsl:when>
 			<xsl:otherwise>
