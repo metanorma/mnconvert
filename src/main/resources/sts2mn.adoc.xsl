@@ -1654,10 +1654,10 @@
 						<xsl:text>&#xa;</xsl:text>
 					</xsl:if>
 				</xsl:if>
-				<xsl:if test="count(node()[normalize-space() != '']) = 1 and styled-content[@style='text-alignment: center']">
+				<!-- <xsl:if test="count(node()[normalize-space() != '']) = 1 and styled-content[@style='text-alignment: center']">
 					<xsl:text>[align=center]</xsl:text>
 						<xsl:text>&#xa;</xsl:text>
-				</xsl:if>
+				</xsl:if> -->
 				<xsl:value-of select="$p_text"/>
 				<xsl:text>&#xa;</xsl:text>
 				<xsl:variable name="isLastPinCommentary" select="preceding-sibling::p[starts-with(normalize-space(), 'COMMENTARY ON') and 
@@ -2218,6 +2218,12 @@
 	
 	<xsl:template match="title/break" priority="2">
 		<xsl:text>+++&lt;br/&gt;+++</xsl:text>
+	</xsl:template>
+	
+	<!-- special case -->
+	<xsl:template match="break[preceding-sibling::node()[1][self::styled-content[@style='text-alignment: center']]] | 
+						break[following-sibling::node()[1][self::styled-content[@style='text-alignment: center']]]">
+		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="break">
@@ -2888,7 +2894,7 @@
 			</xsl:choose>			
 			<xsl:text>+</xsl:text>
 		</xsl:if>
-		<xsl:if test="list or def-list">a</xsl:if>
+		<!-- <xsl:if test="list or def-list">a</xsl:if> -->
 	</xsl:template>
 	
 	<xsl:template name="alignmentProcessing">
@@ -2909,7 +2915,10 @@
 	</xsl:template>
 	
 	<xsl:template name="complexFormatProcessing">
-		<xsl:if test=".//graphic or .//inline-graphic">a</xsl:if> <!-- AsciiDoc prefix before table cell -->
+		<xsl:if test=".//graphic or .//inline-graphic or .//list or .//def-list or
+			.//named-content[@content-type = 'ace-tag'][contains(@specific-use, '_start') or contains(@specific-use, '_end')] or
+			.//styled-content[@style = 'addition' or @style-type = 'addition'] or
+			.//styled-content[@style = 'text-alignment: center']">a</xsl:if> <!-- AsciiDoc prefix before table cell -->
 	</xsl:template>
 	
 	<xsl:template name="getAlignFormat">
@@ -3680,8 +3689,10 @@
 	<!-- =============== -->
 	<xsl:template match="fig/p/named-content[@content-type = 'ace-tag']" priority="3"/>
 	<xsl:template match="named-content[@content-type = 'ace-tag'][contains(@specific-use, '_start') or contains(@specific-use, '_end')]" priority="2" name="ace-tag"><!-- start/end tag for corrections -->
-		<xsl:variable name="space_before"><xsl:if test="local-name(preceding-sibling::node()[1]) != '' or parent::std"><xsl:text> </xsl:text></xsl:if></xsl:variable>
-		<xsl:variable name="space_after"><xsl:if test="local-name(following-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
+		<xsl:variable name="preceding-sibling_local-name" select="local-name(preceding-sibling::node()[1])"/>
+		<xsl:variable name="following-sibling_local-name" select="local-name(following-sibling::node()[1])"/>
+		<xsl:variable name="space_before"><xsl:if test="($preceding-sibling_local-name != '' and $preceding-sibling_local-name != 'break' and $preceding-sibling_local-name != 'list') or parent::std"><xsl:text> </xsl:text></xsl:if></xsl:variable>
+		<xsl:variable name="space_after"><xsl:if test="$following-sibling_local-name != '' and $following-sibling_local-name != 'break' and $following-sibling_local-name != 'list'"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		<xsl:value-of select="$space_before"/>
 		<!--Example: add:[ace-tag_label_C1_start] -->
 		<xsl:text>add:[</xsl:text><xsl:value-of select="@content-type"/><xsl:text>_</xsl:text><xsl:value-of select="@specific-use"/><xsl:text>]</xsl:text>
@@ -3787,11 +3798,22 @@
 	</xsl:template>
 	
 	<xsl:template match="styled-content[@style = 'addition' or @style-type = 'addition']">
-		<xsl:variable name="space_before"><xsl:if test="local-name(preceding-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
-		<xsl:variable name="space_after"><xsl:if test="local-name(following-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
+		<xsl:variable name="preceding-sibling_local-name" select="local-name(preceding-sibling::node()[1])"/>
+		<xsl:variable name="following-sibling_local-name" select="local-name(following-sibling::node()[1])"/>
+		<xsl:variable name="space_before"><xsl:if test="($preceding-sibling_local-name != '' and $preceding-sibling_local-name != 'break' and $preceding-sibling_local-name != 'list') or parent::std"><xsl:text> </xsl:text></xsl:if></xsl:variable>
+		<xsl:variable name="space_after"><xsl:if test="$following-sibling_local-name != '' and $following-sibling_local-name != 'break' and $following-sibling_local-name != 'list'"><xsl:text> </xsl:text></xsl:if></xsl:variable>
+		
 		<xsl:value-of select="$space_before"/>
 		<xsl:text>add:[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
 		<xsl:value-of select="$space_after"/>
+	</xsl:template>
+	
+	<xsl:template match="styled-content[@style='text-alignment: center']">
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>[align=center]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:apply-templates />
+		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
 	<xsl:template name="split">
