@@ -1805,18 +1805,33 @@
 	<!-- ============= -->
 	
 	
+	<!-- special case: p with styled-content inside -->
+	<xsl:template match="p[count(node()[normalize-space() != '']) = 1 and styled-content[@style='text-alignment: center']]">
+		<xsl:apply-templates />
+	</xsl:template>
+	
 	<xsl:template match="p">
 		<xsl:element name="{local-name()}">
 			<xsl:apply-templates select="@*"/>
-			<xsl:if test="count(node()[normalize-space() != '']) = 1 and styled-content[@style='text-alignment: center']">
-				<xsl:apply-templates select="styled-content[@style='text-alignment: center']" mode="styled-content"/>
-			</xsl:if>
 			<xsl:apply-templates />
 		</xsl:element>
 	</xsl:template>
 	
-	<xsl:template match="styled-content[@style='text-alignment: center']" mode="styled-content">
-		<xsl:attribute name="align">center</xsl:attribute>
+	<xsl:template match="styled-content[@style='text-alignment: center']">
+		<p align="center">
+			<xsl:apply-templates />
+		</p>
+	</xsl:template>
+	
+	<!-- special case -->
+	<xsl:template match="styled-content[@style='font-weight: italic; font-family: Times New Roman']">
+		<stem type="MathML">
+			<math xmlns="http://www.w3.org/1998/Math/MathML">
+				<mi>
+					<xsl:apply-templates />
+				</mi>
+			</math>
+		</stem>
 	</xsl:template>
 	
 	<xsl:template match="p/@specific-use">
@@ -1878,6 +1893,10 @@
 			<xsl:apply-templates />
 		</link>
 	</xsl:template>
+	
+	<!-- special case -->
+	<xsl:template match="break[preceding-sibling::node()[1][self::styled-content[@style='text-alignment: center']]] | 
+						break[following-sibling::node()[1][self::styled-content[@style='text-alignment: center']]]"/>
 	
 	<xsl:template match="break">
 		<br/>
@@ -2515,9 +2534,6 @@
 		<xsl:text disable-output-escaping="yes">&gt;--&gt;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="p[count(node()[normalize-space() != '']) = 1]/styled-content[@style='text-alignment: center']">
-		<xsl:apply-templates />
-	</xsl:template>
 	
 	<xsl:template match="processing-instruction()[contains(., 'Page_Break')] | processing-instruction()[contains(., 'Page-Break')]">
 		<pagebreak />

@@ -3979,6 +3979,12 @@
 		</xsl:if>
 	</xsl:template>
 	
+	<!-- special case: <stem type="MathML"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>R</mi></math>< ! - - R - - > </stem><sub>1</sub> -->
+	<xsl:template match="stem[count(mml:math/*) = 1 and mml:math/mml:mi and following-sibling::node()[normalize-space() != ''][1][self::sub or self::sup]]">
+		<styled-content style="font-weight: italic; font-family: Times New Roman"><xsl:value-of select="mml:math/mml:mi"/></styled-content>
+	</xsl:template>
+	
+	
 	<xsl:template match="stem">
 		<inline-formula>
 			<xsl:copy-of select="@id"/>

@@ -3816,6 +3816,11 @@
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
+	<xsl:template match="styled-content[@style='font-weight: italic; font-family: Times New Roman']">
+		<xsl:text>stem:[</xsl:text><xsl:apply-templates /><xsl:text>]</xsl:text>
+	</xsl:template>
+	
+	
 	<xsl:template name="split">
 		<xsl:param name="pText" select="."/>
 		<xsl:param name="sep" select="'/'"/>
