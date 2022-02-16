@@ -1565,7 +1565,8 @@
 				</xsl:if>
 				<!-- put reference text -->
 				<xsl:for-each select="$model_term_source/referenceText[normalize-space() != '']">
-					<xsl:value-of select="."/>
+					<!-- <xsl:value-of select="."/> -->
+					<xsl:copy-of select="./node()"/>
 					<xsl:if test="following-sibling::referenceText[normalize-space() != '']">
 						<xsl:text>,</xsl:text>
 					</xsl:if>
