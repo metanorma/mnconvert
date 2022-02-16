@@ -361,6 +361,11 @@
 									<xsl:value-of select="java:toLowerCase(java:java.lang.String.new($item_text))"/>
 								</locality>
 							</xsl:when>
+							<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^(definition(\s|\h)+)([0-9]+(\.[0-9]+))*$', normalize-space($item_text)) = 'true'"> <!-- Example: definition 3.1 -->
+								<locality>
+									<xsl:text>locality:definition=</xsl:text><xsl:value-of select="java:replaceAll(java:java.lang.String.new($item_text),'^(definition(\s|\h)+)([0-9]+(\.[0-9]+))*$','$3')"/>
+								</locality>
+							</xsl:when>
 							<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^(Box(\s|\h)+)[0-9]+$', normalize-space($item_text)) = 'true'"> <!-- Example: Box 8 -->
 								<locality>
 									<xsl:text>locality:box=</xsl:text><xsl:value-of select="java:replaceAll(java:java.lang.String.new($item_text),'^(Box(\s|\h)+)([0-9]+)$','$3')"/>
