@@ -1618,11 +1618,13 @@
 	
 	<xsl:template match="label"/>
 	
+	<xsl:variable name="commentary_on">COMMENTARY ON</xsl:variable>
+	
 	<xsl:template match="p" name="p">
 		<xsl:if test="ancestor::non-normative-example and not(preceding-sibling::p) and normalize-space(preceding-sibling::node()[1]) != '' and not(preceding-sibling::*[1][self::label])"><xsl:text>&#xa;&#xa;</xsl:text></xsl:if>
 		
-		<xsl:variable name="isFirstPinCommentary" select="starts-with(normalize-space(), 'COMMENTARY ON') and 
-		(starts-with(normalize-space(.//italic/text()), 'COMMENTARY ON') or starts-with(normalize-space(.//italic2/text()), 'COMMENTARY ON'))"/>
+		<xsl:variable name="isFirstPinCommentary" select="starts-with(normalize-space(), $commentary_on) and 
+		(starts-with(normalize-space(.//italic/text()), $commentary_on) or starts-with(normalize-space(.//italic2/text()), $commentary_on))"/>
 		<xsl:choose>
 			<xsl:when test="$isFirstPinCommentary = 'true'"> <!-- COMMENTARY ON -->
 				<xsl:text>[NOTE,type=commentary</xsl:text>
@@ -1631,10 +1633,11 @@
 					<xsl:choose>
 						<xsl:when test=".//xref"><xsl:value-of select=".//xref/@rid"/></xsl:when>
 						<xsl:otherwise>
-							<xsl:variable name="text_target" select=".//*[contains(local-name(),'bold')]"/>
+							<!-- <xsl:variable name="text_target" select=".//*[contains(local-name(),'bold')]"/>
 							<xsl:if test="ancestor::*[@id and label][1]/label = $text_target">
 								<xsl:value-of select="ancestor::*[@id and label][1]/@id"/>
-							</xsl:if>
+							</xsl:if> -->
+							<xsl:value-of select="parent::*/@id"/>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
@@ -1660,8 +1663,8 @@
 				</xsl:if> -->
 				<xsl:value-of select="$p_text"/>
 				<xsl:text>&#xa;</xsl:text>
-				<xsl:variable name="isLastPinCommentary" select="preceding-sibling::p[starts-with(normalize-space(), 'COMMENTARY ON') and 
-							(starts-with(normalize-space(.//italic/text()), 'COMMENTARY ON') or starts-with(normalize-space(.//italic2/text()), 'COMMENTARY ON'))] and
+				<xsl:variable name="isLastPinCommentary" select="preceding-sibling::p[starts-with(normalize-space(), $commentary_on) and 
+							(starts-with(normalize-space(.//italic/text()), $commentary_on) or starts-with(normalize-space(.//italic2/text()), $commentary_on))] and
 							*[1][self::italic or self::italic2] and normalize-space(translate(./text(),'&#xa0;.','  ')) = '' and
 							not(following-sibling::p[*[1][self::italic or self::italic2] and normalize-space(translate(./text(),'&#xa0;.','  ')) = ''])"/>
 				<xsl:if test="$isLastPinCommentary = 'true'">
@@ -2245,14 +2248,14 @@
 		<xsl:choose>
 			<!-- if italic in paragraph that relates to COMMENTARY -->
 			<xsl:when test="parent::p[*[1][self::italic or self::italic2] and normalize-space(translate(./text(),'&#xa0;.','  ')) = ''] and 
-			parent::p/preceding-sibling::p[starts-with(normalize-space(), 'COMMENTARY ON') and 
-							(starts-with(normalize-space(.//italic/text()), 'COMMENTARY ON') or starts-with(normalize-space(.//italic2/text()), 'COMMENTARY ON'))]">
+			parent::p/preceding-sibling::p[starts-with(normalize-space(), $commentary_on) and 
+							(starts-with(normalize-space(.//italic/text()), $commentary_on) or starts-with(normalize-space(.//italic2/text()), $commentary_on))]">
 				<!-- no italic -->
 				<xsl:apply-templates />
 			</xsl:when>
 			<!-- if italic in list-item that relates to COMMENTARY -->
-			<xsl:when test="ancestor::list/preceding-sibling::p[starts-with(normalize-space(), 'COMMENTARY ON') and 
-							(starts-with(normalize-space(.//italic/text()), 'COMMENTARY ON') or starts-with(normalize-space(.//italic2/text()), 'COMMENTARY ON'))]">
+			<xsl:when test="ancestor::list/preceding-sibling::p[starts-with(normalize-space(), $commentary_on) and 
+							(starts-with(normalize-space(.//italic/text()), $commentary_on) or starts-with(normalize-space(.//italic2/text()), $commentary_on))]">
 				<!-- no italic -->
 				<xsl:apply-templates />
 			</xsl:when>
@@ -2265,8 +2268,8 @@
 	</xsl:template>
 	
 	<xsl:template match="*[local-name() = 'italic' or local-name() = 'italic2'][parent::p[*[1][self::italic or self::italic2] and normalize-space(translate(./text(),'&#xa0;.','  ')) = ''] and 
-			parent::p/preceding-sibling::p[starts-with(normalize-space(), 'COMMENTARY ON') and 
-							(starts-with(normalize-space(.//italic/text()), 'COMMENTARY ON') or starts-with(normalize-space(.//italic2/text()), 'COMMENTARY ON'))]]/text()[1]">
+			parent::p/preceding-sibling::p[starts-with(normalize-space(), $commentary_on) and 
+							(starts-with(normalize-space(.//italic/text()), $commentary_on) or starts-with(normalize-space(.//italic2/text()), $commentary_on))]]/text()[1]">
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),'^[a-z]\)(\s|\h)+','. ')"/>
 	</xsl:template>
 	
