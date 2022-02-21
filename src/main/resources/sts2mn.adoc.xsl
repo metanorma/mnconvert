@@ -3421,6 +3421,8 @@
 		</xsl:if>
 	</xsl:template>
 	
+	<xsl:template match="graphic/text()[normalize-space()='']"/>
+	
 	<xsl:template match="graphic/caption" />
 	<xsl:template match="graphic/caption/title" mode="graphic-title">
 		<xsl:text>.</xsl:text>
@@ -3632,6 +3634,9 @@
 	
 	<xsl:template match="disp-formula">
 		<!-- <xsl:text>stem:[</xsl:text> -->
+		<xsl:if test="local-name(preceding-sibling::node()[normalize-space() != ''][1]) != 'p'">
+			<xsl:text>&#xa;&#xa;</xsl:text>
+		</xsl:if>
 		<xsl:text>[stem]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>++++</xsl:text>
@@ -3644,6 +3649,7 @@
 		<!-- <xsl:text>]</xsl:text> -->
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
+	<xsl:template match="disp-formula/text()[normalize-space()='']"/>
 	
 	<!-- MathML -->
 	<!-- https://www.metanorma.com/blog/2019-05-29-latex-math-stem/ -->
@@ -3667,6 +3673,9 @@
 		<xsl:value-of select="local-name()"/>
 		<xsl:text>&gt;</xsl:text>
 	</xsl:template>
+	
+	<!-- remove spaces between mathml tags -->
+	<xsl:template match="mml:*[*]/text()[normalize-space()='']"/>
 	
 	<!-- =============== -->
 	<!-- Definitions list (dl) -->
