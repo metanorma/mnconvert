@@ -56,6 +56,11 @@ public class mnconvert {
                     .argName("xsd-niso|dtd-iso|dtd-niso")
                     .required(true)
                     .build());
+            addOption(Option.builder("idref")
+                    .longOpt("idrefchecking")
+                    .desc("Enable checking of ID/IDREF constraints (for XSD NISO only)")
+                    .required(false)
+                    .build());
         }
     };
     
@@ -125,6 +130,11 @@ public class mnconvert {
                     .argName("xsd-niso|dtd-iso|dtd-niso")
                     .required(false)
                     .build());
+            addOption(Option.builder("idref")
+                    .longOpt("idrefchecking")
+                    .desc("Enable checking of ID/IDREF constraints (for XSD NISO only)")
+                    .required(false)
+                    .build());
             addOption(Option.builder("d")
                     .longOpt("debug")
                     .desc("print additional debug information into output file")
@@ -177,6 +187,7 @@ public class mnconvert {
                 
                 STSValidator validator = new STSValidator(argXmlIn, cmdSTSCheckOnly.getOptionValue("check-type"));
                 validator.setDebugMode(cmdSTSCheckOnly.hasOption("debug"));
+                validator.setIdRefChecking(cmdSTSCheckOnly.hasOption("idrefchecking"));
                 
                 if (!validator.check()) {
                     System.exit(ERROR_EXIT_CODE);
@@ -264,6 +275,7 @@ public class mnconvert {
                 converter.setInputXslPath(cmdMain.getOptionValue("xsl-file"));
                 converter.setOutputFilePath(cmdMain.getOptionValue("output"));
                 converter.setDebugMode(cmdMain.hasOption("debug"));
+                converter.setIdRefChecking(cmdMain.hasOption("idrefchecking"));
                 
                 if (!converter.process()) {
                     System.exit(ERROR_EXIT_CODE);

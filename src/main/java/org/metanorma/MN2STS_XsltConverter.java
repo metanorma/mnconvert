@@ -107,6 +107,7 @@ public class MN2STS_XsltConverter extends XsltConverter {
             
             // check agains XSD NISO, DTD NISO or DTD ISO
             STSValidator validator = new STSValidator(outputFilePath, checkType);
+            validator.setIdRefChecking(isIdRefChecking);
             if (!validator.check()) {
                 return false;
             }

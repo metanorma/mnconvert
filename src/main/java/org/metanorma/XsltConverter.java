@@ -27,6 +27,8 @@ public abstract class XsltConverter {
     
     protected boolean isDebugMode = false; // default no debug
     
+    protected boolean isIdRefChecking = false;
+    
     public void setInputFilePath(String inputFilePath) {
         this.inputFilePath = inputFilePath;
     }
@@ -50,7 +52,11 @@ public abstract class XsltConverter {
     public void setDebugMode(boolean isDebugMode) {
         this.isDebugMode = isDebugMode;
     }
-
+    
+    public void setIdRefChecking(boolean isIdRefChecking) {
+        this.isIdRefChecking = isIdRefChecking;
+    }
+    
     public String getDefaultOutputFilePath() {
         if (outputFilePath.isEmpty()) {
             File fInputFilePath = new File(inputFilePath);

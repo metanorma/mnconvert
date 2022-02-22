@@ -17,6 +17,12 @@ public class XSDValidator extends Validator {
 
     private static final Logger logger = Logger.getLogger(LoggerHelper.LOGGER_NAME);
     
+    protected boolean isIdRefChecking = false;
+    
+    public void setIdRefChecking(boolean isIdRefChecking) {
+        this.isIdRefChecking = isIdRefChecking;
+    }
+    
     public XSDValidator(File xml) {
         super(xml);
     }
@@ -26,8 +32,7 @@ public class XSDValidator extends Validator {
         
         String checkSrc = CheckAgainstMap.getMap().get(checkAgainst);
                 
-        //System.out.println("Validate XML againts XSD " + checkSrc + "...");
-        logger.log(Level.INFO, "Validate XML againts XSD {0}...", checkSrc);
+        logger.log(Level.INFO, "Validate XML against XSD {0}...", checkSrc);
         
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         // associate the schema factory with the resource resolver, which is responsible for resolving the imported XSD's
@@ -39,6 +44,8 @@ public class XSDValidator extends Validator {
             Source schemaFile = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), checkSrc.replaceAll("\\\\", "/")));
             Schema schema = schemaFactory.newSchema(schemaFile);
             javax.xml.validation.Validator validator = schema.newValidator();
+            // Disable checking of ID/IDREF constraints. Validation will not fail if there are non-unique ID values or dangling IDREF values in the document. 
+            validator.setFeature("http://apache.org/xml/features/validation/id-idref-checking", isIdRefChecking);
             validator.setErrorHandler(errorHandler);
             validator.validate(new StreamSource(xml));            
         } catch (Exception e) { 

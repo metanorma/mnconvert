@@ -31,6 +31,8 @@ public class STSValidator {
     
     private boolean isDebugMode = false; // default no debug
     
+    private static boolean isIdRefChecking = false;
+    
     public STSValidator(String xmlFilePath, String checkType) {
         this.xmlFilePath = xmlFilePath;
         if (checkType != null) {
@@ -38,6 +40,10 @@ public class STSValidator {
         }
     }
 
+    public void setIdRefChecking(boolean isIdRefChecking) {
+        this.isIdRefChecking = isIdRefChecking;
+    }
+        
     public void setDebugMode(boolean isDebugMode) {
         this.isDebugMode = isDebugMode;
     }
@@ -68,6 +74,7 @@ public class STSValidator {
 
             if (isXSDcheck) {
                 XSDValidator xsdValidator = new XSDValidator(fXMLin);
+                xsdValidator.setIdRefChecking(isIdRefChecking);
                 exceptions = xsdValidator.validate(checkAgainst);                
             } else {                
                 DTDValidator dtdValidator = new DTDValidator(fXMLin);

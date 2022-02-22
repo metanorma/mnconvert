@@ -42,8 +42,8 @@ public class DTDValidator extends Validator {
                 
         String checkSrc = CheckAgainstMap.getMap().get(checkAgainst);
         String checkSrcPath = "/" + new File(checkSrc).getParentFile();
-        //System.out.println("Validate XML againts DTD " + checkSrc + "...");
-        logger.log(Level.INFO, "Validate XML againts DTD {0}...", checkSrc);
+        
+        logger.log(Level.INFO, "Validate XML against DTD {0}...", checkSrc);
         
         try {        
             DocumentBuilderFactory dbfactory = DocumentBuilderFactory.newInstance();
