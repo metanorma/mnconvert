@@ -972,13 +972,13 @@
 		</contributor>
 	</xsl:template>
 	
-	<xsl:template match="iso-meta/std-ident/edition | nat-meta/std-ident/edition | reg-meta/std-ident/edition | std-meta/std-ident/edition" mode="bibdata">
+	<xsl:template match="*[self::iso-meta or self::nat-meta or self::reg-meta or self::std-meta]/std-ident/edition[normalize-space() != '']" mode="bibdata">
 		<edition>
 			<xsl:apply-templates mode="bibdata"/>
 		</edition>
 	</xsl:template>
 	
-	<xsl:template match="iso-meta/std-ident/version | nat-meta/std-ident/version | reg-meta/std-ident/version | std-meta/std-ident/version" mode="bibdata">
+	<xsl:template match="*[self::iso-meta or self::nat-meta or self::reg-meta or self::std-meta]/std-ident/version[normalize-space() != '']" mode="bibdata">
 		<version>
 			<xsl:variable name="version"><xsl:apply-templates mode="bibdata"/></xsl:variable>
 			<xsl:choose>
@@ -997,10 +997,18 @@
 		</version>
 	</xsl:template>
 	
-	<xsl:template match="iso-meta/content-language | nat-meta/content-language | reg-meta/content-language | std-meta/content-language" mode="bibdata">
+	<xsl:template match="*[self::iso-meta or self::nat-meta or self::reg-meta or self::std-meta]/content-language" mode="bibdata">
+		<xsl:variable name="language"><xsl:apply-templates mode="bibdata"/></xsl:variable>
 		<language>
-			<xsl:apply-templates mode="bibdata"/>
+			<xsl:if test="$semantic = 'false'">
+				<xsl:attribute name="current">true</xsl:attribute>
+			</xsl:if>
+			<xsl:value-of select="$language"/>
 		</language>
+		<xsl:choose>
+			<xsl:when test="$language = 'en'"><script current="true">Latn</script></xsl:when>
+		</xsl:choose>
+		
 	</xsl:template>
 		
 	<xsl:template match="iso-meta/doc-ident/release-version | nat-meta/doc-ident/release-version | reg-meta/doc-ident/release-version | std-meta/doc-ident/release-version | std-meta/release-version" mode="bibdata">
@@ -1537,6 +1545,9 @@
 			<xsl:if test="$model_term_source/modified">
 				<xsl:attribute name="status">modified</xsl:attribute>
 			</xsl:if>
+			<xsl:if test="$model_term_source/adapted">
+				<xsl:attribute name="status">adapted</xsl:attribute>
+			</xsl:if>
 			
 			<!-- put reference -->
 			<xsl:variable name="term_source_reference" select="$model_term_source/reference"/>
@@ -1545,6 +1556,12 @@
 					<xsl:with-param name="stdid" select="normalize-space($term_source_reference)"/>
 				</xsl:call-template>
 			</xsl:variable>
+			
+			<xsl:text>[SOURCE: </xsl:text>
+			
+			<xsl:if test="$model_term_source/adapted">
+				<xsl:text>Adapted from: </xsl:text>
+			</xsl:if>
 			
 			<origin bibitemid="{$term_source_reference}" type="inline" citeas="{$model_term_source/referenceText[1]}">
 				<!-- put locality (-ies) -->
@@ -1582,7 +1599,9 @@
 					</xsl:for-each>
 				</modification>
 			</xsl:if>
-
+			
+			<xsl:text>]</xsl:text>
+			
 		</termsource>
 	</xsl:template>
 	
@@ -2668,6 +2687,7 @@
 		<xsl:param name="abbreviation"/>
 		<xsl:choose>
 			<xsl:when test="$abbreviation = 'IEC'"><name>International Electrotechnical Commission</name></xsl:when>
+			<xsl:when test="$abbreviation = 'BSI'"><name>The British Standards Institution</name></xsl:when>
 		</xsl:choose>
 	</xsl:template>
 	

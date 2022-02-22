@@ -281,10 +281,10 @@
 		<!-- remove 'Adapted from:' or 'Adapted from' text -->
 		<xsl:variable name="text_">
 			<xsl:choose>
-				<xsl:when test="contains(., concat($adapted_from_text, ':')) and $OUTPUT_FORMAT = 'adoc'">
+				<xsl:when test="contains(., concat($adapted_from_text, ':'))"> <!-- and $OUTPUT_FORMAT = 'adoc' -->
 					<xsl:value-of select="normalize-space(substring-after(., concat($adapted_from_text, ':')))"/>
 				</xsl:when>
-				<xsl:when test="contains(., $adapted_from_text) and $OUTPUT_FORMAT = 'adoc'">
+				<xsl:when test="contains(., $adapted_from_text)"> <!--  and $OUTPUT_FORMAT = 'adoc' -->
 					<xsl:value-of select="normalize-space(substring-after(., $adapted_from_text))"/>
 				</xsl:when>
 				<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>

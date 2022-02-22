@@ -99,7 +99,7 @@
 				</xsl:apply-templates>
 				
 				<!-- Normative References -->
-				<xsl:apply-templates select="bibliography/references[@normative='true']" mode="elements"> <!-- [@id = '_normative_references'] -->
+				<xsl:apply-templates select="bibliography//references[@normative='true']" mode="elements"> <!-- [@id = '_normative_references'] -->
 					<xsl:with-param name="sectionNum" select="count(/*/sections/clause[@type='scope']) + 1"/>
 				</xsl:apply-templates>
 				
@@ -145,7 +145,7 @@
 				
 				<xsl:apply-templates select=".//appendix" mode="elements"/>
 				
-				<xsl:apply-templates select="bibliography/references[not(@normative='true')]" mode="elements"/>
+				<xsl:apply-templates select="bibliography//references[not(@normative='true')]" mode="elements"/>
 			
 			</xsl:for-each>
 			
@@ -307,7 +307,7 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:element name="{$wrapper}">
-						<element source_id="{$source_id}" id="{$id}" section="{$section}" section_prefix="{$section_prefix}" section_bolded="{$section_bolded}" parent="{$parent}" parent_id="{normalize-space($parent_id)}"/>
+						<element source_id="{$source_id}" id="{$id}" section="{$section}" section_prefix="{$section_prefix}" section_bolded="{$section_bolded}" parent="{$parent}" parent_id="{normalize-space($parent_id)}" type="{@type}"/>
 					</xsl:element>
 				</xsl:otherwise>
 			</xsl:choose>
@@ -385,10 +385,10 @@
 			
 			<xsl:call-template name="insertBack"/>
 						
-			<xsl:if test="normalize-space($debug) = 'true1'">
+			<xsl:if test="normalize-space($debug) = 'true'">
 				<xsl:text disable-output-escaping="yes">&lt;!-- </xsl:text>
 				<xsl:value-of select="count($elements//element)"/>
-				<!-- <xsl:copy-of select="$elements"/> -->
+				<xsl:copy-of select="$elements"/>
 				<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
 			</xsl:if>
 		</standard>
@@ -835,7 +835,7 @@
 						<xsl:apply-templates select="language" mode="front"/>
 					</language>
 					<release-version>
-						<xsl:apply-templates select="status/stage/@abbreviation" mode="front"/>
+						<xsl:apply-templates select="status/stage[1]/@abbreviation" mode="front"/>
 					</release-version>
 					<xsl:if test="$element_name = 'iso-meta'">
 						<xsl:call-template name="generateURN"/>
@@ -1657,7 +1657,9 @@
 																misc-container/semantic-metadata/metadata-update |
 																misc-container/semantic-metadata/international |
 																misc-container/semantic-metadata/isoviennaagreement |
-																misc-container/semantic-metadata/copyright-statement"
+																misc-container/semantic-metadata/copyright-statement |
+																misc-container/semantic-metadata/color-preface-background |
+																misc-container/presentation-metadata/*"
 																mode="front_check"/>
 
 	<!-- skip processed structure and deep down -->
@@ -1676,7 +1678,8 @@
 																ext/ics |
 																ext |
 																misc-container |
-																semantic-metadata
+																semantic-metadata |
+																presentation-metadata
 																" mode="front_check">
 		<xsl:apply-templates mode="front_check"/>
 	</xsl:template>
@@ -2424,8 +2427,21 @@
 		</tbx:source>
 	</xsl:template>
 	
+	<!-- remove '[SOURCE:'   and ']' -->
+	<xsl:template match="termsource/text()[starts-with(., '[SOURCE: ')]">
+		<xsl:value-of select="substring-after(., '[SOURCE: ')"/>
+	</xsl:template>
+	<xsl:template match="termsource/text()[last()][normalize-space() = ']']"/>
+	
 	<xsl:template match="origin">
-		<xsl:call-template name="eref"/>
+		<xsl:choose>
+			<xsl:when test="$bibitems_URN/bibitem[@id = current()/@bibitemid]/@type = 'standard'">
+				<xsl:call-template name="eref"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:call-template name="xref"/>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="localityStack">
@@ -2880,6 +2896,7 @@
 		<xsl:for-each select="$xml//bibitem[docidentifier]"> <!-- [@type = 'URN'] -->
 			<bibitem>
 				<xsl:copy-of select="@id"/>
+				<xsl:copy-of select="@type"/>
 				<xsl:variable name="urn_" select="docidentifier[@type = 'URN']"/>
 				<!-- remove URN urn: at start -->
 				<xsl:variable name="urn__" select="java:replaceAll(java:java.lang.String.new($urn_),'^(URN )?(urn:)?','')"/>
@@ -2987,7 +3004,6 @@
 			</std>
 		</xsl:if>
 	
-	
 		<xsl:if test="$organization = 'BSI'">
 			<!-- <xsl:copy-of select="$model_eref"/> -->
 			<std>
@@ -3028,7 +3044,8 @@
 				<std-ref>
 					<xsl:choose>
 						<xsl:when test="$organization = 'BSI'">
-							<xsl:value-of select="translate($model_eref/referenceText, ' ', '&#xA0;')"/> <!-- replace space to non-break space -->
+							<xsl:variable name="text_" select="translate($model_eref/referenceText, ' ', '&#xA0;')"/> <!-- replace space to non-break space -->
+							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text_),',(\s|\h)*$', '')"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:value-of select="$model_eref/referenceText"/>
@@ -3181,7 +3198,7 @@
 		<reference><xsl:value-of select="@bibitemid"/></reference>
 		<referenceText>
 			<xsl:choose>
-				<xsl:when test="count(node()[not(self::localityStack)]) &gt; 0"><xsl:apply-templates /></xsl:when> <!-- for presentation xml -->
+				<xsl:when test="count(node()[not(self::localityStack)]) &gt; 0"><xsl:apply-templates select="node()[not(self::localityStack)][1]"/></xsl:when> <!-- for presentation xml -->
 				<xsl:otherwise> <!-- for semantic xml - build string with localities -->
 					<xsl:value-of select="@citeas"/>
 				</xsl:otherwise>
@@ -3317,17 +3334,18 @@
 		</named-content>
 	</xsl:template>
 	
-	<xsl:template match="xref">
+	<xsl:template match="xref" name="xref">
 		<xsl:if test="normalize-space($debug) = 'true'">
 			<xsl:message>Start xref <xsl:number level="any"/></xsl:message>
 		</xsl:if>
-		<xsl:variable name="element_xref_" select="$elements//element[@source_id = current()/@target]"/>
+		<xsl:variable name="element_xref_" select="$elements//element[@source_id = current()/@target or @source_id = current()/@bibitemid]"/>
 		<xsl:variable name="element_xref" select="xalan:nodeset($element_xref_)"/>
 		
 		<xsl:variable name="section" select="$element_xref/@section"/>
 		<xsl:variable name="section_prefix" select="$element_xref/@section_prefix"/>
 		<xsl:variable name="section_bolded" select="$element_xref/@section_bolded"/>
 		<xsl:variable name="parent_id" select="$element_xref/@parent_id"/>
+		<xsl:variable name="type" select="$element_xref/@type"/>
 		
 		<!-- <xsl:variable name="id" select="$elements//element[@source_id = current()/@target]/@id"/> -->
 		<xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
@@ -3355,6 +3373,7 @@
 			<xsl:attribute name="rid">
 				<xsl:choose>
 					<xsl:when test="$parent_id != ''"><xsl:value-of select="$parent_id"/></xsl:when>
+					<xsl:when test="@bibitemid != ''"><xsl:value-of select="@bibitemid"/></xsl:when> <!-- from origin -->
 					<xsl:otherwise><xsl:value-of select="@target"/></xsl:otherwise>
 				</xsl:choose>
 			</xsl:attribute>
