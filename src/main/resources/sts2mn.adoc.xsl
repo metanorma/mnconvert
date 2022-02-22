@@ -3675,7 +3675,7 @@
 	</xsl:template>
 	
 	<!-- remove spaces between mathml tags -->
-	<xsl:template match="mml:*[*]/text()[normalize-space()='']"/>
+	<xsl:template match="mml:*[*]/text()[. = ' ']"/>
 	
 	<!-- =============== -->
 	<!-- Definitions list (dl) -->
@@ -3896,6 +3896,17 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
+		
+		<!-- <xsl:variable name="level_">
+			<xsl:choose>
+				<xsl:when test="ancestor::sec[position() &gt; 1][java:org.metanorma.utils.RegExHelper.matches($regexSectionTitle, normalize-space(title)) = 'true' or
+																			java:org.metanorma.utils.RegExHelper.matches($regexSectionLabel, normalize-space(label)) = 'true']">
+					<xsl:value-of select="$level__"/>
+				</xsl:when>
+				<xsl:otherwise><xsl:value-of select="$level__"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable> -->
+		
 		
 		<xsl:variable name="level_max" select="5"/>
 		<xsl:variable name="level">

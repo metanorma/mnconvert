@@ -187,6 +187,7 @@
 								$name = 'admitted' or
 								$name = 'deprecates' or
 								$name = 'domain' or
+								$name = 'bookmark' or
 								$name = 'em' or
 								$name = 'table' or
 								$name = 'dl' or
@@ -277,6 +278,7 @@
 			<xsl:variable name="parent">
 				<xsl:choose>
 					<xsl:when test="ancestor::annex and not($name = 'figure' or $name = 'table' or $name = 'annex' or $name = 'fn' or $name = 'formula')">annex</xsl:when>
+					<xsl:when test="$name = 'bookmark'"><xsl:value-of select="local-name(ancestor::*[@id][1])"/></xsl:when>
 					<xsl:otherwise><xsl:value-of select="$name"/></xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
@@ -290,6 +292,10 @@
 			
 			<xsl:variable name="wrapper" select="$name"/>
 			
+			<xsl:variable name="parent_id">
+				<xsl:if test="$name = 'bookmark'"><xsl:value-of select="ancestor::*[@id][1]/@id"/></xsl:if>
+			</xsl:variable>
+			
 			<xsl:choose>
 				<xsl:when test="$name = 'terms'">
 					<terms id="{@id}">
@@ -301,7 +307,7 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:element name="{$wrapper}">
-						<element source_id="{$source_id}" id="{$id}" section="{$section}" section_prefix="{$section_prefix}" section_bolded="{$section_bolded}" parent="{$parent}"/>
+						<element source_id="{$source_id}" id="{$id}" section="{$section}" section_prefix="{$section_prefix}" section_bolded="{$section_bolded}" parent="{$parent}" parent_id="{normalize-space($parent_id)}"/>
 					</xsl:element>
 				</xsl:otherwise>
 			</xsl:choose>
@@ -569,7 +575,7 @@
 	</xsl:template>
 	
 	<xsl:template name="insertBack">
-		<xsl:if test="annex or bibliography/references">
+		<xsl:if test="annex or bibliography/references or indexsect">
 			<back>
 				<xsl:if test="annex">
 					<app-group>
@@ -1967,7 +1973,7 @@
 					<xsl:apply-templates select="docidentifier"/>
 					<xsl:apply-templates select="title" mode="mixed_citation"/>
 				</xsl:when>
-				<xsl:when test="@type = 'standard' or docnumber">
+				<xsl:when test="@type = 'standard' or docnumber or fetched">
 					<std>
 						<xsl:variable name="urn" select="docidentifier[@type = 'URN']"/>
 						<xsl:variable name="docidentifier_URN" select="$bibitems_URN/bibitem[@id = $id]/urn"/>
@@ -1976,7 +1982,7 @@
 						  <std-ref>IEC&#160;62391&#8211;1</std-ref> -->
 						
 						<xsl:if test="$organization = 'IEC'">
-							<xsl:variable name="docidentifier" select="docidentifier[not(@type = 'metanorma' or @type = 'URN')][1]"/>
+							<xsl:variable name="docidentifier" select="docidentifier[not(@type = 'metanorma' or @type = 'metanorma-ordinal' or @type = 'URN')][1]"/>
 							<std-id>
 								<xsl:attribute name="std-id-link-type">
 									<xsl:choose>
@@ -2027,8 +2033,8 @@
 							</xsl:if>
 						</xsl:if>
 						
-						<xsl:if test="docidentifier[not(@type = 'metanorma' or @type = 'URN')]">
-							<std-ref><xsl:value-of select="docidentifier[not(@type = 'metanorma' or @type = 'URN')]"/></std-ref>
+						<xsl:if test="docidentifier[not(@type = 'metanorma' or @type = 'metanorma-ordinal' or @type = 'URN')]">
+							<std-ref><xsl:value-of select="docidentifier[not(@type = 'metanorma' or @type = 'metanorma-ordinal' or @type = 'URN')]"/></std-ref>
 						</xsl:if>
 						
 						<xsl:choose>
@@ -2084,6 +2090,7 @@
 	</xsl:template>
 	
 	<xsl:template match="bibitem/docidentifier[@type = 'metanorma']" priority="3"/>
+	<xsl:template match="bibitem/docidentifier[@type = 'metanorma-ordinal']" priority="3"/>
 	<xsl:template match="bibitem/docidentifier[@type = 'URN']" priority="3"/>
 	
 	<xsl:template match="formattedref/em" priority="2">
@@ -2123,6 +2130,13 @@
 		<xsl:copy-of select="$xref_fn"/>
 		
 	</xsl:template>
+	
+	<xsl:template match="bibitem/fetched"/>
+	
+	<xsl:template match="bibitem/uri/@type">
+		<xsl:attribute name="content-type"><xsl:value-of select="."/></xsl:attribute>
+	</xsl:template>
+
 	
 	<xsl:template match="fn " priority="2">
 		<xsl:variable name="number" select="@reference"/>
@@ -2706,6 +2720,7 @@
 			</xsl:if> -->
 			<xsl:copy-of select="@id"/>
 			<xsl:choose>
+				<xsl:when test="local-name(..) = 'ul' and ancestor::indexsect"><!-- no label for index item --></xsl:when>
 				<xsl:when test="local-name(..) = 'ul' and (../@type = 'bullet' or normalize-space(../@type) = '')">
 					<xsl:choose>
 						<xsl:when test="$organization = 'ISO'">
@@ -2795,7 +2810,12 @@
 				</xsl:when>
 			</xsl:choose>
 			
-			<xsl:apply-templates />
+			<xsl:choose>
+				<xsl:when test="ancestor::indexsect and not(p)">
+					<p><xsl:apply-templates /></p>
+				</xsl:when>
+				<xsl:otherwise><xsl:apply-templates /></xsl:otherwise>
+			</xsl:choose>
 			
 		</list-item>
 	</xsl:template>
@@ -2870,7 +2890,7 @@
 				
 				<urn><xsl:value-of select="$urn"/></urn>
 				<docidentifier>
-					<xsl:value-of select="docidentifier[not(@type = 'metanorma')][1]"/>
+					<xsl:value-of select="docidentifier[not(@type = 'metanorma' or @type = 'metanorma-ordinal')][1]"/>
 					<!-- <xsl:if test="starts-with(@id, 'hidden_bibitem_')"> -->
 					<xsl:if test="@hidden = 'true'">
 						<xsl:text> </xsl:text>
@@ -3204,6 +3224,10 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<xsl:template match="preferred/strong">
+		<xsl:apply-templates/>
+	</xsl:template>
+	
 	<xsl:template match="strong">
 		<bold><xsl:apply-templates /></bold>
 	</xsl:template>
@@ -3294,17 +3318,21 @@
 	</xsl:template>
 	
 	<xsl:template match="xref">
+		<xsl:if test="normalize-space($debug) = 'true'">
+			<xsl:message>Start xref <xsl:number level="any"/></xsl:message>
+		</xsl:if>
 		<xsl:variable name="element_xref_" select="$elements//element[@source_id = current()/@target]"/>
 		<xsl:variable name="element_xref" select="xalan:nodeset($element_xref_)"/>
 		
 		<xsl:variable name="section" select="$element_xref/@section"/>
 		<xsl:variable name="section_prefix" select="$element_xref/@section_prefix"/>
 		<xsl:variable name="section_bolded" select="$element_xref/@section_bolded"/>
+		<xsl:variable name="parent_id" select="$element_xref/@parent_id"/>
 		
 		<!-- <xsl:variable name="id" select="$elements//element[@source_id = current()/@target]/@id"/> -->
 		<xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
 		
-		<xsl:variable name="parent" select="$elements//element[@source_id = current()/@target]/@parent"/>
+		<xsl:variable name="parent" select="$element_xref/@parent"/>
 		<xsl:variable name="ref_type">
 			<xsl:choose>
         <xsl:when test="$parent = 'figure'">fig</xsl:when>
@@ -3321,10 +3349,15 @@
 			<xsl:message>WARNING: There is no ID/IDREF binding for IDREF '<xsl:value-of select="@target"/>'.</xsl:message>
 		</xsl:if>
 		<xref> <!-- ref-type="{$ref_type}" rid="{$id}" --> <!-- replaced by xsl:attribute name=... for save ordering -->
-      <xsl:attribute name="ref-type">
-        <xsl:value-of select="$ref_type"/>
-      </xsl:attribute>
-      <xsl:attribute name="rid"><xsl:value-of select="@target"/></xsl:attribute>
+			<xsl:attribute name="ref-type">
+				<xsl:value-of select="$ref_type"/>
+			</xsl:attribute>
+			<xsl:attribute name="rid">
+				<xsl:choose>
+					<xsl:when test="$parent_id != ''"><xsl:value-of select="$parent_id"/></xsl:when>
+					<xsl:otherwise><xsl:value-of select="@target"/></xsl:otherwise>
+				</xsl:choose>
+			</xsl:attribute>
 				<!-- <xsl:choose>
 					<xsl:when test="normalize-space($id) = ''"><xsl:value-of select="@target"/></xsl:when>
 					<xsl:otherwise><xsl:value-of select="$id"/></xsl:otherwise>
@@ -3359,15 +3392,16 @@
 							<xsl:copy-of select="$text"/>
 						</xsl:when>
 						<xsl:otherwise>
-							<xsl:apply-templates />
+							<xsl:apply-templates select="node()[not(local-name() = 'stem')]"/>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:when>
 				<xsl:otherwise> <!-- presentation xml -->
-					<xsl:apply-templates />
+					<xsl:apply-templates select="node()[not(local-name() = 'stem')]"/>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xref>
+		<xsl:apply-templates select="stem"/> <!-- put inline-formula outside xref -->
 	</xsl:template>
 	
   <xsl:template match="strong | em | *" mode="internalFormat">
@@ -3748,7 +3782,7 @@
 				<def-list>
 					<xsl:copy-of select="@id"/>
 					<xsl:if test="preceding-sibling::*[1][self::title][contains(normalize-space(), 'Abbrev')]">
-						<xsl:attribute name="type">abbreviations</xsl:attribute>
+						<xsl:attribute name="list-type">abbreviations</xsl:attribute>
 					</xsl:if>
 					<xsl:apply-templates mode="dl"/>
 				</def-list>
@@ -4138,11 +4172,15 @@
 	<xsl:template match="comment()[starts-with(., 'STS: ')]">
 		<xsl:value-of disable-output-escaping="yes" select="substring-after(., 'STS: ')"/>
 	</xsl:template>
+
+	<xsl:template match="bookmark">
+		<xsl:apply-templates/>
+	</xsl:template>
 	
 	<xsl:template match="indexsect">
 		<sec sec-type="index">
 			<xsl:copy-of select="@id"/>
-			<xsl:apply-templates/>
+			<xsl:apply-templates />
 		</sec>
 	</xsl:template>
 	
