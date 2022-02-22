@@ -362,7 +362,7 @@
 		<xsl:apply-templates select="$xml" mode="xml"/>
     
 		<xsl:variable name="endTime" select="java:getTime(java:java.util.Date.new())"/>
-		<xsl:if test="$debug = 'true'">
+		<xsl:if test="normalize-space($debug) = 'true'">
 			<xsl:message>DEBUG: processing time <xsl:value-of select="$endTime - $startTime"/> msec.</xsl:message>
 		</xsl:if>
 	</xsl:template>
@@ -379,10 +379,10 @@
 			
 			<xsl:call-template name="insertBack"/>
 						
-			<xsl:if test="$debug = 'true1'">
+			<xsl:if test="normalize-space($debug) = 'true1'">
 				<xsl:text disable-output-escaping="yes">&lt;!-- </xsl:text>
 				<xsl:value-of select="count($elements//element)"/>
-				<xsl:copy-of select="$elements"/>
+				<!-- <xsl:copy-of select="$elements"/> -->
 				<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
 			</xsl:if>
 		</standard>
@@ -2173,7 +2173,7 @@
 		<xsl:param name="sectionNum"/>
 		<xsl:param name="sectionNumSkew" select="0"/>
 		<xsl:param name="processFloatingTitle">false</xsl:param>
-		<xsl:if test="$debug = 'true'">
+		<xsl:if test="normalize-space($debug) = 'true'">
 			<xsl:message>DEBUG: <xsl:value-of select="local-name()"/><xsl:text> processing </xsl:text>
 				<xsl:choose>
 					<xsl:when test="local-name() = 'clause'">
@@ -3317,6 +3317,9 @@
 			</xsl:choose>
 		</xsl:variable>
 		<!-- parent=<xsl:value-of select="$parent"/> -->
+		<xsl:if test="not($element_xref)">
+			<xsl:message>WARNING: There is no ID/IDREF binding for IDREF '<xsl:value-of select="@target"/>'.</xsl:message>
+		</xsl:if>
 		<xref> <!-- ref-type="{$ref_type}" rid="{$id}" --> <!-- replaced by xsl:attribute name=... for save ordering -->
       <xsl:attribute name="ref-type">
         <xsl:value-of select="$ref_type"/>
