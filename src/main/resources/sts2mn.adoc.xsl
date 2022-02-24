@@ -2665,12 +2665,20 @@
 	</xsl:template>
 	
 	<xsl:template match="table">
-		<xsl:if test="parent::array">
-			<xsl:if test="parent::array/@id">
-				<xsl:text>[[array_</xsl:text><xsl:value-of select="parent::array/@id"/><xsl:text>]]&#xa;</xsl:text>
-			</xsl:if>
-			<xsl:text>[%unnumbered]&#xa;</xsl:text>
+		
+		<xsl:if test="parent::array/@id">
+			<xsl:text>[[array_</xsl:text><xsl:value-of select="parent::array/@id"/><xsl:text>]]&#xa;</xsl:text>
 		</xsl:if>
+		
+		<xsl:choose>
+			<xsl:when test="ancestor::table-wrap and not(ancestor::table-wrap/label)"><!-- no need to put [%unnumbered] here, see template for table-wrap--></xsl:when>
+			<xsl:when test="ancestor::table-wrap/@content-type = 'ace-table' or 
+					(ancestor::table-wrap and preceding-sibling::*[1][self::table]) or
+					(parent::array/@content-type = 'fig-index' or parent::array/@content-type = 'figure-index') or
+					parent::array">
+				<xsl:text>[%unnumbered]&#xa;</xsl:text>
+			</xsl:when>
+		</xsl:choose>
 		
 		<xsl:if test="(parent::array/@content-type = 'fig-index' or parent::array/@content-type = 'figure-index') and parent::array/label">
 			<xsl:text>.</xsl:text>
@@ -2795,11 +2803,11 @@
 			<xsl:if test="ancestor::table-wrap/table-wrap-foot[count(*[local-name() != 'fn-group' and local-name() != 'fn' and local-name() != 'non-normative-note']) != 0]">
 				<option>footer</option>
 			</xsl:if>
-			<xsl:if test="ancestor::table-wrap/@content-type = 'ace-table' or 
+			<!-- <xsl:if test="ancestor::table-wrap/@content-type = 'ace-table' or 
 					(ancestor::table-wrap and preceding-sibling::*[1][self::table]) or
 					(parent::array/@content-type = 'fig-index' or parent::array/@content-type = 'figure-index')">
 				<option>unnumbered</option>
-			</xsl:if>
+			</xsl:if> -->
 		</xsl:variable>
 		<xsl:if test="count(xalan:nodeset($options)/option) != 0">
 			<xsl:text>,</xsl:text>
