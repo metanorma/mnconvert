@@ -2671,7 +2671,7 @@
 		</xsl:if>
 		
 		<xsl:choose>
-			<xsl:when test="ancestor::table-wrap and not(ancestor::table-wrap/label)"><!-- no need to put [%unnumbered] here, see template for table-wrap--></xsl:when>
+			<xsl:when test="parent::table-wrap and not(parent::table-wrap/label) and not(preceding-sibling::*[1][self::table])"><!-- no need to put [%unnumbered] here, see template for table-wrap--></xsl:when>
 			<xsl:when test="ancestor::table-wrap/@content-type = 'ace-table' or 
 					(ancestor::table-wrap and preceding-sibling::*[1][self::table]) or
 					(parent::array/@content-type = 'fig-index' or parent::array/@content-type = 'figure-index') or
