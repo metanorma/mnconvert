@@ -1000,15 +1000,21 @@
 	<xsl:template match="*[self::iso-meta or self::nat-meta or self::reg-meta or self::std-meta]/content-language" mode="bibdata">
 		<xsl:variable name="language"><xsl:apply-templates mode="bibdata"/></xsl:variable>
 		<language>
-			<xsl:if test="$semantic = 'false'">
+			<xsl:if test="$type_xml = 'presentation'">
 				<xsl:attribute name="current">true</xsl:attribute>
 			</xsl:if>
 			<xsl:value-of select="$language"/>
 		</language>
 		<xsl:choose>
-			<xsl:when test="$language = 'en'"><script current="true">Latn</script></xsl:when>
+			<xsl:when test="$language = 'en'">
+				<script>
+					<xsl:if test="$type_xml = 'presentation'">
+						<xsl:attribute name="current">true</xsl:attribute>
+					</xsl:if>
+					<xsl:text>Latn</xsl:text>
+				</script>
+			</xsl:when>
 		</xsl:choose>
-		
 	</xsl:template>
 		
 	<xsl:template match="iso-meta/doc-ident/release-version | nat-meta/doc-ident/release-version | reg-meta/doc-ident/release-version | std-meta/doc-ident/release-version | std-meta/release-version" mode="bibdata">
@@ -1055,6 +1061,7 @@
 				</xsl:attribute>
 				<xsl:value-of select="$stage"/>
 			</stage>
+			
 			<substage>
 				<xsl:attribute name="abbreviation">
 					<xsl:choose>
@@ -1429,9 +1436,20 @@
 	
 	<xsl:template match="tbx:definition">
 		<definition>
-			<p>
-				<xsl:apply-templates />
-			</p>
+			<xsl:choose>
+				<xsl:when test="$type_xml = 'presentation'">
+					<p>
+						<xsl:apply-templates />
+					</p>
+				</xsl:when>
+				<xsl:otherwise>
+					<verbal-definition>
+						<p>
+							<xsl:apply-templates />
+						</p>
+					</verbal-definition>
+				</xsl:otherwise>
+			</xsl:choose>
 		</definition>
 	</xsl:template>
 	
@@ -1456,6 +1474,12 @@
 	
 	<xsl:template match="tbx:note">
 		<termnote>
+			<xsl:if test="$type_xml = 'presentation'">
+				<name>
+					<xsl:text>NOTE</xsl:text>
+					<xsl:if test="count(../tbx:note) &gt; 1"><xsl:text> </xsl:text><xsl:number /></xsl:if>
+				</name>
+			</xsl:if>
 			<p>
 				<xsl:apply-templates />
 			</p>
@@ -1491,13 +1515,16 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:element name="{$element_name}">
-					<xsl:call-template name="createTermElement"/>
+					<xsl:call-template name="createTermElement">
+						<xsl:with-param name="element_name" select="$element_name"/>
+					</xsl:call-template>
 				</xsl:element>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template name="createTermElement">
+		<xsl:param name="element_name"/>
 		<xsl:variable name="termType" select="normalize-space(../tbx:termType/@value)"/>
 		<xsl:if test="$termType != ''">
 			<xsl:attribute name="type">
@@ -1507,7 +1534,12 @@
 				</xsl:choose>
 			</xsl:attribute>
 		</xsl:if>
-		<xsl:apply-templates />
+		<xsl:choose>
+			<xsl:when test="$type_xml = 'presentation' and $element_name = 'preferred'">
+				<strong><xsl:apply-templates /></strong>
+			</xsl:when>
+			<xsl:otherwise><xsl:apply-templates /></xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="tbx:normativeAuthorization"/>
@@ -1580,14 +1612,18 @@
 						</xsl:for-each>
 					</localityStack>
 				</xsl:if>
-				<!-- put reference text -->
-				<xsl:for-each select="$model_term_source/referenceText[normalize-space() != '']">
-					<!-- <xsl:value-of select="."/> -->
-					<xsl:copy-of select="./node()"/>
-					<xsl:if test="following-sibling::referenceText[normalize-space() != '']">
-						<xsl:text>,</xsl:text>
-					</xsl:if>
-				</xsl:for-each>
+				
+				<xsl:if test="$type_xml = 'presentation'">
+					<!-- put reference text -->
+					<xsl:for-each select="$model_term_source/referenceText[normalize-space() != '']">
+						<!-- <xsl:value-of select="."/> -->
+						<xsl:copy-of select="./node()"/>
+						<xsl:if test="following-sibling::referenceText[normalize-space() != '']">
+							<xsl:text>,</xsl:text>
+						</xsl:if>
+					</xsl:for-each>
+				</xsl:if>
+				
 			</origin>
 			<!-- put modified text (or just indication, i.e. comma ',') -->
 			<xsl:if test="$model_term_source/modified">
@@ -1620,7 +1656,9 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<note>
-					<xsl:apply-templates select="label" mode="note_label" />
+					<xsl:if test="$type_xml = 'presentation'">
+						<xsl:apply-templates select="label" mode="note_label" />
+					</xsl:if>
 					<xsl:apply-templates />
 				</note>
 			</xsl:otherwise>
@@ -1792,7 +1830,10 @@
 	</xsl:template>
 	
 	<xsl:template match="table-wrap/label" mode="table_label">
-		<xsl:apply-templates/><xsl:text> &#8212; </xsl:text>
+		<xsl:if test="$type_xml = 'presentation'">
+			<!-- Table 1 - -->
+			<xsl:apply-templates/><xsl:text> &#8212; </xsl:text>
+		</xsl:if>
 	</xsl:template>
 	
 	<!-- table/col processing -->
@@ -2012,16 +2053,20 @@
 					</xsl:for-each>
 				</localityStack>
 			</xsl:if>
-			<!-- put reference text -->
-			<xsl:for-each select="$model_std/referenceText[normalize-space() != '']">
-				<xsl:value-of select="."/>
-				<xsl:if test="following-sibling::referenceText[normalize-space() != '']">
-					<xsl:text>,</xsl:text>
-				</xsl:if>
-			</xsl:for-each>
-			<xsl:for-each select="$model_std/not_locality">
-				<xsl:text> </xsl:text><xsl:value-of select="."/>
-			</xsl:for-each>
+			
+			<xsl:if test="$type_xml = 'presentation'">
+				<!-- put reference text -->
+				<xsl:for-each select="$model_std/referenceText[normalize-space() != '']">
+					<xsl:value-of select="."/>
+					<xsl:if test="following-sibling::referenceText[normalize-space() != '']">
+						<xsl:text>,</xsl:text>
+					</xsl:if>
+				</xsl:for-each>
+				<xsl:for-each select="$model_std/not_locality">
+					<xsl:text> </xsl:text><xsl:value-of select="."/>
+				</xsl:for-each>
+			</xsl:if>
+			
 			<xsl:apply-templates select=".//processing-instruction()"/>
 		</eref>
 	</xsl:template>
@@ -2170,7 +2215,9 @@
 			
 			<xsl:otherwise>
 				<xref target="{@rid}">
-					<xsl:apply-templates />
+					<xsl:if test="$type_xml = 'presentation'">
+						<xsl:apply-templates />
+					</xsl:if>
 				</xref>		
 			</xsl:otherwise>
 		</xsl:choose>
