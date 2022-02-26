@@ -1978,8 +1978,8 @@
 				<xsl:for-each select="$model_term_source/referenceText[normalize-space() != '']">
 					<xsl:if test="not(starts-with(normalize-space(.), 'footnote:'))">
 						<xsl:text>,</xsl:text>
+						<xsl:value-of select="."/>
 					</xsl:if>
-					<xsl:value-of select="."/>
 				</xsl:for-each>
 			</xsl:variable>
 			
@@ -4917,7 +4917,505 @@
 	<!-- self-testing -->
 	<!-- =============== -->
 	<xsl:template name="self_testing">
+		<xsl:call-template name="self_testing_std"/>
 		<xsl:call-template name="self_testing_termsource"/>
+	</xsl:template>
+	
+	<xsl:template name="self_testing_std">
+		<xsl:variable name="data">
+			<item>
+				<source>
+					<std>
+						<std-ref>EN 12973:2020<?doi https://doi.org/10.3403/30314082?></std-ref>
+					</std>
+				</source>
+				<destination>
+					<xsl:text>&lt;&lt;EN_12973_2020,EN 12973:2020&gt;&gt;</xsl:text>
+				</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="BS EN 12973:2000" type="dated">
+						<std-ref>BS EN 12973:2000<?doi https://doi.org/10.3403/01921654?>
+						</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;BS_EN_12973_2000&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>CEN/TS 16555‑1<?doi https://doi.org/10.3403/PDCENTS16555?>
+						</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;CEN_TS_16555_1,CEN/TS 16555‑1&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>1.2 of<std-ref>EN ISO 13485:2012</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;EN_ISO_13485_2012,clause=1.2,EN ISO 13485:2012&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="iso:std:iso:13485:ed-1:en" type="dated">
+						<std-ref>ISO 13485:1996</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;ISO_13485_1996&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>Clause 1 of<std-ref>EN ISO 13485:2012</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;EN_ISO_13485_2012,clause=1,EN ISO 13485:2012&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="iso:std:iso:13485:ed-1:en" type="dated">
+						<std-ref>ISO 13485:2003/Cor.1:2009</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;ISO_13485_2003_Cor.1_2009&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="EN ISO 13485">7.3.7 of <std-ref>EN ISO 13485</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;EN_ISO_13485,clause=7.3.7,EN ISO 13485&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>IEC 60601-1:2005</std-ref>, definition 3.4</std>
+				</source>
+				<destination>&lt;&lt;IEC_60601_1_2005,locality:definition=3.4&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>ISO 18113-1</std-ref>:—, definition 3.29</std>
+				</source>
+				<destination>&lt;&lt;ISO_18113_1,locality:definition=3.29&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>IEC 62366</std-ref>:—, Annexes B and D.1.3</std>
+				</source>
+				<destination>&lt;&lt;IEC_62366,annex=B,annex=D.1.3&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="iso:std:iso:13485:ed-2:en:clause:7" type="dated">Clause 7 of<std-ref>ISO 13485:2003</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;ISO_13485_2003,clause=7&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="iso:std:iso:13485:ed-2:en:clause:8.2" type="dated">8.2 of<std-ref>ISO 13485:2003</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;ISO_13485_2003,clause=8.2&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="iso:std:iso:14155:-1:ed-1:en:clause:A" type="dated">Annex A of<std-ref>ISO 14155-1:2003</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;ISO_14155_1_2003,annex=A&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>ISO 13485:2003</std-ref>
+						<xref ref-type="bibr" rid="biblref_8">
+							<sup>[8]</sup>
+						</xref>, 7.3.4</std>
+				</source>
+				<destination>&lt;&lt;ISO_13485_2003,clause=7.3.4&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>IEC 60300-3-9:1995</std-ref>
+						<xref ref-type="bibr" rid="biblref_21">
+							<sup>[21]</sup>
+						</xref>, A.5</std>
+				</source>
+				<destination>&lt;&lt;IEC_60300_3_9_1995,annex=A.5&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>Clause 1 of<std-ref>EN ISO 14971:2012</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;EN_ISO_14971_2012,clause=1,EN ISO 14971:2012&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="93/42/EEC" type="dated">
+						<std-ref>93/42/EEC</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;93_42_EEC,93/42/EEC&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>6.2 of<std-ref>ISO 14971</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;ISO_14971,clause=6.2&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>2.15 and in 6.4 of<std-ref>ISO 14971</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;ISO_14971,clause=2.15,clause=6.4&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>D.8 of<std-ref>ISO 14971</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;ISO_14971,annex=D.8&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>ISO Guide 73:2009</std-ref>, 3.5.1.3</std>
+				</source>
+				<destination>&lt;&lt;ISO_Guide_73_2009,clause=3.5.1.3&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="iso:std:iso:guide:73:ed-1:en:clause:3.6.1.3" type="dated">
+						<std-ref>ISO Guide 73:2009</std-ref>, 3.6.1.3</std>
+				</source>
+				<destination>&lt;&lt;ISO_Guide_73_2009,clause=3.6.1.3&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="iso:std:iso:ts:9002:ed-1:en:clause:4" type="dated">
+						<std-ref>ISO/TS 9002:2016<?doi https://doi.org/10.3403/30330644?>
+						</std-ref>, Clause 4</std>
+				</source>
+				<destination>&lt;&lt;ISO_TS_9002_2016,clause=4,ISO/TS 9002:2016&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="iso:std:iso:44001:ed-1:en:clause:F" type="dated">
+						<std-ref>ISO 44001:2017<?doi https://doi.org/10.3403/30353016?>
+						</std-ref>, Annex F</std>
+				</source>
+				<destination>&lt;&lt;ISO_44001_2017,annex=F&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="iso:std:iso:44001:ed-1:en:clause:3.10" type="dated">
+						<std-ref>ISO 44001:2017<?doi https://doi.org/10.3403/30353016?>
+						</std-ref>, 3.10</std>
+				</source>
+				<destination>&lt;&lt;ISO_44001_2017,clause=3.10&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>ISO 44001:2017<?doi https://doi.org/10.3403/30353016?>
+						</std-ref>8.2.7 and 8.3.5</std>
+				</source>
+				<destination>&lt;&lt;ISO_44001_2017,clause=8.2.7,clause=8.3.5&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>ISO 10667 series</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;ISO_10667_series&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>ANSI/AAMI ST79</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;ANSI_AAMI_ST79,ANSI/AAMI ST79&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="iso:std:iso:11137:en" type="undated">
+						<std-ref>ISO 11137 (all parts)</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;ISO_11137__all_parts_&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>JIS P-8144</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;JIS_P_8144,JIS P-8144&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="iso:std:iso-iec:27001:en:clause:A" type="undated">Annex A of<std-ref>ISO/IEC 27001<?doi https://doi.org/10.3403/30126472U?>
+						</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;ISO_IEC_27001,annex=A,ISO/IEC 27001&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="iso:std:iso-iec:27002:ed-2:en:clause:18.1.4" type="dated">18.1.4 of<std-ref>ISO/IEC 27002:2013<?doi https://doi.org/10.3403/30186138?>
+						</std-ref>
+					</std>
+				</source>
+				<destination>&lt;&lt;ISO_IEC_27002_2013,clause=18.1.4,ISO/IEC 27002:2013&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS 5839‑1:2013<?doi https://doi.org/10.3403/30260279?>
+						</std-ref>, <bold>29.2</bold>
+					</std>
+				</source>
+				<destination>&lt;&lt;BS_5839_1_2013,clause=29.2&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS 9999:2017<?doi https://doi.org/10.3403/30314118?>
+						</std-ref>, Clause <bold>4</bold>
+					</std>
+				</source>
+				<destination>&lt;&lt;BS_9999_2017,clause=4&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS 9999:2017<?doi https://doi.org/10.3403/30314118?>
+						</std-ref>,<bold>8.3.2</bold>
+					</std>
+				</source>
+				<destination>&lt;&lt;BS_9999_2017,clause=8.3.2&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS 9999:2017<?doi https://doi.org/10.3403/30314118?>
+						</std-ref>, Section <bold>9</bold>
+					</std>
+				</source>
+				<destination>&lt;&lt;BS_9999_2017,section=9&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS 9999:2017<?doi https://doi.org/10.3403/30314118?>
+						</std-ref>, Table 4</std>
+				</source>
+				<destination>&lt;&lt;BS_9999_2017,table=4&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS 9999:2017<?doi https://doi.org/10.3403/30314118?>
+						</std-ref>,<bold>6.5</bold>
+					</std>
+				</source>
+				<destination>&lt;&lt;BS_9999_2017,clause=6.5&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS 9999:2017<?doi https://doi.org/10.3403/30314118?>
+						</std-ref>, Clause <bold>15</bold> to Clause <bold>17</bold>
+					</std>
+				</source>
+				<destination>&lt;&lt;BS_9999_2017,clause=15-17&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS 9999:2017<?doi https://doi.org/10.3403/30314118?>
+						</std-ref>,<bold>16.6.1</bold> and Table 12</std>
+				</source>
+				<destination>&lt;&lt;BS_9999_2017,clause=16.6.1,table=12&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS 9990:2015<?doi https://doi.org/10.3403/30301828?>
+						</std-ref>,<bold>4.1.1</bold>
+					</std>
+				</source>
+				<destination>&lt;&lt;BS_9990_2015,clause=4.1.1&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS EN 45545‑2:2013+A1</std-ref>, R7</std>
+				</source>
+				<destination>&lt;&lt;BS_EN_45545_2_2013_A1,annex=R7&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS 9999:2017<?doi https://doi.org/10.3403/30314118?>
+						</std-ref>, Table 23 or Table 24</std>
+				</source>
+				<destination>&lt;&lt;BS_9999_2017,table=23,table=24&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS 9999:2017<?doi https://doi.org/10.3403/30314118?>
+						</std-ref>, Table 4 and <bold>6.5</bold>
+					</std>
+				</source>
+				<destination>&lt;&lt;BS_9999_2017,table=4,table=6.5&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS ISO 44001:2017</std-ref>, Table C1</std>
+				</source>
+				<destination>&lt;&lt;BS_ISO_44001_2017,table=C1&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS ISO 44001</std-ref>, Clause 4 to Clause 10</std>
+				</source>
+				<destination>&lt;&lt;BS_ISO_44001,clause=4-10&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS EN 206:2013+A1:2016</std-ref>, <bold>5.2.5.2.3</bold>
+					</std>
+				</source>
+				<destination>&lt;&lt;BS_EN_206_2013_A1_2016,clause=5.2.5.2.3&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS 8500‑1:2015+A2:2019</std-ref>,<bold>A.8.1</bold>
+					</std>
+				</source>
+				<destination>&lt;&lt;BS_8500_1_2015_A2_2019,annex=A.8.1&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS EN 206:2013+A1:2016</std-ref>, <bold>8.1</bold> and <bold>8.2.1.2</bold>
+					</std>
+				</source>
+				<destination>&lt;&lt;BS_EN_206_2013_A1_2016,clause=8.1,clause=8.2.1.2&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="BS 5482-1" type="undated">
+						<bold>
+							<std-ref>BS 5482‑1<?doi https://doi.org/10.3403/01017825U?>
+							</std-ref>
+						</bold>
+					</std>
+				</source>
+				<destination>*&lt;&lt;BS_5482_1&gt;&gt;*</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="BS EN 806-1" type="undated">
+						<bold>
+							<std-ref>BS EN 806‑1</std-ref>
+						</bold>
+					</std>
+				</source>
+				<destination>*&lt;&lt;BS_EN_806_1&gt;&gt;*</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS EN ISO 19011:2018<?doi https://doi.org/10.3403/30354835?>
+						</std-ref>,<bold>3.3</bold> and <bold>3.2</bold>
+					</std>
+				</source>
+				<destination>&lt;&lt;BS_EN_ISO_19011_2018,clause=3.3,clause=3.2&gt;&gt;</destination>
+			</item>
+			
+		</xsl:variable>
+		
+		<xsl:for-each select="xalan:nodeset($data)//item">
+			<xsl:variable name="result">
+				<xsl:apply-templates select="source"/>
+			</xsl:variable>
+			<xsl:call-template name="print_difference">
+				<xsl:with-param name="result" select="$result"/>
+				<xsl:with-param name="destination" select="destination"/>
+			</xsl:call-template>
+		</xsl:for-each>
+		
 	</xsl:template>
 	
 	<xsl:template name="self_testing_termsource">

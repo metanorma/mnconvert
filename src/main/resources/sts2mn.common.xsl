@@ -23,7 +23,7 @@
 	-->
 	<xsl:template name="build_sts_model_std">
 	
-		<xsl:variable name="clause">
+		<xsl:variable name="clause_from_std-id">
 			<xsl:choose>
 				<xsl:when test="std-id"> <!-- for IEC -->
 					 <xsl:value-of select="substring-after(substring-after(std-id, '#'), '-')"/>
@@ -35,15 +35,28 @@
 		</xsl:variable>
 		<xsl:variable name="locality">
 			<xsl:choose>
-				<xsl:when test="$clause != '' and translate(substring($clause, 1, 1), '0123456789', '') = ''"><locality>clause=<xsl:value-of select="$clause"/></locality></xsl:when>
-				<xsl:when test="$clause != ''"><locality>annex=<xsl:value-of select="$clause"/></locality></xsl:when>
-				<xsl:when test="not(@std-id) or $clause = ''">
+				<xsl:when test="$clause_from_std-id != ''">
+					<locality>
+						<xsl:choose>
+							<xsl:when test="translate(substring($clause_from_std-id, 1, 1), '0123456789', '') = ''">clause=</xsl:when>
+							<xsl:otherwise>annex=</xsl:otherwise>
+						</xsl:choose>
+						<xsl:value-of select="$clause_from_std-id"/>
+					</locality>
+				</xsl:when>
+				<xsl:when test="not(@std-id) or $clause_from_std-id = ''">
 					<!-- get text -->
 					<xsl:variable name="std_text_">
 						<xsl:choose>
 							<xsl:when test=".//std-ref">
 								<xsl:variable name="text">
-									<xsl:for-each select=".//std-ref/following-sibling::node()">
+									<xsl:for-each select=".//std-ref/preceding-sibling::node()">
+										<xsl:variable name="preceding_text1" select="java:replaceAll(java:java.lang.String.new(.),'(\s|\h)of(\s|\h)?$','')"/>
+										<!-- remove ' in ' from  '2.15 and in 6.4 of'  -->
+										<xsl:variable name="preceding_text2" select="java:replaceAll(java:java.lang.String.new($preceding_text1),' and in ',' and ')"/>
+										<xsl:value-of select="translate($preceding_text2, '&#xa0;', ' ')"/>
+									</xsl:for-each>
+									<xsl:for-each select=".//std-ref/following-sibling::node()[not(self::xref and @ref-type='bibr' and starts-with(., '['))]">
 										<xsl:value-of select="translate(., '&#xa0;', ' ')"/>
 									</xsl:for-each>
 								</xsl:variable>
@@ -57,7 +70,7 @@
 					
 					<!-- DEBUG: std_text_='<xsl:value-of select="$std_text_"/>' -->
 					
-					<!-- remove leading comma -->
+					<!-- remove leading ':', '—', comma -->
 					<xsl:variable name="std_text" select="normalize-space(java:replaceAll(java:java.lang.String.new($std_text_),'^:?—?,?(.*)$','$1'))"/>
 					<!-- replace ' to ' to '-' -->
 					<xsl:variable name="std_text1" select="java:replaceAll(java:java.lang.String.new($std_text),' to [cC]lause ','-')"/>
@@ -197,7 +210,7 @@
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:call-template name="getStdRef">
-							<xsl:with-param name="text" select="std-ref"/>
+							<xsl:with-param name="text" select=".//std-ref"/>
 						</xsl:call-template>
 					</xsl:otherwise>
 				</xsl:choose>
@@ -239,6 +252,10 @@
 			</xsl:if>
 		</xsl:if>
 	</xsl:template>
+
+	<!-- special case <std>...</std></std-ref><xref ref-type="bibr" ...><sup>[...]</sup></xref> -->
+	<xsl:template match="std[not(ancestor::ref)]/xref[@ref-type='bibr'][starts-with(sup,'[')]"/>
+								
 
 	<!-- ================= -->
 	<!-- END std model processing -->
