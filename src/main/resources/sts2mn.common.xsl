@@ -51,7 +51,7 @@
 							<xsl:when test=".//std-ref">
 								<xsl:variable name="text">
 									<xsl:for-each select=".//std-ref/preceding-sibling::node()">
-										<xsl:variable name="preceding_text1" select="java:replaceAll(java:java.lang.String.new(.),'(\s|\h)of(\s|\h)?$','')"/>
+										<xsl:variable name="preceding_text1" select="java:replaceAll(java:java.lang.String.new(.),'(\s|\h)(of|to)(\s|\h)?$','')"/>
 										<!-- remove ' in ' from  '2.15 and in 6.4 of'  -->
 										<xsl:variable name="preceding_text2" select="java:replaceAll(java:java.lang.String.new($preceding_text1),' and in ',' and ')"/>
 										<xsl:value-of select="translate($preceding_text2, '&#xa0;', ' ')"/>
@@ -80,10 +80,12 @@
 					<xsl:variable name="std_text5" select="java:replaceAll(java:java.lang.String.new($std_text4),' to ','-')"/>
 					
 					<!-- replace ' and|or Xxxxx ' to 'xxxxx' -->
-					<xsl:variable name="std_text6" select="java:replaceAll(java:java.lang.String.new($std_text5),'( and | or )[cC]lause',',clause')"/>
+					<!-- <xsl:variable name="std_text6" select="java:replaceAll(java:java.lang.String.new($std_text5),'( and | or )[cC]lause',',clause')"/>
 					<xsl:variable name="std_text7" select="java:replaceAll(java:java.lang.String.new($std_text6),'( and | or )[aA]nnex',',annex')"/>
 					<xsl:variable name="std_text8" select="java:replaceAll(java:java.lang.String.new($std_text7),'( and | or )[tT]able',',table')"/>
-					<xsl:variable name="std_text9" select="java:replaceAll(java:java.lang.String.new($std_text8),'( and | or )[sS]ection',',section')"/>
+					<xsl:variable name="std_text9" select="java:replaceAll(java:java.lang.String.new($std_text8),'( and | or )[sS]ection',',section')"/> -->
+					
+					<xsl:variable name="std_text9" select="$std_text5"/>
 					
 					<!-- replace  'Xxxxx' to 'xxxxx' -->
 					<xsl:variable name="std_text10" select="java:replaceAll(java:java.lang.String.new($std_text9),'[aA]nnexes','annex')"/>
@@ -94,19 +96,23 @@
 					
 					<xsl:variable name="std_text_lc_" select="$std_text14"/>
 					
+					<!-- <xsl:if test="$std_text_lc_ != '' and normalize-space($debug) = 'true'">
+						<xsl:message>DEBUG: std_text_lc_=<xsl:value-of select="$std_text_lc_"/>&#xa;</xsl:message>
+					</xsl:if> -->
+					
 					<xsl:variable name="std_text_lc">
 						<xsl:choose>
 							<xsl:when test="starts-with($std_text_lc_, 'annex')">
-								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),' and | or ',',annex ')"/>
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),'( and | or )(?!annex)','$1 annex ')"/> <!-- annex X and Y.Z' to 'annex X and annex Y.Z'  -->
 							</xsl:when>
 							<xsl:when test="starts-with($std_text_lc_, 'table')">
-								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),' and | or ',',table ')"/>
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),'( and | or )(?!table)','$1 table ')"/> <!-- table X and Y.Z' to 'table X and table Y.Z'  -->
 							</xsl:when>
 							<xsl:when test="starts-with($std_text_lc_, 'clause')">
-								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),' and | or ',',clause ')"/>
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),'( and | or )(?!clause)','$1 clause ')"/> <!-- clause X and Y.Z' to 'clause X and clause Y.Z'  -->
 							</xsl:when>
 							<xsl:when test="starts-with($std_text_lc_, 'section')">
-								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),' and | or ',',section ')"/>
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),'( and | or )(?!section)','$1 section ')"/> <!-- section X and Y.Z' to 'section X and section Y.Z'  -->
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:value-of select="$std_text_lc_"/>
@@ -114,25 +120,91 @@
 						</xsl:choose>
 					</xsl:variable>
 					
-					<!-- DEBUG:std_text_lc='<xsl:value-of select="$std_text_lc"/>' -->
+					<!-- <xsl:if test="$std_text_lc != '' and normalize-space($debug) = 'true'">
+						<xsl:message>std_text_lc=<xsl:value-of select="$std_text_lc"/>&#xa;</xsl:message>
+					</xsl:if> -->
+					
+					<xsl:variable name="std_text_lc_with_conjunctions_">
+						<xsl:call-template name="addLocalityStructure">
+							<xsl:with-param name="std_text" select="$std_text_lc"/>
+						</xsl:call-template>
+					</xsl:variable>
+					<xsl:variable name="std_text_lc_with_conjunctions" select="xalan:nodeset($std_text_lc_with_conjunctions_)"/>
+					
+					<!-- <xsl:if test="normalize-space($debug) = 'true'">
+						<xsl:message>
+							<xsl:text>DEBUG: &#xa;</xsl:text>
+							<xsl:for-each select="$std_text_lc_with_conjunctions/node()">
+								<xsl:choose>
+									<xsl:when test="self::text()">
+										<xsl:text>text:</xsl:text><xsl:value-of select="."/>
+										<xsl:text>&#xa;</xsl:text>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="local-name()"/>:<xsl:value-of select="."/>
+										<xsl:text>&#xa;</xsl:text>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:for-each>
+						</xsl:message>
+					</xsl:if> -->
+					
 					<xsl:choose>
 						<!-- <xsl:when test="contains($std_text_lc, 'clause') or contains($std_text_lc, 'annex') or contains($std_text_lc, 'table') or contains($std_text_lc, 'section')"> -->
-						<xsl:when test="starts-with($std_text_lc, 'clause') or starts-with($std_text_lc, 'annex') or starts-with($std_text_lc, 'table') or starts-with($std_text_lc, 'section')">
+						<!-- <xsl:when test="starts-with($std_text_lc, 'clause') or starts-with($std_text_lc, 'annex') or starts-with($std_text_lc, 'table') or starts-with($std_text_lc, 'section')"> -->
+						<xsl:when test="$std_text_lc_with_conjunctions/*[1][self::locality]"> <!-- if first element is 'clause', 'annex', 'table' or 'section' -->
 							<!-- <xsl:text>,</xsl:text> -->
-							<xsl:variable name="pairs" select="translate($std_text_lc, ' ', '=')"/>
-							<locality><xsl:value-of select="$pairs"/></locality>
+							<!-- <xsl:variable name="pairs" select="translate($std_text_lc, ' ', '=')"/>
+							<locality><xsl:value-of select="$pairs"/></locality> -->
+							
+							<!-- <xsl:for-each select="$std_text_lc_with_conjunctions/node()">
+								<xsl:choose>
+									<xsl:when test="self::text()">
+										<xsl:variable name="pairs" select="translate(., ' ', '=')"/>
+										<locality><xsl:value-of select="$pairs"/></locality>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:copy-of select="."/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:for-each> -->
+							
+							<xsl:copy-of select="$std_text_lc_with_conjunctions"/>
+							
 							<!-- <xsl:value-of select="java:toLowerCase(java:java.lang.String.new(substring-before($pair, '=')))"/>
 							<xsl:text>=</xsl:text>
 							<xsl:variable name="localityDestination" select="substring-after($pair, '=')"/>
 							<xsl:value-of select="$localityDestination"/> -->
 						</xsl:when>
-						<xsl:when test="contains($std_text_lc, 'clause') or contains($std_text_lc, 'annex') or contains($std_text_lc, 'table') or contains($std_text_lc, 'section')">
+						<!-- <xsl:when test="contains($std_text_lc, 'clause') or contains($std_text_lc, 'annex') or contains($std_text_lc, 'table') or contains($std_text_lc, 'section')"> -->
+						<xsl:when test="$std_text_lc_with_conjunctions/*[self::locality]"> <!-- if there is 'clause', 'annex', 'table' or 'section', but not first -->
 							<!-- <xsl:text>,</xsl:text> -->
-							<xsl:variable name="pairs" select="translate($std_text_lc, ' ', '=')"/>
+							<!-- <xsl:variable name="pairs" select="translate($std_text_lc, ' ', '=')"/>
 							<xsl:choose>
 								<xsl:when test="translate(substring($pairs, 1, 1), '0123456789', '') = ''"><locality>clause=<xsl:value-of select="$pairs"/></locality></xsl:when>
 								<xsl:otherwise><locality>annex=<xsl:value-of select="$pairs"/></locality></xsl:otherwise>
-							</xsl:choose>
+							</xsl:choose> -->
+							
+							<xsl:for-each select="$std_text_lc_with_conjunctions/*">
+								<xsl:choose>
+									<xsl:when test="self::localityValue and not(preceding-sibling::*[1][self::locality])">
+										<xsl:variable name="pairs" select="translate(., ' ', '=')"/>
+										<xsl:choose>
+											<xsl:when test="translate(substring($pairs, 1, 1), '0123456789', '') = ''">
+												<locality>clause</locality>
+											</xsl:when>
+											<xsl:otherwise>
+												<locality>annex</locality>
+											</xsl:otherwise>
+										</xsl:choose>
+										<xsl:copy-of select="."/> <!-- localityValue -->
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:copy-of select="."/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:for-each>
+							
 						</xsl:when>
 						<xsl:when test="contains($std_text_lc, 'definition')">
 							<xsl:variable name="pairs" select="translate($std_text_lc, ' ', '=')"/>
@@ -140,11 +212,13 @@
 						</xsl:when>
 						<xsl:when test="not(.//std-ref)"></xsl:when> <!-- <std std-id="ISO 13485:2016" type="dated">ISO 13485:2016</std> -->
 						<xsl:otherwise>
+						
+							<!-- SKIP -->
 							<xsl:variable name="parts">
-								<xsl:call-template name="split">
+								<!-- <xsl:call-template name="split">
 									<xsl:with-param name="pText" select="$std_text_lc"/>
 									<xsl:with-param name="sep" select="' '"/>
-								</xsl:call-template>
+								</xsl:call-template> -->
 							</xsl:variable>
 							<xsl:for-each select="xalan:nodeset($parts)//item">
 								<xsl:variable name="item_text" select="java:replaceAll(java:java.lang.String.new(.),'^(.*?),?$','$1')"/> <!-- remove trailing comma -->
@@ -156,6 +230,28 @@
 									<xsl:otherwise><locality>annex=<xsl:value-of select="java:toUpperCase(java:java.lang.String.new($item_text))"/></locality></xsl:otherwise>
 								</xsl:choose>
 							</xsl:for-each>
+							<!-- END SKIP -->
+							
+							<xsl:for-each select="$std_text_lc_with_conjunctions/*">
+								<xsl:choose>
+									<xsl:when test="self::localityValue">
+										<xsl:variable name="pairs" select="translate(., ' ', '=')"/>
+										<xsl:choose>
+											<xsl:when test="translate(substring($pairs, 1, 1), '0123456789', '') = ''">
+												<locality>clause</locality>
+											</xsl:when>
+											<xsl:otherwise>
+												<locality>annex</locality>
+											</xsl:otherwise>
+										</xsl:choose>
+										<xsl:copy-of select="."/> <!-- localityValue -->
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:copy-of select="."/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:for-each>
+							
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:when>
@@ -256,6 +352,31 @@
 	<!-- special case <std>...</std></std-ref><xref ref-type="bibr" ...><sup>[...]</sup></xref> -->
 	<xsl:template match="std[not(ancestor::ref)]/xref[@ref-type='bibr'][starts-with(sup,'[')]"/>
 								
+	<xsl:template name="addLocalityStructure">
+		<xsl:param name="std_text"/>
+		<!-- <xsl:message>std_text_lc=<xsl:value-of select="$std_text"/></xsl:message> -->
+		<xsl:variable name="parts_">
+			<xsl:call-template name="split">
+				<xsl:with-param name="pText" select="$std_text"/>
+				<xsl:with-param name="sep" select="' '"/>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name="parts" select="xalan:nodeset($parts_)"/>
+		
+		<xsl:for-each select="$parts/item">
+			<xsl:choose>
+				<xsl:when test="normalize-space() = 'clause' or normalize-space() = 'annex' or normalize-space() = 'table' or normalize-space() = 'section'">
+					<locality><xsl:value-of select="normalize-space()"/></locality>
+				</xsl:when>
+				<xsl:when test="normalize-space() = 'and' or normalize-space() = 'or'">
+					<localityConj><xsl:value-of select="."/></localityConj>
+				</xsl:when>
+				<xsl:when test="normalize-space() != ''">
+					<localityValue><xsl:value-of select="."/></localityValue>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:for-each>
+	</xsl:template>
 
 	<!-- ================= -->
 	<!-- END std model processing -->
@@ -776,6 +897,21 @@
 			<xsl:when test="contains($value, ';')"><xsl:value-of select="substring-before($value, ';')"/></xsl:when>
 			<xsl:otherwise><xsl:value-of select="$value"/></xsl:otherwise>
 		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template name="split">
+		<xsl:param name="pText" select="."/>
+		<xsl:param name="sep" select="'/'"/>
+		<xsl:if test="string-length($pText) &gt; 0">
+			<item>
+				<xsl:variable name="value" select="substring-before(concat($pText, $sep), $sep)"/>
+				<xsl:value-of select="normalize-space(translate($value, '&#xA0;', ' '))"/>
+			</item>
+			<xsl:call-template name="split">
+				<xsl:with-param name="pText" select="substring-after($pText, $sep)"/>
+				<xsl:with-param name="sep" select="$sep"/>
+			</xsl:call-template>
+		</xsl:if>
 	</xsl:template>
 	
 </xsl:stylesheet>

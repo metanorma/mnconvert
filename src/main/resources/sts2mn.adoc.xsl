@@ -1857,9 +1857,24 @@
 			<xsl:value-of select="$model_std/reference"/>
 			
 			<!-- put locality (-ies) -->
-			<xsl:for-each select="$model_std/locality[normalize-space() != '']">
-				<xsl:text>,</xsl:text>
-				<xsl:value-of select="."/>
+			<xsl:for-each select="$model_std/*[self::locality or self::localityValue or self::localityConj][normalize-space() != '']">
+				<xsl:choose>
+					<xsl:when test="self::localityValue">
+						<xsl:text>=</xsl:text>
+						<xsl:value-of select="."/>
+					</xsl:when>
+					<xsl:when test="self::localityConj">
+						<xsl:text>;</xsl:text>
+						<xsl:value-of select="."/>
+						<xsl:text>!</xsl:text>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:if test="not(preceding-sibling::*[1][self::localityConj])">
+							<xsl:text>,</xsl:text>
+						</xsl:if>
+						<xsl:value-of select="."/>
+					</xsl:otherwise>
+				</xsl:choose>
 			</xsl:for-each>
 			
 			<!-- put reference text -->
@@ -3854,21 +3869,6 @@
 	</xsl:template>
 	
 	
-	<xsl:template name="split">
-		<xsl:param name="pText" select="."/>
-		<xsl:param name="sep" select="'/'"/>
-		<xsl:if test="string-length($pText) &gt; 0">
-			<item>
-				<xsl:variable name="value" select="substring-before(concat($pText, $sep), $sep)"/>
-				<xsl:value-of select="normalize-space(translate($value, '&#xA0;', ' '))"/>
-			</item>
-			<xsl:call-template name="split">
-				<xsl:with-param name="pText" select="substring-after($pText, $sep)"/>
-				<xsl:with-param name="sep" select="$sep"/>
-			</xsl:call-template>
-		</xsl:if>
-	</xsl:template>
-	
 	<xsl:template name="getLevel">
 		<xsl:param name="addon">0</xsl:param>
 		<xsl:param name="calculated_level">0</xsl:param>
@@ -4791,7 +4791,9 @@
 	<!-- Remove 'Clause ' from text with '... Clause ' and next element 'xref' -->
 	<!-- Example: some text Clause <xref ...  -->
 	<xsl:template match="text()[contains(., 'Clause ')][following-sibling::*[1][self::xref]]" mode="remove_word_clause">
-		<xsl:message>text: <xsl:number level="any"/></xsl:message>
+		<xsl:if test="normalize-space($debug) = 'true'">
+			<xsl:message>text: <xsl:number level="any"/></xsl:message>
+		</xsl:if>
 		<xsl:variable name="xref_rid" select="following-sibling::*[1][self::xref]/@rid"/>
 		<!-- <xsl:variable name="is_clause_1stlevel_depth" select="count(//*[@id = $xref_rid]/parent::*[self::body or self::back]) &gt; 0"/> -->
 		<xsl:variable name="is_clause_1stlevel_depth" select="count(key('ids', $xref_rid)/parent::*[self::body or self::back]) &gt; 0"/>
@@ -5017,7 +5019,7 @@
 					<std>
 						<std-ref>IEC 62366</std-ref>:—, Annexes B and D.1.3</std>
 				</source>
-				<destination>&lt;&lt;IEC_62366,annex=B,annex=D.1.3&gt;&gt;</destination>
+				<destination>&lt;&lt;IEC_62366,annex=B;and!annex=D.1.3&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5096,7 +5098,7 @@
 					<std>2.15 and in 6.4 of<std-ref>ISO 14971</std-ref>
 					</std>
 				</source>
-				<destination>&lt;&lt;ISO_14971,clause=2.15,clause=6.4&gt;&gt;</destination>
+				<destination>&lt;&lt;ISO_14971,clause=2.15;and!clause=6.4&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5156,7 +5158,7 @@
 						<std-ref>ISO 44001:2017<?doi https://doi.org/10.3403/30353016?>
 						</std-ref>8.2.7 and 8.3.5</std>
 				</source>
-				<destination>&lt;&lt;ISO_44001_2017,clause=8.2.7,clause=8.3.5&gt;&gt;</destination>
+				<destination>&lt;&lt;ISO_44001_2017,clause=8.2.7;and!clause=8.3.5&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5288,7 +5290,7 @@
 						<std-ref>BS 9999:2017<?doi https://doi.org/10.3403/30314118?>
 						</std-ref>,<bold>16.6.1</bold> and Table 12</std>
 				</source>
-				<destination>&lt;&lt;BS_9999_2017,clause=16.6.1,table=12&gt;&gt;</destination>
+				<destination>&lt;&lt;BS_9999_2017,clause=16.6.1;and!table=12&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5315,7 +5317,7 @@
 						<std-ref>BS 9999:2017<?doi https://doi.org/10.3403/30314118?>
 						</std-ref>, Table 23 or Table 24</std>
 				</source>
-				<destination>&lt;&lt;BS_9999_2017,table=23,table=24&gt;&gt;</destination>
+				<destination>&lt;&lt;BS_9999_2017,table=23;or!table=24&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5325,7 +5327,7 @@
 						</std-ref>, Table 4 and <bold>6.5</bold>
 					</std>
 				</source>
-				<destination>&lt;&lt;BS_9999_2017,table=4,table=6.5&gt;&gt;</destination>
+				<destination>&lt;&lt;BS_9999_2017,table=4;and!table=6.5&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5368,7 +5370,7 @@
 						<std-ref>BS EN 206:2013+A1:2016</std-ref>, <bold>8.1</bold> and <bold>8.2.1.2</bold>
 					</std>
 				</source>
-				<destination>&lt;&lt;BS_EN_206_2013_A1_2016,clause=8.1,clause=8.2.1.2&gt;&gt;</destination>
+				<destination>&lt;&lt;BS_EN_206_2013_A1_2016,clause=8.1;and!clause=8.2.1.2&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5401,7 +5403,7 @@
 						</std-ref>,<bold>3.3</bold> and <bold>3.2</bold>
 					</std>
 				</source>
-				<destination>&lt;&lt;BS_EN_ISO_19011_2018,clause=3.3,clause=3.2&gt;&gt;</destination>
+				<destination>&lt;&lt;BS_EN_ISO_19011_2018,clause=3.3;and!clause=3.2&gt;&gt;</destination>
 			</item>
 			
 		</xsl:variable>
@@ -5681,7 +5683,7 @@
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_ISO_9000_2005,clause 3.4.2,ISO 9000:2005, footnote:[Superseded by ISO 9000:2015.]&gt;&gt;,</xsl:text> -->
-					<xsl:text>&lt;&lt;ISO_9000_2005,clause 3.4.2,ISO 9000:2005 footnote:[Superseded by ISO 9000:2015.]&gt;&gt;,</xsl:text>
+					<xsl:text>&lt;&lt;ISO_9000_2005,clause 3.4.2&gt;&gt;,</xsl:text> <!-- ISO_9000_2005,clause 3.4.2,ISO 9000:2005 footnote:[Superseded by ISO 9000:2015.] -->
 				</destination>
 			</item>
 			

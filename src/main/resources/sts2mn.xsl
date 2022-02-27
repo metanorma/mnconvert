@@ -2670,21 +2670,6 @@
 	<xsl:template match="styled-content[@style = 'addition' or @style-type = 'addition']">
 		<add><xsl:apply-templates/></add>
 	</xsl:template>
-	
-	<xsl:template name="split">
-		<xsl:param name="pText" select="."/>
-		<xsl:param name="sep" select="'/'"/>
-		<xsl:if test="string-length($pText) &gt; 0">
-			<item>
-				<xsl:variable name="value" select="substring-before(concat($pText, $sep), $sep)"/>
-				<xsl:value-of select="normalize-space(translate($value, '&#xA0;', ' '))"/>
-			</item>
-			<xsl:call-template name="split">
-				<xsl:with-param name="pText" select="substring-after($pText, $sep)"/>
-				<xsl:with-param name="sep" select="$sep"/>
-			</xsl:call-template>
-		</xsl:if>
-	</xsl:template>
 
 	<xsl:template name="insertTaskImageList"> 
 		<xsl:variable name="imageList">
