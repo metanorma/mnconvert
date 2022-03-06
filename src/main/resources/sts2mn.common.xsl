@@ -123,18 +123,16 @@
 						</xsl:choose>
 					</xsl:variable>
 					
-					<!-- <xsl:if test="$std_text_lc != '' and normalize-space($debug) = 'true'">
-						<xsl:message>std_text_lc=<xsl:value-of select="$std_text_lc"/>&#xa;</xsl:message>
-					</xsl:if> -->
-					
 					<xsl:variable name="std_text_lc_with_conjunctions_">
 						<xsl:call-template name="addLocalityStructure">
 							<xsl:with-param name="std_text" select="$std_text_lc"/>
+							<xsl:with-param name="std_ref" select="$std-ref"/>
 						</xsl:call-template>
 					</xsl:variable>
 					<xsl:variable name="std_text_lc_with_conjunctions" select="xalan:nodeset($std_text_lc_with_conjunctions_)"/>
 					
-					<!-- <xsl:if test="$std_text_lc != ''">
+					<!-- <xsl:message>count std_text_lc_with_conjunctions/*=<xsl:value-of select="count($std_text_lc_with_conjunctions/*)"/></xsl:message>
+					<xsl:if test="$std_text_lc != ''">
 						<xsl:message>DEBUG: std_text_lc=<xsl:value-of select="$std_text_lc"/></xsl:message>
 					</xsl:if>
 					<xsl:for-each select="$std_text_lc_with_conjunctions/*">
@@ -256,8 +254,9 @@
 										</xsl:choose>
 										<xsl:copy-of select="."/> <!-- localityValue -->
 									</xsl:when>
-									<xsl:when test="self::referenceText"> <!-- if there is not locality text -->
-										<referenceText><xsl:value-of select="$std-ref"/><xsl:text> </xsl:text><xsl:value-of select="."/></referenceText>
+									<xsl:when test="self::referenceText and normalize-space(.) !=''"> <!-- if there is not locality text -->
+										<!-- <referenceText><xsl:value-of select="$std-ref"/><xsl:text> </xsl:text><xsl:value-of select="."/></referenceText> -->
+										<xsl:copy-of select="."/>
 									</xsl:when>
 									<xsl:otherwise>
 										<xsl:copy-of select="."/>
@@ -271,6 +270,10 @@
 			</xsl:choose>
 		</xsl:variable>
 		
+		<!-- <xsl:message>DEBUG locality:</xsl:message>
+		<xsl:for-each select="xalan:nodeset($locality)/*">
+			<xsl:message><xsl:value-of select="local-name()"/>=<xsl:value-of select="."/></xsl:message>
+		</xsl:for-each> -->
 		<!--
 		<xsl:message>DEBUG: std-id=<xsl:value-of select="std-id"/></xsl:message>
 		<xsl:message>DEBUG: $std-id=<xsl:value-of select="java:replaceAll(java:java.lang.String.new(std-id), '(#.*)?$','')"/></xsl:message>
@@ -367,9 +370,26 @@
 								
 	<xsl:template name="addLocalityStructure">
 		<xsl:param name="std_text"/>
+		<xsl:param name="std_ref"/>
+		<!-- <xsl:message>DEBUG: std_text=<xsl:value-of select="$std_text"/></xsl:message>
+			<xsl:message>std_ref=<xsl:value-of select="$std_ref"/></xsl:message> -->
+		
+		<!-- case: 'series' inside of std-ref:
+			<std>
+				<std-ref>ISO 10667 series</std-ref>
+			</std>
+		-->
+		<xsl:if test="(contains(normalize-space($std_ref), 'series') or contains(normalize-space($std_ref), 'parts'))"> <!-- if there is not locality text -->
+			<referenceText><xsl:value-of select="$std_ref"/></referenceText>
+		</xsl:if>
 		<xsl:choose>
-			<xsl:when test="contains(normalize-space(), 'series') or contains(normalize-space(), 'parts')"> <!-- if there is not locality text -->
-				<referenceText><xsl:value-of select="$std_text"/></referenceText>
+			<!-- case - 'all parts' outside of std-ref:
+				<std std-id="BS EN ISO 14064" type="undated">
+						<std-ref>BS EN ISO 14064<?doi https://doi.org/10.3403/BSENISO14064?>
+						</std-ref> (all parts)</std>
+			-->
+			<xsl:when test="(contains($std_text, 'series') or contains($std_text, 'parts'))"> <!-- if there is not locality text -->
+				<referenceText><xsl:value-of select="$std_ref"/><xsl:text> </xsl:text><xsl:value-of select="$std_text"/></referenceText>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:variable name="parts_">
@@ -656,6 +676,7 @@
 					java:org.metanorma.utils.RegExHelper.matches('^(ISO|IEC|ITU|IETF|NIST|OGC|IEV|BS|BSI)(\s|\h).*', normalize-space($text)) = 'false'"> <!-- don't put reference text if it is reference to the standard -->
 					<referenceText><xsl:value-of select="$text"/></referenceText>
 				</xsl:if>
+				
 				<!-- <xsl:choose>
 					<xsl:when test="$std-ref != $text">
 						<reference hidden="true">

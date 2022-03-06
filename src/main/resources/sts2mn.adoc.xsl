@@ -1879,8 +1879,10 @@
 			
 			<!-- put reference text -->
 			<xsl:for-each select="$model_std/referenceText[normalize-space() != '']">
-				<xsl:text>,</xsl:text>
-				<xsl:value-of select="."/>
+				<xsl:if test="not(preceding-sibling::referenceText/text() = current()/text())">
+					<xsl:text>,</xsl:text>
+					<xsl:value-of select="."/>
+				</xsl:if>
 			</xsl:for-each>
 			<xsl:for-each select="$model_std/not_locality">
 				<xsl:text> </xsl:text><xsl:value-of select="."/>
@@ -1991,9 +1993,11 @@
 			<!-- put reference text -->
 			<xsl:variable name="referenceText">
 				<xsl:for-each select="$model_term_source/referenceText[normalize-space() != '']">
-					<xsl:if test="not(starts-with(normalize-space(.), 'footnote:'))">
-						<xsl:text>,</xsl:text>
-						<xsl:value-of select="."/>
+					<xsl:if test="not(preceding-sibling::referenceText/text() = current()/text())">
+						<xsl:if test="not(starts-with(normalize-space(.), 'footnote:'))">
+							<xsl:text>,</xsl:text>
+							<xsl:value-of select="."/>
+						</xsl:if>
 					</xsl:if>
 				</xsl:for-each>
 			</xsl:variable>
@@ -5167,7 +5171,48 @@
 						<std-ref>ISO 10667 series</std-ref>
 					</std>
 				</source>
-				<destination>&lt;&lt;ISO_10667_series&gt;&gt;</destination>
+				<destination>&lt;&lt;ISO_10667_series,ISO 10667 series&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std><std-ref>ISO 10667 series</std-ref>, Annex A</std>
+				</source>
+				<destination>&lt;&lt;ISO_10667_series,annex=A,ISO 10667 series&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>Clauses 1 to 9 of <std-ref type="undated">PAS 2030<?doi https://doi.org/10.3403/30248249U?></std-ref></std>
+				</source>
+				<destination>&lt;&lt;PAS_2030,clause=1-9,PAS 2030&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std>
+						<std-ref>BS 5839‑1:2013<?doi https://doi.org/10.3403/30260279?>
+						</std-ref>, <bold>22.3</bold>, <bold>22.5</bold>, <bold>22.7</bold> and <bold>22.9</bold>
+					</std>
+				</source>
+				<destination>&lt;&lt;BS_5839_1_2013,clause=22.3,clause=22.5,clause=22.7;and!clause=22.9&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="BS EN ISO 14064" type="undated">
+						<std-ref>BS EN ISO 14064<?doi https://doi.org/10.3403/BSENISO14064?>
+						</std-ref> (all parts)</std>
+				</source>
+				<destination>&lt;&lt;BS_EN_ISO_14064,BS EN ISO 14064 (all parts)&gt;&gt;</destination>
+			</item>
+			
+			<item>
+				<source>
+					<std std-id="BS 8900" type="undated">
+						<std-ref>BS&#x00A0;8900</std-ref> (series)</std>
+				</source>
+				<destination>&lt;&lt;BS_8900,BS&#x00A0;8900 (series)&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5185,7 +5230,7 @@
 						<std-ref>ISO 11137 (all parts)</std-ref>
 					</std>
 				</source>
-				<destination>&lt;&lt;ISO_11137__all_parts_&gt;&gt;</destination>
+				<destination>&lt;&lt;ISO_11137__all_parts_,ISO 11137 (all parts)&gt;&gt;</destination>
 			</item>
 			
 			<item>
