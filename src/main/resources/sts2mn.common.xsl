@@ -23,6 +23,8 @@
 	-->
 	<xsl:template name="build_sts_model_std">
 	
+		<xsl:variable name="std-ref" select=".//std-ref"/>
+	
 		<xsl:variable name="clause_from_std-id">
 			<xsl:choose>
 				<xsl:when test="std-id"> <!-- for IEC -->
@@ -91,10 +93,11 @@
 					<xsl:variable name="std_text10" select="java:replaceAll(java:java.lang.String.new($std_text9),'[aA]nnexes','annex')"/>
 					<xsl:variable name="std_text11" select="java:replaceAll(java:java.lang.String.new($std_text10),'[aA]nnex','annex')"/>
 					<xsl:variable name="std_text12" select="java:replaceAll(java:java.lang.String.new($std_text11),'[tT]able','table')"/>
-					<xsl:variable name="std_text13" select="java:replaceAll(java:java.lang.String.new($std_text12),'[cC]lause','clause')"/>
-					<xsl:variable name="std_text14" select="java:replaceAll(java:java.lang.String.new($std_text13),'[sS]ection','section')"/>
+					<xsl:variable name="std_text13" select="java:replaceAll(java:java.lang.String.new($std_text12),'[cC]lauses','clause')"/>
+					<xsl:variable name="std_text14" select="java:replaceAll(java:java.lang.String.new($std_text13),'[cC]lause','clause')"/>
+					<xsl:variable name="std_text15" select="java:replaceAll(java:java.lang.String.new($std_text14),'[sS]ection','section')"/>
 					
-					<xsl:variable name="std_text_lc_" select="$std_text14"/>
+					<xsl:variable name="std_text_lc_" select="$std_text15"/>
 					
 					<!-- <xsl:if test="$std_text_lc_ != '' and normalize-space($debug) = 'true'">
 						<xsl:message>DEBUG: std_text_lc_=<xsl:value-of select="$std_text_lc_"/>&#xa;</xsl:message>
@@ -130,6 +133,13 @@
 						</xsl:call-template>
 					</xsl:variable>
 					<xsl:variable name="std_text_lc_with_conjunctions" select="xalan:nodeset($std_text_lc_with_conjunctions_)"/>
+					
+					<!-- <xsl:if test="$std_text_lc != ''">
+						<xsl:message>DEBUG: std_text_lc=<xsl:value-of select="$std_text_lc"/></xsl:message>
+					</xsl:if>
+					<xsl:for-each select="$std_text_lc_with_conjunctions/*">
+						<xsl:message>DEBUG: <xsl:value-of select="local-name()"/>=<xsl:value-of select="."/></xsl:message>
+					</xsl:for-each> -->
 					
 					<!-- <xsl:if test="normalize-space($debug) = 'true'">
 						<xsl:message>
@@ -246,6 +256,9 @@
 										</xsl:choose>
 										<xsl:copy-of select="."/> <!-- localityValue -->
 									</xsl:when>
+									<xsl:when test="self::referenceText"> <!-- if there is not locality text -->
+										<referenceText><xsl:value-of select="$std-ref"/><xsl:text> </xsl:text><xsl:value-of select="."/></referenceText>
+									</xsl:when>
 									<xsl:otherwise>
 										<xsl:copy-of select="."/>
 									</xsl:otherwise>
@@ -354,28 +367,33 @@
 								
 	<xsl:template name="addLocalityStructure">
 		<xsl:param name="std_text"/>
-		<!-- <xsl:message>std_text_lc=<xsl:value-of select="$std_text"/></xsl:message> -->
-		<xsl:variable name="parts_">
-			<xsl:call-template name="split">
-				<xsl:with-param name="pText" select="$std_text"/>
-				<xsl:with-param name="sep" select="' '"/>
-			</xsl:call-template>
-		</xsl:variable>
-		<xsl:variable name="parts" select="xalan:nodeset($parts_)"/>
-		
-		<xsl:for-each select="$parts/item">
-			<xsl:choose>
-				<xsl:when test="normalize-space() = 'clause' or normalize-space() = 'annex' or normalize-space() = 'table' or normalize-space() = 'section'">
-					<locality><xsl:value-of select="normalize-space()"/></locality>
-				</xsl:when>
-				<xsl:when test="normalize-space() = 'and' or normalize-space() = 'or'">
-					<localityConj><xsl:value-of select="."/></localityConj>
-				</xsl:when>
-				<xsl:when test="normalize-space() != ''">
-					<localityValue><xsl:value-of select="."/></localityValue>
-				</xsl:when>
-			</xsl:choose>
-		</xsl:for-each>
+		<xsl:choose>
+			<xsl:when test="contains(normalize-space(), 'series') or contains(normalize-space(), 'parts')"> <!-- if there is not locality text -->
+				<referenceText><xsl:value-of select="$std_text"/></referenceText>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:variable name="parts_">
+					<xsl:call-template name="split">
+						<xsl:with-param name="pText" select="$std_text"/>
+						<xsl:with-param name="sep" select="' '"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:variable name="parts" select="xalan:nodeset($parts_)"/>
+				<xsl:for-each select="$parts/item">
+					<xsl:choose>
+						<xsl:when test="normalize-space() = 'clause' or normalize-space() = 'annex' or normalize-space() = 'table' or normalize-space() = 'section'">
+							<locality><xsl:value-of select="normalize-space()"/></locality>
+						</xsl:when>
+						<xsl:when test="normalize-space() = 'and' or normalize-space() = 'or'">
+							<localityConj><xsl:value-of select="."/></localityConj>
+						</xsl:when>
+						<xsl:when test="normalize-space() != ''">
+							<localityValue><xsl:value-of select="translate(.,',','')"/></localityValue> <!-- remove comma -->
+						</xsl:when>
+					</xsl:choose>
+				</xsl:for-each>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<!-- ================= -->
