@@ -1613,16 +1613,18 @@
 					</localityStack>
 				</xsl:if>
 				
-				<xsl:if test="$type_xml = 'presentation'">
-					<!-- put reference text -->
+				<!-- <xsl:if test="$type_xml = 'presentation'">
 					<xsl:for-each select="$model_term_source/referenceText[normalize-space() != '']">
-						<!-- <xsl:value-of select="."/> -->
 						<xsl:copy-of select="./node()"/>
 						<xsl:if test="following-sibling::referenceText[normalize-space() != '']">
 							<xsl:text>,</xsl:text>
 						</xsl:if>
 					</xsl:for-each>
-				</xsl:if>
+				</xsl:if> -->
+				
+				<xsl:call-template name="insertLocalities">
+					<xsl:with-param name="model" select="$model_term_source"/>
+				</xsl:call-template>
 				
 			</origin>
 			<!-- put modified text (or just indication, i.e. comma ',') -->
@@ -2040,35 +2042,70 @@
 		<eref type="inline" bibitemid="{$model_std/reference}" citeas="{$model_std/referenceText[normalize-space() != ''][1]}">
 			<!-- put locality (-ies) -->
 			<xsl:if test="$model_std/*[self::locality][normalize-space() != ''] and not(parent::ref and ancestor::ref-list)">
-				<localityStack>
-					<xsl:for-each select="$model_std/*[self::locality][normalize-space() != '']">
+				
+				<xsl:for-each select="$model_std/*[self::locality][normalize-space() != '']">
+					<localityStack>
+						<xsl:variable name="connective_following" select="following-sibling::localityConj[normalize-space() != ''][1]"/>
+						<xsl:variable name="connective_preceding" select="preceding-sibling::localityConj[normalize-space() != ''][1]"/>
+						<xsl:if test="$connective_following != '' or $connective_preceding != ''">
+							<xsl:attribute name="connective">
+								<xsl:choose>
+									<xsl:when test="$connective_following != ''"><xsl:value-of select="$connective_following"/></xsl:when>
+									<xsl:otherwise><xsl:value-of select="$connective_preceding"/></xsl:otherwise>
+								</xsl:choose>
+							</xsl:attribute>
+						</xsl:if>
 						<locality>
 							<xsl:attribute name="type">
-								<xsl:value-of select="substring-before(., '=')"/>
+								<!-- <xsl:value-of select="substring-before(., '=')"/> -->
+								<xsl:value-of select="."/>
 							</xsl:attribute>
 							<referenceFrom>
-								<xsl:value-of select="substring-after(., '=')"/>
+								<!-- <xsl:value-of select="substring-after(., '=')"/> -->
+								<xsl:value-of select="following-sibling::localityValue[normalize-space() != ''][1]"/>
 							</referenceFrom>
 						</locality>
-					</xsl:for-each>
-				</localityStack>
+					</localityStack>
+				</xsl:for-each>
 			</xsl:if>
 			
-			<xsl:if test="$type_xml = 'presentation'">
-				<!-- put reference text -->
-				<xsl:for-each select="$model_std/referenceText[normalize-space() != '']">
-					<xsl:value-of select="."/>
-					<xsl:if test="following-sibling::referenceText[normalize-space() != '']">
-						<xsl:text>,</xsl:text>
-					</xsl:if>
-				</xsl:for-each>
-				<xsl:for-each select="$model_std/not_locality">
-					<xsl:text> </xsl:text><xsl:value-of select="."/>
-				</xsl:for-each>
-			</xsl:if>
+			<xsl:call-template name="insertLocalities">
+				<xsl:with-param name="model" select="$model_std"/>
+			</xsl:call-template>
 			
 			<xsl:apply-templates select=".//processing-instruction()"/>
 		</eref>
+	</xsl:template>
+	
+	<xsl:template name="insertLocalities">
+		<xsl:param name="model"/>
+		<xsl:if test="$type_xml = 'presentation'">
+			<!-- put reference text -->
+			<xsl:for-each select="$model/referenceText[normalize-space() != '']">
+				<xsl:value-of select="."/>
+				<xsl:if test="following-sibling::referenceText[normalize-space() != '']">
+					<xsl:text>,</xsl:text>
+				</xsl:if>
+			</xsl:for-each>
+			<xsl:for-each select="$model/*[self::locality or self::localityValue or self::localityConj][normalize-space() != '']">
+				<xsl:if test="position() = 1"><xsl:text>,</xsl:text></xsl:if>
+				<xsl:text> </xsl:text>
+				<xsl:choose>
+					<xsl:when test="self::localityValue"><strong><xsl:value-of select="."/></strong></xsl:when>
+					<xsl:when test="self::locality">
+						<xsl:if test="not(contains(following-sibling::*[self::localityValue][1], '.'))"> <!-- 1 A etc., not 3.2 or A.5 -->
+							<xsl:choose>
+							<xsl:when test=". = 'clause'">Clause </xsl:when>
+							<xsl:when test=". = 'annex'">Annex </xsl:when>
+							<xsl:when test=". = 'section'">Section </xsl:when>
+							<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+						</xsl:choose>
+						</xsl:if>
+					</xsl:when>
+					<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+				</xsl:choose>
+			</xsl:for-each>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="std/std-ref">
