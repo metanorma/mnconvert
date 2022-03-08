@@ -3065,13 +3065,29 @@
 				<xsl:if test="$model_eref/locality">
 					<xsl:text>, </xsl:text>
 					<xsl:for-each select="$model_eref/locality">
-						<xsl:choose>
-							<xsl:when test="@type = 'clause'"><bold><xsl:value-of select="."/></bold></xsl:when>
-						</xsl:choose>
+						<xsl:if test="@type != ''">
+							<xsl:choose>
+								<xsl:when test="@type = 'clause'">
+									<xsl:if test="not(contains(., '.'))"> Clause </xsl:if>
+								</xsl:when>
+								<xsl:when test="@type = 'annex'">
+									<xsl:if test="not(contains(., '.'))"> Annex </xsl:if>
+								</xsl:when>
+								<xsl:when test="@type = 'section'">
+									<xsl:if test="not(contains(., '.'))"> Section </xsl:if>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:if test="not(contains(., '.'))"> <xsl:value-of select="@type"/> </xsl:if>
+								</xsl:otherwise>
+							</xsl:choose>
+							<bold><xsl:value-of select="."/></bold>
+						</xsl:if>
+						
 						<xsl:if test="following-sibling::locality[normalize-space() != '']">
 							<xsl:choose>
+								<xsl:when test="@connective != '' and @connective != 'from' and following-sibling::locality[normalize-space() != '']"><xsl:text> </xsl:text><xsl:value-of select="@connective"/><xsl:text> </xsl:text></xsl:when>
 								<xsl:when test="count(following-sibling::locality[normalize-space() != '']) &gt; 1"><xsl:text>, </xsl:text></xsl:when>
-								<xsl:when test="count(following-sibling::locality[normalize-space() != '']) = 1"><xsl:text> and </xsl:text></xsl:when>
+								<!-- <xsl:when test="count(following-sibling::locality[normalize-space() != '']) = 1"><xsl:text> and </xsl:text></xsl:when> -->
 							</xsl:choose>
 						</xsl:if>
 					</xsl:for-each>
@@ -3202,6 +3218,20 @@
 					<referenceFrom>C</referenceFrom>
 				</locality>
 			</localityStack>ISO 20483:2013, Annex C</eref> -->
+			
+		<!-- Example with 'and' 
+			<localityStack connective="and">
+				<locality type="clause">
+					<referenceFrom>3.3</referenceFrom>
+				</locality>
+			</localityStack>
+			<localityStack connective="and">
+				<locality type="clause">
+					<referenceFrom>3.2</referenceFrom>
+				</locality>
+			</localityStack>
+		-->
+			
 		
 		<reference><xsl:value-of select="@bibitemid"/></reference>
 		<referenceText>
@@ -3215,6 +3245,7 @@
 		<xsl:for-each select="localityStack/locality">
 			<locality>
 				<xsl:copy-of select="@type"/>
+				<xsl:copy-of select="../@connective"/>
 				<xsl:value-of select="referenceFrom"/>
 			</locality>
 		</xsl:for-each>
