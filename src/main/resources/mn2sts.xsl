@@ -2113,6 +2113,7 @@
 		<xsl:apply-templates />
 	</xsl:template>
 	
+	<!-- 'bibitem/note' converts to 'ref//fn' -->
 	<xsl:template match="bibitem/note" priority="2">
 		<xsl:variable name="number">
 			<xsl:number level="any" count="bibitem/note"/>
@@ -2126,7 +2127,14 @@
 				<label>
 					<sup><xsl:value-of select="$number"/></sup>
 				</label>
-				<p><xsl:apply-templates/></p>
+				<xsl:choose>
+					<xsl:when test="p">
+						<xsl:apply-templates/>
+					</xsl:when>
+					<xsl:otherwise>
+						<p><xsl:apply-templates/></p>
+					</xsl:otherwise>
+				</xsl:choose>
 			</fn>
 		</xsl:variable>
 
@@ -2141,7 +2149,7 @@
 	</xsl:template>
 
 	
-	<xsl:template match="fn " priority="2">
+	<xsl:template match="fn" priority="2">
 		<xsl:variable name="number" select="@reference"/>
 		<xsl:variable name="number_id">
 			<xsl:value-of select="$number"/>_<xsl:number level="any" count="fn"/>
