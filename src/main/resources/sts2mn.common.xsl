@@ -30,14 +30,16 @@
 				<xsl:when test="std-id"> <!-- for IEC -->
 					 <xsl:value-of select="substring-after(substring-after(std-id, '#'), '-')"/>
 				</xsl:when>
-				<xsl:otherwise>
+				<xsl:otherwise> <!-- Example: iso:std:iso:13485:ed-2:en:clause:7 -->
 					<xsl:value-of select="substring-after(@std-id, ':clause:')"/>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
+		
 		<xsl:variable name="locality">
 			<xsl:choose>
-				<xsl:when test="$clause_from_std-id != ''">
+			
+				<xsl:when test="$clause_from_std-id != ''"> <!-- if locality set in @std-id -->
 					<locality>
 						<xsl:choose>
 							<xsl:when test="translate(substring($clause_from_std-id, 1, 1), '0123456789', '') = ''">clause=</xsl:when>
@@ -46,6 +48,7 @@
 						<xsl:value-of select="$clause_from_std-id"/>
 					</locality>
 				</xsl:when>
+				
 				<xsl:when test="not(@std-id) or $clause_from_std-id = ''">
 					<!-- get text -->
 					<xsl:variable name="std_text_">
@@ -75,11 +78,11 @@
 					<!-- remove leading ':', '—', comma -->
 					<xsl:variable name="std_text" select="normalize-space(java:replaceAll(java:java.lang.String.new($std_text_),'^:?—?,?(.*)$','$1'))"/>
 					<!-- replace ' to ' to '-' -->
-					<xsl:variable name="std_text1" select="java:replaceAll(java:java.lang.String.new($std_text),' to [cC]lause ','-')"/>
+					<!-- <xsl:variable name="std_text1" select="java:replaceAll(java:java.lang.String.new($std_text),' to [cC]lause ','-')"/>
 					<xsl:variable name="std_text2" select="java:replaceAll(java:java.lang.String.new($std_text1),' to [aA]nnex ','-')"/>
 					<xsl:variable name="std_text3" select="java:replaceAll(java:java.lang.String.new($std_text2),' to [tT]able ','-')"/>
 					<xsl:variable name="std_text4" select="java:replaceAll(java:java.lang.String.new($std_text3),' to [sS]ection ','-')"/>
-					<xsl:variable name="std_text5" select="java:replaceAll(java:java.lang.String.new($std_text4),' to ','-')"/>
+					<xsl:variable name="std_text5" select="java:replaceAll(java:java.lang.String.new($std_text4),' to ','-')"/> -->
 					
 					<!-- replace ' and|or Xxxxx ' to 'xxxxx' -->
 					<!-- <xsl:variable name="std_text6" select="java:replaceAll(java:java.lang.String.new($std_text5),'( and | or )[cC]lause',',clause')"/>
@@ -87,7 +90,8 @@
 					<xsl:variable name="std_text8" select="java:replaceAll(java:java.lang.String.new($std_text7),'( and | or )[tT]able',',table')"/>
 					<xsl:variable name="std_text9" select="java:replaceAll(java:java.lang.String.new($std_text8),'( and | or )[sS]ection',',section')"/> -->
 					
-					<xsl:variable name="std_text9" select="$std_text5"/>
+					<!-- <xsl:variable name="std_text9" select="$std_text5"/> -->
+					<xsl:variable name="std_text9" select="$std_text"/>
 					
 					<!-- replace  'Xxxxx' to 'xxxxx' -->
 					<xsl:variable name="std_text10" select="java:replaceAll(java:java.lang.String.new($std_text9),'[aA]nnexes','annex')"/>
@@ -106,16 +110,16 @@
 					<xsl:variable name="std_text_lc">
 						<xsl:choose>
 							<xsl:when test="starts-with($std_text_lc_, 'annex')">
-								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),'( and | or )(?!annex)','$1 annex ')"/> <!-- annex X and Y.Z' to 'annex X and annex Y.Z'  -->
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),'( and | or | to )(?!annex)','$1 annex ')"/> <!-- annex X and Y.Z' to 'annex X and annex Y.Z'  -->
 							</xsl:when>
 							<xsl:when test="starts-with($std_text_lc_, 'table')">
-								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),'( and | or )(?!table)','$1 table ')"/> <!-- table X and Y.Z' to 'table X and table Y.Z'  -->
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),'( and | or | to )(?!table)','$1 table ')"/> <!-- table X and Y.Z' to 'table X and table Y.Z'  -->
 							</xsl:when>
 							<xsl:when test="starts-with($std_text_lc_, 'clause')">
-								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),'( and | or )(?!clause)','$1 clause ')"/> <!-- clause X and Y.Z' to 'clause X and clause Y.Z'  -->
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),'( and | or | to )(?!clause)','$1 clause ')"/> <!-- clause X and Y.Z' to 'clause X and clause Y.Z'  -->
 							</xsl:when>
 							<xsl:when test="starts-with($std_text_lc_, 'section')">
-								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),'( and | or )(?!section)','$1 section ')"/> <!-- section X and Y.Z' to 'section X and section Y.Z'  -->
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($std_text_lc_),'( and | or | to )(?!section)','$1 section ')"/> <!-- section X and Y.Z' to 'section X and section Y.Z'  -->
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:value-of select="$std_text_lc_"/>
@@ -402,9 +406,12 @@
 				<xsl:for-each select="$parts/item">
 					<xsl:choose>
 						<xsl:when test="normalize-space() = 'clause' or normalize-space() = 'annex' or normalize-space() = 'table' or normalize-space() = 'section'">
+							<xsl:if test="following-sibling::*[2] = 'to'">
+								<localityConj>from</localityConj>
+							</xsl:if>
 							<locality><xsl:value-of select="normalize-space()"/></locality>
 						</xsl:when>
-						<xsl:when test="normalize-space() = 'and' or normalize-space() = 'or'">
+						<xsl:when test="normalize-space() = 'and' or normalize-space() = 'or' or normalize-space() = 'to'">
 							<localityConj><xsl:value-of select="."/></localityConj>
 						</xsl:when>
 						<xsl:when test="normalize-space() != ''">

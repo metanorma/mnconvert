@@ -1864,14 +1864,20 @@
 						<xsl:value-of select="."/>
 					</xsl:when>
 					<xsl:when test="self::localityConj">
-						<xsl:text>;</xsl:text>
+						<xsl:choose>
+							<xsl:when test="position() = 1"><xsl:text>,</xsl:text></xsl:when>
+							<xsl:otherwise><xsl:text>;</xsl:text></xsl:otherwise>
+						</xsl:choose>
 						<xsl:value-of select="."/>
 						<xsl:text>!</xsl:text>
 					</xsl:when>
-					<xsl:otherwise>
+					<xsl:otherwise> <!-- locality -->
 						<xsl:if test="not(preceding-sibling::*[1][self::localityConj])">
 							<xsl:text>,</xsl:text>
 						</xsl:if>
+						<!-- <xsl:if test="following-sibling::localityConj[1][. = 'to']">
+							<xsl:text>from!</xsl:text>
+						</xsl:if> -->
 						<xsl:value-of select="."/>
 					</xsl:otherwise>
 				</xsl:choose>
@@ -5185,7 +5191,7 @@
 				<source>
 					<std>Clauses 1 to 9 of <std-ref type="undated">PAS 2030<?doi https://doi.org/10.3403/30248249U?></std-ref></std>
 				</source>
-				<destination>&lt;&lt;PAS_2030,clause=1-9,PAS 2030&gt;&gt;</destination>
+				<destination>&lt;&lt;PAS_2030,from!clause=1;to!clause=9,PAS 2030&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5326,7 +5332,7 @@
 						</std-ref>, Clause <bold>15</bold> to Clause <bold>17</bold>
 					</std>
 				</source>
-				<destination>&lt;&lt;BS_9999_2017,clause=15-17&gt;&gt;</destination>
+				<destination>&lt;&lt;BS_9999_2017,from!clause=15;to!clause=17&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5388,7 +5394,7 @@
 					<std>
 						<std-ref>BS ISO 44001</std-ref>, Clause 4 to Clause 10</std>
 				</source>
-				<destination>&lt;&lt;BS_ISO_44001,clause=4-10&gt;&gt;</destination>
+				<destination>&lt;&lt;BS_ISO_44001,from!clause=4;to!clause=10&gt;&gt;</destination>
 			</item>
 			
 			<item>

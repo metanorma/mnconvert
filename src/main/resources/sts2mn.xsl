@@ -2045,11 +2045,12 @@
 				
 				<xsl:for-each select="$model_std/*[self::locality][normalize-space() != '']">
 					<localityStack>
-						<xsl:variable name="connective_following" select="following-sibling::localityConj[normalize-space() != ''][1]"/>
 						<xsl:variable name="connective_preceding" select="preceding-sibling::localityConj[normalize-space() != ''][1]"/>
+						<xsl:variable name="connective_following" select="following-sibling::localityConj[normalize-space() != ''][1]"/>
 						<xsl:if test="$connective_following != '' or $connective_preceding != ''">
 							<xsl:attribute name="connective">
 								<xsl:choose>
+									<xsl:when test="$connective_preceding = 'from'"><xsl:value-of select="$connective_preceding"/></xsl:when>
 									<xsl:when test="$connective_following != ''"><xsl:value-of select="$connective_following"/></xsl:when>
 									<xsl:otherwise><xsl:value-of select="$connective_preceding"/></xsl:otherwise>
 								</xsl:choose>
@@ -2102,7 +2103,7 @@
 						</xsl:choose>
 						</xsl:if>
 					</xsl:when>
-					<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+					<xsl:otherwise><xsl:if test=". != 'from'"><xsl:value-of select="."/></xsl:if></xsl:otherwise>
 				</xsl:choose>
 			</xsl:for-each>
 		</xsl:if>
