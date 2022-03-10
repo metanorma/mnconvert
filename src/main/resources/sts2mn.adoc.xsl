@@ -3104,6 +3104,28 @@
 			<!-- ===================== -->
 			<!-- insert hidden bibitem -->
 			<!-- ===================== -->
+      
+      <!-- 
+      <xsl:for-each select="$updated_xml//ref">
+        <xsl:for-each select="@*">
+          <xsl:text>att </xsl:text><xsl:value-of select="local-name()"/>=<xsl:value-of select="."/>
+          <xsl:text>&#xa;</xsl:text>
+        </xsl:for-each>
+      </xsl:for-each>
+      
+      <xsl:for-each select="$updated_xml//std[not(parent::ref)]">
+        <xsl:text>DEBUG:&#xa;</xsl:text>
+        <xsl:text>stdid=</xsl:text><xsl:value-of select="@stdid"/>
+        <xsl:text>&#xa;</xsl:text>
+        <xsl:variable name="reference">
+          <xsl:call-template name="getReference">
+            <xsl:with-param name="stdid" select="@stdid"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:text>reference=</xsl:text><xsl:value-of select="$reference"/>
+        <xsl:text>&#xa;</xsl:text>
+      </xsl:for-each> -->
+      
 			<xsl:variable name="hidden_bibitems">
 				<!-- std reference iteration -->
 				<xsl:for-each select="$updated_xml//std[not(parent::ref)][@stdid != '']">
@@ -3356,6 +3378,30 @@
 	
 	<xsl:template match="ref/std//title/text()">
 		<xsl:value-of select="translate(., '&#xA0;', ' ')"/>
+	</xsl:template>
+  
+	<!-- empty references -->
+	<!-- Example: <ref>
+            <mixed-citation> </mixed-citation>
+          </ref>
+	-->
+	<xsl:template match="ref[normalize-space(translate(., '&#xa0;', ' ')) = '']" priority="2"/>
+	
+	<xsl:template match="ref[normalize-space(mixed-citation) = 'Standards references' or normalize-space(mixed-citation) = 'Other publications']">
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>[bibliography]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:for-each select="ancestor::sec[1]">
+			<xsl:variable name="level">
+				<xsl:call-template name="getLevel">
+					<xsl:with-param name="addon">1</xsl:with-param>
+				</xsl:call-template>
+			</xsl:variable>
+			<xsl:value-of select="$level"/><xsl:text> </xsl:text>
+		</xsl:for-each>
+		<xsl:value-of select="normalize-space(mixed-citation)"/>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	<!-- ============================ -->
 	<!-- References -->
