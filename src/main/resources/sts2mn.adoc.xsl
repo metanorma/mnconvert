@@ -3380,13 +3380,20 @@
 		<xsl:value-of select="translate(., '&#xA0;', ' ')"/>
 	</xsl:template>
   
-	<!-- empty references -->
+	<!-- Special case: empty references -->
 	<!-- Example: <ref>
             <mixed-citation> </mixed-citation>
           </ref>
 	-->
 	<xsl:template match="ref[normalize-space(translate(., '&#xa0;', ' ')) = '']" priority="2"/>
 	
+	<!-- Special case:
+		<ref>
+			<mixed-citation publication-type="other" id="ref_1">
+				<bold>Standards references</bold>
+			</mixed-citation>
+		</ref>
+	-->
 	<xsl:template match="ref[normalize-space(mixed-citation) = 'Standards references' or normalize-space(mixed-citation) = 'Other publications']">
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>[bibliography]</xsl:text>
@@ -3403,6 +3410,32 @@
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
+	
+	
+	<!-- Special case:
+		<ref>
+			<mixed-citation publication-type="book" id="ref_47">[N1]     Text ... </mixed-citation>
+		</ref>
+		converts to:
+		* [[[ref_47,(N1)]]], Text ... 
+	-->
+	<xsl:variable name="regexNormRefsNumber">^(\[N\d+\])(\s|\h)+(.*)</xsl:variable>
+	<xsl:template match="ref[count(*) = 1 and mixed-citation and java:org.metanorma.utils.RegExHelper.matches($regexNormRefsNumber, normalize-space()) = 'true']">
+		<xsl:text>* [[[</xsl:text>
+		<xsl:value-of select="mixed-citation/@id"/>
+		<xsl:text>,(</xsl:text>
+		<xsl:value-of select="translate(java:replaceAll(java:java.lang.String.new(.),$regexNormRefsNumber,'$1'),'[]','')"/>
+		<xsl:text>)]]], </xsl:text>
+		<xsl:apply-templates select="mixed-citation"/>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="ref[count(*) = 1 and mixed-citation and java:org.metanorma.utils.RegExHelper.matches($regexNormRefsNumber, normalize-space()) = 'true']/mixed-citation//text()[1]">
+		<!-- remove [N2] ... from start of mixed-citation -->
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regexNormRefsNumber,'$3')"/>
+	</xsl:template>
+	
 	<!-- ============================ -->
 	<!-- References -->
 	<!-- ============================ -->
