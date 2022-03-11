@@ -3237,7 +3237,7 @@
 		
 		<xsl:variable name="reference">
 			
-			<xsl:if test="@id or std/@std-id or std/std-ref">
+			<xsl:if test="@id or std/@std-id or std/std-ref or mixed-citation/@id">
 				<xsl:text>[[[</xsl:text>
 				<xsl:value-of select="@id"/>
 				<xsl:if test="not(@id)">
@@ -3257,6 +3257,11 @@
 						</xsl:variable>
 						
 						<xsl:value-of select="$std_ref"/>
+						
+						<xsl:if test="normalize-space($std_ref) = ''">
+							<xsl:value-of select="mixed-citation/@id"/>
+						</xsl:if>
+						
 					</xsl:if>
 				</xsl:if>
 				
@@ -3394,10 +3399,15 @@
 			</mixed-citation>
 		</ref>
 	-->
-	<xsl:template match="ref[normalize-space(mixed-citation) = 'Standards references' or normalize-space(mixed-citation) = 'Other publications']">
+	<xsl:template match="ref[normalize-space(mixed-citation) = 'Standards references' or normalize-space(mixed-citation) = 'Other publications' or 
+											normalize-space(mixed-citation) = 'Standards publications']">
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>[bibliography]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
+		<xsl:for-each select="mixed-citation[1]">
+			<xsl:call-template name="setId"/> <!-- Example: [[ref_2]] -->
+		</xsl:for-each>
+		
 		<xsl:for-each select="ancestor::sec[1]">
 			<xsl:variable name="level">
 				<xsl:call-template name="getLevel">
@@ -3410,7 +3420,6 @@
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
-	
 	
 	<!-- Special case:
 		<ref>
@@ -3435,7 +3444,6 @@
 		<!-- remove [N2] ... from start of mixed-citation -->
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regexNormRefsNumber,'$3')"/>
 	</xsl:template>
-	
 	<!-- ============================ -->
 	<!-- References -->
 	<!-- ============================ -->
