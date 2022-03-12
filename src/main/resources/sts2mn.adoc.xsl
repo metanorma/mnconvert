@@ -4275,6 +4275,12 @@
 					<xsl:text>]</xsl:text>
 					<xsl:text>&#xa;</xsl:text>
 				</xsl:if>
+				
+				<xsl:if test="@sec-type = 'foreword' and (contains(@id, '_nat') or contains(@id, '_euro')) and not(title = 'Foreword'))">
+					<xsl:text>[.preface]</xsl:text>
+					<xsl:text>&#xa;</xsl:text>
+				</xsl:if>
+				
 			</xsl:when>
 			<xsl:when test="ancestor::front and @sec-type">
 				<xsl:text>[type=</xsl:text><xsl:value-of select="@sec-type"/>
