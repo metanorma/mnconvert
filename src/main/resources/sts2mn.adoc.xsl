@@ -316,9 +316,9 @@
 							<!-- ========================= -->
 							<xsl:if test="local-name() = 'nat-meta'">
 								
-								<xsl:if test="not(../reg-meta) and not(../iso-meta)">
+								<!-- <xsl:if test="not(../reg-meta) and not(../iso-meta)"> -->
 									<xsl:call-template name="insertCommonAttributes"/>
-								</xsl:if>
+								<!-- </xsl:if> -->
 								
 								<xsl:text>&#xa;&#xa;</xsl:text>
 								
@@ -353,9 +353,9 @@
 							<!-- ========================= -->
 							<xsl:if test="local-name() = 'reg-meta'">
 								
-								<xsl:if test="not(../iso-meta)">
+								<!-- <xsl:if test="not(../iso-meta)"> -->
 									<xsl:call-template name="insertCommonAttributes"/>
-								</xsl:if>
+								<!-- </xsl:if> -->
 								
 								<xsl:text>&#xa;&#xa;</xsl:text>
 								
@@ -4276,7 +4276,7 @@
 					<xsl:text>&#xa;</xsl:text>
 				</xsl:if>
 				
-				<xsl:if test="@sec-type = 'foreword' and (contains(@id, '_nat') or contains(@id, '_euro')) and not(title = 'Foreword'))">
+				<xsl:if test="@sec-type = 'foreword' and (contains(@id, '_nat') or contains(@id, '_euro')) and not(title = 'Foreword')">
 					<xsl:text>[.preface]</xsl:text>
 					<xsl:text>&#xa;</xsl:text>
 				</xsl:if>
