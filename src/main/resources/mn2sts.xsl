@@ -18,6 +18,7 @@
 	
 	<!-- ===================== -->
 	<!-- remove namespace -->
+	<!-- for simplify templates: use '<xsl:template match="element">' instead of '<xsl:template match="*[local-name() = 'element']"> -->
 	<!-- ===================== -->
 	<xsl:variable name="xml_">
 		<xsl:apply-templates mode="remove_namespace"/>
@@ -43,8 +44,6 @@
 	
 	<xsl:variable name="format" select="normalize-space($outputformat)"/>
 	
-	<xsl:variable name="change_id">true</xsl:variable>
-		
 	<xsl:variable name="organization_abbreviation">
 		<xsl:choose>
 			<xsl:when test="$xml/metanorma-collection">
@@ -79,7 +78,11 @@
 		<xsl:if test="not($xml/*/bibdata/relation[@type = 'adopted-from']) and $organization = 'BSI'">true</xsl:if>
 	</xsl:variable>
 	
+	<xsl:variable name="isSemanticXML" select="//*[contains(local-name(), '-standard')]/@type = 'semantic'"/>
+	
 	<!-- ====================================================================== -->
+	<!-- array 'elements' stores section's numbers -->
+	<!-- semantic metanorma xml doesn't contain section's number and displayorder attribute, therefore we need to calculate section's numbers -->
 	<!-- ====================================================================== -->
 	<xsl:variable name="elements_">
 		<elements>
@@ -110,7 +113,6 @@
 																		sections/clause[.//terms] |
 																		sections/definitions | 
 																		sections/clause[.//definitions]">
-					<!-- <xsl:with-param name="sectionNumSkew" select="count(/*/sections/clause[@type='scope']) + count(bibliography/references[@normative='true']) + 1"/> -->
 					<xsl:variable name="num" select="position()"/>
 					<xsl:apply-templates select="." mode="elements">
 						<xsl:with-param name="sectionNum" select="($num - 1) + $count_1 + 1"/>
@@ -135,12 +137,6 @@
 					</xsl:apply-templates>
 				</xsl:for-each>
 
-						
-				<!-- Other main sections: Terms, etc... -->					
-				<!-- <xsl:apply-templates select="/*/*[local-name() = 'sections']/*[not(@type='scope') and not(@type='intro')]" mode="elements">
-					<xsl:with-param name="sectionNumSkew" select="'1'"/>
-				</xsl:apply-templates> -->
-				
 				<xsl:apply-templates select="annex" mode="elements"/>
 				
 				<xsl:apply-templates select=".//appendix" mode="elements"/>
@@ -154,18 +150,11 @@
 
 	<xsl:template match="text()" mode="elements"/>
 	
-	<xsl:variable name="isSemanticXML" select="//*[contains(local-name(), '-standard')]/@type = 'semantic'"/>
-	
 	<xsl:template match="*" mode="elements">
 		<xsl:param name="sectionNum"/>
-		<xsl:param name="sectionNumSkew" select="0"/>
 		<xsl:variable name="sectionNum_">
 			<xsl:choose>
 				<xsl:when test="$sectionNum"><xsl:value-of select="$sectionNum"/></xsl:when>
-				<xsl:when test="$sectionNumSkew != 0">
-					<xsl:variable name="number"><xsl:number count="*"/></xsl:variable>
-					<xsl:value-of select="$number + $sectionNumSkew"/>
-				</xsl:when>
 				<xsl:otherwise>
 					<xsl:number count="*"/>
 				</xsl:otherwise>
@@ -197,10 +186,10 @@
 								$name = 'figure' or 
 								$name = 'image' or
 								$name = 'formula' or
-								$name = 'stem'">
-								
-			
-			
+								$name = 'stem' or
+								$name = 'section-title' or
+								($name = 'p' and @type = 'section-title')">
+					
 			<xsl:variable name="source_id">			
 				<xsl:call-template name="getId"/>
 			</xsl:variable>
@@ -285,15 +274,24 @@
 			
 			<xsl:variable name="section_prefix">
 				<xsl:if test="($name = 'clause' or $name = 'terms') and $section != '' and not(contains($section, '.'))">Clause </xsl:if> <!-- first level clause -->
+				<xsl:if test="$name = 'section-title' or ($name = 'p' and @type = 'section-title')">Section </xsl:if>
 				<xsl:if test="$name = 'formula' and $organization = 'IEC'">Equation </xsl:if>
 			</xsl:variable>
 			
-			<xsl:variable name="section_bolded" select="($name = 'clause' or $name = 'terms') and $section != ''"/>
+			<xsl:variable name="section_bolded" select="($name = 'clause' or $name = 'terms' or
+			$name = 'section-title' or ($name = 'p' and @type = 'section-title')) and $section != ''"/>
 			
 			<xsl:variable name="wrapper" select="$name"/>
 			
 			<xsl:variable name="parent_id">
 				<xsl:if test="$name = 'bookmark'"><xsl:value-of select="ancestor::*[@id][1]/@id"/></xsl:if>
+			</xsl:variable>
+			
+			<xsl:variable name="type">
+				<xsl:choose>
+					<xsl:when test="$name = 'section-title' or ($name = 'p' and @type = 'section-title')">section-title</xsl:when>
+					<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
+				</xsl:choose>
 			</xsl:variable>
 			
 			<xsl:choose>
@@ -307,7 +305,7 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:element name="{$wrapper}">
-						<element source_id="{$source_id}" id="{$id}" section="{$section}" section_prefix="{$section_prefix}" section_bolded="{$section_bolded}" parent="{$parent}" parent_id="{normalize-space($parent_id)}" type="{@type}"/>
+						<element source_id="{$source_id}" id="{$id}" section="{$section}" section_prefix="{$section_prefix}" section_bolded="{$section_bolded}" parent="{$parent}" parent_id="{normalize-space($parent_id)}" type="{$type}"/>
 					</xsl:element>
 				</xsl:otherwise>
 			</xsl:choose>
@@ -334,30 +332,152 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<xsl:template name="getSection">
+		<xsl:param name="sectionNum"/>
+		<xsl:variable name="level">
+			<xsl:call-template name="getLevel"/>
+		</xsl:variable>		
+		<xsl:variable name="section">
+			<xsl:choose>
+				<xsl:when test="self::dl"><xsl:number format="a" level="any"/></xsl:when>
+				<xsl:when test="self::formula and ancestor::sections"><xsl:number format="(1)" level="any"/></xsl:when>
+				<xsl:when test="self::formula and ancestor::annex">
+					<xsl:variable name="root_element_id" select="generate-id(ancestor::annex)"/>
+					<xsl:number format="A" level="any" count="annex"/>
+					<xsl:text>.</xsl:text>
+					<xsl:number format="1" level="any" count="formula[ancestor::*[generate-id() = $root_element_id] and not(@unnumbered = 'true')]"/>
+				</xsl:when>
+				<xsl:when test="self::bibitem and ancestor::references[@normative='true']">norm_ref_<xsl:number/></xsl:when>
+				<xsl:when test="self::bibitem">ref_<xsl:number/></xsl:when>
+				<xsl:when test="ancestor::bibliography">
+					<xsl:value-of select="$sectionNum"/>
+				</xsl:when>
+				<xsl:when test="self::annex">
+					<xsl:number format="A" level="any" count="annex"/>
+				</xsl:when>
+				<xsl:when test="(self::table or self::figure) and not(ancestor::annex)">
+					<xsl:variable name="root_element_id" select="generate-id(ancestor::*[contains(local-name(), '-standard')])"/> <!-- prevent global numbering for metanorma-collection -->
+					<xsl:choose>
+						<xsl:when test="self::table">
+							<xsl:variable name="table_number_">
+								<xsl:number format="1" level="any" count="table[ancestor::*[generate-id() = $root_element_id] and not(ancestor::annex) and not(@unnumbered = 'true')]"/>
+							</xsl:variable>
+							<xsl:variable name="table_number" select="normalize-space($table_number_)"/>
+							<xsl:if test="$table_number != '0'"><xsl:value-of select="$table_number"/></xsl:if>
+						</xsl:when>
+						<xsl:when test="self::figure">
+							<xsl:variable name="figure_number_">
+								<xsl:number format="1" level="any" count="figure[ancestor::*[generate-id() = $root_element_id] and not(ancestor::annex) and not(@unnumbered = 'true')]"/>
+							</xsl:variable>
+							<xsl:variable name="figure_number" select="normalize-space($figure_number_)"/>
+							<xsl:if test="$figure_number != '0'"><xsl:value-of select="$figure_number"/></xsl:if>
+							</xsl:when>
+					</xsl:choose>
+				</xsl:when>
+				<xsl:when test="(self::p and @type = 'section-title') or self::section-title">
+					<xsl:number format="1" level="any" count="p[@type = 'section-title'] | section-title"/>
+				</xsl:when>
+				<xsl:when test="ancestor::sections">
+					<!-- 1, 2, 3, 4, ... from main section (not annex, bibliography, ...) -->
+					<xsl:choose>
+						<!-- <xsl:when test="self::table"><xsl:number format="1" level="any" count="table[ancestor::sections or ancestor::introduction]"/></xsl:when>
+						<xsl:when test="self::figure"><xsl:number format="1" level="any" count="figure[ancestor::sections or ancestor::introduction]"/></xsl:when> -->
+						<xsl:when test="$level = 1">
+							<xsl:value-of select="$sectionNum"/>
+						</xsl:when>
+						<xsl:when test="$level &gt;= 2">
+							<xsl:variable name="num">
+								<xsl:number format=".1" level="multiple" count="clause/clause | 
+																																										clause/terms | 
+																																										terms/term | 
+																																										clause/term |  
+																																										term/term |  
+																																										terms/clause |
+																																										terms/definitions |
+																																										definitions/clause |
+																																										clause/definitions |
+																																										definitions/definitions"/>
+							</xsl:variable>
+							<xsl:variable name="addon">
+								<xsl:choose>
+									<xsl:when test="self::preferred or self::admitted or self::deprecates or self::domain">
+										<xsl:number format="-1" count="preferred | admitted | deprecates | domain"/>
+									</xsl:when>
+									<xsl:otherwise></xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
+							<xsl:value-of select="concat($sectionNum, $num, $addon)"/>
+							
+						</xsl:when>
+						<xsl:otherwise></xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>				
+				<xsl:when test="ancestor::annex">
+					<xsl:variable name="annexid" select="normalize-space(/*/bibdata/ext/structuredidentifier/annexid)"/>
+					<xsl:choose>
+						<xsl:when test="self::table">
+							<xsl:variable name="curr_annexid" select="ancestor::annex/@id"/>							
+							<xsl:number format="A" count="annex"/>
+							<xsl:number format=".1" level="any" count="table[ancestor::annex/@id = $curr_annexid]"/>
+						</xsl:when>						
+						<xsl:when test="self::figure">
+							<xsl:number format="A.1-1" level="multiple" count="annex | figure"/>
+						</xsl:when>
+						<xsl:when test="$level = 1">							
+							<xsl:choose>
+								<xsl:when test="count(//annex) = 1 and $annexid != ''">
+									<xsl:value-of select="$annexid"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:number format="A" level="any" count="annex"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+						<xsl:otherwise>							
+							<xsl:choose>
+								<xsl:when test="count(//annex) = 1 and $annexid != ''">
+									<xsl:value-of select="$annexid"/><xsl:number format=".1" level="multiple" count="clause"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:number format="A.1" level="multiple" count="annex | clause"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
+				<xsl:when test="ancestor::preface"> <!-- if preface and there is clause(s) -->
+					<xsl:choose>
+						<xsl:when test="$level = 1 and  ..//clause">0</xsl:when>
+						<xsl:when test="$level &gt;= 2">
+							<xsl:variable name="num">
+								<xsl:number format=".1" level="multiple" count="clause"/>
+							</xsl:variable>
+							<xsl:value-of select="concat('0', $num)"/>
+						</xsl:when>
+						<xsl:otherwise></xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
+				<xsl:otherwise></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:value-of select="$section"/>
+	</xsl:template>
+	
 	<xsl:variable name="elements" select="xalan:nodeset($elements_)"/>
 	<!-- ====================================================================== -->
+	<!-- END array 'elements' -->
 	<!-- ====================================================================== -->
 	
 	
 	<xsl:template match="@*|node()">
-		<xsl:param name="sectionNum"/>
-		<xsl:param name="sectionNumSkew"/>
 		<xsl:copy>
-				<xsl:apply-templates select="@*|node()">
-					<xsl:with-param name="sectionNum" select="$sectionNum"/>
-					<xsl:with-param name="sectionNumSkew" select="$sectionNumSkew"/>
-				</xsl:apply-templates>
+				<xsl:apply-templates select="@*|node()"/>
 		</xsl:copy>
 	</xsl:template>
 
 	<xsl:template match="*">
-		<xsl:param name="sectionNum"/>
-		<xsl:param name="sectionNumSkew"/>
 		<xsl:element name="{local-name()}">
-			<xsl:apply-templates select="@*|node()">
-				<xsl:with-param name="sectionNum" select="$sectionNum"/>
-				<xsl:with-param name="sectionNumSkew" select="$sectionNumSkew"/>
-			</xsl:apply-templates>
+			<xsl:apply-templates select="@*|node()"/>
 		</xsl:element>
 	</xsl:template>
 	
@@ -379,12 +499,41 @@
 			
 			<!-- <debug><xsl:copy-of select="$xml"/></debug> -->
 			
-			<xsl:call-template name="insertFront"/>
+			<xsl:variable name="xmlContent_">
+				<xsl:call-template name="insertFront"/>
+				<xsl:call-template name="insertBody"/>
+			</xsl:variable>
+			<xsl:variable name="xmlContent" select="xalan:nodeset($xmlContent_)"/>
 			
-			<xsl:call-template name="insertBody"/>
+			<xsl:variable name="existsSections" select="normalize-space(count($xmlContent//*[@sec-type = 'section-title']) &gt; 0)"/>
+			<xsl:choose>
+				<xsl:when test="$existsSections = 'true'">
+					<!-- <test1>
+						<xsl:value-of select="count($xmlContent//*[@sec-type = 'section-title'])"/>
+						<xsl:for-each select="$xmlContent//*[@sec-type = 'section-title']">
+							<item><xsl:value-of select="."/></item>
+						</xsl:for-each>
+					</test1> -->
+					
+					<xsl:variable name="xmlContent_step1">
+						<xsl:apply-templates select="$xmlContent" mode="section-title_step1" />
+					</xsl:variable>
+					
+					<xsl:variable name="xmlContent_step2">
+						<xsl:apply-templates select="xalan:nodeset($xmlContent_step1)" mode="section-title_step2" />
+					</xsl:variable>
+					
+					<xsl:copy-of select="$xmlContent_step2"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:copy-of select="$xmlContent"/>
+				</xsl:otherwise>
+			</xsl:choose>
+			
 			
 			<xsl:call-template name="insertBack"/>
-						
+			
+			
 			<xsl:if test="normalize-space($debug) = 'true'">
 				<xsl:text disable-output-escaping="yes">&lt;!-- </xsl:text>
 				<xsl:value-of select="count($elements//element)"/>
@@ -394,6 +543,65 @@
 		</standard>
 		
 	</xsl:template>
+	
+	<!-- ======= -->
+	<!-- step 1 -->
+	<!-- ======= -->
+	<xsl:template match="@*|node()" mode="section-title_step1">
+		<xsl:copy>
+				<xsl:apply-templates select="@*|node()" mode="section-title_step1"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<!-- Examples:
+	<sec sec-type="section-title" id="section_1">
+		<title>Section 1: General</title>
+		</sec> -->
+	
+	<!-- remove section title if it positioned as last sec -->
+	<!-- it will be moved to upper element before following sec -->
+	<xsl:template match="sec[@sec-type = 'section-title'][not(following-sibling::sec)]" mode="section-title_step1"/>
+	
+	<!-- remove all elements (non-normative-note, p, etc.) after section-title as last sec -->
+	<!-- these elements will be moved to upper element before following sec -->
+	<xsl:template match="*[preceding-sibling::sec[@sec-type = 'section-title'][not(following-sibling::sec)]]" mode="section-title_step1"/>
+	
+	<xsl:template match="sec[(preceding-sibling::sec[1]//sec)[last()][@sec-type = 'section-title']]" mode="section-title_step1">
+		<xsl:for-each select="(preceding-sibling::sec[1]//sec)[last()][@sec-type = 'section-title']"> <!-- copy section-title from end of the previous sec -->
+			<xsl:copy-of select="."/>
+			<xsl:copy-of select="following-sibling::*"/>
+		</xsl:for-each>
+		
+		<xsl:copy-of select="."/>
+	</xsl:template>
+	<!-- ======= -->
+	<!-- End step 1 -->
+	<!-- ======= -->
+	
+	
+	<!-- ======= -->
+	<!-- step 2 -->
+	<!-- ======= -->
+	<xsl:template match="@*|node()" mode="section-title_step2">
+		<xsl:copy>
+				<xsl:apply-templates select="@*|node()" mode="section-title_step2"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<!-- move sec inside sec with type 'section-title' -->
+	<xsl:template match="sec[@sec-type = 'section-title']" mode="section-title_step2" priority="2">
+		<xsl:copy>
+			<xsl:copy-of select="@id"/>
+			<xsl:copy-of select="node()"/>
+			<xsl:for-each select="following-sibling::*[preceding-sibling::sec[@sec-type = 'section-title'][1][@id = current()/@id]][not(@sec-type = 'section-title')]">
+				<xsl:copy-of select="." />
+			</xsl:for-each>
+		</xsl:copy>
+	</xsl:template>
+	<xsl:template match="*[not(@sec-type = 'section-title') and preceding-sibling::sec[@sec-type = 'section-title']]" mode="section-title_step2"/>
+	<!-- ======= -->
+	<!-- End step 2 -->
+	<!-- ======= -->
 	
 	<!-- ================================ -->
 	<!-- metanorma collection processing -->
@@ -531,26 +739,20 @@
 		<xsl:if test="sections or bibliography[.//references[@normative='true']]">
 			<body>
 				<xsl:if test="$nat_meta_only = 'true'"> <!-- $organization = 'BSI' -->
+					<xsl:apply-templates select="preface/*[@type = 'section-title' or local-name() = 'section-title'][following-sibling::*[not(self::p or self::note)][1][self::introduction]]" mode="front_preface"/>
 					<xsl:apply-templates select="preface/introduction" mode="front_preface"> <!-- [0] -->
 						<xsl:with-param name="skipIntroduction">false</xsl:with-param>
 					</xsl:apply-templates>
 				</xsl:if>
 				
 				<!-- Introduction in sections -->
-				<xsl:apply-templates select="sections/clause[@type='intro']"> <!-- [0] -->
-					<xsl:with-param name="sectionNum" select="'0'"/>
-				</xsl:apply-templates>
-				
+				<xsl:apply-templates select="sections/clause[@type='intro']"/> <!-- [0] -->
 			
 				<!-- Scope -->
-				<xsl:apply-templates select="sections/clause[@type='scope']"> <!-- [1] -->
-					<xsl:with-param name="sectionNum" select="'1'"/>
-				</xsl:apply-templates>
+				<xsl:apply-templates select="sections/clause[@type='scope']"/> <!-- [1] -->
 				
 				<!-- Normative References -->
-				<xsl:apply-templates select="bibliography/references[@normative='true'] | bibliography/clause[references[@normative='true']]"> <!-- [@id = '_normative_references'] -->
-					<xsl:with-param name="sectionNum" select="count(sections/clause[@type='scope']) + 1"/>
-				</xsl:apply-templates>
+				<xsl:apply-templates select="bibliography/references[@normative='true'] | bibliography/clause[references[@normative='true']]"/>
 				
 				<!-- Terms and definitions -->
 				<xsl:apply-templates select="sections/terms | 
@@ -564,12 +766,6 @@
 																																																not(@type='scope') and
 																																																not(self::clause and .//terms) and
 																																																not(self::clause and .//definitions)]" />
-				
-				<!-- Other main sections: Terms, etc... -->					
-				<!-- <xsl:apply-templates select="*[local-name() = 'sections']/*[not(@type='scope') and not(@type='intro')]">
-					<xsl:with-param name="sectionNumSkew" select="'1'"/>
-				</xsl:apply-templates> -->
-				
 			</body>	
 		</xsl:if>
 	</xsl:template>
@@ -1795,7 +1991,7 @@
 		</xsl:copy>
 	</xsl:template>
 	
-	<xsl:template match="preface/*[not(self::abstract)]" mode="front_preface">
+	<xsl:template match="preface/*[not(self::abstract or @type = 'section-title' or self::section-title)]" mode="front_preface">
 		<xsl:param name="skipIntroduction">true</xsl:param>
 		<xsl:variable name="name" select="local-name()"/>
 		<xsl:choose>
@@ -1844,6 +2040,9 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<xsl:template match="preface//*[@type = 'section-title' or local-name() = 'section-title']" mode="front_preface">
+		<xsl:apply-templates select="." mode="section-title"/>
+	</xsl:template>
 	
 	<xsl:template match="annex" mode="back">
 		<xsl:variable name="current_id">
@@ -2195,8 +2394,6 @@
 																references[@normative='true'] | 
 																terms |
 																definitions">
-		<xsl:param name="sectionNum"/>
-		<xsl:param name="sectionNumSkew" select="0"/>
 		<xsl:param name="processFloatingTitle">false</xsl:param>
 		<xsl:if test="normalize-space($debug) = 'true'">
 			<xsl:message>DEBUG: <xsl:value-of select="local-name()"/><xsl:text> processing </xsl:text>
@@ -2216,18 +2413,6 @@
 				</xsl:choose>
 			</xsl:message>
 		</xsl:if>
-		<xsl:variable name="sectionNum_">
-			<xsl:choose>
-				<xsl:when test="$sectionNum"><xsl:value-of select="$sectionNum"/></xsl:when>
-				<xsl:when test="$sectionNumSkew != 0">
-					<xsl:variable name="number"><xsl:number count="*"/></xsl:variable>
-					<xsl:value-of select="$number + $sectionNumSkew"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:number count="*"/>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
 	
 		<xsl:variable name="sec_type">
 			<xsl:choose>
@@ -2263,7 +2448,7 @@
 		</xsl:variable>
 		
 		<xsl:choose>
-			<xsl:when test="$processFloatingTitle = 'false' and preceding-sibling::p[1][@type = 'floating-title' or @type = 'section-title']"><!-- skip processing, see template for 'p' --></xsl:when>
+			<xsl:when test="$processFloatingTitle = 'false' and preceding-sibling::p[1][@type = 'floating-title']"><!-- skip processing, see template for 'p' --></xsl:when> <!--  or @type = 'section-title' -->
 			<xsl:otherwise>
 				<sec id="{$id}">
 					<xsl:if test="normalize-space($sec_type) != ''">
@@ -2283,9 +2468,7 @@
 						</xsl:otherwise>
 					</xsl:choose>
 					
-					<xsl:apply-templates select="title">
-						<xsl:with-param name="sectionNum" select="$sectionNum_"/>
-					</xsl:apply-templates>
+					<xsl:apply-templates select="title"/>
 					
 					<xsl:if test="@change">
 						<editing-instruction>
@@ -2303,9 +2486,8 @@
 						</editing-instruction>
 					</xsl:if>
 					
-					<xsl:apply-templates select="node()[not(self::title)]">
-						<xsl:with-param name="sectionNum" select="$sectionNum_"/>
-					</xsl:apply-templates>
+					<xsl:apply-templates select="node()[not(self::title)]"/>
+					
 				</sec>
 			</xsl:otherwise>
 		</xsl:choose>
@@ -2313,7 +2495,6 @@
 
 
 	<xsl:template match="term">
-		<xsl:param name="sectionNum"/>
 		<xsl:variable name="current_id">
 			<xsl:call-template name="getId"/>
 		</xsl:variable>
@@ -2348,29 +2529,21 @@
 				<tbx:langSet xml:lang="en">
 					<xsl:apply-templates select="node()[not(self::termexample or self::termnote or self::termsource or 
 																										self::preferred or self::admitted or self::deprecates or self::domain or 
-																										self::term)]">
-						<xsl:with-param name="sectionNum" select="$sectionNum"/>
-					</xsl:apply-templates>
-					<xsl:apply-templates select="termexample">
-						<xsl:with-param name="sectionNum" select="$sectionNum"/>
-					</xsl:apply-templates>
-					<xsl:apply-templates select="termnote">
-						<xsl:with-param name="sectionNum" select="$sectionNum"/>
-					</xsl:apply-templates>
-					<xsl:apply-templates select="termsource">
-						<xsl:with-param name="sectionNum" select="$sectionNum"/>
-					</xsl:apply-templates>
+																										self::term)]"/>
 					
-					<xsl:apply-templates select="preferred | admitted | deprecates | domain">
-						<xsl:with-param name="sectionNum" select="$sectionNum"/>
-					</xsl:apply-templates>
+					<xsl:apply-templates select="termexample"/>
+					
+					<xsl:apply-templates select="termnote"/>
+					
+					<xsl:apply-templates select="termsource"/>
+					
+					<xsl:apply-templates select="preferred | admitted | deprecates | domain"/>
 					
 				</tbx:langSet>
 			</tbx:termEntry>
 			
-			<xsl:apply-templates select="term">
-				<xsl:with-param name="sectionNum" select="$sectionNum"/>
-			</xsl:apply-templates>
+			<xsl:apply-templates select="term"/>
+			
 		</term-sec>
 	</xsl:template>	
 
@@ -2492,7 +2665,6 @@
 	
 	<!-- <xsl:template match="*[local-name() = 'preferred'] | *[local-name() = 'admitted'] | *[local-name() = 'deprecates'] | *[local-name() = 'domain']"/> -->
 	<xsl:template match="preferred | admitted | deprecates | domain"> <!--  mode="termEntry" -->
-		<xsl:param name="sectionNum"/>
 		
 		<!-- <xsl:variable name="current_id">
 			<xsl:call-template name="getId"/>
@@ -2591,12 +2763,12 @@
 				<xsl:if test="preceding-sibling::*[1][self::p]"><break /></xsl:if>
 				<xsl:apply-templates />
 			</xsl:when>
-			<xsl:when test="@type = 'floating-title' or @type = 'section-title'">
+			<xsl:when test="@type = 'floating-title'">
 				<!-- create parent element with floating title, for nested clauses (sec) -->
 				<sec>
 					<xsl:copy-of select="@id"/>
 					<title><xsl:apply-templates /></title>
-					<xsl:apply-templates select="following-sibling::*[preceding-sibling::p[1][@type = 'floating-title' or @type = 'section-title']]">
+					<xsl:apply-templates select="following-sibling::*[preceding-sibling::p[1][@type = 'floating-title']]">
 						<xsl:with-param name="processFloatingTitle">true</xsl:with-param>
 					</xsl:apply-templates>
 				</sec>
@@ -2634,6 +2806,29 @@
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
+	
+	<xsl:template match="sections//*[@type = 'section-title' or local-name() = 'section-title']" priority="2">
+		<xsl:apply-templates select="." mode="section-title"/>
+	</xsl:template>
+	
+	<!-- Examples:
+	 in semantic metanorma xml: <section-title id="section_1" depth="1" type="floating-title">General</section-title>
+	 in presentation metanorma xml: <p id="section_1" depth="1" type="section-title" displayorder="3">Section 1<tab/>General</p> -->
+	<xsl:template match="*[@type = 'section-title' or local-name() = 'section-title']" mode="section-title">
+		<sec sec-type="section-title">
+			<xsl:copy-of select="@id"/>
+			<title>
+				<xsl:if test="$isSemanticXML = 'true'">
+					<!-- Example: Section 2: -->
+					<xsl:value-of select="$elements//element[@source_id = current()/@id]/@section_prefix"/>
+					<xsl:value-of select="$elements//element[@source_id = current()/@id]/@section"/>
+					<xsl:text>: </xsl:text>
+				</xsl:if>
+				<xsl:apply-templates />
+			</title>
+		</sec>
+	</xsl:template>
+	
 	
 	<xsl:template match="p/@align[. = 'indent']" priority="2">
 		<xsl:attribute name="specific-use"><xsl:value-of select="."/></xsl:attribute>
@@ -3615,6 +3810,11 @@
 		</named-content>
 	</xsl:template>
 	
+	<xsl:template match="li/table" priority="2">
+		<p>
+			<xsl:call-template name="table"/>
+		</p>
+	</xsl:template>
 	
 	<xsl:template match="table" name="table"> <!-- [*[local-name() = 'name']] -->
 		<xsl:variable name="number"><xsl:number level="any"/></xsl:variable>
@@ -4156,7 +4356,7 @@
 	
 	<xsl:template match="title/@depth"/>
 	<xsl:template match="tab">
-		<xsl:if test="parent::*[self::p and @type = 'section-title']"><xsl:text>: </xsl:text></xsl:if> <!-- replace 'tab' to ': ' for 'Section x' -->
+		<xsl:if test="parent::*[self::p and @type = 'section-title' or local-name() = 'section-title']"><xsl:text>: </xsl:text></xsl:if> <!-- replace 'tab' to ': ' for 'Section x' -->
 	</xsl:template>
 	
 	<!-- special case -->
@@ -4401,134 +4601,6 @@
 			</xsl:choose>
 		</xsl:variable>
 		<xsl:value-of select="$level"/>
-	</xsl:template>
-	
-	<xsl:template name="getSection">
-		<xsl:param name="sectionNum"/>
-		<xsl:variable name="level">
-			<xsl:call-template name="getLevel"/>
-		</xsl:variable>		
-		<xsl:variable name="section">
-			<xsl:choose>
-				<xsl:when test="self::dl"><xsl:number format="a" level="any"/></xsl:when>
-				<xsl:when test="self::formula and ancestor::sections"><xsl:number format="(1)" level="any"/></xsl:when>
-				<xsl:when test="self::formula and ancestor::annex">
-					<xsl:variable name="root_element_id" select="generate-id(ancestor::annex)"/>
-					<xsl:number format="A" level="any" count="annex"/>
-					<xsl:text>.</xsl:text>
-					<xsl:number format="1" level="any" count="formula[ancestor::*[generate-id() = $root_element_id] and not(@unnumbered = 'true')]"/>
-				</xsl:when>
-				<xsl:when test="self::bibitem and ancestor::references[@normative='true']">norm_ref_<xsl:number/></xsl:when>
-				<xsl:when test="self::bibitem">ref_<xsl:number/></xsl:when>
-				<xsl:when test="ancestor::bibliography">
-					<xsl:value-of select="$sectionNum"/>
-				</xsl:when>
-				<xsl:when test="self::annex">
-					<xsl:number format="A" level="any" count="annex"/>
-				</xsl:when>
-				<xsl:when test="(self::table or self::figure) and not(ancestor::annex)">
-					<xsl:variable name="root_element_id" select="generate-id(ancestor::*[contains(local-name(), '-standard')])"/> <!-- prevent global numbering for metanorma-collection -->
-					<xsl:choose>
-						<xsl:when test="self::table">
-							<xsl:variable name="table_number_">
-								<xsl:number format="1" level="any" count="table[ancestor::*[generate-id() = $root_element_id] and not(ancestor::annex) and not(@unnumbered = 'true')]"/>
-							</xsl:variable>
-							<xsl:variable name="table_number" select="normalize-space($table_number_)"/>
-							<xsl:if test="$table_number != '0'"><xsl:value-of select="$table_number"/></xsl:if>
-						</xsl:when>
-						<xsl:when test="self::figure">
-							<xsl:variable name="figure_number_">
-								<xsl:number format="1" level="any" count="figure[ancestor::*[generate-id() = $root_element_id] and not(ancestor::annex) and not(@unnumbered = 'true')]"/>
-							</xsl:variable>
-							<xsl:variable name="figure_number" select="normalize-space($figure_number_)"/>
-							<xsl:if test="$figure_number != '0'"><xsl:value-of select="$figure_number"/></xsl:if>
-							</xsl:when>
-					</xsl:choose>
-				</xsl:when>
-				<xsl:when test="ancestor::sections">
-					<!-- 1, 2, 3, 4, ... from main section (not annex, bibliography, ...) -->
-					<xsl:choose>
-						<!-- <xsl:when test="self::table"><xsl:number format="1" level="any" count="table[ancestor::sections or ancestor::introduction]"/></xsl:when>
-						<xsl:when test="self::figure"><xsl:number format="1" level="any" count="figure[ancestor::sections or ancestor::introduction]"/></xsl:when> -->
-						<xsl:when test="$level = 1">
-							<xsl:value-of select="$sectionNum"/>
-						</xsl:when>
-						<xsl:when test="$level &gt;= 2">
-							<xsl:variable name="num">
-								<xsl:number format=".1" level="multiple" count="clause/clause | 
-																																										clause/terms | 
-																																										terms/term | 
-																																										clause/term |  
-																																										term/term |  
-																																										terms/clause |
-																																										terms/definitions |
-																																										definitions/clause |
-																																										clause/definitions |
-																																										definitions/definitions"/>
-							</xsl:variable>
-							<xsl:variable name="addon">
-								<xsl:choose>
-									<xsl:when test="self::preferred or self::admitted or self::deprecates or self::domain">
-										<xsl:number format="-1" count="preferred | admitted | deprecates | domain"/>
-									</xsl:when>
-									<xsl:otherwise></xsl:otherwise>
-								</xsl:choose>
-							</xsl:variable>
-							<xsl:value-of select="concat($sectionNum, $num, $addon)"/>
-							
-						</xsl:when>
-						<xsl:otherwise></xsl:otherwise>
-					</xsl:choose>
-				</xsl:when>				
-				<xsl:when test="ancestor::annex">
-					<xsl:variable name="annexid" select="normalize-space(/*/bibdata/ext/structuredidentifier/annexid)"/>
-					<xsl:choose>
-						<xsl:when test="self::table">
-							<xsl:variable name="curr_annexid" select="ancestor::annex/@id"/>							
-							<xsl:number format="A" count="annex"/>
-							<xsl:number format=".1" level="any" count="table[ancestor::annex/@id = $curr_annexid]"/>
-						</xsl:when>						
-						<xsl:when test="self::figure">
-							<xsl:number format="A.1-1" level="multiple" count="annex | figure"/>
-						</xsl:when>
-						<xsl:when test="$level = 1">							
-							<xsl:choose>
-								<xsl:when test="count(//annex) = 1 and $annexid != ''">
-									<xsl:value-of select="$annexid"/>
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:number format="A" level="any" count="annex"/>
-								</xsl:otherwise>
-							</xsl:choose>
-						</xsl:when>
-						<xsl:otherwise>							
-							<xsl:choose>
-								<xsl:when test="count(//annex) = 1 and $annexid != ''">
-									<xsl:value-of select="$annexid"/><xsl:number format=".1" level="multiple" count="clause"/>
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:number format="A.1" level="multiple" count="annex | clause"/>
-								</xsl:otherwise>
-							</xsl:choose>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:when>
-				<xsl:when test="ancestor::preface"> <!-- if preface and there is clause(s) -->
-					<xsl:choose>
-						<xsl:when test="$level = 1 and  ..//clause">0</xsl:when>
-						<xsl:when test="$level &gt;= 2">
-							<xsl:variable name="num">
-								<xsl:number format=".1" level="multiple" count="clause"/>
-							</xsl:variable>
-							<xsl:value-of select="concat('0', $num)"/>
-						</xsl:when>
-						<xsl:otherwise></xsl:otherwise>
-					</xsl:choose>
-				</xsl:when>
-				<xsl:otherwise></xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		<xsl:value-of select="$section"/>
 	</xsl:template>
 	
 	<xsl:template name="capitalize">
