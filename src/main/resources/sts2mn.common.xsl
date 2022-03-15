@@ -438,6 +438,8 @@
 			localityContinue - uses when locality number placed in another element than locality, for example, '=2.5'
 		-->
 	<xsl:variable name="adapted_from_text">Adapted from</xsl:variable>
+	
+	<xsl:variable name="source_text">SOURCE:</xsl:variable>
 	 
 	<xsl:template name="build_sts_model_term_source">
 		<xsl:apply-templates />
@@ -464,6 +466,9 @@
 		<!-- remove 'Adapted from:' or 'Adapted from' text -->
 		<xsl:variable name="text_">
 			<xsl:choose>
+				<xsl:when test="$isFirstText = 'true' and starts-with(., $source_text)">
+					<xsl:value-of select="normalize-space(substring-after(., $source_text))"/>
+				</xsl:when>
 				<xsl:when test="contains(., concat($adapted_from_text, ':'))"> <!-- and $OUTPUT_FORMAT = 'adoc' -->
 					<xsl:value-of select="normalize-space(substring-after(., concat($adapted_from_text, ':')))"/>
 				</xsl:when>
