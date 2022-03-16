@@ -4624,9 +4624,16 @@
 				<xsl:variable name="str20">
 				
 					<!-- string ends with [ -->
-					<xsl:variable name="isEndsWithOpeningBracket" select="java:endsWith(java:java.lang.String.new($str10),'[') and following-sibling::node()[1][self::xref][@ref-type = 'bibr'] and not(parent::tbx:source) and starts-with(following-sibling::node()[2],']')"/>
+					<!-- Case 1:  [61]
+								[<xref ref-type="bibr" rid="biblref_61">61</xref>]
+							Case 2: [61,62]
+								[<xref ref-type="bibr" rid="biblref_61">61</xref>,<xref ref-type="bibr" rid="biblref_62">62</xref>] 
+					-->
+					<xsl:variable name="isEndsWithOpeningBracket" select="java:endsWith(java:java.lang.String.new($str10),'[') and following-sibling::node()[1][self::xref][@ref-type = 'bibr'] and not(parent::tbx:source) and 
+					(starts-with(following-sibling::node()[2],']') or  (following-sibling::node()[2] = ',' and following-sibling::node()[3][self::xref][@ref-type = 'bibr']))"/>
 					<!-- string starts with ] -->
-					<xsl:variable name="isStartsWithClosingBracket" select="starts-with($str10,']') and preceding-sibling::node()[1][self::xref][@ref-type = 'bibr'] and not(parent::tbx:source) and java:endsWith(java:java.lang.String.new(preceding-sibling::node()[2]),'[')"/>
+					<xsl:variable name="isStartsWithClosingBracket" select="starts-with($str10,']') and preceding-sibling::node()[1][self::xref][@ref-type = 'bibr'] and not(parent::tbx:source) and 
+					(java:endsWith(java:java.lang.String.new(preceding-sibling::node()[2]),'[') or (preceding-sibling::node()[2] = ',' and preceding-sibling::node()[3][self::xref][@ref-type = 'bibr']))"/>
 					
 					<xsl:choose>
 					
