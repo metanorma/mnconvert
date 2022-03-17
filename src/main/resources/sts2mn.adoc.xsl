@@ -4885,6 +4885,48 @@
 	<xsl:template match="tbx:source[italic and count(node()) = 1]" mode="linearize">
 		<tbx:note><xsl:apply-templates mode="linearize"/></tbx:note>
 	</xsl:template>
+	
+	<!-- special case:, 
+		... social bond (</italic>
+	<tbx:entailedTerm target="term_2.18">
+		<italic>2.18</italic>
+	</tbx:entailedTerm>
+	-->
+	<!-- remove termname + '(' before entailedTerm with term's number only -->
+	<!-- and -->
+	<!-- remove ')' after entailedTerm with term's number only -->
+	<xsl:template match="node()[following-sibling::node()[1][self::tbx:entailedTerm][translate(., '01234567890.', '') = '']]/text() |
+	
+	node()[preceding-sibling::node()[1][self::tbx:entailedTerm][translate(., '01234567890.', '') = '']]/text()" mode="linearize">
+		<xsl:variable name="preceding_entailedTerm_target" select="../preceding-sibling::node()[1][self::tbx:entailedTerm]/@target"/>
+		<xsl:variable name="preceding_term_name" select="normalize-space(key('ids', $preceding_entailedTerm_target)//tbx:term[1])"/>
+		
+		<xsl:variable name="text">
+			<xsl:choose>
+				<xsl:when test="$preceding_term_name != '' and java:endsWith(java:java.lang.String.new(normalize-space(../preceding-sibling::node()[2])), concat($preceding_term_name,' ('))"> <!-- and java:org.metanorma.utils.RegExHelper.matches(concat($term_name,' \($'), ../preceding-sibling::node()[2]/text()) = 'true' -->
+					<!-- remove ')' after entailedTerm with term's number only -->
+					<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.), '^\)','')"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="."/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:variable name="following_entailedTerm_target" select="../following-sibling::node()[1][self::tbx:entailedTerm]/@target"/>
+		<xsl:variable name="following_term_name" select="normalize-space(key('ids', $following_entailedTerm_target)//tbx:term[1])"/>
+		<xsl:choose>
+			<xsl:when test="$following_term_name != ''">
+				<!-- remove termname + '(' before entailedTerm with term's number only -->
+				<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text), concat($following_term_name,' \($'),'')"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$text"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	<!-- end special case -->
+	
 	<!-- ========================================= -->
 	<!-- END XML Linearization -->
 	<!-- ========================================= -->
