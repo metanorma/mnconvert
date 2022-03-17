@@ -3914,9 +3914,16 @@
 				
 				<xsl:variable name="value" select="."/>
 				
+				<xsl:variable name="options">
+					<xsl:if test="ancestor::*[@sec-type='terms'] and ancestor::term-sec">
+						<xsl:text>noref,noital</xsl:text>
+					</xsl:if>
+				</xsl:variable>
+				
 				<xsl:call-template name="insertTermReference">
 					<xsl:with-param name="term" select="$term_real"/>
 					<xsl:with-param name="rendering" select="$value"/>
+					<xsl:with-param name="options" select="$options"/>
 				</xsl:call-template>
 				
 			</xsl:when>
