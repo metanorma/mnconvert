@@ -1701,7 +1701,10 @@
 	<xsl:template match="tbx:entailedTerm">
 	
 		<xsl:variable name="space_before"><xsl:if test="local-name(preceding-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
-		<xsl:variable name="space_after"><xsl:if test="local-name(following-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
+		<xsl:variable name="following_first_char" select="substring(following-sibling::node()[1],1,1)"/>
+		
+		<xsl:variable name="space_after"><xsl:if test="local-name(following-sibling::node()[1]) != '' and not($following_first_char = '.' or 
+		$following_first_char = ',')"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		<xsl:value-of select="$space_before"/>
 	
 		<xsl:variable name="target" select="substring-after(@target, 'term_')"/>
@@ -1721,14 +1724,14 @@
 		</xsl:variable>
 		<!-- <xsl:variable name="term_real" select="normalize-space(//*[@id = current()/@target]//tbx:term[1])"/> -->
 		<xsl:variable name="term_real" select="normalize-space(key('ids', current()/@target)//tbx:term[1])"/>
-		
+
 		<xsl:call-template name="insertTermReference">
 			<xsl:with-param name="term" select="$term_real"/>
 			<xsl:with-param name="rendering" select="$term"/>
 		</xsl:call-template>
 
 		<xsl:value-of select="$space_after"/>
-		
+
 	</xsl:template>
 	
 	<!-- old: term:[term] -->
@@ -2285,9 +2288,15 @@
 				<xsl:apply-templates />
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:if test="self::italic2"><xsl:text>_</xsl:text></xsl:if>
-				<xsl:text>_</xsl:text><xsl:apply-templates /><xsl:text>_</xsl:text>
-				<xsl:if test="self::italic2"><xsl:text>_</xsl:text></xsl:if>
+				<xsl:variable name="text"><xsl:apply-templates /></xsl:variable>
+				<xsl:choose>
+					<xsl:when test="$text = '.'"><xsl:value-of select="$text"/></xsl:when>
+					<xsl:otherwise>
+						<xsl:if test="self::italic2"><xsl:text>_</xsl:text></xsl:if>
+						<xsl:text>_</xsl:text><xsl:value-of select="$text"/><xsl:text>_</xsl:text>
+						<xsl:if test="self::italic2"><xsl:text>_</xsl:text></xsl:if>
+					</xsl:otherwise>
+				</xsl:choose>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
