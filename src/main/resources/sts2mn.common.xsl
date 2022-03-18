@@ -461,7 +461,8 @@
 	
 		<xsl:variable name="isFirstText" select="not(preceding-sibling::node())"/>
 	
-		<xsl:variable name="modified_text">, modified</xsl:variable>
+		<!-- <xsl:variable name="modified_text">, modified</xsl:variable> -->
+		<xsl:variable name="modified_text_regex">,? modified</xsl:variable>
 		
 		<!-- remove 'Adapted from:' or 'Adapted from' text -->
 		<xsl:variable name="text_">
@@ -482,8 +483,12 @@
 		<!-- remove modified text -->
 		<xsl:variable name="text">
 			<xsl:choose>
-				<xsl:when test="contains($text_, $modified_text) or contains(preceding-sibling::text(), $modified_text)">
+				<!-- <xsl:when test="contains($text_, $modified_text) or contains(preceding-sibling::text(), $modified_text)">
 					<xsl:value-of select="substring-before($text_, $modified_text)"/>
+				</xsl:when> -->
+				<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($modified_text_regex, $text_) = 'true' or
+					java:org.metanorma.utils.RegExHelper.matches($modified_text_regex, preceding-sibling::text()) = 'true'">
+					<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text_), concat('^(.*)(', $modified_text_regex, ')'),'$1')"/>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:value-of select="$text_"/>
