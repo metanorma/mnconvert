@@ -282,6 +282,25 @@
 			</xsl:if>
 			<xsl:if test="sec or notes">
 				<preface>
+					
+					<xsl:if test="$type_xml = 'presentation' and ($organization = 'BSI' or $organization = 'PAS')">
+						<xsl:variable name="model_related_refs_">
+							<xsl:for-each select="nat-meta">
+								<xsl:call-template name="build_sts_related_refs"/>
+							</xsl:for-each>
+						</xsl:variable>
+						<xsl:variable name="model_related_refs" select="xalan:nodeset($model_related_refs_)"/>
+						<xsl:if test="$model_related_refs//item">
+							<clause type="related-refs" displayorder="1">
+								<p><xsl:text>The following BSI references relate to the work on this document:</xsl:text>
+									<xsl:for-each select="$model_related_refs//item">
+										<br/><xsl:value-of select="."/>
+									</xsl:for-each>
+								</p>
+							</clause>
+						</xsl:if>
+					</xsl:if>
+					
 					<xsl:apply-templates select="notes" mode="preface"/>
 					<xsl:apply-templates select="sec" mode="preface"/>
 					<xsl:if test="$nat_meta_only = 'true'"> <!-- move Introduction section from body to preface, if  nat_meta_only -->

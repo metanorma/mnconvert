@@ -14,6 +14,28 @@
 	<!-- ================= -->
 	<!-- std model processing -->
 	<!-- ================= -->
+		
+		
+	<!-- build related refs model:
+			Committee reference ...
+			Draft for comment ...
+	-->
+	<xsl:template name="build_sts_related_refs">
+		<xsl:for-each select="comm-ref[normalize-space() != '']">
+			<item>Committee reference <xsl:value-of select="."/></item> <!-- Example: Committee reference DEF/1 -->
+		</xsl:for-each>
+		<xsl:if test="std-xref[@type='isPublishedFormatOf']">
+			<item>
+				<xsl:text>Draft for comment </xsl:text>
+				<xsl:for-each select="std-xref[@type='isPublishedFormatOf']">
+					<xsl:value-of select="std-ref"/><!-- Example: Draft for comment 20/30387670 DC -->
+					<xsl:if test="position() != last()">,</xsl:if>
+				</xsl:for-each>
+		</item>
+		</xsl:if>
+	</xsl:template>
+	
+
 	
 	<!-- build std model:
 			reference - link to bibliography item
