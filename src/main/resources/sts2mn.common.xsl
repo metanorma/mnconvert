@@ -966,6 +966,221 @@
 	<!-- END Relations (std-xref processing) -->
 	<!-- =============================== -->
 	
+	
+	<!-- build fig model:
+			title_main - figure's name
+			caption/title - nested figure's name
+			graphic - figure's filename
+			key - table's key
+			non-normative-note - figure's note(s)
+	-->
+	<xsl:template name="build_sts_model_fig">
+		<xsl:copy>
+			<xsl:copy-of select="@*"/>
+			<xsl:copy-of select=".//*/@orientation"/>
+			<xsl:apply-templates mode="model_fig"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="@*|node()" mode="model_fig">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="model_fig"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="fig/caption" mode="model_fig"> <!-- remove 'caption' element, but not nested elements -->
+		<xsl:apply-templates mode="model_fig"/>
+	</xsl:template>
+	
+	<xsl:template match="fig/caption/title" mode="model_fig">
+		<title_main>
+			<xsl:apply-templates mode="model_fig"/>
+		</title_main>
+	</xsl:template>
+	
+	<xsl:template match="fig/caption/p" mode="model_fig">
+		<non-normative-note><xsl:apply-templates mode="model_fig"/></non-normative-note>
+	</xsl:template>
+	
+	<xsl:template match="fig/*[self::table-wrap or self::array][count(table/col) + count(table/colgroup/col) = 1 and .//graphic]" mode="model_fig">
+		<xsl:apply-templates mode="model_fig"/>
+	</xsl:template>
+	
+	
+	<xsl:template match="fig/*[self::table-wrap or self::array][count(table/col) + count(table/colgroup/col) = 1 and .//graphic]/caption" mode="model_fig">
+		<non-normative-note>
+			<p>
+				<xsl:apply-templates mode="model_fig"/>
+			</p>
+		</non-normative-note>
+	</xsl:template>
+	
+	<xsl:template match="fig/p" mode="model_fig">
+		<non-normative-note>
+			<xsl:copy>
+				<xsl:copy-of select="@*"/>
+				<xsl:apply-templates mode="model_fig"/>
+			</xsl:copy>
+		</non-normative-note>
+	</xsl:template>
+	
+	<xsl:template match="fig/*[self::table-wrap or self::array][count(table/col) + count(table/colgroup/col) = 1 and .//graphic]/table" mode="model_fig">
+		<xsl:apply-templates mode="ignore_table"/>
+	</xsl:template>
+	
+	<!-- figure's key -->
+	<xsl:template match="fig/array[@content-type = 'figure-index' or @content-type = 'fig-index']" mode="model_fig">
+		<key label="{label}">
+			<xsl:apply-templates mode="model_fig"/>
+		</key>
+	</xsl:template>
+	
+	<xsl:template match="fig/array/@orientation" mode="model_fig"/>
+	
+	<xsl:template match="fig/table-wrap[@content-type = 'figure-index' or @content-type = 'fig-index']" mode="model_fig">
+		<!-- <key label="{caption/title}"> -->
+			<xsl:copy>
+				<xsl:copy-of select="@*"/>
+				<xsl:apply-templates mode="model_fig"/>
+			</xsl:copy>
+		<!-- </key> -->
+	</xsl:template>
+	
+	<xsl:template match="fig/table-wrap/@orientation" mode="model_fig"/>
+	
+	<!-- Special case: table with image and key -->
+	<xsl:template match="fig[not(graphic) and array and not(table-wrap)]/array" mode="model_fig">
+		<xsl:apply-templates select="../*[not(self::array or self::caption or self::label)]" mode="model_fig"/>
+		<xsl:apply-templates select="." mode="fig_array"/>
+	</xsl:template>
+	
+	<!-- ============= -->
+	<!-- mode: ignore_table -->
+	<!-- ============= -->
+	<xsl:template match="@*|node()" mode="ignore_table">
+		<xsl:apply-templates select="@*|node()" mode="ignore_table"/>
+	</xsl:template>
+	
+	<xsl:template match="tr[.//graphic]" mode="ignore_table">
+		<xsl:copy-of select=".//graphic"/>
+	</xsl:template>
+	
+	<xsl:template match="tr[not(.//graphic)]" mode="ignore_table">
+		<title><xsl:apply-templates select="td/node()" mode="model_fig"/></title>
+	</xsl:template>
+	
+	<xsl:template match="td/text()[1]" mode="model_fig">
+		<!-- Example: 'a) Common fire relay' to 'Common fire relay' -->
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regexListItemLabel, '$6')"/> <!-- get last group from regexListItemLabel, i.e. list item text without label-->
+	</xsl:template>
+	
+	<!-- ============= -->
+	<!-- END mode: ignore_table -->
+	<!-- ============= -->
+	
+	
+	<!-- ============= -->
+	<!-- mode: fig_array -->
+	<!-- ============= -->
+	<xsl:template match="fig/array" mode="fig_array" priority="2">
+		<xsl:variable name="MAX_ROW">99999</xsl:variable>
+		<!-- table's row number with 'Key' -->
+		<xsl:variable name="row_key_" select="count(.//tr[normalize-space(td) = 'Key']/preceding-sibling::tr)" />
+		<xsl:variable name="row_key">
+			<xsl:choose>
+				<xsl:when test="$row_key_ = '0'"><xsl:value-of select="$MAX_ROW"/></xsl:when> <!-- no Key -->
+				<xsl:otherwise><xsl:value-of select="$row_key_ + 1"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<!-- <xsl:text>&#xa;row-key=</xsl:text><xsl:value-of select="$row_key"/><xsl:text>&#xa;</xsl:text> -->
+		
+		<xsl:for-each select=".//tr[position() &lt; $row_key]">
+			<xsl:if test=".//graphic">
+				<xsl:if test="not(following-sibling::tr[1]//graphic) and position() != last() and not(following-sibling::tr[1]//non-normative-note)">
+					<title>
+						<xsl:apply-templates select="following-sibling::tr[1]" mode="fig_array"/>
+					</title>
+				</xsl:if>
+				<xsl:apply-templates select="." mode="fig_array"/>
+			</xsl:if>
+			<xsl:if test=".//non-normative-note">
+				<xsl:apply-templates mode="fig_array"/>
+			</xsl:if>
+		</xsl:for-each>
+		
+		
+		<xsl:if test="$row_key != $MAX_ROW"> <!-- if there is table with 'Key' -->
+			<key>
+				<xsl:copy>
+					<xsl:copy-of select="@*"/>
+					<xsl:apply-templates select="table" mode="copy_table">
+						<xsl:with-param name="rownum" select="$row_key"/>
+					</xsl:apply-templates>
+					<xsl:for-each select="table2"> <!-- change context to 'table' -->
+						<xsl:copy>
+							<xsl:copy-of select="@*"/>
+								<xsl:for-each select=".//tr[position() &gt;= $row_key]">
+									<xsl:apply-templates select="." mode="model_fig"/>
+								</xsl:for-each>
+						</xsl:copy>
+					</xsl:for-each>
+				</xsl:copy>
+			</key>
+		</xsl:if>
+		
+	</xsl:template>
+	
+	<xsl:template match="tr" mode="fig_array" priority="2">
+		<xsl:apply-templates mode="fig_array"/>
+	</xsl:template>
+	
+	<xsl:template match="td" mode="fig_array" priority="2">
+		<xsl:apply-templates mode="fig_array"/>
+	</xsl:template>
+	
+	<xsl:template match="*" mode="fig_array">
+		<xsl:apply-templates select="." mode="model_fig"/>
+	</xsl:template>
+	
+	<xsl:template match="td/text()[1]" mode="fig_array">
+		<!-- Example: 'a) Common fire relay' to 'Common fire relay' -->
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regexListItemLabel, '$6')"/> <!-- get last group from regexListItemLabel, i.e. list item text without label-->
+	</xsl:template>
+	<!-- ============= -->
+	<!-- END mode: fig_array -->
+	<!-- ============= -->
+	
+	
+	<!-- ================= -->
+	<!-- copy table rows after specified row -->
+	<!-- ================= -->
+	<xsl:template match="@*|node()" mode="copy_table">
+		<xsl:param name="rownum"/>
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="copy_table">
+				<xsl:with-param name="rownum" select="$rownum"/>
+			</xsl:apply-templates>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="tr" mode="copy_table">
+		<xsl:param name="rownum"/>
+		<xsl:variable name="rownum_curr"><xsl:number/></xsl:variable>
+		<xsl:if test="$rownum_curr &gt;= $rownum">
+			<xsl:copy-of select="."/>
+		</xsl:if>
+	</xsl:template>
+	
+	<!-- ================= -->
+	<!-- END: copy table rows after specified row -->
+	<!-- ================= -->
+	
+	<!-- ======================== -->
+	<!-- end  build_sts_model_fig -->
+	<!-- ======================== -->
+	
+	
 	<xsl:variable name="regexSectionTitle" select="'^Section(\s|\h)+[0-9]+(:|\-|\.)*(\s|\h)*(.*)$'"/>
 	<xsl:variable name="regexSectionLabel" select="'^Section(\s|\h)+[0-9]+$'"/>
 	

@@ -1648,6 +1648,12 @@
 						<xsl:text>&#xa;</xsl:text>
 					</xsl:if>
 				</xsl:if>
+				<!-- <xsl:if test="not(parent::fig)">
+					<xsl:if test="@style-type = 'align-center'">
+						<xsl:text>[align=center]</xsl:text>
+							<xsl:text>&#xa;</xsl:text>
+					</xsl:if>
+				</xsl:if> -->
 				<!-- <xsl:if test="count(node()[normalize-space() != '']) = 1 and styled-content[@style='text-alignment: center']">
 					<xsl:text>[align=center]</xsl:text>
 						<xsl:text>&#xa;</xsl:text>
@@ -2677,7 +2683,7 @@
 	</xsl:template>
 	
 	<xsl:template match="table/@width" mode="orientation">
-		<xsl:if test=". &gt;= 700">
+		<xsl:if test=". &gt;= 700 and not(ancestor::fig)">
 			<xsl:call-template name="setPageOrientation">
 				<xsl:with-param name="orientation" select="'landscape'"/>
 			</xsl:call-template>
@@ -2689,7 +2695,7 @@
 	</xsl:template>
 	
 	<xsl:template match="table/@width" mode="after_table">
-		<xsl:if test=". &gt;= 700">
+		<xsl:if test=". &gt;= 700 and not(ancestor::fig)">
 			<xsl:call-template name="setPageOrientation"/>
 		</xsl:if>
 	</xsl:template>
@@ -3473,8 +3479,123 @@
 	<!-- ============================ -->
 	<!-- Figure -->
 	<!-- ============================ -->
-	<!-- in STS XML there are two figure's group structure: fig-group/fig* and fig/graphic[title]* (in BSI documents) -->
-	<xsl:template match="fig-group | fig[graphic[caption]] | fig[count(graphic) &gt;= 2]">
+	
+	<xsl:template match="fig" priority="3">
+	
+		<xsl:variable name="fig_">
+			<xsl:call-template name="build_sts_model_fig"/>
+		</xsl:variable>
+		<xsl:variable name="fig" select="xalan:nodeset($fig_)"/>
+		
+		<!-- <xsl:text>&#xa;DEBUG&#xa;</xsl:text>
+		<xsl:apply-templates select="$fig" mode="print_as_xml"/>
+		<xsl:text>&#xa;</xsl:text> -->
+		
+		<xsl:if test="parent::tbx:note">
+			<xsl:text> +&#xa;</xsl:text>
+		</xsl:if>
+		
+		<xsl:apply-templates select="$fig/fig/@orientation"/>
+		
+		<!-- Example: [[fig_1]] -->
+		<xsl:call-template name="setId"/>
+
+		<xsl:apply-templates select="$fig/fig/label"/>
+
+		<xsl:choose>
+			<xsl:when test="count($fig/fig/graphic) &gt; 1 or count($fig/fig/title_main) + count($fig/fig/graphic//title) &gt; 1">
+				
+				<!-- Example: . Figure title -->
+				<xsl:apply-templates select="$fig/fig/title_main" />
+				
+				<!-- <xsl:apply-templates select="$fig/fig/title[1]" /> -->
+			
+				<xsl:text>====</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+				
+				<xsl:variable name="title_before_graphic" select="normalize-space($fig/fig/graphic[1][preceding-sibling::title] and 1 = 1)"/>
+				<xsl:for-each select="$fig/fig/graphic">
+					<xsl:if test="$title_before_graphic = 'true'">
+						<xsl:apply-templates select="preceding-sibling::title[1]"/>
+					</xsl:if>
+					<xsl:if test="$title_before_graphic = 'false'">
+						<xsl:apply-templates select="following-sibling::title[1]"/>
+					</xsl:if>
+					<xsl:apply-templates select="."/>
+				</xsl:for-each>
+
+				<xsl:text>====</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:when>
+			
+			<xsl:otherwise>
+				<!-- Example: . Figure title -->
+				<xsl:apply-templates select="$fig/fig/title_main" />
+				<xsl:apply-templates select="$fig/fig/graphic"/>
+				<xsl:text>&#xa;</xsl:text>
+				<!-- <xsl:text>&#xa;</xsl:text> -->
+			</xsl:otherwise>
+		</xsl:choose>
+		
+		<!-- process another elements (key, note, ... ) -->
+		<xsl:apply-templates select="$fig/fig/*[not(self::label or self::title or self::title_main or self::graphic)]"/>
+		
+		<xsl:apply-templates select="$fig/fig/@orientation" mode="after_fig"/>
+		
+	</xsl:template>
+	
+	<!-- ==================== -->
+	<!-- figure model processing -->
+	<!-- ==================== -->
+	<xsl:template match="fig/title | fig/title_main"> <!-- in xml: fig/caption/title -->
+		<xsl:text>.</xsl:text>
+		<xsl:apply-templates />
+		<xsl:for-each select="ancestor::fig[1]/p/named-content[@content-type='ace-tag']"> <!-- move ace-tag at the end of figure's title -->
+			<xsl:call-template name="ace-tag"/>
+		</xsl:for-each>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="fig/label" priority="2">
+		<xsl:variable name="number" select="normalize-space(substring-after(., '&#xa0;'))"/>
+		<xsl:if test="substring($number, 1, 1) = '0'"> <!-- example: Figure 0.1 -->
+			<xsl:text>[number=</xsl:text><xsl:value-of select="$number"/><xsl:text>]&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="fig/key">
+		<xsl:if test="table">
+			<xsl:text>[%unnumbered]&#xa;</xsl:text>
+		</xsl:if>
+		<xsl:apply-templates select="@label"/>
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="fig/key/@label">
+		<xsl:text>.</xsl:text>
+		<xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="fig/@orientation">
+		<xsl:call-template name="setPageOrientation">
+			<xsl:with-param name="orientation" select="."/>
+		</xsl:call-template>
+	</xsl:template>
+	
+	<xsl:template match="fig/@orientation" mode="after_fig">
+		<xsl:call-template name="setPageOrientation"/>
+	</xsl:template>
+	
+	<!-- ==================== -->
+	<!-- END figure model processing -->
+	<!-- ==================== -->
+	
+	
+	<!-- in STS XML there are two figure's group structure: fig-group/fig* and 
+					fig/graphic[title]* (in BSI documents), for latter see template match="fig" -->
+	<xsl:template match="fig-group">
 		<xsl:call-template name="setId"/>
 		<xsl:apply-templates select="caption/title" mode="fig-group-title"/>
 		<xsl:text>====</xsl:text>
@@ -3487,45 +3608,8 @@
 		<xsl:apply-templates select="*[self::array or self::non-normative-note]"/>
 	</xsl:template>
 	
-	<xsl:template match="fig[graphic[caption] or count(graphic) &gt;= 2]/caption/title" priority="2"/>
 	<xsl:template match="fig-group/caption/title"/>
-	<xsl:template match="fig-group/caption/title | fig/caption/title" mode="fig-group-title">
-		<xsl:text>.</xsl:text>
-		<xsl:apply-templates />
-		<xsl:for-each select="ancestor::fig[1]/p/named-content[@content-type='ace-tag']"> <!-- move ace-tag at the end of figure's title -->
-			<xsl:call-template name="ace-tag"/>
-		</xsl:for-each>
-		<xsl:text>&#xa;</xsl:text>
-	</xsl:template>
-	
-	<xsl:template match="fig">
-		<xsl:if test="not(parent::fig-group)">
-			<xsl:if test="parent::tbx:note"><xsl:text> +&#xa;</xsl:text></xsl:if>
-			<xsl:call-template name="setId"/>
-		</xsl:if>
-		<xsl:choose>
-			<xsl:when test="not(graphic) and array"> <!-- Case for https://github.com/metanorma/mnconvert/issues/87 -->
-				<xsl:apply-templates select="*[not(self::array)]"/>
-				<xsl:apply-templates select="array" mode="fig_array"/>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:apply-templates/>
-			</xsl:otherwise>
-		</xsl:choose>
-		
-		<xsl:if test="(parent::fig-group and position() != last()) or not(parent::fig-group)">
-			<xsl:text>&#xa;</xsl:text>
-		</xsl:if>
-	</xsl:template>
-	
-	<xsl:template match="fig/label" priority="2">
-		<xsl:variable name="number" select="normalize-space(substring-after(., '&#xa0;'))"/>
-		<xsl:if test="substring($number, 1, 1) = '0'"> <!-- example: Figure 0.1 -->
-			<xsl:text>[number=</xsl:text><xsl:value-of select="$number"/><xsl:text>]&#xa;</xsl:text>
-		</xsl:if>
-	</xsl:template>
-	
-	<xsl:template match="fig/caption/title">
+	<xsl:template match="fig-group/caption/title" mode="fig-group-title">
 		<xsl:text>.</xsl:text>
 		<xsl:apply-templates />
 		<xsl:for-each select="ancestor::fig[1]/p/named-content[@content-type='ace-tag']"> <!-- move ace-tag at the end of figure's title -->
@@ -3612,92 +3696,6 @@
 				</xsl:if>
 			</xsl:otherwise>
 		</xsl:choose>
-	</xsl:template>
-	
-	
-	<xsl:template match="fig/array" mode="fig_array" priority="2">
-		<xsl:variable name="MAX_ROW">99999</xsl:variable>
-		<!-- table row number with 'Key' -->
-		<xsl:variable name="row_key_" select="count(.//tr[normalize-space(td) = 'Key']/preceding-sibling::tr)" />
-		<xsl:variable name="row_key">
-			<xsl:choose>
-				<xsl:when test="$row_key_ = '0'"><xsl:value-of select="$MAX_ROW"/></xsl:when>
-				<xsl:otherwise><xsl:value-of select="$row_key_ + 1"/></xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		<!-- <xsl:text>row_key=</xsl:text><xsl:value-of select="$row_key"/><xsl:text>&#xa;</xsl:text> -->
-		
-		<xsl:variable name="images">
-			<xsl:for-each select=".//tr[position() &lt; $row_key]">
-				<xsl:if test=".//graphic">
-					<xsl:if test="not(following-sibling::tr[1]//graphic) and position() != last() and not(following-sibling::tr[1]//non-normative-note)">
-						<xsl:text>.</xsl:text><xsl:apply-templates select="following-sibling::tr[1]" mode="fig_array"/>
-					</xsl:if>
-					<xsl:apply-templates select="." mode="fig_array"/>
-				</xsl:if>
-				<xsl:if test=".//non-normative-note">
-					<xsl:apply-templates mode="fig_array"/>
-				</xsl:if>
-				<!-- <xsl:text>&#xa;</xsl:text> -->
-			</xsl:for-each>
-		</xsl:variable>
-		
-		<xsl:choose>
-			<xsl:when test="starts-with($images, '.')"> <!-- there is image's title -->
-				<xsl:text>====</xsl:text>
-				<xsl:text>&#xa;</xsl:text>
-				<xsl:value-of select="$images"/>
-				<xsl:text>====</xsl:text>
-				<xsl:text>&#xa;</xsl:text>
-				<xsl:text>&#xa;</xsl:text>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:value-of select="$images"/>
-			</xsl:otherwise>
-		</xsl:choose>
-		
-		
-		<xsl:if test="$row_key != $MAX_ROW"> <!-- if there is table with 'Key' -->
-			<!-- <xsl:text>&#xa;</xsl:text> -->
-			<xsl:if test="@id">
-				<xsl:text>[[array_</xsl:text><xsl:value-of select="@id"/><xsl:text>]]&#xa;</xsl:text>
-			</xsl:if>
-			<xsl:text>[%unnumbered]&#xa;</xsl:text>
-			<xsl:for-each select="table"> <!-- change context to 'table' -->
-				<xsl:call-template name="insertTableProperties"/>
-				<xsl:text>&#xa;</xsl:text>
-				<xsl:text>|===</xsl:text>
-				<xsl:text>&#xa;</xsl:text>
-				<xsl:text>&#xa;</xsl:text>
-				<xsl:for-each select=".//tr[position() &gt;= $row_key]">
-					<xsl:apply-templates select="."/>
-				</xsl:for-each>
-				<xsl:text>&#xa;</xsl:text>
-				<xsl:text>&#xa;</xsl:text>
-				<xsl:text>|===</xsl:text>
-				<xsl:text>&#xa;</xsl:text>
-				<xsl:text>&#xa;</xsl:text>
-			</xsl:for-each>
-		</xsl:if>
-		
-	</xsl:template>
-	
-	<xsl:template match="tr" mode="fig_array" priority="2">
-		<xsl:apply-templates mode="fig_array"/>
-		<xsl:text>&#xa;</xsl:text>
-	</xsl:template>
-	
-	<xsl:template match="td" mode="fig_array" priority="2">
-		<xsl:apply-templates mode="fig_array"/>
-	</xsl:template>
-	
-	<xsl:template match="*" mode="fig_array">
-		<xsl:apply-templates select="."/>
-	</xsl:template>
-	
-	<xsl:template match="td/text()[1]" mode="fig_array">
-		<!-- Example: 'a) Common fire relay' to 'Common fire relay' -->
-		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regexListItemLabel, '$6')"/> <!-- get last group from regexListItemLabel, i.e. list item text without label-->
 	</xsl:template>
 	
 	<!-- ============================ -->
@@ -5981,5 +5979,22 @@
 	<!-- =============== -->
 	
 	<xsl:include href="sts2mn.common.xsl"/>
+	
+	<xsl:template match="*" mode="print_as_xml">
+		<xsl:text>&#xa;&lt;</xsl:text>
+		<xsl:value-of select="local-name()"/>
+		<xsl:for-each select="@*">
+			<xsl:text> </xsl:text>
+			<xsl:value-of select="local-name()"/>
+			<xsl:text>="</xsl:text>
+			<xsl:value-of select="."/>
+			<xsl:text>"</xsl:text>
+		</xsl:for-each>
+		<xsl:text>&gt;</xsl:text>
+		<xsl:apply-templates mode="print_as_xml"/>
+		<xsl:text>&lt;/</xsl:text>
+		<xsl:value-of select="local-name()"/>
+		<xsl:text>&gt;</xsl:text>
+	</xsl:template>
 	
 </xsl:stylesheet>
