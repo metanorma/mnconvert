@@ -1690,7 +1690,7 @@
 	</xsl:template>
 		
 	<xsl:template match="tbx:entailedTerm">
-	
+		<xsl:variable name="target" select="@target"/>
 		<xsl:variable name="space_before"><xsl:if test="local-name(preceding-sibling::node()[1]) != ''"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		<xsl:variable name="following_first_char" select="substring(following-sibling::node()[1],1,1)"/>
 		
@@ -1698,13 +1698,13 @@
 		$following_first_char = ',')"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		<xsl:value-of select="$space_before"/>
 	
-		<xsl:variable name="target" select="substring-after(@target, 'term_')"/>
+		<xsl:variable name="target_number" select="substring-after($target, 'term_')"/>
 		<xsl:variable name="term">
 			<xsl:choose>
-				<xsl:when test="contains(., concat('(', $target, ')'))"> <!-- example: concept entry (3.5) -->
-					<xsl:value-of select="normalize-space(substring-before(., concat('(', $target, ')')))"/>
+				<xsl:when test="contains(., concat('(', $target_number, ')'))"> <!-- example: concept entry (3.5) -->
+					<xsl:value-of select="normalize-space(substring-before(., concat('(', $target_number, ')')))"/>
 				</xsl:when>
-				<xsl:when test="contains(., concat(' ', $target, ')'))"> <!-- example: vocational competence (see 3.26) -->
+				<xsl:when test="contains(., concat(' ', $target_number, ')'))"> <!-- example: vocational competence (see 3.26) -->
 					<xsl:value-of select="normalize-space(substring-before(., '('))"/>
 				</xsl:when>
 				<xsl:when test="translate(., '01234567890.', '') = ''"></xsl:when><!-- if digits and dot only, example 3.13 -->
@@ -1714,7 +1714,13 @@
 			</xsl:choose>
 		</xsl:variable>
 		<!-- <xsl:variable name="term_real" select="normalize-space(//*[@id = current()/@target]//tbx:term[1])"/> -->
-		<xsl:variable name="term_real" select="normalize-space(key('ids', current()/@target)//tbx:term[1])"/>
+		<!-- <xsl:variable name="term_real" select="normalize-space(key('ids', current()/@target)//tbx:term[1])"/> -->
+		
+		<xsl:variable name="term_real">
+			<xsl:for-each select="$updated_xml"> <!-- change context -->
+				<xsl:value-of select="normalize-space(key('ids', $target)//tbx:term[1])"/>
+			</xsl:for-each>
+		</xsl:variable>
 
 		<xsl:call-template name="insertTermReference">
 			<xsl:with-param name="term" select="$term_real"/>
@@ -2382,6 +2388,13 @@
 			<xsl:value-of select="$rid_"/>
 		</xsl:variable>
 		<xsl:variable name="rid" select="normalize-space($rid_tmp)"/>
+		
+		<xsl:variable name="isTerm">
+			<xsl:for-each select="$updated_xml"> <!-- change context -->
+				<xsl:value-of select="local-name(key('ids', $rid_)) = 'term-sec'"/>
+			</xsl:for-each>
+		</xsl:variable>
+		
 		<xsl:choose>
 			<xsl:when test="@ref-type = 'fn' or @ref-type = 'table-fn'">
 				<!-- find <fn id="$rid" -->
@@ -2430,9 +2443,16 @@
 				<xsl:text>&lt;</xsl:text><xsl:value-of select="."/><xsl:text>&gt;</xsl:text>
 			</xsl:when>
 			<!-- <xsl:when test="@ref-type = 'sec' and local-name(//*[@id = current()/@rid]) = 'term-sec'"> -->
-			<xsl:when test="@ref-type = 'sec' and local-name(key('ids', current()/@rid)) = 'term-sec'"> <!-- <xref ref-type="sec" rid="sec_3.21"> link to term clause -->
+			<!-- <xsl:when test="@ref-type = 'sec' and local-name(key('ids', current()/@rid)) = 'term-sec'"> --> <!-- <xref ref-type="sec" rid="sec_3.21"> link to term clause -->
+			<xsl:when test="@ref-type = 'sec' and normalize-space($isTerm) = 'true'"> <!-- <xref ref-type="sec" rid="sec_3.21"> link to term clause -->
 				<!-- <xsl:variable name="term_name" select="//*[@id = current()/@rid]//tbx:term[1]"/> -->
-				<xsl:variable name="term_name" select="key('ids', current()/@rid)//tbx:term[1]"/>
+				<!-- <xsl:variable name="term_name" select="key('ids', current()/@rid)//tbx:term[1]"/> -->
+				<xsl:variable name="term_name">
+					<xsl:for-each select="$updated_xml">
+						<xsl:value-of select="key('ids', $rid_)//tbx:term[1]"/>
+					</xsl:for-each>
+				</xsl:variable>
+				
 				
 				<!-- <xsl:variable name="term_name" select="java:toLowerCase(java:java.lang.String.new(translate($term_name_, ' ', '-')_))"/>				 -->
 				<!-- <xsl:text>&lt;&lt;</xsl:text>term-<xsl:value-of select="$term_name"/><xsl:text>&gt;&gt;</xsl:text> -->
@@ -3895,11 +3915,24 @@
 			</xsl:choose>
 		</xsl:variable>
 		
+		<xsl:variable name="isTerm">
+			<xsl:for-each select="$updated_xml"> <!-- change context -->
+				<xsl:value-of select="local-name(key('ids', $target)) = 'term-sec' or local-name(key('ids', $target)) = 'termEntry'"/>
+			</xsl:for-each>
+		</xsl:variable>
+		
 		<xsl:choose>
 			<!-- <xsl:when test="@content-type = 'term' and (local-name(//*[@id = $target]) = 'term-sec' or local-name(//*[@id = $target]) = 'termEntry')"> -->
-			<xsl:when test="@content-type = 'term' and (local-name(key('ids', $target)) = 'term-sec' or local-name(key('ids', $target)) = 'termEntry')">
+			<!-- <xsl:when test="@content-type = 'term' and (local-name(key('ids', $target)) = 'term-sec' or local-name(key('ids', $target)) = 'termEntry')"> -->
+			<xsl:when test="@content-type = 'term' and normalize-space($isTerm) = 'true'">
 				<!-- <xsl:variable name="term_real" select="//*[@id = $target]//tbx:term[1]"/> -->
-				<xsl:variable name="term_real" select="key('ids', $target)//tbx:term[1]"/>
+				<!-- <xsl:variable name="term_real" select="key('ids', $target)//tbx:term[1]"/> -->
+				<xsl:variable name="term_real">
+					<xsl:for-each select="$updated_xml"> <!-- change context -->
+						 <xsl:value-of select="key('ids', $target)//tbx:term[1]"/>
+					</xsl:for-each>
+				</xsl:variable>
+				
 				<!-- <xsl:variable name="term_name" select="java:toLowerCase(java:java.lang.String.new(translate($term_name_, ' ', '-')))"/> -->
 				<!-- <xsl:text>term-</xsl:text><xsl:value-of select="$term_name"/>,<xsl:value-of select="."/> -->
 				
