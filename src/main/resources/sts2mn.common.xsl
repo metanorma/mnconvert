@@ -1176,6 +1176,71 @@
 	<!-- END: copy table rows after specified row -->
 	<!-- ================= -->
 	
+	<!-- sts model graphic:
+		caption/title
+		@filename
+		@unnumbered = 'true'
+		alt-text
+	-->
+	<xsl:template name="build_sts_model_graphic">
+		<xsl:param name="copymode">false</xsl:param>
+		<xsl:copy>
+			<xsl:copy-of select="@*"/>
+			<xsl:if test="not(caption/title) and not(parent::fig)"> <!--  and not(ancestor::table) -->
+				<xsl:attribute name="unnumbered">true</xsl:attribute>
+			</xsl:if>
+			<xsl:attribute name="filename">
+				<xsl:if test="@xlink:href and not(processing-instruction('isoimg-id'))">
+					<xsl:variable name="image_link" select="@xlink:href"/>
+					<xsl:choose>
+						<xsl:when test="contains($image_link, 'base64,')">
+							<xsl:value-of select="$image_link"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:if test="$copymode = 'false' and $OUTPUT_FORMAT = 'xml'"><xsl:value-of select="$imagesdir"/><xsl:text>/</xsl:text></xsl:if>
+							<xsl:value-of select="$image_link"/>
+							<xsl:if test="not(contains($image_link, '.png')) and not(contains($image_link, '.jpg')) and not(contains($image_link, '.bmp'))">
+								<xsl:text>.png</xsl:text>
+							</xsl:if>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:if>
+				
+				<xsl:apply-templates select="processing-instruction('isoimg-id')" mode="pi_isoimg-id">
+					<xsl:with-param name="copymode" select="$copymode"/>
+				</xsl:apply-templates>
+			</xsl:attribute>
+			
+			<xsl:apply-templates mode="model_graphic"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="@*|node()" mode="model_graphic">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="model_graphic"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="*[self::graphic or self::inline-graphic]/processing-instruction('isoimg-id')" mode="model_graphic"/>
+	<xsl:template match="*[self::graphic or self::inline-graphic]/processing-instruction('isoimg-id')" mode="pi_isoimg-id">
+		<xsl:param name="copymode">false</xsl:param>
+		<xsl:variable name="image_link" select="."/>
+		<xsl:if test="$copymode = 'false' and $OUTPUT_FORMAT = 'xml'"><xsl:value-of select="$imagesdir"/><xsl:text>/</xsl:text></xsl:if>
+		<xsl:choose>
+			<xsl:when test="contains($image_link, '.eps')">
+				<xsl:value-of select="substring-before($image_link, '.eps')"/><xsl:text>.png</xsl:text>
+			</xsl:when>
+			<xsl:when test="contains($image_link, '.EPS')">
+				<xsl:value-of select="substring-before($image_link, '.EPS')"/><xsl:text>.png</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$image_link"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>	
+	
+	<!-- end build_sts_model_graphic -->
+	
 	<!-- ======================== -->
 	<!-- end  build_sts_model_fig -->
 	<!-- ======================== -->

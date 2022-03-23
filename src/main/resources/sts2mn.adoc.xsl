@@ -3618,64 +3618,6 @@
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
-	
-	<xsl:template match="graphic | inline-graphic" name="graphic">
-		<xsl:apply-templates select="caption/title" mode="graphic-title"/>
-		<xsl:if test="not(caption/title) and not(ancestor::fig) and not(ancestor::table)">
-			<xsl:text>[%unnumbered]</xsl:text>
-			<xsl:text>&#xa;</xsl:text>
-		</xsl:if>
-		<xsl:text>image::</xsl:text>
-		<xsl:if test="not(processing-instruction('isoimg-id'))">
-			<xsl:variable name="image_link" select="@xlink:href"/>
-			<xsl:value-of select="$image_link"/>
-			<xsl:choose>
-				<xsl:when test="contains($image_link, 'base64,')"/>
-				<xsl:when test="not(contains($image_link, '.png')) and not(contains($image_link, '.jpg')) and not(contains($image_link, '.bmp'))">
-					<xsl:text>.png</xsl:text>
-				</xsl:when>
-			</xsl:choose>
-		</xsl:if>
-		<xsl:apply-templates select="processing-instruction('isoimg-id')" mode="pi_isoimg-id"/>
-		<xsl:apply-templates />
-		<xsl:if test="not(alt-text)">[]</xsl:if>
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:if test="following-sibling::node()">
-			<xsl:text>&#xa;</xsl:text>
-		</xsl:if>
-	</xsl:template>
-	
-	<xsl:template match="graphic/text()[normalize-space()='']"/>
-	
-	<xsl:template match="graphic/caption" />
-	<xsl:template match="graphic/caption/title" mode="graphic-title">
-		<xsl:text>.</xsl:text>
-		<xsl:apply-templates />
-		<xsl:text>&#xa;</xsl:text>
-	</xsl:template>
-	
-	<xsl:template match="graphic/processing-instruction('isoimg-id')" />
-	<xsl:template match="graphic/processing-instruction('isoimg-id')" mode="pi_isoimg-id">
-		<xsl:variable name="image_link" select="."/>
-		<xsl:choose>
-			<xsl:when test="contains($image_link, '.eps')">
-				<xsl:value-of select="substring-before($image_link, '.eps')"/><xsl:text>.png</xsl:text>
-			</xsl:when>
-			<xsl:when test="contains($image_link, '.EPS')">
-				<xsl:value-of select="substring-before($image_link, '.EPS')"/><xsl:text>.png</xsl:text>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:value-of select="$image_link"/>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>	
-
-	<xsl:template match="alt-text">
-		<xsl:text>[</xsl:text>
-		<xsl:value-of select="."/>
-		<xsl:text>]</xsl:text>
-	</xsl:template>
-	
 	<xsl:template match="fig/array[count(table/col) + count(table/colgroup/col) = 1 and .//graphic]" priority="2">
 		<xsl:apply-templates mode="ignore_array"/>
 	</xsl:template>
@@ -3697,6 +3639,59 @@
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
+	
+	<!-- ================================== -->
+	<!-- graphic, inline-graphic processing -->
+	<!-- ================================== -->
+	<xsl:template match="graphic | inline-graphic" name="graphic">
+	
+		<xsl:variable name="graphic_">
+			<xsl:call-template name="build_sts_model_graphic"/>
+		</xsl:variable>
+		<xsl:variable name="graphic" select="xalan:nodeset($graphic_)"/>
+	
+		<xsl:apply-templates select="$graphic/*[self::graphic or self::inline-graphic]/caption/title" />
+		<xsl:apply-templates select="$graphic/*[self::graphic or self::inline-graphic]/@unnumbered" />
+		<xsl:apply-templates select="$graphic/*[self::graphic or self::inline-graphic]/@filename" />
+		
+		<xsl:apply-templates select="$graphic/*[self::graphic or self::inline-graphic]/node()[not(self::caption)]"/>
+		<xsl:if test="not($graphic/*[self::graphic or self::inline-graphic]/alt-text)">[]</xsl:if>
+		<xsl:text>&#xa;</xsl:text>
+		
+		<xsl:if test="following-sibling::node()">
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="*[self::graphic or self::inline-graphic]/text()[normalize-space()='']"/>
+	
+	<xsl:template match="*[self::graphic or self::inline-graphic]/caption/title">
+		<xsl:text>.</xsl:text>
+		<xsl:apply-templates />
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<!-- graphic model attribute @unnumbered-->
+	<xsl:template match="*[self::graphic or self::inline-graphic]/@unnumbered">
+		<xsl:if test=". = 'true'">
+			<xsl:text>[%unnumbered]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	<!-- graphic model attribute @filename-->
+	<xsl:template match="*[self::graphic or self::inline-graphic]/@filename">
+		<xsl:text>image::</xsl:text><xsl:value-of select="."/>
+	</xsl:template>
+
+	<xsl:template match="alt-text">
+		<xsl:text>[</xsl:text>
+		<xsl:value-of select="."/>
+		<xsl:text>]</xsl:text>
+	</xsl:template>
+	<!-- ================================== -->
+	<!-- graphic, inline-graphic processing -->
+	<!-- ================================== -->
 	
 	<!-- ============================ -->
 	<!-- END Figure -->

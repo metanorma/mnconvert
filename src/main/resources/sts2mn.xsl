@@ -2473,52 +2473,22 @@
 	
 	<xsl:template match="graphic | inline-graphic" name="graphic">
 		<xsl:param name="copymode">false</xsl:param>
-		<image height="auto" width="auto">
-			<xsl:if test="@xlink:href and not(processing-instruction('isoimg-id'))">
-				<xsl:variable name="image_link" select="@xlink:href"/>
-				<xsl:attribute name="src">
-					<xsl:choose>
-						<xsl:when test="contains($image_link, 'base64,')">
-							<xsl:value-of select="$image_link"/>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:if test="$copymode = 'false'"><xsl:value-of select="$imagesdir"/><xsl:text>/</xsl:text></xsl:if>
-							<xsl:value-of select="$image_link"/>
-							<xsl:if test="not(contains($image_link, '.png')) and not(contains($image_link, '.jpg')) and not(contains($image_link, '.bmp'))">
-								<xsl:text>.png</xsl:text>
-							</xsl:if>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:attribute>
+		
+		<xsl:variable name="graphic_">
+			<xsl:call-template name="build_sts_model_graphic">
+				<xsl:with-param name="copymode" select="$copymode" />
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name="graphic" select="xalan:nodeset($graphic_)"/>
+		
+		<image height="auto" width="auto" src="{$graphic/*[self::graphic or self::inline-graphic]/@filename}">
+			<xsl:if test="$graphic/*[self::graphic or self::inline-graphic]/alt-text">
+				<xsl:attribute name="alt"><xsl:value-of select="$graphic/*[self::graphic or self::inline-graphic]/alt-text"/></xsl:attribute>
 			</xsl:if>
-			<xsl:if test="alt-text">
-				<xsl:attribute  name="alt"><xsl:value-of select="alt-text"/></xsl:attribute>
-			</xsl:if>
-			<xsl:apply-templates select="*[not(local-name() = 'caption') and not(local-name() = 'label')] | processing-instruction()">
+			<xsl:apply-templates select="*[not(local-name() = 'caption') and not(local-name() = 'label')  and not(local-name() = 'alt-text')]">
 				<xsl:with-param name="copymode" select="$copymode"/>
 			</xsl:apply-templates>
 		</image>
-	</xsl:template>
-	
-	<xsl:template match="graphic/alt-text"/>
-	
-	<xsl:template match="graphic/processing-instruction('isoimg-id')">
-		<xsl:param name="copymode">false</xsl:param>
-		<xsl:attribute name="src">
-			<xsl:variable name="image_link" select="."/>
-			<xsl:if test="$copymode = 'false'"><xsl:value-of select="$imagesdir"/><xsl:text>/</xsl:text></xsl:if>
-			<xsl:choose>
-				<xsl:when test="contains($image_link, '.eps')">
-					<xsl:value-of select="substring-before($image_link, '.eps')"/><xsl:text>.png</xsl:text>
-				</xsl:when>
-				<xsl:when test="contains($image_link, '.EPS')">
-					<xsl:value-of select="substring-before($image_link, '.EPS')"/><xsl:text>.png</xsl:text>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="$image_link"/>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:attribute>
 	</xsl:template>
 	
 	<xsl:template match="fig-group">
