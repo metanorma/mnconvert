@@ -1860,7 +1860,7 @@
 			<xsl:variable name="model_std" select="xalan:nodeset($model_std_)"/>
 		
 			<!-- put reference -->
-			<xsl:value-of select="$model_std/reference"/>
+			<xsl:value-of select="java:replaceAll(java:java.lang.String.new($model_std/reference),'_{2,}','_')"/>
 			
 			<!-- put locality (-ies) -->
 			<xsl:for-each select="$model_std/*[self::locality or self::localityValue or self::localityConj][normalize-space() != '']">
@@ -1994,7 +1994,8 @@
 					<xsl:with-param name="stdid" select="normalize-space($term_source_reference)"/>
 				</xsl:call-template>
 			</xsl:variable>
-			<!-- <xsl:if test="normalize-space($reference) = ''">hidden_bibitem_</xsl:if> --><xsl:value-of select="$term_source_reference"/>
+			<!-- <xsl:if test="normalize-space($reference) = ''">hidden_bibitem_</xsl:if> -->
+			<xsl:value-of select="java:replaceAll(java:java.lang.String.new($term_source_reference),'_{2,}','_')"/>
 			
 			<!-- put locality (-ies) -->
 			<xsl:for-each select="$model_term_source/*[self::locality or self::localityContinue][normalize-space() != '']">
@@ -3165,7 +3166,7 @@
 						<item id="{@stdid}">
 							<!-- <xsl:text>* [[[hidden_bibitem_</xsl:text> -->
 							<xsl:text>* [[[</xsl:text>
-							<xsl:value-of select="@stdid"/>
+							<xsl:value-of select="java:replaceAll(java:java.lang.String.new(@stdid),'_{2,}','_')"/>
 							<xsl:text>,hidden(</xsl:text>
 							<xsl:value-of select="translate(.//std-ref/text(), '&#xA0;‑', ' -')"/>
 							<xsl:text>)]]]</xsl:text>
@@ -3185,7 +3186,7 @@
 					<xsl:if test="$model_term_source/reference/@hidden = 'true'">
 						<item id="{$term_source_reference}">
 							<xsl:text>* [[[</xsl:text>
-							<xsl:value-of select="$term_source_reference"/>
+							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($term_source_reference),'_{2,}','_')"/>
 							<xsl:text>,hidden(</xsl:text>
 							
 							<!-- put reference text -->
@@ -3343,7 +3344,8 @@
 				<xsl:variable name="preceding_title" select="java:toLowerCase(java:java.lang.String.new(translate(preceding-sibling::title[1]/text(), ' ', '_')))"/>
 				<xsl:if test="normalize-space($preceding_title) != ''">
 					<xsl:text>[[[</xsl:text>
-					<xsl:value-of select="$preceding_title"/>_<xsl:number/>
+					<!-- <xsl:value-of select="$preceding_title"/>_<xsl:number/> -->
+					<xsl:value-of select="java:replaceAll(java:java.lang.String.new($preceding_title),'_{2,}','_')"/>_<xsl:number/>
 					<xsl:text>]]]</xsl:text>
 				</xsl:if>
 			</xsl:if>
