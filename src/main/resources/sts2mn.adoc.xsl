@@ -1889,17 +1889,26 @@
 				</xsl:choose>
 			</xsl:for-each>
 			
-			<!-- put reference text -->
-			<xsl:for-each select="$model_std/referenceText[normalize-space() != '']">
-				<xsl:if test="not(preceding-sibling::referenceText/text() = current()/text())">
-					<xsl:text>,</xsl:text>
-					<xsl:value-of select="."/>
-				</xsl:if>
-			</xsl:for-each>
-			<xsl:for-each select="$model_std/not_locality">
-				<xsl:text> </xsl:text><xsl:value-of select="."/>
-			</xsl:for-each>
 			
+			<!-- put reference text -->
+			<xsl:variable name="referenceText">
+				<xsl:for-each select="$model_std/referenceText[normalize-space() != '']">
+					<xsl:if test="not(preceding-sibling::referenceText/text() = current()/text())">
+						<xsl:text>,</xsl:text>
+						<xsl:value-of select="."/>
+					</xsl:if>
+				</xsl:for-each>
+			</xsl:variable>
+			
+			<xsl:variable name="refs_referenceText" select="$refs//ref[@id = $model_std/reference or @stdid_option = $model_std/reference]/@referenceText"/>
+			
+			<xsl:if test="$model_std/not_locality or 
+				($refs_referenceText != '' and not($refs_referenceText = substring($referenceText,2)))">
+				<xsl:value-of select="$referenceText"/>
+				<xsl:for-each select="$model_std/not_locality">
+					<xsl:text> </xsl:text><xsl:value-of select="."/>
+				</xsl:for-each>
+			</xsl:if>
 	
 		<xsl:text>&gt;&gt;</xsl:text>
 		
@@ -1998,10 +2007,13 @@
 			<xsl:value-of select="java:replaceAll(java:java.lang.String.new($term_source_reference),'_{2,}','_')"/>
 			
 			<!-- put locality (-ies) -->
-			<xsl:for-each select="$model_term_source/*[self::locality or self::localityContinue][normalize-space() != '']">
-				<xsl:if test="self::locality"><xsl:text>,</xsl:text></xsl:if>
-				<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),',$','')"/> <!-- remove comma at end -->
-			</xsl:for-each>
+			<xsl:variable name="localities">
+				<xsl:for-each select="$model_term_source/*[self::locality or self::localityContinue][normalize-space() != '']">
+					<xsl:if test="self::locality"><xsl:text>,</xsl:text></xsl:if>
+					<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),',$','')"/> <!-- remove comma at end -->
+				</xsl:for-each>
+			</xsl:variable>
+			<xsl:value-of select="$localities"/>
 			
 			<!-- put reference text -->
 			<xsl:variable name="referenceText">
@@ -2015,8 +2027,12 @@
 				</xsl:for-each>
 			</xsl:variable>
 			
+			<!-- <xsl:message>$refs//ref=<xsl:value-of select="$refs//ref[@id = $term_source_reference or @stdid_option = $term_source_reference]/@referenceText"/></xsl:message>
+			<xsl:message>referenceText=<xsl:value-of select="substring($referenceText,2)"/></xsl:message> -->
+			
 			<!-- if reference text is different than reference title in the Bibliography -->
-			<xsl:if test="not($refs//ref[@id = $term_source_reference or @stdid_option = $term_source_reference]/@referenceText = substring($referenceText,2))"> <!-- after comma -->
+			<xsl:variable name="refs_referenceText" select="$refs//ref[@id = $term_source_reference or @stdid_option = $term_source_reference]/@referenceText"/>
+			<xsl:if test="$localities = '' and not($refs_referenceText = substring($referenceText,2))"> <!-- after comma -->
 				<xsl:value-of select="$referenceText"/>
 			</xsl:if>
 			
@@ -3131,28 +3147,28 @@
 			<!-- ===================== -->
 			<!-- insert hidden bibitem -->
 			<!-- ===================== -->
-      
-      <!-- 
-      <xsl:for-each select="$updated_xml//ref">
-        <xsl:for-each select="@*">
-          <xsl:text>att </xsl:text><xsl:value-of select="local-name()"/>=<xsl:value-of select="."/>
-          <xsl:text>&#xa;</xsl:text>
-        </xsl:for-each>
-      </xsl:for-each>
-      
-      <xsl:for-each select="$updated_xml//std[not(parent::ref)]">
-        <xsl:text>DEBUG:&#xa;</xsl:text>
-        <xsl:text>stdid=</xsl:text><xsl:value-of select="@stdid"/>
-        <xsl:text>&#xa;</xsl:text>
-        <xsl:variable name="reference">
-          <xsl:call-template name="getReference">
-            <xsl:with-param name="stdid" select="@stdid"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:text>reference=</xsl:text><xsl:value-of select="$reference"/>
-        <xsl:text>&#xa;</xsl:text>
-      </xsl:for-each> -->
-      
+			
+			<!-- 
+			<xsl:for-each select="$updated_xml//ref">
+				<xsl:for-each select="@*">
+					<xsl:text>att </xsl:text><xsl:value-of select="local-name()"/>=<xsl:value-of select="."/>
+					<xsl:text>&#xa;</xsl:text>
+				</xsl:for-each>
+			</xsl:for-each>
+			
+			<xsl:for-each select="$updated_xml//std[not(parent::ref)]">
+				<xsl:text>DEBUG:&#xa;</xsl:text>
+				<xsl:text>stdid=</xsl:text><xsl:value-of select="@stdid"/>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:variable name="reference">
+					<xsl:call-template name="getReference">
+						<xsl:with-param name="stdid" select="@stdid"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:text>reference=</xsl:text><xsl:value-of select="$reference"/>
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:for-each> -->
+			
 			<xsl:variable name="hidden_bibitems">
 				<!-- std reference iteration -->
 				<xsl:for-each select="$updated_xml//std[not(parent::ref)][@stdid != '']">
@@ -3168,6 +3184,7 @@
 							<xsl:text>* [[[</xsl:text>
 							<xsl:value-of select="java:replaceAll(java:java.lang.String.new(@stdid),'_{2,}','_')"/>
 							<xsl:text>,hidden(</xsl:text>
+							<!-- <xsl:text>(</xsl:text><xsl:value-of select=".//std-ref/text()"/><xsl:text>)</xsl:text> -->
 							<xsl:value-of select="translate(.//std-ref/text(), '&#xA0;‑', ' -')"/>
 							<xsl:text>)]]]</xsl:text>
 						</item>
@@ -5368,7 +5385,8 @@
 				<source>
 					<std>Clauses 1 to 9 of <std-ref type="undated">PAS 2030<?doi https://doi.org/10.3403/30248249U?></std-ref></std>
 				</source>
-				<destination>&lt;&lt;PAS_2030,from!clause=1;to!clause=9,PAS 2030&gt;&gt;</destination>
+				<!-- <destination>&lt;&lt;PAS_2030,from!clause=1;to!clause=9,PAS 2030&gt;&gt;</destination> -->
+				<destination>&lt;&lt;PAS_2030,from!clause=1;to!clause=9&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5404,7 +5422,8 @@
 						<std-ref>ANSI/AAMI ST79</std-ref>
 					</std>
 				</source>
-				<destination>&lt;&lt;ANSI_AAMI_ST79,ANSI/AAMI ST79&gt;&gt;</destination>
+				<!-- <destination>&lt;&lt;ANSI_AAMI_ST79,ANSI/AAMI ST79&gt;&gt;</destination> -->
+				<destination>&lt;&lt;ANSI_AAMI_ST79&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5422,7 +5441,8 @@
 						<std-ref>JIS P-8144</std-ref>
 					</std>
 				</source>
-				<destination>&lt;&lt;JIS_P_8144,JIS P-8144&gt;&gt;</destination>
+				<!-- <destination>&lt;&lt;JIS_P_8144,JIS P-8144&gt;&gt;</destination> -->
+				<destination>&lt;&lt;JIS_P_8144&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5431,7 +5451,8 @@
 						</std-ref>
 					</std>
 				</source>
-				<destination>&lt;&lt;ISO_IEC_27001,annex=A,ISO/IEC 27001&gt;&gt;</destination>
+				<!-- <destination>&lt;&lt;ISO_IEC_27001,annex=A,ISO/IEC 27001&gt;&gt;</destination> -->
+				<destination>&lt;&lt;ISO_IEC_27001,annex=A&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5440,7 +5461,8 @@
 						</std-ref>
 					</std>
 				</source>
-				<destination>&lt;&lt;ISO_IEC_27002_2013,clause=18.1.4,ISO/IEC 27002:2013&gt;&gt;</destination>
+				<!-- <destination>&lt;&lt;ISO_IEC_27002_2013,clause=18.1.4,ISO/IEC 27002:2013&gt;&gt;</destination> -->
+				<destination>&lt;&lt;ISO_IEC_27002_2013,clause=18.1.4&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5781,7 +5803,8 @@
 				</source>
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
-					<xsl:text>&lt;&lt;biblref_1,locality:definition=2.14,CEN/CENELEC Internal Regulations,Part 2:2015&gt;&gt;</xsl:text>
+					<!-- <xsl:text>&lt;&lt;biblref_1,locality:definition=2.14,CEN/CENELEC Internal Regulations,Part 2:2015&gt;&gt;</xsl:text> -->
+					<xsl:text>&lt;&lt;biblref_1,locality:definition=2.14&gt;&gt;</xsl:text>
 				</destination>
 			</item>
 
@@ -5802,7 +5825,8 @@
 				</source>
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
-					<xsl:text>&lt;&lt;biblref_2,locality:definition=1.7,ISO/IEC Guide 2:2004&gt;&gt;</xsl:text>
+					<!-- <xsl:text>&lt;&lt;biblref_2,locality:definition=1.7,ISO/IEC Guide 2:2004&gt;&gt;</xsl:text> -->
+					<xsl:text>&lt;&lt;biblref_2,locality:definition=1.7&gt;&gt;</xsl:text>
 				</destination>
 			</item>
 
@@ -5883,7 +5907,8 @@
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_GHTF_SG1_N055_2009,clause 5.2,GHTF/SG1/N055:2009&gt;&gt;</xsl:text> -->
-					<xsl:text>&lt;&lt;GHTF_SG1_N055_2009,clause 5.2,GHTF/SG1/N055:2009&gt;&gt;</xsl:text>
+					<!-- <xsl:text>&lt;&lt;GHTF_SG1_N055_2009,clause 5.2,GHTF/SG1/N055:2009&gt;&gt;</xsl:text> -->
+					<xsl:text>&lt;&lt;GHTF_SG1_N055_2009,clause 5.2&gt;&gt;</xsl:text>
 				</destination>
 			</item>
 
@@ -5894,7 +5919,8 @@
 				<destination>
 					<xsl:text>[.source]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_GHTF_SG5_N4_2010,clause 4,GHTF/SG5/N4:2010&gt;&gt;</xsl:text> -->
-					<xsl:text>&lt;&lt;GHTF_SG5_N4_2010,clause 4,GHTF/SG5/N4:2010&gt;&gt;</xsl:text>
+					<!-- <xsl:text>&lt;&lt;GHTF_SG5_N4_2010,clause 4,GHTF/SG5/N4:2010&gt;&gt;</xsl:text> -->
+					<xsl:text>&lt;&lt;GHTF_SG5_N4_2010,clause 4&gt;&gt;</xsl:text>
 				</destination>
 			</item>
 
