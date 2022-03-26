@@ -3242,6 +3242,12 @@
 								<xsl:value-of select="translate(., '&#xA0;‑', ' -')"/>
 							</xsl:for-each>
 							
+							<xsl:if test="not($model_term_source/referenceTextInBibliography[normalize-space() != ''])">
+								<xsl:for-each select="$model_term_source/referenceText[normalize-space() != '']">
+									<xsl:value-of select="translate(., '&#xA0;‑', ' -')"/>
+								</xsl:for-each>
+							</xsl:if>
+							
 							<xsl:text>)]]]</xsl:text>
 						</item>
 					</xsl:if>
