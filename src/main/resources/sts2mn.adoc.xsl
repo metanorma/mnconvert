@@ -1864,6 +1864,7 @@
 			
 			<!-- put locality (-ies) -->
 			<xsl:for-each select="$model_std/*[self::locality or self::localityValue or self::localityConj][normalize-space() != '']">
+				<xsl:variable name="node_position" select="position()"/>
 				<xsl:choose>
 					<xsl:when test="self::localityValue">
 						<xsl:text>=</xsl:text>
@@ -1871,20 +1872,33 @@
 					</xsl:when>
 					<xsl:when test="self::localityConj">
 						<xsl:choose>
-							<xsl:when test="position() = 1"><xsl:text>,</xsl:text></xsl:when>
+							<xsl:when test="$node_position = 1"><xsl:text>,</xsl:text></xsl:when>
 							<xsl:otherwise><xsl:text>;</xsl:text></xsl:otherwise>
 						</xsl:choose>
 						<xsl:value-of select="."/>
 						<xsl:text>!</xsl:text>
 					</xsl:when>
 					<xsl:otherwise> <!-- locality -->
-						<xsl:if test="not(preceding-sibling::*[1][self::localityConj])">
-							<xsl:text>,</xsl:text>
-						</xsl:if>
+						<xsl:variable name="locality" select="."/>
+						<xsl:variable name="count_current_locality" select="count(../locality[. = $locality])"/>
+						
+						<!-- As with cross-references, more than two references combined by `and` should be marked up
+								with semicolons, e.g. `<<ref1,clause=3.2;clause=4.7;clause=4.9;clause=9>>` or
+								`<<ref1,clause=3.2;and!clause=4.7;and!clause=4.9;and!clause=9>>`. -->
+						<xsl:choose>
+							<xsl:when test="$node_position != 1 and $count_current_locality &gt; 2 and following-sibling::localityConj">
+								<xsl:text>;</xsl:text>
+								<xsl:value-of select="following-sibling::localityConj[1]"/>
+								<xsl:text>!</xsl:text>
+							</xsl:when>
+							<xsl:when test="not(preceding-sibling::*[1][self::localityConj])">
+								<xsl:text>,</xsl:text>
+							</xsl:when>
+						</xsl:choose>
 						<!-- <xsl:if test="following-sibling::localityConj[1][. = 'to']">
 							<xsl:text>from!</xsl:text>
 						</xsl:if> -->
-						<xsl:value-of select="."/>
+						<xsl:value-of select="$locality"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:for-each>
