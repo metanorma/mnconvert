@@ -652,6 +652,8 @@
 		<referenceText><xsl:call-template name="fn"/></referenceText>
 	</xsl:template>
 	
+	<xsl:variable name="start_standard_regex">^(CN|IEC|(IEC/[A-Z]{2,3})|IETF|ISO|(ISO/[A-Z]{2,3})|ITU|NIST|OGC|CC|OMG|UN|W3C|IEEE|IHO|BIPM|ECMA|CIE|BS|BSI|PAS|CEN|(CEN/[A-Z]{2,3})|EN|IANA|3GPP|OASIS|IEV)(\s|\h).*</xsl:variable>
+	
 	<xsl:template name="getStdRef">
 		<xsl:param name="text" select="."/>
 		<!-- <xsl:variable name="std-ref" select="java:replaceAll(java:java.lang.String.new($text),'- -','—')"/> -->
@@ -712,7 +714,7 @@
 				</reference>
 				<referenceTextInBibliography><xsl:value-of select="$text"/></referenceTextInBibliography>
 				<xsl:if test="$OUTPUT_FORMAT = 'xml' or 
-					java:org.metanorma.utils.RegExHelper.matches('^(ISO|IEC|ITU|IETF|NIST|OGC|IEV|BS|BSI)(\s|\h).*', normalize-space($text)) = 'false'"> <!-- don't put reference text if it is reference to the standard -->
+					java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($text)) = 'false'"> <!-- don't put reference text if it is reference to the standard -->
 					<referenceText><xsl:value-of select="$text"/></referenceText>
 				</xsl:if>
 				

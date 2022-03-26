@@ -2008,6 +2008,9 @@
 		<xsl:if test="$model_term_source/adapted">%adapted</xsl:if>
 		<xsl:text>]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
+		
+		<xsl:variable name="isHidden" select="normalize-space($model_term_source/reference/@hidden = 'true')"/>
+		
 		<xsl:text>&lt;&lt;</xsl:text>
 			
 			<!-- put reference -->
@@ -2046,7 +2049,9 @@
 			
 			<!-- if reference text is different than reference title in the Bibliography -->
 			<xsl:variable name="refs_referenceText" select="$refs//ref[@id = $term_source_reference or @stdid_option = $term_source_reference]/@referenceText"/>
-			<xsl:if test="$localities = '' and not($refs_referenceText = substring($referenceText,2))"> <!-- after comma -->
+			 <!-- after comma -->
+			<xsl:if test="($localities = '' and not($refs_referenceText = substring($referenceText,2))) or
+				java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText)) = 'false'">
 				<xsl:value-of select="$referenceText"/>
 			</xsl:if>
 			
