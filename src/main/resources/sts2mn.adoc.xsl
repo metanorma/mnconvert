@@ -2049,9 +2049,10 @@
 			
 			<!-- if reference text is different than reference title in the Bibliography -->
 			<xsl:variable name="refs_referenceText" select="$refs//ref[@id = $term_source_reference or @stdid_option = $term_source_reference]/@referenceText"/>
-			 <!-- after comma -->
-			<xsl:if test="($localities = '' and not($refs_referenceText = substring($referenceText,2))) or
-				java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText)) = 'false'">
+			<!-- after comma -->
+			<xsl:variable name="referenceText_after_comma" select="substring($referenceText,2)"/>
+			<xsl:if test="($localities = '' and not($refs_referenceText = $referenceText_after_comma)) or
+				java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText_after_comma)) = 'false'">
 				<xsl:value-of select="$referenceText"/>
 			</xsl:if>
 			
