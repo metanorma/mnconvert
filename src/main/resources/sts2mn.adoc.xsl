@@ -3231,20 +3231,20 @@
 								<xsl:text>(</xsl:text>
 									<!-- Example: * [[[ref,hidden((ISO 9000:2005 footnote:[Superseded by ISO 9000:2015.])ISO 9000:2005)]]] -->
 									<xsl:for-each select="$model_term_source/referenceTextInBibliography[normalize-space() != ''][1]">	
-										<xsl:value-of select="translate(., '&#xA0;‑', ' -')"/>
+										<xsl:value-of select="translate(., '&#xA0;‑–', ' --')"/>
 									</xsl:for-each>
 									<xsl:for-each select="$model_term_source/referenceText[normalize-space() != '']">
-										<xsl:value-of select="translate(., '&#xA0;‑', ' -')"/>
+										<xsl:value-of select="translate(., '&#xA0;‑–', ' --')"/>
 									</xsl:for-each>
 								<xsl:text>)</xsl:text>
 							</xsl:if>
 							<xsl:for-each select="$model_term_source/referenceTextInBibliography[normalize-space() != ''][1]">	
-								<xsl:value-of select="translate(., '&#xA0;‑', ' -')"/>
+								<xsl:value-of select="translate(., '&#xA0;‑–', ' --')"/>
 							</xsl:for-each>
 							
 							<xsl:if test="not($model_term_source/referenceTextInBibliography[normalize-space() != ''])">
 								<xsl:for-each select="$model_term_source/referenceText[normalize-space() != '']">
-									<xsl:value-of select="translate(., '&#xA0;‑', ' -')"/>
+									<xsl:value-of select="translate(., '&#xA0;‑–', ' --')"/>
 								</xsl:for-each>
 							</xsl:if>
 							
