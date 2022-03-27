@@ -570,23 +570,27 @@
 						</xsl:choose>
 					</xsl:when>
 					<xsl:otherwise>
+						<xsl:variable name="regex_clause">^(Clause(\s|\h)+)[0-9]+(\.[0-9]+)*$</xsl:variable>
+						<xsl:variable name="regex_definition">^(definition(\s|\h)+)([0-9]+(\.[0-9]+)*)*$</xsl:variable>
+						<xsl:variable name="regex_box">^(Box(\s|\h)+)([0-9]+)$</xsl:variable>
+						<xsl:variable name="item_text_normalized" select="normalize-space($item_text)"/>
 						<xsl:choose>
-							<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^(Clause(\s|\h)+)[0-9]+(\.[0-9]+)*$', normalize-space($item_text)) = 'true'"> <!-- Example: Clause 4 -->
+							<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_clause, $item_text_normalized) = 'true'"> <!-- Example: Clause 4 -->
 								<locality>
 									<xsl:value-of select="java:toLowerCase(java:java.lang.String.new($item_text))"/>
 								</locality>
 							</xsl:when>
-							<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^(definition(\s|\h)+)([0-9]+(\.[0-9]+))*$', normalize-space($item_text)) = 'true'"> <!-- Example: definition 3.1 -->
+							<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_definition, $item_text_normalized) = 'true'"> <!-- Example: definition 3.1 -->
 								<locality>
-									<xsl:text>locality:definition=</xsl:text><xsl:value-of select="java:replaceAll(java:java.lang.String.new($item_text),'^(definition(\s|\h)+)([0-9]+(\.[0-9]+))*$','$3')"/>
+									<xsl:text>locality:definition=</xsl:text><xsl:value-of select="java:replaceAll(java:java.lang.String.new($item_text),$regex_definition,'$3')"/>
 								</locality>
 							</xsl:when>
-							<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^(Box(\s|\h)+)[0-9]+$', normalize-space($item_text)) = 'true'"> <!-- Example: Box 8 -->
+							<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_box, $item_text_normalized) = 'true'"> <!-- Example: Box 8 -->
 								<locality>
-									<xsl:text>locality:box=</xsl:text><xsl:value-of select="java:replaceAll(java:java.lang.String.new($item_text),'^(Box(\s|\h)+)([0-9]+)$','$3')"/>
+									<xsl:text>locality:box=</xsl:text><xsl:value-of select="java:replaceAll(java:java.lang.String.new($item_text),$regex_box,'$3')"/>
 								</locality>
 							</xsl:when>
-							<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^[0-9]+(\.[0-9]+)*$', normalize-space($item_text)) = 'true'"> <!-- Example: 3.23 or 3.2.4 -->
+							<xsl:when test="java:org.metanorma.utils.RegExHelper.matches('^[0-9]+(\.[0-9]+)*$', $item_text_normalized) = 'true'"> <!-- Example: 3.23 or 3.2.4 -->
 								<locality>
 									<xsl:text>clause </xsl:text><xsl:value-of select="$item_text"/>
 								</locality>
