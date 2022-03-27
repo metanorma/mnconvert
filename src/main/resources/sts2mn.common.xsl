@@ -469,7 +469,7 @@
 		<xsl:if test="$isModified = 'true'">
 			<modified>
 				<xsl:text>,</xsl:text>
-				<xsl:value-of select="java:replaceAll(java:java.lang.String.new(substring-after(normalize-space(.), ' modified')), '^(\s|\h)*(-|–)?(\s|\h)*','')"/>
+				<xsl:value-of select="java:replaceAll(java:java.lang.String.new(substring-after(normalize-space(.), ' modified')), '^(\s|\h)*(-|–|—)?(\s|\h)*','')"/>
 			</modified>
 		</xsl:if>
 		<xsl:variable name="isAdapted" select="contains(normalize-space(.), $adapted_from_text)"/>
