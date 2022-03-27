@@ -465,11 +465,11 @@
 	 
 	<xsl:template name="build_sts_model_term_source">
 		<xsl:apply-templates />
-		<xsl:variable name="isModified" select="contains(normalize-space(.), ' modified')"/>
+		<xsl:variable name="isModified" select="contains(normalize-space(.), ' modified') or .//node()[starts-with(., 'modified')]"/>
 		<xsl:if test="$isModified = 'true'">
 			<modified>
 				<xsl:text>,</xsl:text>
-				<xsl:value-of select="java:replaceAll(java:java.lang.String.new(substring-after(normalize-space(.), ' modified')), '^(\s|\h)*(-|–|—)?(\s|\h)*','')"/>
+				<xsl:value-of select="java:replaceAll(java:java.lang.String.new(substring-after(normalize-space(.), 'modified')), '^(\s|\h)*(-|–|—)?(\s|\h)*','')"/> <!-- ' modified' -->
 			</modified>
 		</xsl:if>
 		<xsl:variable name="isAdapted" select="contains(normalize-space(.), $adapted_from_text)"/>
@@ -484,7 +484,7 @@
 		<xsl:variable name="isFirstText" select="not(preceding-sibling::node())"/>
 	
 		<!-- <xsl:variable name="modified_text">, modified</xsl:variable> -->
-		<xsl:variable name="modified_text_regex">^(.*),? modified(.*)$</xsl:variable>
+		<xsl:variable name="modified_text_regex">^(.*),?(\s|\h)?modified(.*)$</xsl:variable>
 		
 		<!-- remove 'Adapted from:' or 'Adapted from' text -->
 		<xsl:variable name="text_">
