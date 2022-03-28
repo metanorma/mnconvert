@@ -274,6 +274,9 @@
 											<xsl:when test="translate(substring($pairs, 1, 1), '0123456789', '') = ''">
 												<locality>clause</locality>
 											</xsl:when>
+											<xsl:when test="substring($pairs, 1, 1) = 'R'">
+												<locality droploc="true">locality:requirement</locality>
+											</xsl:when>
 											<xsl:otherwise>
 												<locality>annex</locality>
 											</xsl:otherwise>

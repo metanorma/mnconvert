@@ -1898,6 +1898,7 @@
 						<!-- <xsl:if test="following-sibling::localityConj[1][. = 'to']">
 							<xsl:text>from!</xsl:text>
 						</xsl:if> -->
+						<xsl:if test="@droploc = 'true'">droploc%</xsl:if>
 						<xsl:value-of select="$locality"/>
 					</xsl:otherwise>
 				</xsl:choose>
