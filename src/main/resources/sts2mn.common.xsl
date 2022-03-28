@@ -326,44 +326,58 @@
 			</xsl:choose>
 			
 		</xsl:variable>
-		
-		<xsl:choose>
-			<!-- <xsl:when test="xalan:nodeset($ref_by_stdid)/*"> --> <!-- if references in References found, then put id of those reference -->
-			<xsl:when test="normalize-space($reference) != ''"> <!-- if references in References found, then put id of those reference -->
-				<!-- <xsl:value-of select="xalan:nodeset($ref_by_stdid)/@id"/> -->
-				<!-- <xsl:value-of select="$reference"/> -->
-				<xsl:copy-of select="$reference"/>
-				<!-- <xsl:value-of select="$locality"/> -->
-			</xsl:when>
-			<xsl:otherwise> <!-- put id of current std -->
-				<xsl:choose>
-					<xsl:when test="@stdid">
-						<reference hidden="true">
-							<!-- <xsl:text>hidden_bibitem_</xsl:text> -->
-							<xsl:value-of select="@stdid"/><xsl:text></xsl:text>
-						</reference>
-						<!-- if there isn't in References, then display name -->
-						<xsl:variable name="std-ref_text" select=".//std-ref/text()"/>
-						<xsl:if test="normalize-space($std-ref_text) != ''">
-							<!-- <xsl:text>,</xsl:text><xsl:value-of select="$std-ref_text"/> -->
-							<referenceText><xsl:value-of select="$std-ref_text"/></referenceText>
-						</xsl:if>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:call-template name="getStdRef">
-							<xsl:with-param name="text" select=".//std-ref"/>
-						</xsl:call-template>
-					</xsl:otherwise>
-				</xsl:choose>
-				
-				<!-- <xsl:value-of select="$locality"/> -->
-				<!-- <xsl:for-each select="xalan:nodeset($locality)/locality">
-					<xsl:text>,</xsl:text><xsl:value-of select="."/>
-				</xsl:for-each> -->
-				<xsl:copy-of select="$locality"/>
-				
-			</xsl:otherwise>
-		</xsl:choose>
+			
+		<xsl:variable name="model">
+			<xsl:choose>
+				<!-- <xsl:when test="xalan:nodeset($ref_by_stdid)/*"> --> <!-- if references in References found, then put id of those reference -->
+				<xsl:when test="normalize-space($reference) != ''"> <!-- if references in References found, then put id of those reference -->
+					<!-- <xsl:value-of select="xalan:nodeset($ref_by_stdid)/@id"/> -->
+					<!-- <xsl:value-of select="$reference"/> -->
+					<xsl:copy-of select="$reference"/>
+					<!-- <xsl:value-of select="$locality"/> -->
+				</xsl:when>
+				<xsl:otherwise> <!-- put id of current std -->
+					<xsl:choose>
+						<xsl:when test="@stdid">
+							<reference hidden="true">
+								<!-- <xsl:text>hidden_bibitem_</xsl:text> -->
+								<xsl:value-of select="@stdid"/><xsl:text></xsl:text>
+							</reference>
+							<!-- if there isn't in References, then display name -->
+							<xsl:variable name="std-ref_text" select=".//std-ref/text()"/>
+							<xsl:if test="normalize-space($std-ref_text) != ''">
+								<!-- <xsl:text>,</xsl:text><xsl:value-of select="$std-ref_text"/> -->
+								<referenceText><xsl:value-of select="$std-ref_text"/></referenceText>
+							</xsl:if>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:call-template name="getStdRef">
+								<xsl:with-param name="text" select=".//std-ref"/>
+							</xsl:call-template>
+						</xsl:otherwise>
+					</xsl:choose>
+					
+					<!-- <xsl:value-of select="$locality"/> -->
+					<!-- <xsl:for-each select="xalan:nodeset($locality)/locality">
+						<xsl:text>,</xsl:text><xsl:value-of select="."/>
+					</xsl:for-each> -->
+					<xsl:copy-of select="$locality"/>
+					
+				</xsl:otherwise>
+			</xsl:choose>
+	
+		</xsl:variable>
+	
+		<!-- cleaning model -->
+		<xsl:for-each select="xalan:nodeset($model)/*">
+			<xsl:choose>
+				<xsl:when test="self::referenceText and normalize-space() = ''"><!-- remove empty referenceText --></xsl:when>
+				<xsl:when test="self::referenceText and preceding-sibling::referenceText/text() = current()/text()"><!-- remove repeated referenceText --></xsl:when>
+				<xsl:when test="self::referenceText and following-sibling::referenceText[normalize-space() != ''][contains(text(), current()/text()) and not(text() = current()/text())]"><!-- remove referenceText, if next referenceText contains more information --></xsl:when>
+				<!-- copy as-is -->
+				<xsl:otherwise><xsl:copy-of select="."/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:for-each>
 	
 	</xsl:template>
 

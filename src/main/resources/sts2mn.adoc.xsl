@@ -1852,16 +1852,29 @@
 		<xsl:if test="bold[std-ref]">*</xsl:if>
 		<xsl:if test="bold2[std-ref]">**</xsl:if>
 		
-		<xsl:text>&lt;&lt;</xsl:text>
+		<xsl:variable name="model_std_">
+			<xsl:call-template name="build_sts_model_std"/>
+		</xsl:variable>
+		<xsl:variable name="model_std" select="xalan:nodeset($model_std_)"/>
 		
-			<xsl:variable name="model_std_">
-				<xsl:call-template name="build_sts_model_std"/>
-			</xsl:variable>
-			<xsl:variable name="model_std" select="xalan:nodeset($model_std_)"/>
+		<!-- <xsl:text>&#xa;DEBUG&#xa;</xsl:text>
+		<xsl:apply-templates select="$model_std" mode="print_as_xml"/>
+		<xsl:text>&#xa;</xsl:text> -->
 		
-			<!-- put reference -->
-			<xsl:value-of select="java:replaceAll(java:java.lang.String.new($model_std/reference),'_{2,}','_')"/>
-			
+		<!-- reference text -->
+		<xsl:variable name="referenceText">
+			<xsl:for-each select="$model_std/referenceText"> <!-- [normalize-space() != ''] -->
+				<!-- <xsl:if test="not(preceding-sibling::referenceText/text() = current()/text())
+					and not(following-sibling::referenceText[normalize-space() != ''][contains(text(), current()/text()) and not(text() = current()/text())])"> -->
+					<xsl:if test="position() != 1">
+						<xsl:text>,</xsl:text>
+					</xsl:if>
+					<xsl:value-of select="."/>
+				<!-- </xsl:if> -->
+			</xsl:for-each>
+		</xsl:variable>
+		
+		<xsl:variable name="localities">
 			<!-- put locality (-ies) -->
 			<xsl:for-each select="$model_std/*[self::locality or self::localityValue or self::localityConj][normalize-space() != '']">
 				<xsl:variable name="node_position" select="position()"/>
@@ -1903,23 +1916,31 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:for-each>
+		</xsl:variable>
+		
+		<xsl:variable name="isHidden" select="normalize-space($model_std/reference/@hidden = 'true')"/>
+		
+		<!-- $referenceText='<xsl:value-of select="$referenceText"/>' -->
+		
+		<xsl:text>&lt;&lt;</xsl:text>
+		
+			<!-- put reference -->
+			<xsl:value-of select="java:replaceAll(java:java.lang.String.new($model_std/reference),'_{2,}','_')"/>
 			
-			
-			<!-- put reference text -->
-			<xsl:variable name="referenceText">
-				<xsl:for-each select="$model_std/referenceText[normalize-space() != '']">
-					<xsl:if test="not(preceding-sibling::referenceText/text() = current()/text())">
-						<xsl:text>,</xsl:text>
-						<xsl:value-of select="."/>
-					</xsl:if>
-				</xsl:for-each>
-			</xsl:variable>
+			<xsl:value-of select="$localities"/>
 			
 			<xsl:variable name="refs_referenceText" select="$refs//ref[@id = $model_std/reference or @stdid_option = $model_std/reference]/@referenceText"/>
 			
 			<xsl:if test="$model_std/not_locality or 
-				($refs_referenceText != '' and not($refs_referenceText = substring($referenceText,2)))">
-				<xsl:value-of select="$referenceText"/>
+				($refs_referenceText != '' and not($refs_referenceText = substring($referenceText,2))) or
+				java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText)) = 'false' or
+				((contains($referenceText, 'series') or contains($referenceText, 'parts')) and not($model_std/locality))">
+				 
+				<xsl:if test="$referenceText != ''">
+					<xsl:text>,</xsl:text>
+					<xsl:value-of select="$referenceText"/>
+				</xsl:if>
+				
 				<xsl:for-each select="$model_std/not_locality">
 					<xsl:text> </xsl:text><xsl:value-of select="."/>
 				</xsl:for-each>
@@ -3191,6 +3212,7 @@
 			</xsl:for-each> -->
 			
 			<xsl:variable name="hidden_bibitems">
+			
 				<!-- std reference iteration -->
 				<xsl:for-each select="$updated_xml//std[not(parent::ref)][@stdid != '']">
 					<xsl:variable name="reference">
@@ -3206,7 +3228,16 @@
 							<xsl:value-of select="java:replaceAll(java:java.lang.String.new(@stdid),'_{2,}','_')"/>
 							<xsl:text>,hidden(</xsl:text>
 							<!-- <xsl:text>(</xsl:text><xsl:value-of select=".//std-ref/text()"/><xsl:text>)</xsl:text> -->
-							<xsl:value-of select="translate(.//std-ref/text(), '&#xA0;‑', ' -')"/>
+							
+							<xsl:choose>
+								<xsl:when test="contains(normalize-space(), 'series') or contains(normalize-space(), 'parts')">
+									<xsl:value-of select="translate(normalize-space(), '&#xA0;‑–', ' --')"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="translate(.//std-ref/text(), '&#xA0;‑–', ' --')"/>
+								</xsl:otherwise>
+							</xsl:choose>
+							
 							<xsl:text>)]]]</xsl:text>
 						</item>
 					</xsl:if>
