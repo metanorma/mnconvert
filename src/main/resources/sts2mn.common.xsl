@@ -1027,7 +1027,7 @@
 						<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
 					</xsl:choose>
 				</xsl:attribute>
-				<xsl:value-of select="normalize-space(std-ref)"/>
+				<xsl:value-of select="normalize-space(translate(std-ref, '&#xA0;&#x2011;', ' -'))"/>
 			</relation>
 		</xsl:for-each>
 	</xsl:template>
