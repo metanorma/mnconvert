@@ -502,7 +502,7 @@
 				<xsl:when test="self::referenceText and normalize-space() = ''"><!-- remove empty referenceText --></xsl:when>
 				<xsl:when test="self::referenceText and (preceding-sibling::referenceText/text() = current()/text() or preceding-sibling::referenceTextInBibliography/text() = current()/text())"><!-- remove repeated referenceText --></xsl:when>
 				<xsl:when test="(self::referenceText or self::referenceTextInBibliography) and following-sibling::referenceText[normalize-space() != ''][contains(text(), current()/text()) and not(text() = current()/text())]"><!-- remove referenceText, if next referenceText contains more information --></xsl:when>
-				
+
 				<!-- copy as-is -->
 				<xsl:otherwise><xsl:copy-of select="."/></xsl:otherwise>
 			</xsl:choose>
@@ -693,6 +693,7 @@
 	<xsl:template name="getStdRef">
 		<xsl:param name="text" select="."/>
 		<!-- <xsl:variable name="std-ref" select="java:replaceAll(java:java.lang.String.new($text),'- -','—')"/> -->
+		<!-- <xsl:message>DEBUG: getStdRef text=<xsl:value-of select="$text"/></xsl:message> -->
 		<xsl:variable name="std-ref">
 			<xsl:call-template name="getNormalizedId">
 				<xsl:with-param name="id" select="$text"/>
@@ -706,7 +707,7 @@
 		<!-- std-ref=<xsl:value-of select="$std-ref"/><xsl:text>&#xa;</xsl:text> -->
 		<!-- <xsl:variable name="ref1" select="//ref[std/std-ref = $std-ref]/@id"/> -->
 		<xsl:variable name="ref1_" select="$refs//ref[@id3 = $std-ref]"/>				
-		<xsl:variable name="ref1" select="xalan:nodeset($ref1_)"/>				
+		<xsl:variable name="ref1" select="xalan:nodeset($ref1_)"/>
 		<!-- ref1=<xsl:value-of select="$ref1"/><xsl:text>&#xa;</xsl:text> -->
 		<!-- <xsl:variable name="ref2" select="//ref[starts-with(std/std-ref, concat($std-ref, ' '))]/@id"/> -->
 		<xsl:variable name="ref2_" select="$refs//ref[starts-with(@id3, concat($std-ref, ' '))]"/>
@@ -715,6 +716,10 @@
 		
 		<xsl:variable name="ref3_" select="$refs//ref[@id3 = $std-ref]/@id3"/>				
 		<xsl:variable name="ref3" select="xalan:nodeset($ref3_)"/>				
+		
+		<!-- find by referenceText, example: GHTF/SG1/N055:2009 -->
+		<xsl:variable name="ref4_" select="$refs//ref[@referenceText = $text]"/>
+		<xsl:variable name="ref4" select="xalan:nodeset($ref4_)"/>
 		
 		<xsl:choose>
 			<xsl:when test="$ref1/@id != ''">
@@ -741,6 +746,13 @@
 				<xsl:if test="$ref3/@addTextToReference = 'true' or $OUTPUT_FORMAT = 'xml'">
 					<!-- if reference to standard and bibitem is numbered, for example: [1] -->
 					<!-- <xsl:text>,</xsl:text> -->
+					<referenceText><xsl:value-of select="$text"/></referenceText>
+				</xsl:if>
+			</xsl:when>
+			<xsl:when test="$ref4/@id != ''">
+				<reference><xsl:value-of select="$ref4/@id"/></reference>
+				
+				<xsl:if test="$ref4/@addTextToReference = 'true' or $OUTPUT_FORMAT = 'xml'">
 					<referenceText><xsl:value-of select="$text"/></referenceText>
 				</xsl:if>
 			</xsl:when>

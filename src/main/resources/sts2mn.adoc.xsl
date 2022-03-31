@@ -2016,6 +2016,9 @@
 	
 		<!-- <xsl:for-each select="$model_term_source/*">
 			<xsl:value-of select="local-name()"/>=<xsl:value-of select="."/><xsl:text>&#xa;</xsl:text>
+			<xsl:for-each select="@*">
+				<xsl:text>@</xsl:text><xsl:value-of select="local-name()"/>=<xsl:value-of select="."/><xsl:text>&#xa;</xsl:text>
+			</xsl:for-each>
 		</xsl:for-each> -->
 	
 		<xsl:text>[.source</xsl:text>
@@ -3311,10 +3314,12 @@
 			</xsl:choose>
 		</xsl:variable>
 		
+		<xsl:variable name="isAsciiBibFormat" select="normalize-space(@referenceText != '' and
+				java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, @referenceText) = 'false')"/>
+		
 		<xsl:variable name="reference">
 			
-			<xsl:if test="@id or std/@std-id or std/std-ref or mixed-citation/@id">
-				<xsl:text>[[[</xsl:text>
+			<xsl:variable name="id">
 				<xsl:value-of select="@id"/>
 				<xsl:if test="not(@id)">
 					<xsl:value-of select="@id2"/>
@@ -3325,67 +3330,127 @@
 						</xsl:if>
 					</xsl:if>
 				</xsl:if>
-				
-				<xsl:variable name="referenceText">
+			</xsl:variable>
+			
+			<xsl:choose>
+				<xsl:when test="$isAsciiBibFormat = 'true'">
+					<!-- bibitem extended format:
+					https://www.metanorma.org/author/topics/document-format/bibliography/#entering-entries-using-asciibib
+					https://www.relaton.org/specs/asciibib/
+					-->
+					<xsl:text>[[</xsl:text><xsl:value-of select="$id"/><xsl:text>]]&#xa;</xsl:text>
+					<xsl:text>[%bibitem]&#xa;</xsl:text>
 					
-					<xsl:variable name="label_">
-						<xsl:apply-templates select="label" mode="references"/>
+					<xsl:text>=== </xsl:text>
+					<xsl:variable name="isThereFootnoteAfterNumber" select="normalize-space(*/node()[normalize-space() != ''][2][self::xref and @ref-type='fn'] and
+					*/node()[normalize-space() != ''][3][self::fn])"/>
+					
+					<xsl:variable name="title">
+						<xsl:choose>
+							<xsl:when test="$isThereFootnoteAfterNumber = 'true'">
+								<xsl:apply-templates select="*/node()[normalize-space() != ''][3][self::fn]/following-sibling::node()"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:apply-templates/>
+							</xsl:otherwise>
+						</xsl:choose>
 					</xsl:variable>
-					<xsl:variable name="label" select="normalize-space($label_)"/>
-					
-					
-					<!-- note: @referenceText was added at ref_fix step -->
-					<xsl:if test="$label != '' and @referenceText != ''">
-						<xsl:text>(</xsl:text>
+					<!-- remove comma at start -->
+					<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($title),'^(\s|\h)*,',''))"/>
+					<xsl:text>&#xa;</xsl:text>
+					<xsl:text>docid::&#xa;</xsl:text>
+					<xsl:text>id::: </xsl:text><xsl:value-of select="@referenceText"/><xsl:text>&#xa;</xsl:text>
+					<xsl:text>type:: standard&#xa;</xsl:text>
+					<xsl:if test="$isThereFootnoteAfterNumber = 'true'">
+						<xsl:text>biblionote:: &#xa;</xsl:text>
+						<xsl:text>type::: Unpublished-Status&#xa;</xsl:text>
+						<xsl:text>content::: </xsl:text>
+						<xsl:apply-templates select="*/node()[normalize-space() != ''][3][self::fn]/node()"/>
+						<xsl:text>&#xa;</xsl:text>
 					</xsl:if>
-					<xsl:value-of select="$label"/>
-					<xsl:if test="$label != '' and @referenceText != ''">
-						<xsl:text>)</xsl:text>
-					</xsl:if>
-					<xsl:value-of select="@referenceText"/>
-					
-				</xsl:variable>
-				
-				
-				<xsl:if test="$referenceText != ''">
-					<xsl:text>,</xsl:text>
-					
-					<xsl:if test=".//named-content[@content-type='ace-tag']">
-						<xsl:text>path:(hyperlink,</xsl:text>
-					</xsl:if>
-					
-					<xsl:value-of select="$referenceText"/>
-					
-					<xsl:if test=".//named-content[@content-type='ace-tag']">
-						<xsl:text>)</xsl:text>
-					</xsl:if>
-				</xsl:if>
-				
-				<xsl:text>]]]</xsl:text>
-			</xsl:if>
+
+				</xsl:when>
+				<xsl:otherwise>
+
+					<!-- <xsl:if test="@id or @id2 or @id3 or @id4 or std/@std-id or std/std-ref or mixed-citation/@id"> -->
+					<xsl:if test="$id != ''">
 			
-			<!-- Bibliography items without id -->
-			<!-- Example: Further Reading -->
-			<xsl:if test="not(@id or std/@std-id or std/std-ref)">
-				<xsl:variable name="preceding_title" select="java:toLowerCase(java:java.lang.String.new(translate(preceding-sibling::title[1]/text(), ' ', '_')))"/>
-				<xsl:if test="normalize-space($preceding_title) != ''">
-					<xsl:text>[[[</xsl:text>
-					<!-- <xsl:value-of select="$preceding_title"/>_<xsl:number/> -->
-					<xsl:value-of select="java:replaceAll(java:java.lang.String.new($preceding_title),'_{2,}','_')"/>_<xsl:number/>
-					<xsl:text>]]]</xsl:text>
-				</xsl:if>
-			</xsl:if>
-			
-			<xsl:apply-templates/>
+						<xsl:text>[[[</xsl:text>
+						
+						<xsl:value-of select="$id"/>
+						
+						<xsl:variable name="referenceText">
+							
+							<xsl:variable name="label_">
+								<xsl:apply-templates select="label" mode="references"/>
+							</xsl:variable>
+							<xsl:variable name="label" select="normalize-space($label_)"/>
+							
+							
+							<!-- note: @referenceText was added at ref_fix step -->
+							<xsl:if test="$label != '' and @referenceText != ''">
+								<xsl:text>(</xsl:text>
+							</xsl:if>
+							<xsl:value-of select="$label"/>
+							<xsl:if test="$label != '' and @referenceText != ''">
+								<xsl:text>)</xsl:text>
+							</xsl:if>
+							<xsl:value-of select="@referenceText"/>
+							
+						</xsl:variable>
+						
+						
+						<xsl:if test="$referenceText != ''">
+							<xsl:text>,</xsl:text>
+							
+							<xsl:if test=".//named-content[@content-type='ace-tag']">
+								<xsl:text>path:(hyperlink,</xsl:text>
+							</xsl:if>
+							
+							<xsl:value-of select="$referenceText"/>
+							
+							<xsl:if test=".//named-content[@content-type='ace-tag']">
+								<xsl:text>)</xsl:text>
+							</xsl:if>
+						</xsl:if>
+						
+						<xsl:text>]]]</xsl:text>
+					
+					</xsl:if>
+				
+					<!-- Bibliography items without id -->
+					<!-- Example: Further Reading -->
+					<xsl:if test="not(@id or std/@std-id or std/std-ref)">
+						<xsl:variable name="preceding_title" select="java:toLowerCase(java:java.lang.String.new(translate(preceding-sibling::title[1]/text(), ' ', '_')))"/>
+						<xsl:if test="normalize-space($preceding_title) != ''">
+							<xsl:text>[[[</xsl:text>
+							<!-- <xsl:value-of select="$preceding_title"/>_<xsl:number/> -->
+							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($preceding_title),'_{2,}','_')"/>_<xsl:number/>
+							<xsl:text>]]]</xsl:text>
+						</xsl:if>
+					</xsl:if>
+					
+					<xsl:apply-templates/>
+				
+				</xsl:otherwise>
+			</xsl:choose>
 			
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:variable>
+		
 		<xsl:if test="normalize-space($reference) != ''">
-			<!-- comment repeated references -->
-			<xsl:if test="normalize-space($unique) = 'false'">// </xsl:if>
-			<xsl:text>* </xsl:text>
-			<xsl:value-of select="$reference"/>
+			<xsl:choose>
+				<xsl:when test="$isAsciiBibFormat = 'true'">
+					<xsl:value-of select="$reference"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<!-- comment repeated references -->
+					<xsl:if test="normalize-space($unique) = 'false'">// </xsl:if>
+					<xsl:text>* </xsl:text>
+					<xsl:value-of select="$reference"/>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:if>
 		
 		<xsl:if test="normalize-space($unique) = 'false'">
