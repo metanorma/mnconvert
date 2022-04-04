@@ -1932,12 +1932,18 @@
 					<xsl:value-of select="$localities"/>
 					
 					<xsl:variable name="refs_referenceText" select="$refs//ref[@id = $model_std/reference or 
-										@id2 = $model_std/reference or @id3 = $model_std/reference or @id4 = $model_std/reference]/@referenceText"/>
+										@id2 = $model_std/reference or @id3 = $model_std/reference or @id4 = $model_std/reference]/@referenceText"/> <!-- note: @referenceText was added at ref_fix step -->
+					
+					<!-- <xsl:text>&#xa;DEBUG:</xsl:text>refs_referenceText=<xsl:value-of select="$refs_referenceText"/><xsl:text>&#xa;</xsl:text>
+					<xsl:text>&#xa;</xsl:text>referenceText=<xsl:value-of select="$referenceText"/><xsl:text>&#xa;</xsl:text>
+					<xsl:text>&#xa;</xsl:text><xsl:value-of select="($refs_referenceText != '' and not($refs_referenceText = substring($referenceText,2)))"/><xsl:text>&#xa;</xsl:text> -->
 					
 					<xsl:if test="$model_std/not_locality or 
-						($refs_referenceText != '' and not($refs_referenceText = substring($referenceText,2))) or
+						($refs_referenceText != '' and not($refs_referenceText = $referenceText)) or
 						java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText)) = 'false' or
 						((contains($referenceText, 'series') or contains($referenceText, 'parts')) and not($model_std/locality))">
+						 
+						 <!-- java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText)) = 'false' or -->
 						 
 						<xsl:if test="$referenceText != ''">
 							<xsl:text>,</xsl:text>
@@ -2066,8 +2072,10 @@
 			
 			<!-- if reference text is different than reference title in the Bibliography -->
 			<xsl:variable name="refs_referenceText" select="$refs//ref[@id = $term_source_reference or 
-						@id2 = $term_source_reference or @id3 = $term_source_reference or @id4 = $term_source_reference]/@referenceText"/>
+						@id2 = $term_source_reference or @id3 = $term_source_reference or @id4 = $term_source_reference or @id5 = $term_source_reference]/@referenceText"/>
 			<!-- after comma -->
+			
+			
 			<xsl:variable name="referenceText_after_comma" select="substring($referenceText,2)"/>
 			<xsl:if test="($localities = '' and not($refs_referenceText = $referenceText_after_comma)) or
 				java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText_after_comma)) = 'false'">
@@ -3314,26 +3322,36 @@
 			</xsl:choose>
 		</xsl:variable>
 		
-		<xsl:variable name="isAsciiBibFormat" select="normalize-space(@referenceText != '' and
-				java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, @referenceText) = 'false')"/>
+		<!-- <xsl:variable name="isAsciiBibFormat" select="normalize-space(@referenceText != '' and
+				java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, @referenceText) = 'false')"/> -->
 		
 		<xsl:variable name="reference">
 			
-			<xsl:variable name="id">
-				<xsl:value-of select="@id"/>
-				<xsl:if test="not(@id)">
+			<xsl:variable name="ids">
+				<item><xsl:value-of select="@id"/></item>
+				<item><xsl:value-of select="@id2"/></item>
+				<item><xsl:value-of select="@id3"/></item>
+				<item><xsl:value-of select="@id4"/></item>
+				<item><xsl:value-of select="@id5"/></item>
+				<item><xsl:value-of select="@id6"/></item>
+<!-- 				<xsl:if test="not(@id)">
 					<xsl:value-of select="@id2"/>
 					<xsl:if test="not(@id2)">
 						<xsl:value-of select="@id3"/>
 						<xsl:if test="not(@id3)">
 							<xsl:value-of select="@id4"/>
+							<xsl:if test="not(@id4)">
+								<xsl:value-of select="@id5"/>
+							</xsl:if>
 						</xsl:if>
 					</xsl:if>
-				</xsl:if>
+				</xsl:if> -->
 			</xsl:variable>
+			<xsl:variable name="id" select="xalan:nodeset($ids)/item[normalize-space()!=''][1]"/>
 			
 			<xsl:choose>
-				<xsl:when test="$isAsciiBibFormat = 'true'">
+				<!-- <xsl:when test="$isAsciiBibFormat = 'true'"> -->
+				<xsl:when test="@content-type = 'standard_other'"> <!-- add on 'ref_fix' step, for non ISO, IEC, ... standards, example: GHTF_SG1_N055_2009 -->
 					<!-- bibitem extended format:
 					https://www.metanorma.org/author/topics/document-format/bibliography/#entering-entries-using-asciibib
 					https://www.relaton.org/specs/asciibib/
@@ -3359,7 +3377,7 @@
 					<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($title),'^(\s|\h)*,',''))"/>
 					<xsl:text>&#xa;</xsl:text>
 					<xsl:text>docid::&#xa;</xsl:text>
-					<xsl:text>id::: </xsl:text><xsl:value-of select="@referenceText"/><xsl:text>&#xa;</xsl:text>
+					<xsl:text>id::: </xsl:text><xsl:value-of select="@referenceText"/><xsl:text>&#xa;</xsl:text> <!-- note: @referenceText was added at ref_fix step -->
 					<xsl:text>type:: standard&#xa;</xsl:text>
 					<xsl:if test="$isThereFootnoteAfterNumber = 'true'">
 						<xsl:text>biblionote:: &#xa;</xsl:text>
@@ -3420,37 +3438,47 @@
 				
 					<!-- Bibliography items without id -->
 					<!-- Example: Further Reading -->
-					<xsl:if test="not(@id or std/@std-id or std/std-ref)">
+					<!-- <xsl:if test="not(@id or std/@std-id or std/std-ref)">
 						<xsl:variable name="preceding_title" select="java:toLowerCase(java:java.lang.String.new(translate(preceding-sibling::title[1]/text(), ' ', '_')))"/>
 						<xsl:if test="normalize-space($preceding_title) != ''">
 							<xsl:text>[[[</xsl:text>
-							<!-- <xsl:value-of select="$preceding_title"/>_<xsl:number/> -->
 							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($preceding_title),'_{2,}','_')"/>_<xsl:number/>
 							<xsl:text>]]]</xsl:text>
 						</xsl:if>
-					</xsl:if>
+					</xsl:if> -->
 					
 					<xsl:apply-templates/>
 				
 				</xsl:otherwise>
 			</xsl:choose>
 			
-			<xsl:text>&#xa;</xsl:text>
-			<xsl:text>&#xa;</xsl:text>
 		</xsl:variable>
 		
 		<xsl:if test="normalize-space($reference) != ''">
-			<xsl:choose>
+			<!-- <xsl:choose>
 				<xsl:when test="$isAsciiBibFormat = 'true'">
 					<xsl:value-of select="$reference"/>
 				</xsl:when>
-				<xsl:otherwise>
+				<xsl:otherwise> -->
 					<!-- comment repeated references -->
+					<!-- <xsl:value-of select="@content-type"/> -->
 					<xsl:if test="normalize-space($unique) = 'false'">// </xsl:if>
-					<xsl:text>* </xsl:text>
-					<xsl:value-of select="$reference"/>
-				</xsl:otherwise>
-			</xsl:choose>
+					<xsl:if test="not(@content-type and @content-type = 'standard_other')">* </xsl:if>
+					<!-- <xsl:value-of select="$reference"/> -->
+					<xsl:choose>
+						<xsl:when test="normalize-space($unique) = 'false'">
+							<!-- add comment // before each line in the $reference -->
+							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($reference),'&#xa;','&#xa;// ')"/> 
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$reference"/>
+						</xsl:otherwise>
+					</xsl:choose>
+					
+					<xsl:text>&#xa;&#xa;</xsl:text>
+					
+				<!-- </xsl:otherwise>
+			</xsl:choose> -->
 		</xsl:if>
 		
 		<xsl:if test="normalize-space($unique) = 'false'">

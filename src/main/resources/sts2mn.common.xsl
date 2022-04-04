@@ -375,6 +375,9 @@
 				<xsl:when test="self::referenceText and preceding-sibling::referenceText/text() = current()/text()"><!-- remove repeated referenceText --></xsl:when>
 				<xsl:when test="self::referenceText and following-sibling::referenceText[normalize-space() != ''][contains(text(), current()/text()) and not(text() = current()/text())]"><!-- remove referenceText, if next referenceText contains more information --></xsl:when>
 				<!-- copy as-is -->
+				<xsl:when test="self::referenceText">
+					<referenceText><xsl:value-of select="translate(., '&#xA0;&#x2011;', ' -')"/></referenceText>
+				</xsl:when>
 				<xsl:otherwise><xsl:copy-of select="."/></xsl:otherwise>
 			</xsl:choose>
 		</xsl:for-each>
@@ -502,7 +505,9 @@
 				<xsl:when test="self::referenceText and normalize-space() = ''"><!-- remove empty referenceText --></xsl:when>
 				<xsl:when test="self::referenceText and (preceding-sibling::referenceText/text() = current()/text() or preceding-sibling::referenceTextInBibliography/text() = current()/text())"><!-- remove repeated referenceText --></xsl:when>
 				<xsl:when test="(self::referenceText or self::referenceTextInBibliography) and following-sibling::referenceText[normalize-space() != ''][contains(text(), current()/text()) and not(text() = current()/text())]"><!-- remove referenceText, if next referenceText contains more information --></xsl:when>
-
+				<xsl:when test="self::referenceText">
+					<referenceText><xsl:value-of select="translate(., '&#xA0;&#x2011;', ' -')"/></referenceText>
+				</xsl:when>
 				<!-- copy as-is -->
 				<xsl:otherwise><xsl:copy-of select="."/></xsl:otherwise>
 			</xsl:choose>
@@ -688,7 +693,8 @@
 		<referenceText><xsl:call-template name="fn"/></referenceText>
 	</xsl:template>
 	
-	<xsl:variable name="start_standard_regex">^(CN|IEC|(IEC/[A-Z]{2,3})|IETF|ISO|(ISO/[A-Z]{2,3})|ITU|NIST|OGC|CC|OMG|UN|W3C|IEEE|IHO|BIPM|ECMA|CIE|BS|BSI|PAS|CEN|(CEN/[A-Z]{2,3})|CEN/CENELEC|EN|IANA|3GPP|OASIS|IEV)(\s|\h).*</xsl:variable>
+	<!-- Examples: ISO number, BS EN number, EN ISO number -->
+	<xsl:variable name="start_standard_regex">^((CN|IEC|(IEC/[A-Z]{2,3})|IETF|BCP|ISO|(ISO/[A-Z]{2,3})|ITU|NIST|OGC|CC|OMG|UN|W3C|IEEE|IHO|BIPM|ECMA|CIE|BS|BSI|BS(\s|\h)OHSAS|PAS|CEN|(CEN/[A-Z]{2,3})|CEN/CENELEC|EN|IANA|3GPP|OASIS|IEV)(\s|\h))+((Guide|TR|TC)(\s|\h))?\d.*</xsl:variable>
 	
 	<xsl:template name="getStdRef">
 		<xsl:param name="text" select="."/>
@@ -714,11 +720,12 @@
 		<xsl:variable name="ref2" select="xalan:nodeset($ref2_)"/>
 		<!-- ref2=<xsl:value-of select="$ref2"/><xsl:text>&#xa;</xsl:text> -->
 		
-		<xsl:variable name="ref3_" select="$refs//ref[@id3 = $std-ref]/@id3"/>				
+		<xsl:variable name="ref3_" select="$refs//ref[@id3 = $std-ref]"/> <!-- /@id3 -->
 		<xsl:variable name="ref3" select="xalan:nodeset($ref3_)"/>				
 		
 		<!-- find by referenceText, example: GHTF/SG1/N055:2009 -->
-		<xsl:variable name="ref4_" select="$refs//ref[@referenceText = $text]"/>
+		<!-- <xsl:variable name="ref4_" select="$refs//ref[@referenceText = $text]"/> -->
+		<xsl:variable name="ref4_" select="$refs//ref[@id5 = $std-ref]"/>
 		<xsl:variable name="ref4" select="xalan:nodeset($ref4_)"/>
 		
 		<xsl:choose>
@@ -884,11 +891,8 @@
 				</xsl:attribute>
 			</xsl:if>
 			
-			<xsl:attribute name="addTextToReference">
-				<xsl:value-of select="normalize-space(@content-type = 'standard' and starts-with(label, '['))"/>
-			</xsl:attribute>
 			
-			<xsl:variable name="referenceText">
+			<xsl:variable name="referenceText_">
 				<xsl:variable name="std-ref_text">
 					<xsl:apply-templates select="std/std-ref | std/italic/std-ref | std/bold/std-ref | std/italic2/std-ref | std/bold2/std-ref" mode="references"/>
 				</xsl:variable>
@@ -914,15 +918,48 @@
 						)">
 						<xsl:value-of select="$mixed-citation_first_text"/>
 					</xsl:if>
-					
 				</xsl:if>
 			</xsl:variable>
+			<xsl:variable name="referenceText" select="normalize-space($referenceText_)"/>
 			
 			<xsl:attribute name="referenceText">
-				<xsl:value-of select="normalize-space($referenceText)"/>
+				<xsl:value-of select="normalize-space($referenceText_)"/>
 			</xsl:attribute>
 			
+			<xsl:variable name="content-type">
+				<xsl:choose>
+					<xsl:when test="(not(@content-type) or @content-type = 'standard') and
+							$referenceText != '' and java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, $referenceText) = 'false'">standard_other</xsl:when>
+					<xsl:when test="@content-type"><xsl:value-of select="@content-type"/></xsl:when>
+					<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, $referenceText) = 'true'">standard</xsl:when>
+				</xsl:choose>
+			</xsl:variable>
 			
+			<xsl:if test="$content-type != ''">
+				<xsl:attribute name="content-type"><xsl:value-of select="$content-type"/></xsl:attribute>
+			</xsl:if>
+			
+			<xsl:attribute name="addTextToReference">
+				<xsl:value-of select="normalize-space(($content-type = 'standard' or $content-type = 'standard_other') and starts-with(label, '['))"/>
+			</xsl:attribute>
+			
+			<xsl:attribute name="id5">
+				<xsl:call-template name="getNormalizedId">
+					<xsl:with-param name="id" select="$referenceText"/>
+				</xsl:call-template>
+			</xsl:attribute>
+			
+			<xsl:attribute name="id6">
+				<xsl:variable name="preceding_title" select="java:toLowerCase(java:java.lang.String.new(translate(preceding-sibling::title[1]/text(), ' ', '_')))"/>
+				<xsl:choose>
+					<xsl:when test="normalize-space($preceding_title) != ''">
+						<xsl:value-of select="java:replaceAll(java:java.lang.String.new($preceding_title),'_{2,}','_')"/>_<xsl:number/>
+					</xsl:when>
+					<xsl:otherwise>bibliography_<xsl:number/></xsl:otherwise>
+				</xsl:choose>
+			</xsl:attribute>
+			
+
 			<xsl:apply-templates select="node()" mode="ref_fix"/>
 		</xsl:copy>
 	</xsl:template>
