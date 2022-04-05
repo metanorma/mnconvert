@@ -3241,26 +3241,40 @@
 							
 							<xsl:variable name="hidden">
 								<!-- put reference text -->
-								<xsl:if test="$model_term_source/referenceText[normalize-space() != ''] != $model_term_source/referenceTextInBibliography[normalize-space() != ''][1]">
-									<xsl:text>(</xsl:text>
-										<!-- Example: * [[[ref,hidden((ISO 9000:2005 footnote:[Superseded by ISO 9000:2015.])ISO 9000:2005)]]] -->
-										<xsl:for-each select="$model_term_source/referenceTextInBibliography[normalize-space() != ''][1]">	
-											<xsl:value-of select="."/>
-										</xsl:for-each>
+								
+								<xsl:variable name="referenceText">
+									<xsl:for-each select="$model_term_source/referenceTextInBibliography[normalize-space() != ''][1]">	
+										<xsl:value-of select="."/>
+									</xsl:for-each>
+									<xsl:if test="not($model_term_source/referenceTextInBibliography[normalize-space() != ''])">
 										<xsl:for-each select="$model_term_source/referenceText[normalize-space() != '']">
 											<xsl:value-of select="."/>
 										</xsl:for-each>
-									<xsl:text>)</xsl:text>
-								</xsl:if>
-								<xsl:for-each select="$model_term_source/referenceTextInBibliography[normalize-space() != ''][1]">	
-									<xsl:value-of select="."/>
-								</xsl:for-each>
+									</xsl:if>
+								</xsl:variable>
 								
-								<xsl:if test="not($model_term_source/referenceTextInBibliography[normalize-space() != ''])">
-									<xsl:for-each select="$model_term_source/referenceText[normalize-space() != '']">
-										<xsl:value-of select="."/>
-									</xsl:for-each>
-								</xsl:if>
+								<xsl:choose>
+									<xsl:when test="$model_term_source/referenceText[normalize-space() != ''] != $model_term_source/referenceTextInBibliography[normalize-space() != ''][1]">
+										<!-- Example: * [[[ref,hidden((ISO 9000:2005 footnote:[Superseded by ISO 9000:2015.])ISO 9000:2005)]]] -->
+										<xsl:text>(</xsl:text>
+											<xsl:for-each select="$model_term_source/referenceTextInBibliography[normalize-space() != ''][1]">	
+												<xsl:value-of select="."/>
+											</xsl:for-each>
+											<xsl:for-each select="$model_term_source/referenceText[normalize-space() != '']">
+												<xsl:value-of select="."/>
+											</xsl:for-each>
+										<xsl:text>)</xsl:text>
+									</xsl:when>
+									<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText)) = 'false'">
+										<!-- Example: * [[[Oxford_English_Dictionary,hidden((Oxford English Dictionary)Oxford English Dictionary)]]] -->
+										<xsl:text>(</xsl:text>
+											<xsl:value-of select="$referenceText"/>
+										<xsl:text>)</xsl:text>
+									</xsl:when>
+								</xsl:choose>
+								
+								<xsl:value-of select="$referenceText"/>
+								
 							</xsl:variable>
 							
 							<xsl:value-of select="translate($hidden, '&#xA0;‑–', ' --')"/>
