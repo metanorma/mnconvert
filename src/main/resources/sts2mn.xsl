@@ -1604,7 +1604,7 @@
 			<xsl:variable name="term_source_reference" select="$model_term_source/reference"/>
 			<xsl:variable name="reference">
 				<xsl:call-template name="getReference_std">
-					<xsl:with-param name="stdid" select="normalize-space($term_source_reference)"/>
+					<xsl:with-param name="std-id" select="normalize-space($term_source_reference)"/>
 				</xsl:call-template>
 			</xsl:variable>
 			

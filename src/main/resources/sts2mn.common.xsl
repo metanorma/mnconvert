@@ -313,13 +313,15 @@
 				<xsl:when test="std/std-id"> <!-- for IEC -->
 					<xsl:variable name="std-id" select="java:replaceAll(java:java.lang.String.new(std-id), '(#.*)?$','')"/>
 					<xsl:call-template name="getReference_std">
-						<xsl:with-param name="stdid" select="$std-id"/>
+						<xsl:with-param name="std-id" select="$std-id"/>
 						<xsl:with-param name="locality" select="$locality"/>
 					</xsl:call-template>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:call-template name="getReference_std">
-						<xsl:with-param name="stdid" select="current()/@stdid"/>
+						<xsl:with-param name="std-id" select="current()/@std-id"/>
+						<xsl:with-param name="std-id2" select="current()/@std-id2"/>
+						<xsl:with-param name="std-id3" select="current()/@std-id3"/>
 						<xsl:with-param name="locality" select="$locality"/>
 					</xsl:call-template>
 				</xsl:otherwise>
@@ -338,15 +340,16 @@
 				</xsl:when>
 				<xsl:otherwise> <!-- put id of current std -->
 					<xsl:choose>
-						<xsl:when test="@stdid">
+						<xsl:when test="normalize-space(@std-id2) != '' or normalize-space(@std-id3) != ''">
 							<reference hidden="true">
-								<!-- <xsl:text>hidden_bibitem_</xsl:text> -->
-								<xsl:value-of select="@stdid"/><xsl:text></xsl:text>
+								<xsl:value-of select="@std-id2"/>
+								<xsl:if test="normalize-space(@std-id2) = ''">
+									<xsl:value-of select="@std-id3"/>
+								</xsl:if>
 							</reference>
 							<!-- if there isn't in References, then display name -->
 							<xsl:variable name="std-ref_text" select=".//std-ref/text()"/>
 							<xsl:if test="normalize-space($std-ref_text) != ''">
-								<!-- <xsl:text>,</xsl:text><xsl:value-of select="$std-ref_text"/> -->
 								<referenceText><xsl:value-of select="$std-ref_text"/></referenceText>
 							</xsl:if>
 						</xsl:when>
@@ -385,10 +388,14 @@
 	</xsl:template>
 
 	<xsl:template name="getReference_std">
-		<xsl:param name="stdid"/>
+		<xsl:param name="std-id"/>
+		<xsl:param name="std-id2"/>
+		<xsl:param name="std-id3"/>
 		<xsl:param name="locality"/>
 		<!-- @id2, @id3 and @id4 attributes were added in linearize.xsl -->
-		<xsl:variable name="ref_" select="$updated_xml//ref[@id2 = $stdid or @id3 = $stdid or @id = $stdid]"/>
+		<xsl:variable name="ref_" select="$updated_xml//ref[($std-id != '' and (@id = $std-id or @id2 = $std-id or @id3 = $std-id or @id4 = $std-id)) or
+													($std-id2 != '' and (@id = $std-id2 or @id2 = $std-id2 or @id3 = $std-id2 or @id4 = $std-id2)) or
+													($std-id3 != '' and (@id = $std-id3 or @id2 = $std-id3 or @id3 = $std-id3 or @id4 = $std-id3))]"/>
 		<xsl:variable name="ref" select="xalan:nodeset($ref_)"/>
 		<xsl:variable name="ref_by_stdid" select="normalize-space($ref/@id)"/> <!-- find ref by id -->
 		<reference><xsl:value-of select="$ref_by_stdid"/></reference>
@@ -968,31 +975,31 @@
 	<xsl:template match="std[not(parent::ref)]" mode="ref_fix">
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="ref_fix"/>
-			<xsl:attribute name="stdid">
-				<xsl:choose>
-					<!-- if there is attribute @std-id -->
-					<xsl:when test="normalize-space(@std-id) != ''">
-						<xsl:variable name="std_id">
-							<xsl:choose>
-								<xsl:when test="contains(@std-id, ':clause:')"><xsl:value-of select="substring-before(@std-id, ':clause:')"/></xsl:when>
-								<xsl:otherwise><xsl:value-of select="@std-id"/></xsl:otherwise>
-							</xsl:choose>
-						</xsl:variable>
-						<xsl:call-template name="getNormalizedId">
-							<xsl:with-param name="id" select="$std_id"/>
-						</xsl:call-template>
-					</xsl:when>
-					<!-- if there is nested std-ref -->
-					<xsl:when test="normalize-space(.//std-ref) != ''">
-						<xsl:variable name="std_ref_text_" select="normalize-space(.//std-ref)"/>
-						<xsl:variable name="std_ref_text" select="normalize-space(java:replaceAll(java:java.lang.String.new($std_ref_text_),'(,.*)?$',''))"/> <!-- remove comma at end -->
-						<xsl:call-template name="getNormalizedId">
-							<!-- <xsl:with-param name="id" select="normalize-space(.//std-ref)"/> -->
-							<xsl:with-param name="id" select="normalize-space($std_ref_text)"/>
-						</xsl:call-template>
-					</xsl:when>
-				</xsl:choose>
-			</xsl:attribute>
+			
+			<xsl:if test="normalize-space(@std-id) != ''"> <!-- if there is attribute @std-id -->
+				<xsl:attribute name="std-id2">
+					<xsl:variable name="std_id">
+						<xsl:choose>
+							<xsl:when test="contains(@std-id, ':clause:')"><xsl:value-of select="substring-before(@std-id, ':clause:')"/></xsl:when>
+							<xsl:otherwise><xsl:value-of select="@std-id"/></xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+					<xsl:call-template name="getNormalizedId">
+						<xsl:with-param name="id" select="$std_id"/>
+					</xsl:call-template>
+				</xsl:attribute>
+			</xsl:if>
+			
+			<xsl:if test="normalize-space(.//std-ref) != ''"> <!-- if there is nested std-ref -->
+				<xsl:attribute name="std-id3">
+					<xsl:variable name="std_ref_text_" select="normalize-space(.//std-ref)"/>
+					<xsl:variable name="std_ref_text" select="normalize-space(java:replaceAll(java:java.lang.String.new($std_ref_text_),'(,.*)?$',''))"/> <!-- remove comma at end -->
+					<xsl:call-template name="getNormalizedId">
+						<xsl:with-param name="id" select="normalize-space($std_ref_text)"/>
+					</xsl:call-template>
+				</xsl:attribute>
+			</xsl:if>
+			
 			<xsl:apply-templates select="node()" mode="ref_fix"/>
 		</xsl:copy>
 	</xsl:template>

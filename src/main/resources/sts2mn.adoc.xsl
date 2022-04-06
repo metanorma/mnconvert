@@ -1858,6 +1858,9 @@
 		<xsl:variable name="model_std" select="xalan:nodeset($model_std_)"/>
 		
 		<!-- <xsl:text>&#xa;DEBUG&#xa;</xsl:text>
+		<xsl:for-each select="@*">
+			<xsl:text>@</xsl:text><xsl:value-of select="local-name()"/><xsl:text>=</xsl:text><xsl:value-of select="."/><xsl:text>&#xa;</xsl:text>
+		</xsl:for-each>
 		<xsl:apply-templates select="$model_std" mode="print_as_xml"/>
 		<xsl:text>&#xa;</xsl:text> -->
 		
@@ -2040,7 +2043,7 @@
 			<xsl:variable name="term_source_reference" select="$model_term_source/reference"/>
 			<xsl:variable name="reference">
 				<xsl:call-template name="getReference_std">
-					<xsl:with-param name="stdid" select="normalize-space($term_source_reference)"/>
+					<xsl:with-param name="std-id" select="normalize-space($term_source_reference)"/>
 				</xsl:call-template>
 			</xsl:variable>
 			<!-- <xsl:if test="normalize-space($reference) = ''">hidden_bibitem_</xsl:if> -->
@@ -3198,15 +3201,46 @@
 			
 				<xsl:if test="1 = 1"> <!-- skip -->
 				<!-- std reference iteration -->
-				<xsl:for-each select="$updated_xml//std[not(parent::ref)][@stdid != '']">
-					<xsl:variable name="stdid" select="@stdid"/>
-					<xsl:variable name="reference" select="$refs//ref[@id2 = $stdid or @id3 = $stdid or @id4 = $stdid or @id = $stdid]/@id" />
+				<xsl:for-each select="$updated_xml//std[not(parent::ref)][normalize-space(@std-id) != '' or normalize-space(@std-id2) != '' or normalize-space(@std-id3) != '']">
+					<xsl:variable name="std-id" select="normalize-space(@std-id)"/>
+					<xsl:variable name="std-id2" select="normalize-space(@std-id2)"/>
+					<xsl:variable name="std-id3" select="normalize-space(@std-id3)"/>
 					
-					<xsl:if test="normalize-space($reference) = ''">
-						<item id="{@stdid}">
-							
+					<xsl:variable name="reference_by_std-id">
+						<xsl:if test="$std-id != ''">
+							<xsl:value-of select="$refs//ref[@id = $std-id or @id2 = $std-id or @id3 = $std-id or @id4 = $std-id or @id5 = $std-id]/@id"/>
+						</xsl:if>
+					</xsl:variable>
+					
+					<xsl:variable name="reference_by_std-id2">
+						<xsl:if test="$std-id2 != ''">
+							<xsl:value-of select="$refs//ref[@id = $std-id2 or @id2 = $std-id2 or @id3 = $std-id2 or @id4 = $std-id2 or @id5 = $std-id2]/@id"/>
+						</xsl:if>
+					</xsl:variable>
+					
+					<xsl:variable name="reference_by_std-id3">
+						<xsl:if test="$std-id3 != ''">
+							<xsl:value-of select="$refs//ref[@id = $std-id3 or @id2 = $std-id3 or @id3 = $std-id3 or @id4 = $std-id3 or @id5 = $std-id3]/@id"/>
+						</xsl:if>
+					</xsl:variable>
+					
+					<!-- <xsl:variable name="reference" select="$refs//ref[($std-id2 != '' and (@id2 = $std-id2 or @id3 = $std-id2 or @id4 = $std-id2 or @id = $std-id2)) or
+					($std-id3 != '' and (@id2 = $std-id3 or @id3 = $std-id3 or @id4 = $std-id3 or @id = $std-id3))]/@id" /> -->
+					
+					<xsl:if test="normalize-space($reference_by_std-id) = '' and normalize-space($reference_by_std-id2) = '' and normalize-space($reference_by_std-id3) = ''">
+					
+						<item>
+							<xsl:variable name="id">
+								<xsl:value-of select="$std-id2"/>
+								<xsl:if test="$std-id2 = ''">
+									<xsl:value-of select="$std-id3"/>
+								</xsl:if>
+							</xsl:variable>
+							<xsl:attribute name="id">
+								<xsl:value-of select="$id"/>
+							</xsl:attribute>
 							<xsl:text>* [[[</xsl:text>
-							<xsl:value-of select="java:replaceAll(java:java.lang.String.new(@stdid),'_{2,}','_')"/>
+							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($id),'_{2,}','_')"/>
 							<xsl:text>,hidden(</xsl:text>
 							
 							<xsl:choose>
@@ -3348,18 +3382,7 @@
 				<item><xsl:value-of select="@id4"/></item>
 				<item><xsl:value-of select="@id5"/></item>
 				<item><xsl:value-of select="@id6"/></item>
-<!-- 				<xsl:if test="not(@id)">
-					<xsl:value-of select="@id2"/>
-					<xsl:if test="not(@id2)">
-						<xsl:value-of select="@id3"/>
-						<xsl:if test="not(@id3)">
-							<xsl:value-of select="@id4"/>
-							<xsl:if test="not(@id4)">
-								<xsl:value-of select="@id5"/>
-							</xsl:if>
-						</xsl:if>
-					</xsl:if>
-				</xsl:if> -->
+
 			</xsl:variable>
 			<xsl:variable name="id" select="xalan:nodeset($ids)/item[normalize-space()!=''][1]"/>
 			
