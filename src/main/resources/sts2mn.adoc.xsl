@@ -1934,17 +1934,23 @@
 					
 					<xsl:value-of select="$localities"/>
 					
-					<xsl:variable name="refs_referenceText" select="$refs//ref[@id = $model_std/reference or 
-										@id2 = $model_std/reference or @id3 = $model_std/reference or @id4 = $model_std/reference]/@referenceText"/> <!-- note: @referenceText was added at ref_fix step -->
+					<xsl:variable name="ref_by_id_" select="$refs//ref[@id = $model_std/reference or 
+										@id2 = $model_std/reference or @id3 = $model_std/reference or @id4 = $model_std/reference or @id5 = $model_std/reference]"/>
+					<xsl:variable name="ref_by_id" select="xalan:nodeset($ref_by_id_)"/>
+					
+					
+					<xsl:variable name="refs_referenceText" select="$ref_by_id/@referenceText"/> <!-- note: @referenceText was added at ref_fix step -->
 					
 					<!-- <xsl:text>&#xa;DEBUG:</xsl:text>refs_referenceText=<xsl:value-of select="$refs_referenceText"/><xsl:text>&#xa;</xsl:text>
 					<xsl:text>&#xa;</xsl:text>referenceText=<xsl:value-of select="$referenceText"/><xsl:text>&#xa;</xsl:text>
 					<xsl:text>&#xa;</xsl:text><xsl:value-of select="($refs_referenceText != '' and not($refs_referenceText = substring($referenceText,2)))"/><xsl:text>&#xa;</xsl:text> -->
 					
+					<!-- note: @label_number was added on ref_fix step -->
 					<xsl:if test="$model_std/not_locality or 
 						($refs_referenceText != '' and not($refs_referenceText = $referenceText)) or
 						java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText)) = 'false' or
-						((contains($referenceText, 'series') or contains($referenceText, 'parts')) and not($model_std/locality))">
+						((contains($referenceText, 'series') or contains($referenceText, 'parts')) and not($model_std/locality)) or
+						$ref_by_id/@label_number">
 						 
 						 <!-- java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText)) = 'false' or -->
 						 
@@ -2074,14 +2080,17 @@
 			<xsl:message>referenceText=<xsl:value-of select="substring($referenceText,2)"/></xsl:message> -->
 			
 			<!-- if reference text is different than reference title in the Bibliography -->
-			<xsl:variable name="refs_referenceText" select="$refs//ref[@id = $term_source_reference or 
-						@id2 = $term_source_reference or @id3 = $term_source_reference or @id4 = $term_source_reference or @id5 = $term_source_reference]/@referenceText"/>
+			<xsl:variable name="ref_by_id_" select="$refs//ref[@id = $term_source_reference or 
+						@id2 = $term_source_reference or @id3 = $term_source_reference or @id4 = $term_source_reference or @id5 = $term_source_reference]"/>
+			<xsl:variable name="ref_by_id" select="xalan:nodeset($ref_by_id_)"/>
+			
 			<!-- after comma -->
+			<!-- <xsl:variable name="referenceText_after_comma" select="substring($referenceText,2)"/> -->
+			<xsl:variable name="referenceText_after_comma" select="java:replaceAll(java:java.lang.String.new($referenceText),'^,?(.*)$','$1')"/>
 			
-			
-			<xsl:variable name="referenceText_after_comma" select="substring($referenceText,2)"/>
-			<xsl:if test="($localities = '' and not($refs_referenceText = $referenceText_after_comma)) or
-				java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText_after_comma)) = 'false'">
+			<xsl:if test="($localities = '' and not($ref_by_id/@referenceText = $referenceText_after_comma)) or
+				java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText_after_comma)) = 'false' or
+				$ref_by_id/@label_number">
 				<xsl:value-of select="$referenceText"/>
 			</xsl:if>
 			
@@ -3436,18 +3445,21 @@
 						
 						<xsl:variable name="referenceText">
 							
-							<xsl:variable name="label_">
+							<!-- <xsl:variable name="label_">
 								<xsl:apply-templates select="label" mode="references"/>
 							</xsl:variable>
-							<xsl:variable name="label" select="normalize-space($label_)"/>
+							<xsl:variable name="label" select="normalize-space($label_)"/> -->
 							
 							
-							<!-- note: @referenceText was added at ref_fix step -->
-							<xsl:if test="$label != '' and @referenceText != ''">
+							<!-- note: @referenceText and @label_number added at ref_fix step -->
+							<!-- <xsl:if test="$label != '' and @referenceText != ''"> -->
+							<xsl:if test="@label_number != '' and @referenceText != ''">
 								<xsl:text>(</xsl:text>
 							</xsl:if>
-							<xsl:value-of select="$label"/>
-							<xsl:if test="$label != '' and @referenceText != ''">
+							<!-- <xsl:value-of select="$label"/> -->
+							<xsl:value-of select="@label_number"/>
+							<!-- <xsl:if test="$label != '' and @referenceText != ''"> -->
+							<xsl:if test="@label_number != '' and @referenceText != ''">
 								<xsl:text>)</xsl:text>
 							</xsl:if>
 							<xsl:value-of select="@referenceText"/>
@@ -3538,15 +3550,13 @@
 		<xsl:apply-templates/>
 	</xsl:template>
 	
-	<xsl:template match="ref/label" mode="references">
-		<!-- <xsl:text>, </xsl:text> -->
+	<!-- <xsl:template match="ref/label" mode="references">
 		<xsl:variable name="label" select="translate(., '[]', '')"/>
 		<xsl:choose>
 			<xsl:when test="$label = '—'"></xsl:when>
 			<xsl:otherwise><xsl:value-of select="$label"/></xsl:otherwise>
 		</xsl:choose>
-		
-	</xsl:template>
+	</xsl:template> -->
 	
 	<xsl:template match="ref/std/std-ref"/>
 	

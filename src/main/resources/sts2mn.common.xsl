@@ -966,6 +966,14 @@
 				</xsl:choose>
 			</xsl:attribute>
 			
+			<!-- extract number from '[1]', '[N1]', '1)' , remove non-digit chars except N -->
+			<xsl:variable name="label_number" select="normalize-space(java:replaceAll(java:java.lang.String.new(label),'[^\dN]',''))"/> 
+			
+			<xsl:if test="$label_number != ''">
+				<xsl:attribute name="label_number">
+					<xsl:value-of select="$label_number"/>
+				</xsl:attribute>
+			</xsl:if>
 
 			<xsl:apply-templates select="node()" mode="ref_fix"/>
 		</xsl:copy>
