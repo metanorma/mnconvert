@@ -489,7 +489,8 @@
 	</xsl:template>
 	
 	<xsl:template name="getMetaBibFilename">
-		<xsl:variable name="name1" select="java:replaceAll(java:java.lang.String.new(std-ref[@type = 'undated']), '(\s|\h|/|‑)', '-')"/>
+		<xsl:variable name="std-ref_undated" select="normalize-space(std-ref[@type = 'undated'])"/>
+		<xsl:variable name="name1" select="java:replaceAll(java:java.lang.String.new($std-ref_undated), '(\s|\h|/|‑)', '-')"/>
 		<xsl:value-of select="java:toLowerCase(java:java.lang.String.new($name1))"/><xsl:text>.</xsl:text><xsl:value-of select="$docfile_ext"/>
 	</xsl:template>
 	
