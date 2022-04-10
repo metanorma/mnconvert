@@ -157,9 +157,21 @@
 				</xsl:choose>
 			</xsl:variable>
 			
-			<xsl:variable name="xml_result">
-				<xsl:apply-templates select="xalan:nodeset($xml_result_)" mode="setNamespace"/>
+			<xsl:variable name="xml_result_displayorder">
+				<xsl:choose>
+					<xsl:when test="$type_xml = 'presentation'">
+						<xsl:apply-templates select="xalan:nodeset($xml_result_)" mode="displayorder"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:copy-of select="$xml_result_"/>
+					</xsl:otherwise>
+				</xsl:choose>
 			</xsl:variable>
+			
+			<xsl:variable name="xml_result">
+				<xsl:apply-templates select="xalan:nodeset($xml_result_displayorder)" mode="setNamespace"/>
+			</xsl:variable>
+			
 			<xsl:copy-of select="$xml_result"/>
 			
 			
@@ -291,7 +303,7 @@
 						</xsl:variable>
 						<xsl:variable name="model_related_refs" select="xalan:nodeset($model_related_refs_)"/>
 						<xsl:if test="$model_related_refs//item">
-							<clause type="related-refs" displayorder="1">
+							<clause type="related-refs">
 								<p><xsl:text>The following BSI references relate to the work on this document:</xsl:text>
 									<xsl:for-each select="$model_related_refs//item">
 										<br/><xsl:value-of select="."/>
@@ -1066,17 +1078,38 @@
 				<xsl:when test="$value = 'PPUB'">60</xsl:when>
 			</xsl:choose>
 		</xsl:variable>
+		
 		<status>
+		
+			<xsl:variable name="stage_abbreviation">
+				<xsl:choose>
+					<xsl:when test="$custom-meta_stage_abbreviation != ''">
+						<xsl:value-of select="$custom-meta_stage_abbreviation"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:apply-templates mode="bibdata"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
+			
+			<xsl:if test="$type_xml = 'presentation'">
+				<stage language="en">
+					<xsl:attribute name="abbreviation">
+						<xsl:value-of select="$stage_abbreviation"/>
+					</xsl:attribute>
+					<xsl:choose>
+						<xsl:when test="$stage = '20'">Working draft</xsl:when>
+						<xsl:when test="$stage = '30'">Committee draft</xsl:when>
+						<xsl:when test="$stage = '40'">Draft international standard</xsl:when>
+						<xsl:when test="$stage = '50'">Final draft international standard</xsl:when>
+						<xsl:when test="$stage = '60'">International standard</xsl:when>
+					</xsl:choose>
+				</stage>
+			</xsl:if>
+			
 			<stage>
 				<xsl:attribute name="abbreviation">
-					<xsl:choose>
-						<xsl:when test="$custom-meta_stage_abbreviation != ''">
-							<xsl:value-of select="$custom-meta_stage_abbreviation"/>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:apply-templates mode="bibdata"/>
-						</xsl:otherwise>
-					</xsl:choose>
+					<xsl:value-of select="$stage_abbreviation"/>
 				</xsl:attribute>
 				<xsl:value-of select="$stage"/>
 			</stage>
@@ -2750,6 +2783,84 @@
 		</xsl:choose>
 	</xsl:template>
 	
+  <!-- ====================== -->
+  <!-- add @displayorder      -->
+  <!-- ====================== -->
+  <xsl:template match="@*|node()" mode="displayorder">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="displayorder"/>
+		</xsl:copy>
+	</xsl:template>
+
+	<xsl:template match="preface/*" mode="displayorder">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="displayorder"/>
+			<xsl:attribute name="displayorder"><xsl:number count="*[parent::preface]"/></xsl:attribute>
+			<xsl:apply-templates select="node()" mode="displayorder"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="sections/*" mode="displayorder">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="displayorder"/>
+			<xsl:variable name="count_preface_nodes" select="count(ancestor::*[contains(local-name(), '-standard')]/preface/*)"/>
+			<xsl:variable name="count_normative_references_node" select="count(ancestor::*[contains(local-name(), '-standard')]/bibliography/*[@normative='true'])"/>
+			<xsl:variable name="number_current_node"><xsl:number count="*[parent::sections]"/></xsl:variable>
+			<xsl:attribute name="displayorder">
+				<xsl:choose>
+					<xsl:when test="@type = 'scope'"><xsl:value-of select="$count_preface_nodes + $number_current_node"/></xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="$count_preface_nodes + $count_normative_references_node + $number_current_node"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="displayorder"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="annex" mode="displayorder">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="displayorder"/>
+			<xsl:variable name="count_preface_nodes" select="count(ancestor::*[contains(local-name(), '-standard')]/preface/*)"/>
+			<xsl:variable name="count_normative_references_node" select="count(ancestor::*[contains(local-name(), '-standard')]/bibliography/*[@normative = 'true'])"/>
+			<xsl:variable name="count_sections_nodes" select="count(ancestor::*[contains(local-name(), '-standard')]/sections/*)"/>
+			<xsl:variable name="number_current_node"><xsl:number count="annex"/></xsl:variable>
+			<xsl:attribute name="displayorder">
+				<xsl:value-of select="$count_preface_nodes + $count_normative_references_node + $count_sections_nodes + $number_current_node"/>
+			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="displayorder"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="bibliography/*[@normative = 'true']" mode="displayorder">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="displayorder"/>
+			<xsl:variable name="count_preface_nodes" select="count(ancestor::*[contains(local-name(), '-standard')]/preface/*)"/>
+			<xsl:variable name="count_scope_node" select="count(ancestor::*[contains(local-name(), '-standard')]/sections/*[@type = 'scope'])"/>
+			<xsl:attribute name="displayorder">
+				<xsl:value-of select="$count_preface_nodes + $count_scope_node + 1"/>
+			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="displayorder"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="bibliography/*[not(@normative = 'true')]" mode="displayorder">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="displayorder"/>
+			<xsl:variable name="count_preface_nodes" select="count(ancestor::*[contains(local-name(), '-standard')]/preface/*)"/>
+			<xsl:variable name="count_sections_nodes" select="count(ancestor::*[contains(local-name(), '-standard')]/sections/*)"/>
+			<xsl:variable name="count_annex_nodes" select="count(ancestor::*[contains(local-name(), '-standard')]/annex)"/>
+			<xsl:variable name="count_normative_references_node" select="count(ancestor::*[contains(local-name(), '-standard')]/bibliography/*[@normative = 'true'])"/>
+			<xsl:attribute name="displayorder">
+				<xsl:value-of select="$count_preface_nodes + $count_sections_nodes + $count_annex_nodes + $count_normative_references_node + 1"/>
+			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="displayorder"/>
+		</xsl:copy>
+	</xsl:template>
+	<!-- ====================== -->
+	<!-- END add @displayorder  -->
+	<!-- ====================== -->
+
 	<xsl:include href="sts2mn.common.xsl"/>
 	
 </xsl:stylesheet>
