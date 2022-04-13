@@ -79,7 +79,7 @@
 	
 	<!-- prepare assosiative array - id and index term -->
 	<xsl:variable name="index_">
-		<xsl:for-each select="//sec[@id = 'ind']//xref">
+		<xsl:for-each select="//sec[@id = 'ind' or @id = 'sec_ind']//xref">
 			<reference rid="{@rid}">
 				<xsl:for-each select="ancestor::list-item/p">
 					<xsl:for-each select="node()[not(preceding-sibling::xref) and not(self::xref)]">
@@ -96,7 +96,7 @@
 				</xsl:for-each>
 			</reference>
 		</xsl:for-each>
-		<xsl:for-each select="//sec[@id = 'ind']//p[italic/text() = 'see' or italic/text() = 'see also']">
+		<xsl:for-each select="//sec[@id = 'ind' or @id = 'sec_ind']//p[italic/text() = 'see' or italic/text() = 'see also']">
 			<reference type="{italic/text()}">
 				<xsl:if test="italic/text() = 'see also'">
 					<xsl:attribute name="type">also</xsl:attribute>
@@ -1411,7 +1411,7 @@
 	</xsl:template>
 	
 	<!-- put index terms with 'see', 'see also' -->
-	<xsl:template match="sec[@sec-type = 'index'] | back/sec[@id = 'ind']" priority="2">
+	<xsl:template match="sec[@sec-type = 'index'] | back/sec[@id = 'ind' or @id = 'sec_ind']" priority="2">
 		<xsl:if test="$index//reference[@type]">
 			<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 			<redirect:write file="{$outpath}/{$sectionsFolder}/index-see-terms.adoc">

@@ -771,7 +771,7 @@
 	</xsl:template>
 	
 	<xsl:template name="insertBack">
-		<xsl:if test="annex or bibliography/references or indexsect">
+		<xsl:if test="annex or bibliography/references or indexsect or .//index">
 			<back>
 				<xsl:if test="annex">
 					<app-group>
@@ -779,7 +779,7 @@
 					</app-group>
 				</xsl:if>
 				<xsl:apply-templates select="bibliography/references[not(@normative='true')] | bibliography/clause[references[not(@normative='true')]]" mode="back"/>
-				<xsl:apply-templates select="indexsect"/>
+				<xsl:call-template name="insertIndex"/>
 			</back>
 		</xsl:if>
 	</xsl:template>
@@ -3108,14 +3108,26 @@
 				<!-- remove :ed-z -->
 				<!-- <xsl:variable name="urn" select="java:replaceAll(java:java.lang.String.new($urn___),':ed-\d+','')"/> -->
 				
-				<urn><xsl:value-of select="$urn"/></urn>
-				<docidentifier>
+				<xsl:variable name="docidentifier">
 					<xsl:value-of select="docidentifier[not(@type = 'metanorma' or @type = 'metanorma-ordinal')][1]"/>
 					<!-- <xsl:if test="starts-with(@id, 'hidden_bibitem_')"> -->
 					<xsl:if test="@hidden = 'true'">
 						<xsl:text> </xsl:text>
 						<xsl:value-of select="translate(docnumber, '&#xa0;&#8209;', ' -')"/>
 					</xsl:if>
+				</xsl:variable>
+				
+				<xsl:if test="not(@type)">
+					<!-- Examples: ISO number, BS EN number, EN ISO number -->
+					<xsl:variable name="start_standard_regex">^((CN|IEC|(IEC/[A-Z]{2,3})|IETF|BCP|ISO|(ISO/[A-Z]{2,3})|ITU|NIST|OGC|CC|OMG|UN|W3C|IEEE|IHO|BIPM|ECMA|CIE|BS|BSI|BS(\s|\h)OHSAS|PAS|CEN|(CEN/[A-Z]{2,3})|CEN/CENELEC|EN|IANA|3GPP|OASIS|IEV)(\s|\h))+((Guide|TR|TC)(\s|\h))?\d.*</xsl:variable>
+					<xsl:if test="java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($docidentifier)) = 'true'">
+						<xsl:attribute name="type">standard</xsl:attribute>
+					</xsl:if>
+				</xsl:if>
+				
+				<urn><xsl:value-of select="$urn"/></urn>
+				<docidentifier>
+					<xsl:value-of select="$docidentifier"/>
 				</docidentifier>
 			</bibitem>
 		</xsl:for-each>
@@ -4435,12 +4447,84 @@
 		<xsl:apply-templates/>
 	</xsl:template>
 	
+	<!-- =================== -->
+	<!-- Index processing    -->
+	<!-- =================== -->
+	<xsl:template name="insertIndex">
+		<xsl:apply-templates select="indexsect"/>
+		<xsl:if test=".//index">
+			<sec sec-type="index">
+				<title>Index</title>
+				<list list-type="simple">
+					<!-- Example:
+						<list-item>
+							<p>abstentions, <xref ref-type="sec" rid="sec_7.7">7.7</xref>
+							</p>
+						</list-item>
+					-->
+					<xsl:for-each select=".//index">
+						<xsl:sort select="primary"/>
+						<xsl:message>Index item <xsl:number level="any"/>: <xsl:value-of select="primary"/></xsl:message>
+						<xsl:apply-templates select="." mode="index_item"/>
+					</xsl:for-each>
+				</list>
+			</sec>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="index"/> <!-- process in 'insertIndex' -->
+	<xsl:template match="index" mode="index_item">
+		<list-item>
+			<p>
+				<xsl:apply-templates select="primary"/>
+			</p>
+			<xsl:apply-templates select="secondary"/>
+		</list-item>
+	</xsl:template>
+	
+	<xsl:template match="index/primary">
+		<xsl:call-template name="insert_index_reference"/>
+	</xsl:template>
+	
+	<xsl:template match="index/secondary">
+		<list list-type="simple">
+			<list-item>
+				<p>
+					<xsl:call-template name="insert_index_reference"/>
+				</p>
+				<xsl:apply-templates select="../tertiary"/>
+			</list-item>
+		</list>
+	</xsl:template>
+	
+	<xsl:template match="index/tertiary">
+		<list list-type="simple">
+			<list-item>
+				<p>
+					<xsl:call-template name="insert_index_reference"/>
+				</p>
+			</list-item>
+		</list>
+	</xsl:template>
+	
+	<xsl:template name="insert_index_reference">
+		<xsl:apply-templates /><xsl:text>, </xsl:text>
+		<xsl:variable name="id_to" select="ancestor::*[self::clause or self::term or self::definitions or self::terms][@id][1]/@id"/> <!-- [local-name() = 'term' or local-name = 'clause'] -->
+		<xsl:variable name="section" select="$elements//element[@source_id = $id_to]/@section"/>
+		<!-- <xsl:variable name="section">1.2.3</xsl:variable> -->
+		<!-- <xsl:variable name="element_dest" select="xalan:nodeset($element_dest_)"/> -->
+		<xref ref-type="sec" rid="{$id_to}"><xsl:value-of select="$section"/></xref>
+	</xsl:template>
+	
 	<xsl:template match="indexsect">
 		<sec sec-type="index">
 			<xsl:copy-of select="@id"/>
 			<xsl:apply-templates />
 		</sec>
 	</xsl:template>
+	<!-- =================== -->
+	<!-- End: Index processing -->
+	<!-- =================== -->
 	
 	<xsl:template match="pagebreak">
 		<xsl:choose>

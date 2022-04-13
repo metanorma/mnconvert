@@ -112,7 +112,7 @@
 													<xsl:apply-templates select="body/sub-part[1]/back/ref-list" mode="bibliography"/>
 												</bibliography>
 											</xsl:if>
-											<xsl:apply-templates select="body/sub-part[1]//sec[@sec-type = 'index'] | body/sub-part[1]//back/sec[@id = 'ind']" mode="index"/>
+											<xsl:apply-templates select="body/sub-part[1]//sec[@sec-type = 'index'] | body/sub-part[1]//back/sec[@id = 'ind' or @id = 'sec_ind']" mode="index"/>
 										</xsl:element>
 									</doc-container>
 									<!-- 2nd, 3rd, ... documents -->
@@ -149,7 +149,7 @@
 											<xsl:apply-templates select="back/ref-list" mode="bibliography"/>
 										</bibliography>
 									</xsl:if>
-									<xsl:apply-templates select="//sec[@sec-type = 'index'] | //back/sec[@id = 'ind']" mode="index"/>
+									<xsl:apply-templates select="//sec[@sec-type = 'index'] | //back/sec[@id = 'ind' or @id = 'sec_ind']" mode="index"/>
 								</xsl:element>
 							</xsl:otherwise>
 						</xsl:choose>
@@ -2439,8 +2439,8 @@
 	<!-- END Math formula, equation, etc. -->
 	<!-- ============================= -->
 	
-	<xsl:template match="sec[@sec-type = 'index'] | back/sec[@id = 'ind']" priority="2"/>
-	<xsl:template match="sec[@sec-type = 'index'] | back/sec[@id = 'ind']" mode="index">
+	<xsl:template match="sec[@sec-type = 'index'] | back/sec[@id = 'ind' or @id = 'sec_ind']" priority="2"/>
+	<xsl:template match="sec[@sec-type = 'index'] | back/sec[@id = 'ind' or @id = 'sec_ind']" mode="index">
 		<indexsect id="{@id}">
 			<xsl:apply-templates />
 		</indexsect>
