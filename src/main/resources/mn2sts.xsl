@@ -4348,6 +4348,8 @@
 		</xsl:attribute>
 	</xsl:template>
 	
+	<xsl:template match="sourcecode/@unnumbered"/>
+	
 	<xsl:template match="title" name="title">
 		<xsl:choose>
 			<xsl:when test="not(tab) and normalize-space(translate(., '0123456789.', '')) = ''"><!-- put number in label, see above --></xsl:when>
