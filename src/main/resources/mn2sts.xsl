@@ -20,11 +20,12 @@
 	<!-- remove namespace -->
 	<!-- for simplify templates: use '<xsl:template match="element">' instead of '<xsl:template match="*[local-name() = 'element']"> -->
 	<!-- ===================== -->
+	<xsl:variable name="xml_step1_">
+		<xsl:apply-templates mode="remove_namespace"/>
+	</xsl:variable>
+	<xsl:variable name="xml_step1" select="xalan:nodeset($xml_step1_)"/>
 	<xsl:variable name="xml_">
-		<xsl:variable name="xml1">
-			<xsl:apply-templates mode="remove_namespace"/>
-		</xsl:variable>
-		<xsl:apply-templates select="xalan:nodeset($xml1)" mode="add_attributes"/>
+		<xsl:apply-templates select="$xml_step1" mode="add_attributes"/>
 	</xsl:variable>
 	
 	<xsl:template match="*" mode="remove_namespace" priority="2">
@@ -199,22 +200,22 @@
 	
 	<xsl:variable name="organization_abbreviation">
 		<xsl:choose>
-			<xsl:when test="$xml/metanorma-collection">
-				<xsl:value-of select="$xml/metanorma-collection/doc-container[1]/*/bibdata/copyright/owner/organization/abbreviation"/>
+			<xsl:when test="$xml_step1/metanorma-collection">
+				<xsl:value-of select="$xml_step1/metanorma-collection/doc-container[1]/*/bibdata/copyright/owner/organization/abbreviation"/>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:value-of select="$xml/*/bibdata/copyright/owner/organization/abbreviation"/>
+				<xsl:value-of select="$xml_step1/*/bibdata/copyright/owner/organization/abbreviation"/>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable>
 	
 	<xsl:variable name="organization_name">
 		<xsl:choose>
-			<xsl:when test="$xml/metanorma-collection">
-				<xsl:value-of select="$xml/metanorma-collection/doc-container[1]/*/bibdata/copyright/owner/organization/name"/>
+			<xsl:when test="$xml_step1/metanorma-collection">
+				<xsl:value-of select="$xml_step1/metanorma-collection/doc-container[1]/*/bibdata/copyright/owner/organization/name"/>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:value-of select="$xml/*/bibdata/copyright/owner/organization/name"/>
+				<xsl:value-of select="$xml_step1/*/bibdata/copyright/owner/organization/name"/>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable>
@@ -2008,7 +2009,7 @@
 	<xsl:template match="preface/abstract" priority="2" mode="front_preface"/>
 	<xsl:template match="preface/abstract" mode="front_abstract">
 		<xsl:copy>
-			<xsl:copy-of select="@*"/>
+			<xsl:copy-of select="@*[local-name() = 'section' or local-name() = 'section_prefix']"/>
 			<xsl:apply-templates />
 		</xsl:copy>
 	</xsl:template>
@@ -3899,7 +3900,7 @@
 				<xsl:apply-templates select="name" mode="table"/>
 			</xsl:if>
 			<table>
-				<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered')]"/>
+				<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix')]"/>
 				<xsl:apply-templates select="@width"/>
 				
 				<xsl:apply-templates select="colgroup" mode="table"/>
@@ -3947,7 +3948,7 @@
 
 		<xsl:if test="starts-with(@id, concat($first_table_id, '_'))">
 			<table>
-				<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered')]"/>
+				<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix')]"/>
 				<xsl:apply-templates select="@width"/>
 				
 				<xsl:apply-templates select="colgroup" mode="table"/>
