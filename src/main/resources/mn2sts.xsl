@@ -1626,7 +1626,7 @@
 	
 	<xsl:template match="*[self::bibdata or self::bibitem]/relation[@type != 'adopted-from']/bibitem" mode="front">
 		<std-ref>
-			<xsl:copy-of select="@*"/>
+			<xsl:copy-of select="@*[not(local-name() = 'section' or local-name() = 'section_prefix')]"/>
 			<xsl:attribute name="type">
 				<xsl:call-template name="setDatedUndatedType">
 					<xsl:with-param name="value" select="docidentifier"/>
@@ -2009,7 +2009,7 @@
 	<xsl:template match="preface/abstract" priority="2" mode="front_preface"/>
 	<xsl:template match="preface/abstract" mode="front_abstract">
 		<xsl:copy>
-			<xsl:copy-of select="@*[local-name() = 'section' or local-name() = 'section_prefix']"/>
+			<xsl:copy-of select="@*[not(local-name() = 'section' or local-name() = 'section_prefix')]"/>
 			<xsl:apply-templates />
 		</xsl:copy>
 	</xsl:template>
@@ -4443,37 +4443,68 @@
 	<xsl:template name="insertIndex">
 		<xsl:apply-templates select="indexsect"/>
 		<xsl:if test=".//index">
-			<sec sec-type="index">
-				<title>Index</title>
-				<list list-type="simple">
-					<!-- Example:
-						<list-item>
-							<p>abstentions, <xref ref-type="sec" rid="sec_7.7">7.7</xref>
-							</p>
-						</list-item>
-					-->
-					<xsl:for-each select=".//index">
-						<xsl:sort select="primary"/>
-						<!-- <xsl:message>Index item <xsl:number level="any"/>: <xsl:value-of select="primary"/></xsl:message> -->
-						<xsl:apply-templates select="." mode="index_item"/>
-					</xsl:for-each>
-				</list>
-			</sec>
+			<xsl:choose>
+				<xsl:when test="$format = 'NISO' and not($organization = 'BSI')">
+					<index>
+						<index-title-group>
+							<title>INDEX</title>
+						</index-title-group>
+						<index-div>
+							<xsl:for-each select=".//index">
+								<xsl:sort select="primary"/>
+								<xsl:apply-templates select="primary">
+									<xsl:with-param name="mode">NISO</xsl:with-param>
+								</xsl:apply-templates>
+							</xsl:for-each>
+						</index-div>
+					</index>
+				</xsl:when>
+				<xsl:otherwise>
+					<sec sec-type="index">
+						<title>Index</title>
+						<list list-type="simple">
+							<!-- Example:
+								<list-item>
+									<p>abstentions, <xref ref-type="sec" rid="sec_7.7">7.7</xref>
+									</p>
+								</list-item>
+							-->
+							<xsl:for-each select=".//index">
+								<xsl:sort select="primary"/>
+								<xsl:apply-templates select="." mode="index_item"/>
+							</xsl:for-each>
+						</list>
+					</sec>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="index"/> <!-- process in 'insertIndex' -->
 	<xsl:template match="index" mode="index_item">
-		<list-item>
-			<p>
-				<xsl:apply-templates select="primary"/>
-			</p>
-			<xsl:apply-templates select="secondary"/>
-		</list-item>
+		<xsl:param name="mode"/>
+		<xsl:choose>
+			<xsl:when test="$mode = 'NISO'">
+				<xsl:apply-templates select="primary">
+					<xsl:with-param name="mode">NISO</xsl:with-param>
+				</xsl:apply-templates>
+			</xsl:when>
+			<xsl:otherwise>
+				<list-item>
+					<p>
+						<xsl:apply-templates select="primary"/>
+					</p>
+					<xsl:apply-templates select="secondary"/>
+				</list-item>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="index/primary">
-		<xsl:call-template name="insert_index_reference"/>
+		<xsl:param name="mode"/>
+		<xsl:call-template name="insert_index_reference">
+			<xsl:with-param name="mode"><xsl:value-of select="$mode"/></xsl:with-param>
+		</xsl:call-template>
 	</xsl:template>
 	
 	<xsl:template match="index/secondary">
@@ -4498,10 +4529,40 @@
 	</xsl:template>
 	
 	<xsl:template name="insert_index_reference">
-		<xsl:apply-templates /><xsl:text>, </xsl:text>
+		<xsl:param name="mode"/>
 		<xsl:variable name="element_target_" select="ancestor::*[self::clause or self::term or self::definitions or self::terms][@id and @section][1]"/>
 		<xsl:variable name="element_target" select="xalan:nodeset($element_target_)"/>
-		<xref ref-type="sec" rid="{$element_target/@id}"><xsl:value-of select="$element_target/@section"/></xref>
+		<xsl:choose>
+			<xsl:when test="$mode = 'NISO'">
+				<index-entry>
+					<term>
+						<xsl:apply-templates />
+					</term>
+					<nav-pointer-group>
+						<nav-pointer specific-use="section" rid="{$element_target/@id}"/>
+						<nav-pointer specific-use="section"><xsl:value-of select="$element_target/@section"/></nav-pointer>
+					</nav-pointer-group>
+					<xsl:if test="self::primary">
+						<xsl:for-each select="../secondary">
+							<xsl:call-template name="insert_index_reference">
+								<xsl:with-param name="mode">NISO</xsl:with-param>
+							</xsl:call-template>
+						</xsl:for-each>
+					</xsl:if>
+					<xsl:if test="self::secondary">
+						<xsl:for-each select="../tertiary">
+							<xsl:call-template name="insert_index_reference">
+								<xsl:with-param name="mode">NISO</xsl:with-param>
+							</xsl:call-template>
+						</xsl:for-each>
+					</xsl:if>
+				</index-entry>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:apply-templates /><xsl:text>, </xsl:text>
+				<xref ref-type="sec" rid="{$element_target/@id}"><xsl:value-of select="$element_target/@section"/></xref>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="indexsect">
