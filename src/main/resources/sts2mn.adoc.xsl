@@ -3341,6 +3341,11 @@
 			<!-- END insert hidden bibitem -->
 			<!-- ===================== -->
 			
+			<!-- output [%bibitem] at the end of bibliography -->
+			<xsl:apply-templates select="node()[@content-type = 'standard_other']">
+				<xsl:with-param name="skip_standard_other">false</xsl:with-param>
+			</xsl:apply-templates>
+			
 		</redirect:write>
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$docfile}">
@@ -3365,6 +3370,11 @@
 		</xsl:if>
 		
 		<xsl:apply-templates/>
+		
+		<!-- output [%bibitem] at the end of bibliography -->
+		<xsl:apply-templates select="node()[@content-type = 'standard_other']">
+			<xsl:with-param name="skip_standard_other">false</xsl:with-param>
+		</xsl:apply-templates>
 	</xsl:template>
 	
 	<xsl:template match="ref-list/title/bold | ref-list/title/bold2">
@@ -3372,6 +3382,7 @@
 	</xsl:template>
 	
 	<xsl:template match="ref">
+		<xsl:param name="skip_standard_other">true</xsl:param>
 		<xsl:variable name="unique"><!-- skip repeating references -->
 			<xsl:choose>
 				<xsl:when test="@id and preceding-sibling::ref[@id = current()/@id]">false</xsl:when>
@@ -3397,7 +3408,7 @@
 			<xsl:variable name="id" select="xalan:nodeset($ids)/item[normalize-space()!=''][1]"/>
 			
 			<xsl:choose>
-				<!-- <xsl:when test="$isAsciiBibFormat = 'true'"> -->
+				<xsl:when test="@content-type = 'standard_other' and $skip_standard_other = 'true'"><!-- standard_other references will be inserted last --></xsl:when>
 				<xsl:when test="@content-type = 'standard_other'"> <!-- add on 'ref_fix' step, for non ISO, IEC, ... standards, example: GHTF_SG1_N055_2009 -->
 					<!-- bibitem extended format:
 					https://www.metanorma.org/author/topics/document-format/bibliography/#entering-entries-using-asciibib
@@ -3406,7 +3417,15 @@
 					<xsl:text>[[</xsl:text><xsl:value-of select="$id"/><xsl:text>]]&#xa;</xsl:text>
 					<xsl:text>[%bibitem]&#xa;</xsl:text>
 					
-					<xsl:text>=== </xsl:text>
+					<!-- <xsl:text>=== </xsl:text> -->
+					<xsl:for-each select="ancestor::*[title][1]/title">
+						<xsl:variable name="level">
+							<xsl:call-template name="getLevel">
+								<xsl:with-param name="addon">1</xsl:with-param>
+							</xsl:call-template>
+						</xsl:variable>
+						<xsl:value-of select="$level"/><xsl:text> </xsl:text>
+					</xsl:for-each>
 					<xsl:variable name="isThereFootnoteAfterNumber" select="normalize-space(*/node()[normalize-space() != ''][2][self::xref and @ref-type='fn'] and
 					*/node()[normalize-space() != ''][3][self::fn])"/>
 					
@@ -3437,7 +3456,6 @@
 				</xsl:when>
 				<xsl:otherwise>
 
-					<!-- <xsl:if test="@id or @id2 or @id3 or @id4 or std/@std-id or std/std-ref or mixed-citation/@id"> -->
 					<xsl:if test="$id != ''">
 			
 						<xsl:text>[[[</xsl:text>
@@ -3446,20 +3464,11 @@
 						
 						<xsl:variable name="referenceText">
 							
-							<!-- <xsl:variable name="label_">
-								<xsl:apply-templates select="label" mode="references"/>
-							</xsl:variable>
-							<xsl:variable name="label" select="normalize-space($label_)"/> -->
-							
-							
 							<!-- note: @referenceText and @label_number added at ref_fix step -->
-							<!-- <xsl:if test="$label != '' and @referenceText != ''"> -->
 							<xsl:if test="@label_number != '' and @referenceText != ''">
 								<xsl:text>(</xsl:text>
 							</xsl:if>
-							<!-- <xsl:value-of select="$label"/> -->
 							<xsl:value-of select="@label_number"/>
-							<!-- <xsl:if test="$label != '' and @referenceText != ''"> -->
 							<xsl:if test="@label_number != '' and @referenceText != ''">
 								<xsl:text>)</xsl:text>
 							</xsl:if>
@@ -3486,17 +3495,7 @@
 					
 					</xsl:if>
 				
-					<!-- Bibliography items without id -->
-					<!-- Example: Further Reading -->
-					<!-- <xsl:if test="not(@id or std/@std-id or std/std-ref)">
-						<xsl:variable name="preceding_title" select="java:toLowerCase(java:java.lang.String.new(translate(preceding-sibling::title[1]/text(), ' ', '_')))"/>
-						<xsl:if test="normalize-space($preceding_title) != ''">
-							<xsl:text>[[[</xsl:text>
-							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($preceding_title),'_{2,}','_')"/>_<xsl:number/>
-							<xsl:text>]]]</xsl:text>
-						</xsl:if>
-					</xsl:if> -->
-					
+				
 					<xsl:apply-templates/>
 				
 				</xsl:otherwise>
@@ -3505,30 +3504,21 @@
 		</xsl:variable>
 		
 		<xsl:if test="normalize-space($reference) != ''">
-			<!-- <xsl:choose>
-				<xsl:when test="$isAsciiBibFormat = 'true'">
-					<xsl:value-of select="$reference"/>
+			<!-- comment repeated references -->
+			<xsl:if test="normalize-space($unique) = 'false'">// </xsl:if>
+			<xsl:if test="not(@content-type and @content-type = 'standard_other')">* </xsl:if>
+			<!-- <xsl:value-of select="$reference"/> -->
+			<xsl:choose>
+				<xsl:when test="normalize-space($unique) = 'false'">
+					<!-- add comment // before each line in the $reference -->
+					<xsl:value-of select="java:replaceAll(java:java.lang.String.new($reference),'&#xa;','&#xa;// ')"/> 
 				</xsl:when>
-				<xsl:otherwise> -->
-					<!-- comment repeated references -->
-					<!-- <xsl:value-of select="@content-type"/> -->
-					<xsl:if test="normalize-space($unique) = 'false'">// </xsl:if>
-					<xsl:if test="not(@content-type and @content-type = 'standard_other')">* </xsl:if>
-					<!-- <xsl:value-of select="$reference"/> -->
-					<xsl:choose>
-						<xsl:when test="normalize-space($unique) = 'false'">
-							<!-- add comment // before each line in the $reference -->
-							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($reference),'&#xa;','&#xa;// ')"/> 
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:value-of select="$reference"/>
-						</xsl:otherwise>
-					</xsl:choose>
-					
-					<xsl:text>&#xa;&#xa;</xsl:text>
-					
-				<!-- </xsl:otherwise>
-			</xsl:choose> -->
+				<xsl:otherwise>
+					<xsl:value-of select="$reference"/>
+				</xsl:otherwise>
+			</xsl:choose>
+			
+			<xsl:text>&#xa;&#xa;</xsl:text>
 		</xsl:if>
 		
 		<xsl:if test="normalize-space($unique) = 'false'">
