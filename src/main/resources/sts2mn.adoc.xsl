@@ -3648,6 +3648,22 @@
 		</xsl:variable>
 		<xsl:variable name="fig" select="xalan:nodeset($fig_)"/>
 		
+		<!-- Example figure model:
+			<fig id="fig_7">
+				<label>Figure 7</label>
+				<title_main>Figure title example</title_main>
+				<graphic type="simple" href="30357099_Fig07a"> 
+					<label>a)</label> 
+					<caption><title>Sub-figure a) title</title></caption>
+				</graphic>
+				<graphic_text>Sub-figure a) descriptive text.</graphic_text>
+				<graphic type="simple" href="30357099_Fig07b"> 
+					<label>b)</label> 
+					<caption><title>Sub-figure b) title </title></caption>
+				</graphic>
+				<graphic_text>Sub-figure b) descriptive text.</graphic_text>
+		-->
+		
 		<!-- <xsl:text>&#xa;DEBUG&#xa;</xsl:text>
 		<xsl:apply-templates select="$fig" mode="print_as_xml"/>
 		<xsl:text>&#xa;</xsl:text> -->
@@ -3662,6 +3678,13 @@
 		<xsl:call-template name="setId"/>
 
 		<xsl:apply-templates select="$fig/fig/label"/>
+		
+		<xsl:variable name="isDescriptiveText" select="normalize-space(count($fig/fig/graphic_text) &gt; 0)"/>
+		
+		<xsl:if test="$isDescriptiveText = 'true'"> <!-- if there is descriptive text for figure, then add 'figure role' -->
+			<xsl:text>[.figure]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 
 		<xsl:choose>
 			<xsl:when test="count($fig/fig/graphic) &gt; 1 or count($fig/fig/title_main) + count($fig/fig/graphic//title) &gt; 1">
@@ -3683,6 +3706,10 @@
 						<xsl:apply-templates select="following-sibling::title[1]"/>
 					</xsl:if>
 					<xsl:apply-templates select="."/>
+					
+					<!-- descriptive text for figure -->
+					<xsl:variable name="curr_id" select="generate-id()"/>
+					<xsl:apply-templates select="following-sibling::graphic_text[preceding-sibling::graphic[1][generate-id() = $curr_id]]"/> <!--  -->
 				</xsl:for-each>
 
 				<xsl:text>====</xsl:text>
@@ -3693,14 +3720,27 @@
 			<xsl:otherwise>
 				<!-- Example: . Figure title -->
 				<xsl:apply-templates select="$fig/fig/title_main" />
+				
+				<xsl:if test="$isDescriptiveText = 'true'">
+					<xsl:text>====</xsl:text>
+					<xsl:text>&#xa;</xsl:text>
+				</xsl:if>
+				
 				<xsl:apply-templates select="$fig/fig/graphic"/>
+				<xsl:apply-templates select="$fig/fig/graphic_text"/>
+				
+				<xsl:if test="$isDescriptiveText = 'true'">
+					<xsl:text>====</xsl:text>
+					<xsl:text>&#xa;</xsl:text>
+				</xsl:if>
+				
 				<xsl:text>&#xa;</xsl:text>
 				<!-- <xsl:text>&#xa;</xsl:text> -->
 			</xsl:otherwise>
 		</xsl:choose>
 		
 		<!-- process another elements (key, note, ... ) -->
-		<xsl:apply-templates select="$fig/fig/*[not(self::label or self::title or self::title_main or self::graphic)]"/>
+		<xsl:apply-templates select="$fig/fig/*[not(self::label or self::title or self::title_main or self::graphic or self::graphic_text)]"/>
 		
 		<xsl:apply-templates select="$fig/fig/@orientation" mode="after_fig"/>
 		

@@ -1148,6 +1148,15 @@
 		</non-normative-note>
 	</xsl:template>
 	
+	<xsl:template match="fig/p[preceding-sibling::*[not(self::p)][1][self::graphic]]" mode="model_fig" priority="2">
+		<graphic_text>
+			<xsl:copy>
+				<xsl:copy-of select="@*"/>
+				<xsl:apply-templates mode="model_fig"/>
+			</xsl:copy>
+		</graphic_text>
+	</xsl:template>
+	
 	<xsl:template match="fig/p" mode="model_fig">
 		<non-normative-note>
 			<xsl:copy>
