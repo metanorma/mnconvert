@@ -3195,6 +3195,8 @@
 	<!-- ============================ -->
 	<!-- References -->
 	<!-- ============================ -->
+	<xsl:variable name="regex_add_bsi_prefix">^(PAS(\s|\h))</xsl:variable>
+	
 	<xsl:template match="ref-list[@content-type = 'bibl']" priority="2">
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$sectionsFolder}/99-bibliography.adoc">
@@ -3253,14 +3255,20 @@
 							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($id),'_{2,}','_')"/>
 							<xsl:text>,hidden(</xsl:text>
 							
-							<xsl:choose>
-								<xsl:when test="contains(normalize-space(), 'series') or contains(normalize-space(), 'parts')">
-									<xsl:value-of select="translate(normalize-space(), '&#xA0;‑–', ' --')"/>
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:value-of select="translate(.//std-ref/text(), '&#xA0;‑–', ' --')"/>
-								</xsl:otherwise>
-							</xsl:choose>
+							<xsl:variable name="ref_text">
+								<xsl:choose>
+									<xsl:when test="contains(normalize-space(), 'series') or contains(normalize-space(), 'parts')">
+										<xsl:value-of select="translate(normalize-space(), '&#xA0;‑–', ' --')"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="translate(.//std-ref/text(), '&#xA0;‑–', ' --')"/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
+							
+							<!-- add BSI prefix for PAS -->
+							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($ref_text), $regex_add_bsi_prefix, 'BS $1')"/>
+							
 							
 							<xsl:text>)]]]</xsl:text>
 						</item>
@@ -3317,7 +3325,8 @@
 									</xsl:when>
 								</xsl:choose>
 								
-								<xsl:value-of select="$referenceText"/>
+								<!-- <xsl:value-of select="$referenceText"/> -->
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($referenceText), $regex_add_bsi_prefix, 'BS $1')"/>
 								
 							</xsl:variable>
 							
@@ -3403,7 +3412,6 @@
 				<item><xsl:value-of select="@id4"/></item>
 				<item><xsl:value-of select="@id5"/></item>
 				<item><xsl:value-of select="@id6"/></item>
-
 			</xsl:variable>
 			<xsl:variable name="id" select="xalan:nodeset($ids)/item[normalize-space()!=''][1]"/>
 			
@@ -3443,7 +3451,10 @@
 					<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($title),'^(\s|\h)*,',''))"/>
 					<xsl:text>&#xa;</xsl:text>
 					<xsl:text>docid::&#xa;</xsl:text>
-					<xsl:text>id::: </xsl:text><xsl:value-of select="@referenceText"/><xsl:text>&#xa;</xsl:text> <!-- note: @referenceText was added at ref_fix step -->
+					<xsl:text>id::: </xsl:text>
+					<!-- add BSI prefix for PAS -->
+					<xsl:value-of select="java:replaceAll(java:java.lang.String.new(@referenceText), $regex_add_bsi_prefix, 'BS $1')"/>
+					<xsl:text>&#xa;</xsl:text> <!-- note: @referenceText was added at ref_fix step -->
 					<xsl:text>type:: standard&#xa;</xsl:text>
 					<xsl:if test="$isThereFootnoteAfterNumber = 'true'">
 						<xsl:text>biblionote:: &#xa;</xsl:text>
@@ -3472,7 +3483,9 @@
 							<xsl:if test="@label_number != '' and @referenceText != ''">
 								<xsl:text>)</xsl:text>
 							</xsl:if>
-							<xsl:value-of select="@referenceText"/>
+							<!-- <xsl:value-of select="@referenceText"/> -->
+							<!-- add BSI prefix for PAS -->
+							<xsl:value-of select="java:replaceAll(java:java.lang.String.new(@referenceText), $regex_add_bsi_prefix, 'BS $1')"/>
 							
 						</xsl:variable>
 						
