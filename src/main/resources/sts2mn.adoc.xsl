@@ -3196,6 +3196,7 @@
 	<!-- References -->
 	<!-- ============================ -->
 	<xsl:variable name="regex_add_bsi_prefix">^(PAS(\s|\h))</xsl:variable>
+	<xsl:variable name="regex_add_bsi_prefix_result">BSI $1</xsl:variable>
 	
 	<xsl:template match="ref-list[@content-type = 'bibl']" priority="2">
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
@@ -3267,7 +3268,7 @@
 							</xsl:variable>
 							
 							<!-- add BSI prefix for PAS -->
-							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($ref_text), $regex_add_bsi_prefix, 'BS $1')"/>
+							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($ref_text), $regex_add_bsi_prefix, $regex_add_bsi_prefix_result)"/>
 							
 							
 							<xsl:text>)]]]</xsl:text>
@@ -3326,7 +3327,7 @@
 								</xsl:choose>
 								
 								<!-- <xsl:value-of select="$referenceText"/> -->
-								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($referenceText), $regex_add_bsi_prefix, 'BS $1')"/>
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new($referenceText), $regex_add_bsi_prefix, $regex_add_bsi_prefix_result)"/>
 								
 							</xsl:variable>
 							
@@ -3453,7 +3454,7 @@
 					<xsl:text>docid::&#xa;</xsl:text>
 					<xsl:text>id::: </xsl:text>
 					<!-- add BSI prefix for PAS -->
-					<xsl:value-of select="java:replaceAll(java:java.lang.String.new(@referenceText), $regex_add_bsi_prefix, 'BS $1')"/>
+					<xsl:value-of select="java:replaceAll(java:java.lang.String.new(@referenceText), $regex_add_bsi_prefix, $regex_add_bsi_prefix_result)"/>
 					<xsl:text>&#xa;</xsl:text> <!-- note: @referenceText was added at ref_fix step -->
 					<xsl:text>type:: standard&#xa;</xsl:text>
 					<xsl:if test="$isThereFootnoteAfterNumber = 'true'">
@@ -3485,7 +3486,7 @@
 							</xsl:if>
 							<!-- <xsl:value-of select="@referenceText"/> -->
 							<!-- add BSI prefix for PAS -->
-							<xsl:value-of select="java:replaceAll(java:java.lang.String.new(@referenceText), $regex_add_bsi_prefix, 'BS $1')"/>
+							<xsl:value-of select="java:replaceAll(java:java.lang.String.new(@referenceText), $regex_add_bsi_prefix, $regex_add_bsi_prefix_result)"/>
 							
 						</xsl:variable>
 						
