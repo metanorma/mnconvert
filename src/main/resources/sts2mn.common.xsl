@@ -486,7 +486,9 @@
 			locality - example: clause 2.5
 			localityContinue - uses when locality number placed in another element than locality, for example, '=2.5'
 		-->
-	<xsl:variable name="adapted_from_text">Adapted from</xsl:variable>
+	<xsl:variable name="regex_adapted_from_text">^.*Adapted from:?[\s|\h](.*)$</xsl:variable>
+	<xsl:variable name="regex_modified_from_text">^.*Modified from:?[\s|\h](.*)$</xsl:variable>
+	<xsl:variable name="regex_quoted_from_text">^.*Quoted from:?[\s|\h](.*)$</xsl:variable>
 	
 	<xsl:variable name="source_text">SOURCE:</xsl:variable>
 	 
@@ -500,11 +502,18 @@
 					<xsl:value-of select="java:replaceAll(java:java.lang.String.new(substring-after(normalize-space(.), 'modified')), '^(\s|\h)*(-|–|—)?(\s|\h)*','')"/> <!-- ' modified' -->
 				</modified>
 			</xsl:if>
-			<xsl:variable name="isAdapted" select="contains(normalize-space(.), $adapted_from_text)"/>
-			<xsl:if test="$isAdapted = 'true'">
+			<xsl:if test="java:org.metanorma.utils.RegExHelper.matches($regex_adapted_from_text, normalize-space(.)) = 'true'">
 				<adapted/>
 			</xsl:if>
+			<xsl:if test="java:org.metanorma.utils.RegExHelper.matches($regex_modified_from_text, normalize-space(.)) = 'true'">
+				<modified_from/>
+			</xsl:if>
+			<xsl:if test="java:org.metanorma.utils.RegExHelper.matches($regex_quoted_from_text, normalize-space(.)) = 'true'">
+				<quoted/>
+			</xsl:if>
 		</xsl:variable>
+		
+		
 		
 		<!-- cleaning model -->
 		<xsl:for-each select="xalan:nodeset($model)/*">
@@ -524,25 +533,33 @@
 	
 	
 	<xsl:template match="tbx:source/text()" priority="3">
-	
+		
 		<xsl:variable name="isFirstText" select="not(preceding-sibling::node())"/>
 	
 		<!-- <xsl:variable name="modified_text">, modified</xsl:variable> -->
 		<xsl:variable name="modified_text_regex">^(.*),?(\s|\h)?modified(.*)$</xsl:variable>
 		
 		<!-- remove 'Adapted from:' or 'Adapted from' text -->
+		<!-- remove 'Quoted from:' or 'Quoted from' text -->
+		<!-- remove 'Modified from:' or 'Modified from' text -->
 		<xsl:variable name="text_">
 			<xsl:choose>
 				<xsl:when test="$isFirstText = 'true' and starts-with(., $source_text)">
 					<xsl:value-of select="normalize-space(substring-after(., $source_text))"/>
 				</xsl:when>
-				<xsl:when test="contains(., concat($adapted_from_text, ':'))"> <!-- and $OUTPUT_FORMAT = 'adoc' -->
+				<!-- <xsl:when test="contains(., concat($adapted_from_text, ':'))">
 					<xsl:value-of select="normalize-space(substring-after(., concat($adapted_from_text, ':')))"/>
 				</xsl:when>
-				<xsl:when test="contains(., $adapted_from_text)"> <!--  and $OUTPUT_FORMAT = 'adoc' -->
+				<xsl:when test="contains(., $adapted_from_text)">
 					<xsl:value-of select="normalize-space(substring-after(., $adapted_from_text))"/>
 				</xsl:when>
-				<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+				<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise> -->
+				<xsl:otherwise>
+					<xsl:variable name="text1" select="java:replaceAll(java:java.lang.String.new(.), $regex_adapted_from_text, '$1')"/> <!-- without 'Adapted from' -->
+					<xsl:variable name="text2" select="java:replaceAll(java:java.lang.String.new($text1), $regex_modified_from_text, '$1')"/> <!-- without 'Modified from' -->
+					<xsl:variable name="text3" select="java:replaceAll(java:java.lang.String.new($text2), $regex_quoted_from_text, '$1')"/> <!-- without 'Quoted from' -->
+					<xsl:value-of select="$text3"/>
+				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
 		
@@ -578,6 +595,7 @@
 		
 		<xsl:variable name="result_parts_">
 			<xsl:for-each select="$source_parts//item">
+				
 				<xsl:variable name="item_text">
 					<xsl:choose>
 						<!-- remove [ before xref -->
@@ -701,7 +719,7 @@
 	</xsl:template>
 	
 	<!-- Examples: ISO number, BS EN number, EN ISO number -->
-	<xsl:variable name="start_standard_regex">^((CN|IEC|(IEC/[A-Z]{2,3})|IETF|BCP|ISO|(ISO/[A-Z]{2,3})|ITU|NIST|OGC|CC|OMG|UN|W3C|IEEE|IHO|BIPM|ECMA|CIE|BS|BSI|BS(\s|\h)OHSAS|PAS|CEN|(CEN/[A-Z]{2,3})|CEN/CENELEC|EN|IANA|3GPP|OASIS|IEV)(\s|\h))+((Guide|TR|TC)(\s|\h))?\d.*</xsl:variable>
+	<xsl:variable name="start_standard_regex">^((CN|IEC|(IEC/[A-Z]{2,3})|IETF|BCP|ISO|(ISO/[A-Z]{2,3})|ITU|NIST|OGC|CC|OMG|UN|W3C|IEEE|IHO|BIPM|ECMA|CIE|BS|BSI|BS(\s|\h)OHSAS|PAS|PD|CEN|(CEN/[A-Z]{2,3})|CEN/CENELEC|EN|IANA|3GPP|OASIS|IEV)(\s|\h))+((Guide|TR|TC)(\s|\h))?\d.*</xsl:variable>
 	
 	<xsl:template name="getStdRef">
 		<xsl:param name="text" select="."/>
@@ -1040,7 +1058,20 @@
 		<xsl:choose>
 			<xsl:when test="not(contains(., ',')) and
 			java:org.metanorma.utils.RegExHelper.matches('^.*(\s|\h)\d+:\d{4}(\s|\h).*$', .) = 'true'">
-				<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),'^(.*(\s|\h)\d+:\d{4})((\s|\h).*)$','$1,$1 $3')"/>
+				<!-- <xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),'^(.*(\s|\h)\d+:\d{4})((\s|\h).*)$','$1,$1 $3')"/> -->
+				
+				<xsl:variable name="part1" select="java:replaceAll(java:java.lang.String.new(.),'^(.*(\s|\h)\d+:\d{4})((\s|\h).*)$','$1')"/>
+				
+				<xsl:variable name="part1_text1" select="java:replaceAll(java:java.lang.String.new($part1), $regex_adapted_from_text, '$1')"/> <!-- without 'Adapted from' -->
+				<xsl:variable name="part1_text2" select="java:replaceAll(java:java.lang.String.new($part1_text1), $regex_modified_from_text, '$1')"/> <!-- without 'Modified from' -->
+				<xsl:variable name="part1_text3" select="java:replaceAll(java:java.lang.String.new($part1_text2), $regex_quoted_from_text, '$1')"/> <!-- without 'Quoted from' -->
+				
+				<xsl:variable name="part2" select="$part1_text3"/>
+				
+				<xsl:variable name="part3" select="java:replaceAll(java:java.lang.String.new(.),'^(.*(\s|\h)\d+:\d{4})((\s|\h).*)$','$3')"/>
+				
+				<xsl:value-of select="concat($part1, ',', $part2, ' ', $part3)"/>
+				
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="."/>

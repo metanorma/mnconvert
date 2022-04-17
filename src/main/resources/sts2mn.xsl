@@ -1629,9 +1629,17 @@
 			<xsl:if test="$model_term_source/modified">
 				<xsl:attribute name="status">modified</xsl:attribute>
 			</xsl:if>
-			<xsl:if test="$model_term_source/adapted">
-				<xsl:attribute name="status">adapted</xsl:attribute>
-			</xsl:if>
+			<xsl:choose>
+				<xsl:when test="$model_term_source/adapted">
+					<xsl:attribute name="status">adapted</xsl:attribute>
+				</xsl:when>
+				<xsl:when test="$model_term_source/modified_from">
+					<xsl:attribute name="status">modified</xsl:attribute>
+				</xsl:when>
+				<xsl:when test="$model_term_source/quoted">
+					<xsl:attribute name="status">quoted</xsl:attribute>
+				</xsl:when>
+			</xsl:choose>
 			
 			<!-- put reference -->
 			<xsl:variable name="term_source_reference" select="$model_term_source/reference"/>
@@ -1643,9 +1651,17 @@
 			
 			<xsl:text>[SOURCE: </xsl:text>
 			
-			<xsl:if test="$model_term_source/adapted">
-				<xsl:text>Adapted from: </xsl:text>
-			</xsl:if>
+			<xsl:choose>
+				<xsl:when test="$model_term_source/adapted">
+					<xsl:text>Adapted from: </xsl:text>
+				</xsl:when>
+				<xsl:when test="$model_term_source/modified_from">
+					<xsl:text>Modified from: </xsl:text>
+				</xsl:when>
+				<xsl:when test="$model_term_source/quoted">
+					<xsl:text>Quoted from: </xsl:text>
+				</xsl:when>
+			</xsl:choose>
 			
 			<origin bibitemid="{$term_source_reference}" type="inline" citeas="{$model_term_source/referenceText[1]}">
 				<!-- put locality (-ies) -->
