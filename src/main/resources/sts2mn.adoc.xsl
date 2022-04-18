@@ -1865,18 +1865,6 @@
 		<xsl:apply-templates select="$model_std" mode="print_as_xml"/>
 		<xsl:text>&#xa;</xsl:text> -->
 		
-		<!-- reference text -->
-		<xsl:variable name="referenceText">
-			<xsl:for-each select="$model_std/referenceText"> <!-- [normalize-space() != ''] -->
-				<!-- <xsl:if test="not(preceding-sibling::referenceText/text() = current()/text())
-					and not(following-sibling::referenceText[normalize-space() != ''][contains(text(), current()/text()) and not(text() = current()/text())])"> -->
-					<xsl:if test="position() != 1">
-						<xsl:text>,</xsl:text>
-					</xsl:if>
-					<xsl:value-of select="."/>
-				<!-- </xsl:if> -->
-			</xsl:for-each>
-		</xsl:variable>
 		
 		<xsl:variable name="localities">
 			<!-- put locality (-ies) -->
@@ -1922,12 +1910,20 @@
 			</xsl:for-each>
 		</xsl:variable>
 		
-		<xsl:variable name="isHidden" select="normalize-space($model_std/reference/@hidden = 'true')"/>
-		
 		<!-- $referenceText='<xsl:value-of select="$referenceText"/>' -->
 		
 		<!-- <xsl:choose>
-			<xsl:when test="not($isHidden = 'true')"> -->
+			<xsl:when test="$model_std/reference/@hidden = 'true' and java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, $referenceText) = 'true'">
+				<xsl:text>std-link:[</xsl:text>
+					<xsl:value-of select="$referenceText"/>
+					<xsl:for-each select="$model_std/not_locality">
+						<xsl:text> </xsl:text><xsl:value-of select="."/>
+					</xsl:for-each>
+					<xsl:value-of select="$localities"/>
+				<xsl:text>]</xsl:text>
+			</xsl:when>
+			
+			<xsl:otherwise> -->
 				<xsl:text>&lt;&lt;</xsl:text>
 				
 					<!-- put reference -->
@@ -1935,47 +1931,52 @@
 					
 					<xsl:value-of select="$localities"/>
 					
-					<xsl:variable name="ref_by_id_" select="$refs//ref[@id = $model_std/reference or 
-										@id2 = $model_std/reference or @id3 = $model_std/reference or @id4 = $model_std/reference or @id5 = $model_std/reference]"/>
-					<xsl:variable name="ref_by_id" select="xalan:nodeset($ref_by_id_)"/>
 					
-					
-					<xsl:variable name="refs_referenceText" select="$ref_by_id/@referenceText"/> <!-- note: @referenceText was added at ref_fix step -->
-					
-					<!-- <xsl:text>&#xa;DEBUG:</xsl:text>refs_referenceText=<xsl:value-of select="$refs_referenceText"/><xsl:text>&#xa;</xsl:text>
-					<xsl:text>&#xa;</xsl:text>referenceText=<xsl:value-of select="$referenceText"/><xsl:text>&#xa;</xsl:text>
-					<xsl:text>&#xa;</xsl:text><xsl:value-of select="($refs_referenceText != '' and not($refs_referenceText = substring($referenceText,2)))"/><xsl:text>&#xa;</xsl:text> -->
-					
-					<!-- note: @label_number was added on ref_fix step -->
-					<xsl:if test="$model_std/not_locality or 
-						($refs_referenceText != '' and not($refs_referenceText = $referenceText)) or
-						java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText)) = 'false' or
-						((contains($referenceText, 'series') or contains($referenceText, 'parts')) and not($model_std/locality)) or
-						$ref_by_id/@label_number">
-						 
-						 <!-- java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText)) = 'false' or -->
-						 
-						<xsl:if test="$referenceText != ''">
-							<xsl:text>,</xsl:text>
-							<xsl:value-of select="$referenceText"/>
+					<xsl:if test="normalize-space($localities) = ''"> <!-- omit reference text if there is locality, otherwise reference text override localities  -->
+						
+						<!-- reference's text -->
+						<xsl:variable name="referenceText_">
+							<xsl:for-each select="$model_std/referenceText">
+								<xsl:if test="position() != 1">
+									<xsl:text>,</xsl:text>
+								</xsl:if>
+								<xsl:value-of select="."/>
+							</xsl:for-each>
+						</xsl:variable>
+						<xsl:variable name="referenceText" select="translate($referenceText_, '&#xA0;‑', ' -')"/>
+						
+						<!-- find reference in Bibliography/Normative References section -->
+						<xsl:variable name="ref_by_id_" select="$refs//ref[@id = $model_std/reference or 
+											@id2 = $model_std/reference or @id3 = $model_std/reference or @id4 = $model_std/reference or @id5 = $model_std/reference]"/>
+						<xsl:variable name="ref_by_id" select="xalan:nodeset($ref_by_id_)"/>
+						
+						<!-- reference's text from Bibliography/Normative References section -->
+						<xsl:variable name="refs_referenceText" select="$ref_by_id/@referenceText"/> <!-- note: @referenceText was added at ref_fix step -->
+						
+						<!-- note: @label_number was added on ref_fix step -->
+						<xsl:if test="$model_std/not_locality or 
+							($refs_referenceText != '' and not($refs_referenceText = $referenceText)) or
+							java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText)) = 'false' or
+							((contains($referenceText, 'series') or contains($referenceText, 'parts')) and not($model_std/locality)) or
+							$ref_by_id/@label_number">
+							 
+							 <!-- java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText)) = 'false' or -->
+							 
+							<xsl:if test="$referenceText != ''">
+								<xsl:text>,</xsl:text>
+								<xsl:value-of select="$referenceText"/>
+							</xsl:if>
+							
+							<xsl:for-each select="$model_std/not_locality">
+								<xsl:text> </xsl:text><xsl:value-of select="."/>
+							</xsl:for-each>
+							
 						</xsl:if>
 						
-						<xsl:for-each select="$model_std/not_locality">
-							<xsl:text> </xsl:text><xsl:value-of select="."/>
-						</xsl:for-each>
 					</xsl:if>
 			
 				<xsl:text>&gt;&gt;</xsl:text>
-			<!-- </xsl:when>
-			<xsl:otherwise>
-				<xsl:text>std-link:[</xsl:text>
-					<xsl:value-of select="translate($referenceText, '&#xA0;‑', ' -')"/>
-					<xsl:for-each select="$model_std/not_locality">
-						<xsl:text> </xsl:text><xsl:value-of select="."/>
-					</xsl:for-each>
-					<xsl:value-of select="$localities"/>
-				<xsl:text>]</xsl:text>
-			</xsl:otherwise>
+			<!-- </xsl:otherwise>
 		</xsl:choose> -->
 		
 		
@@ -2069,7 +2070,7 @@
 			</xsl:variable>
 			<xsl:value-of select="$localities"/>
 			
-			<xsl:if test="$localities = ''">
+			<xsl:if test="normalize-space($localities) = ''">
 				<!-- put reference text -->
 				<xsl:variable name="referenceText">
 					<xsl:for-each select="$model_term_source/referenceText"> <!-- [normalize-space() != ''] -->
