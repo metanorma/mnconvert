@@ -2069,34 +2069,36 @@
 			</xsl:variable>
 			<xsl:value-of select="$localities"/>
 			
-			<!-- put reference text -->
-			<xsl:variable name="referenceText">
-				<xsl:for-each select="$model_term_source/referenceText"> <!-- [normalize-space() != ''] -->
-					<xsl:if test="not(preceding-sibling::referenceText/text() = current()/text())">
-						<xsl:if test="not(starts-with(normalize-space(.), 'footnote:'))">
-							<xsl:text>,</xsl:text>
-							<xsl:value-of select="."/>
+			<xsl:if test="$localities = ''">
+				<!-- put reference text -->
+				<xsl:variable name="referenceText">
+					<xsl:for-each select="$model_term_source/referenceText"> <!-- [normalize-space() != ''] -->
+						<xsl:if test="not(preceding-sibling::referenceText/text() = current()/text())">
+							<xsl:if test="not(starts-with(normalize-space(.), 'footnote:'))">
+								<xsl:text>,</xsl:text>
+								<xsl:value-of select="."/>
+							</xsl:if>
 						</xsl:if>
-					</xsl:if>
-				</xsl:for-each>
-			</xsl:variable>
-			
-			<!-- <xsl:message>$refs//ref=<xsl:value-of select="$refs//ref[@id = $term_source_reference or @id3 = $term_source_reference]/@referenceText"/></xsl:message>
-			<xsl:message>referenceText=<xsl:value-of select="substring($referenceText,2)"/></xsl:message> -->
-			
-			<!-- if reference text is different than reference title in the Bibliography -->
-			<xsl:variable name="ref_by_id_" select="$refs//ref[@id = $term_source_reference or 
-						@id2 = $term_source_reference or @id3 = $term_source_reference or @id4 = $term_source_reference or @id5 = $term_source_reference]"/>
-			<xsl:variable name="ref_by_id" select="xalan:nodeset($ref_by_id_)"/>
-			
-			<!-- after comma -->
-			<!-- <xsl:variable name="referenceText_after_comma" select="substring($referenceText,2)"/> -->
-			<xsl:variable name="referenceText_after_comma" select="java:replaceAll(java:java.lang.String.new($referenceText),'^,?(.*)$','$1')"/>
-			
-			<xsl:if test="($localities = '' and not($ref_by_id/@referenceText = $referenceText_after_comma)) or
-				java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText_after_comma)) = 'false' or
-				$ref_by_id/@label_number">
-				<xsl:value-of select="$referenceText"/>
+					</xsl:for-each>
+				</xsl:variable>
+				
+				<!-- <xsl:message>$refs//ref=<xsl:value-of select="$refs//ref[@id = $term_source_reference or @id3 = $term_source_reference]/@referenceText"/></xsl:message>
+				<xsl:message>referenceText=<xsl:value-of select="substring($referenceText,2)"/></xsl:message> -->
+				
+				<!-- if reference text is different than reference title in the Bibliography -->
+				<xsl:variable name="ref_by_id_" select="$refs//ref[@id = $term_source_reference or 
+							@id2 = $term_source_reference or @id3 = $term_source_reference or @id4 = $term_source_reference or @id5 = $term_source_reference]"/>
+				<xsl:variable name="ref_by_id" select="xalan:nodeset($ref_by_id_)"/>
+				
+				<!-- after comma -->
+				<!-- <xsl:variable name="referenceText_after_comma" select="substring($referenceText,2)"/> -->
+				<xsl:variable name="referenceText_after_comma" select="java:replaceAll(java:java.lang.String.new($referenceText),'^,?(.*)$','$1')"/>
+				
+				<xsl:if test="(not($ref_by_id/@referenceText = $referenceText_after_comma)) or
+					java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText_after_comma)) = 'false' or
+					$ref_by_id/@label_number">
+					<xsl:value-of select="$referenceText"/>
+				</xsl:if>
 			</xsl:if>
 			
 		<xsl:text>&gt;&gt;</xsl:text>
@@ -5596,7 +5598,7 @@
 						</std-ref>, <bold>22.3</bold>, <bold>22.5</bold>, <bold>22.7</bold> and <bold>22.9</bold>
 					</std>
 				</source>
-				<destination>&lt;&lt;BS_5839_1_2013,clause=22.3,clause=22.5,clause=22.7;and!clause=22.9&gt;&gt;</destination>
+				<destination>&lt;&lt;BS_5839_1_2013;and!clause=22.3;and!clause=22.5;and!clause=22.7;and!clause=22.9&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5605,7 +5607,7 @@
 						<std-ref>BS EN ISO 14064<?doi https://doi.org/10.3403/BSENISO14064?>
 						</std-ref> (all parts)</std>
 				</source>
-				<destination>&lt;&lt;BS_EN_ISO_14064,BS EN ISO 14064 (all parts)&gt;&gt;</destination>
+				<destination>&lt;&lt;BS_EN_ISO_14064,BS EN ISO 14064 (all parts)&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5642,7 +5644,7 @@
 					</std>
 				</source>
 				<!-- <destination>&lt;&lt;JIS_P_8144,JIS P-8144&gt;&gt;</destination> -->
-				<destination>&lt;&lt;JIS_P_8144&gt;&gt;</destination>
+				<destination>&lt;&lt;JIS_P_8144,JIS P-8144&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5758,7 +5760,7 @@
 					<std>
 						<std-ref>BS EN 45545‑2:2013+A1</std-ref>, R7</std>
 				</source>
-				<destination>&lt;&lt;BS_EN_45545_2_2013_A1,annex=R7&gt;&gt;</destination>
+				<destination>&lt;&lt;BS_EN_45545_2_2013_A1,droploc%locality:requirement=R7&gt;&gt;</destination>
 			</item>
 			
 			<item>
@@ -5958,9 +5960,9 @@
 					<tbx:source>Quoted from PD 25222:2011 Business continuity management – Guidance on supply chain continuity</tbx:source>
 				</source>
 				<destination>
-					<xsl:text>[.source]&#xa;</xsl:text>
+					<xsl:text>[.source%quoted]&#xa;</xsl:text>
 					<!-- <xsl:text>&lt;&lt;hidden_bibitem_Quoted_from_PD_25222_2011_Business_continuity_management___Guidance_on_supply_chain_continuity,Quoted from PD 25222:2011 Business continuity management – Guidance on supply chain continuity&gt;&gt;</xsl:text> -->
-					<xsl:text>&lt;&lt;Quoted_from_PD_25222_2011_Business_continuity_management___Guidance_on_supply_chain_continuity,Quoted from PD 25222:2011 Business continuity management – Guidance on supply chain continuity&gt;&gt;</xsl:text>
+					<xsl:text>&lt;&lt;PD_25222_2011_Business_continuity_management_Guidance_on_supply_chain_continuity&gt;&gt;</xsl:text>
 				</destination>
 			</item>
 
