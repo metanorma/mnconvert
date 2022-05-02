@@ -2192,7 +2192,7 @@
 					<xsl:apply-templates select="docidentifier"/>
 					<xsl:apply-templates select="title" mode="mixed_citation"/>
 				</xsl:when>
-				<xsl:when test="@type = 'standard' or docnumber or fetched">
+				<xsl:when test="@type = 'standard' or @type = 'international-standard' or docnumber or fetched">
 					<std>
 						<xsl:variable name="urn" select="docidentifier[@type = 'URN']"/>
 						<xsl:variable name="docidentifier_URN" select="$bibitems_URN/bibitem[@id = $id]/urn"/>
@@ -2279,7 +2279,7 @@
 		
 	</xsl:template>
 	
-	<xsl:template match="references/bibitem/*[self::docidentifier or self::docnumber or self::date or self::contributor]" priority="2">
+	<xsl:template match="references/bibitem/*[self::docidentifier or self::docnumber or self::date or self::contributor or self::edition or self::language or self::script or self::copyright]" priority="2">
 		<xsl:text disable-output-escaping="yes">&lt;!--</xsl:text>
 			<xsl:copy-of select="."/>
 		<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
@@ -2296,10 +2296,10 @@
 		<mixed-citation><xsl:apply-templates/></mixed-citation>
 	</xsl:template>
 	
-	<xsl:template match="bibitem[not(@type = 'standard') and not(docnumber)]/formattedref" priority="2">
+	<xsl:template match="bibitem[not(@type = 'standard' or @type = 'international-standard') and not(docnumber)]/formattedref" priority="2">
 		<xsl:apply-templates/>
 	</xsl:template>
-	<xsl:template match="bibitem[not(@type = 'standard') and not(docnumber)]/text()[normalize-space() = '']" priority="2"/> <!-- linearization -->
+	<xsl:template match="bibitem[not(@type = 'standard' or @type = 'international-standard') and not(docnumber)]/text()[normalize-space() = '']" priority="2"/> <!-- linearization -->
 	<xsl:template match="bibitem/formattedref">
 		<title><xsl:apply-templates/></title>
 	</xsl:template>
@@ -2611,7 +2611,7 @@
 	
 	<xsl:template match="origin">
 		<xsl:choose>
-			<xsl:when test="$bibitems_URN/bibitem[@id = current()/@bibitemid]/@type = 'standard'">
+			<xsl:when test="$bibitems_URN/bibitem[@id = current()/@bibitemid][@type = 'standard'  or @type = 'international-standard']">
 				<xsl:call-template name="eref"/>
 			</xsl:when>
 			<xsl:otherwise>
@@ -2620,12 +2620,14 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<xsl:variable name="regex_locality">^(locality:)?(.*)$</xsl:variable>
 	<xsl:template match="localityStack">
 		<xsl:text>, </xsl:text>
 		<xsl:for-each select="locality">
+			<xsl:variable name="type_" select="java:replaceAll(java:java.lang.String.new(@type),$regex_locality,'$2')"/>
 			<xsl:variable name="type">
 				<xsl:call-template name="capitalize">
-					<xsl:with-param name="str" select="@type"/>
+					<xsl:with-param name="str" select="$type_"/>
 				</xsl:call-template>
 			</xsl:variable>
 			<xsl:if test="$type != ''">
@@ -3201,8 +3203,9 @@
 						<xsl:choose>
 							<xsl:when test="@type = 'clause'"></xsl:when>
 							<xsl:otherwise>
+								<xsl:variable name="type" select="java:replaceAll(java:java.lang.String.new(@type),$regex_locality,'$2')"/>
 								<xsl:call-template name="capitalize">
-									<xsl:with-param name="str" select="@type"/>
+									<xsl:with-param name="str" select="$type"/>
 								</xsl:call-template>
 								<xsl:text> </xsl:text>
 							</xsl:otherwise>
@@ -3279,7 +3282,8 @@
 									<xsl:if test="not(contains(., '.'))"> Section </xsl:if>
 								</xsl:when>
 								<xsl:otherwise>
-									<xsl:if test="not(contains(., '.'))"> <xsl:value-of select="@type"/> </xsl:if>
+									<xsl:variable name="type" select="java:replaceAll(java:java.lang.String.new(@type),$regex_locality,'$2')"/>
+									<xsl:if test="not(contains(., '.'))"> <xsl:value-of select="$type"/> </xsl:if>
 								</xsl:otherwise>
 							</xsl:choose>
 							<bold><xsl:value-of select="."/></bold>
@@ -3642,6 +3646,10 @@
 						</xsl:if>
 					</xsl:variable>
 					<xsl:choose>
+						<xsl:when test="self::origin">
+							<xsl:value-of select="@citeas"/>
+							<xsl:apply-templates/>
+						</xsl:when>
 						<xsl:when test="./*">
 							<xsl:apply-templates mode="internalFormat">
 								<xsl:with-param name="text" select="$text"/>
@@ -3763,7 +3771,10 @@
 		<xsl:choose>
 			<xsl:when test="@type ='clause'">Clause </xsl:when>
 			<xsl:when test="@type ='annex'">Annex </xsl:when>
-			<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
+			<xsl:otherwise>
+				<xsl:variable name="type" select="java:replaceAll(java:java.lang.String.new(@type),$regex_locality,'$2')"/>
+				<xsl:value-of select="$type"/>
+			</xsl:otherwise>
 		</xsl:choose>
 		<xsl:value-of select="referenceFrom"/>
 	</xsl:template>
