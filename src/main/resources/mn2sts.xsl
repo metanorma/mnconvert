@@ -896,7 +896,12 @@
 		<xsl:element name="{$element_name}">
 			<xsl:if test="$element_name != 'iso-meta' and $element_name != 'std-meta'">
 				<xsl:attribute name="originator">
-					<xsl:variable name="abbrev" select="contributor[role/@type='publisher']/organization/abbreviation"/>
+					<xsl:variable name="abbrev">
+						<xsl:for-each select="contributor[role/@type='publisher']/organization/abbreviation">
+							<xsl:value-of select="."/>
+							<xsl:if test="position() != last()">/</xsl:if>
+						</xsl:for-each>
+					</xsl:variable>
 					<xsl:choose>
 						<xsl:when test="starts-with($abbrev, 'BS')">BSI</xsl:when>
 						<xsl:when test="starts-with($abbrev, 'CEN')">CEN</xsl:when>
@@ -1052,7 +1057,10 @@
 			<xsl:if test="$element_name != 'std-meta'">
 				<doc-ident>
 					<sdo>
-						<xsl:apply-templates select="contributor[role/@type='author']/organization/abbreviation" mode="front"/>
+						<xsl:for-each select="contributor[role/@type='author']/organization/abbreviation">
+							<xsl:apply-templates select="." mode="front"/>
+							<xsl:if test="position() != last()">/</xsl:if>
+						</xsl:for-each>
 					</sdo>
 					<proj-id>
 						<!-- <xsl:apply-templates select="ext/structuredidentifier/project-number" mode="front"/> -->
@@ -1072,9 +1080,12 @@
 			
 			<std-ident>
 				<originator>
-					<xsl:apply-templates select="contributor[role/@type='publisher']/organization/abbreviation" mode="front">
-						<xsl:with-param name="short">true</xsl:with-param>
-					</xsl:apply-templates>
+					<xsl:for-each select="contributor[role/@type='publisher']/organization/abbreviation">
+						<xsl:apply-templates select="." mode="front">
+							<xsl:with-param name="short">true</xsl:with-param>
+						</xsl:apply-templates>
+						<xsl:if test="position() != last()">/</xsl:if>
+					</xsl:for-each>
 				</originator>
 				<doc-type>
 					<xsl:apply-templates select="ext/doctype" mode="front"/>
@@ -1109,7 +1120,7 @@
 					</xsl:if>
 				</version>
 				
-				<xsl:if test="$organization = 'IEC'">
+				<xsl:if test="contains($organization_abbreviation, 'IEC')">
 					<std-id-group>
 						<std-id originator="IEC" std-id-link-type="urn" std-id-type="dated">
 							<!-- urn:iec:std:iec:62830-8:2021-10::: -->
@@ -1133,9 +1144,14 @@
 				
 			</std-ident>
 			
-			<xsl:if test="$organization = 'IEC'">
+			<xsl:if test="contains($organization_abbreviation, 'IEC')">
 				<std-org>
-					<std-org-abbrev><xsl:value-of select="copyright/owner/organization/abbreviation"/></std-org-abbrev>
+					<std-org-abbrev>
+						<xsl:for-each select="copyright/owner/organization/abbreviation">
+							<xsl:value-of select="."/>
+							<xsl:if test="position() != last()">/</xsl:if>
+						</xsl:for-each>
+					</std-org-abbrev>
 				</std-org>
 			</xsl:if>
 
@@ -1263,15 +1279,26 @@
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:variable name="abbreviation">
-							<xsl:apply-templates select="copyright/owner/organization/abbreviation" mode="front"/>
+							<xsl:for-each select="copyright/owner/organization/abbreviation">
+								<xsl:apply-templates select="." mode="front"/>
+								<xsl:if test="position() != last()">/</xsl:if>
+							</xsl:for-each>
 						</xsl:variable>
 						<xsl:if test="$abbreviation != $organization">
-							<xsl:value-of select="$abbreviation"/><xsl:text>/</xsl:text>
+							<xsl:value-of select="$abbreviation"/>
+							<xsl:if test="$organization != 'ISO'">
+								<xsl:text>/</xsl:text>
+							</xsl:if>
+							<xsl:if test="$organization = 'ISO'">
+								<xsl:text> </xsl:text>
+							</xsl:if>
 						</xsl:if>
 						<xsl:variable name="editorialgroup">
 							<item><xsl:apply-templates select="ext/editorialgroup/technical-committee" mode="front"/></item>
 							<item><xsl:apply-templates select="ext/editorialgroup/subcommittee" mode="front"/></item>
-							<item><xsl:apply-templates select="ext/editorialgroup/workgroup" mode="front"/></item>
+							<xsl:if test="$organization != 'ISO'"> <!-- should only be the "committee level" -->
+								<item><xsl:apply-templates select="ext/editorialgroup/workgroup" mode="front"/></item> 
+							</xsl:if>
 						</xsl:variable>
 						<xsl:for-each select="xalan:nodeset($editorialgroup)/item[normalize-space() != '']">
 							<xsl:value-of select="."/>
@@ -1445,7 +1472,7 @@
 	</xsl:template>
 	<xsl:template name="put_copyright_year">
 		<copyright-year>
-			<xsl:apply-templates select="copyright/from" mode="front"/>
+			<xsl:apply-templates select="copyright[1]/from" mode="front"/>
 		</copyright-year>
 	</xsl:template>
 	<xsl:template name="put_copyright_holder">
@@ -1453,13 +1480,22 @@
 		<copyright-holder>
 			<xsl:choose>
 				<xsl:when test="$from = 'name'">
-					<xsl:apply-templates select="copyright/owner/organization/name" mode="front"/>
+					<xsl:for-each select="copyright/owner/organization/name">
+						<xsl:apply-templates select="." mode="front"/>
+						<xsl:if test="position() != last()">/</xsl:if>
+					</xsl:for-each>
 				</xsl:when>
 				<xsl:when test="copyright/owner/organization/abbreviation">
-					<xsl:apply-templates select="copyright/owner/organization/abbreviation" mode="front"/>
+					<xsl:for-each select="copyright/owner/organization/abbreviation">
+						<xsl:apply-templates select="." mode="front"/>
+						<xsl:if test="position() != last()">/</xsl:if>
+					</xsl:for-each>
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:apply-templates select="copyright/owner/organization/name" mode="front"/>
+					<xsl:for-each select="copyright/owner/organization/name">
+						<xsl:apply-templates select="." mode="front"/>
+						<xsl:if test="position() != last()">/</xsl:if>
+					</xsl:for-each>
 				</xsl:otherwise>
 			</xsl:choose>
 		</copyright-holder>
