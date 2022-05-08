@@ -201,10 +201,16 @@
 	<xsl:variable name="organization_abbreviation">
 		<xsl:choose>
 			<xsl:when test="$xml_step1/metanorma-collection">
-				<xsl:value-of select="$xml_step1/metanorma-collection/doc-container[1]/*/bibdata/copyright/owner/organization/abbreviation"/>
+				<xsl:for-each select="$xml_step1/metanorma-collection/doc-container[1]/*/bibdata/copyright/owner/organization/abbreviation">
+					<xsl:value-of select="."/>
+					<xsl:if test="position() != last()">,</xsl:if>
+				</xsl:for-each>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:value-of select="$xml_step1/*/bibdata/copyright/owner/organization/abbreviation"/>
+				<xsl:for-each select="$xml_step1/*/bibdata/copyright/owner/organization/abbreviation">
+					<xsl:value-of select="."/>
+					<xsl:if test="position() != last()">,</xsl:if>
+				</xsl:for-each>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable>
@@ -222,7 +228,9 @@
 	
 	<xsl:variable name="organization">
 		<xsl:choose>
-			<xsl:when test="$organization_abbreviation = 'BSI' or $organization_name = 'The British Standards Institution' or $organization_name = 'British Standards Institution'">BSI</xsl:when>
+			<xsl:when test="contains($organization_abbreviation,'BSI') or $organization_name = 'The British Standards Institution' or $organization_name = 'British Standards Institution'">BSI</xsl:when>
+			<xsl:when test="contains($organization_abbreviation,'ISO')">ISO</xsl:when>
+			<xsl:when test="contains($organization_abbreviation,'IEC')">IEC</xsl:when>
 			<xsl:when test="$organization_abbreviation != ''"><xsl:value-of select="$organization_abbreviation"/></xsl:when>
 			<xsl:when test="$organization_name != ''"><xsl:value-of select="$organization_name"/></xsl:when>
 		</xsl:choose>
