@@ -233,27 +233,31 @@ public class Util {
         return outFilename;
     }
     
-    public static String getXMLFormat(String inputXmlFile) {
-        DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
-        try {
-            DocumentBuilder builder = fact.newDocumentBuilder();
-            Document doc;
-            if (inputXmlFile.toLowerCase().startsWith("http") || inputXmlFile.toLowerCase().startsWith("www.")) {
-                doc = builder.parse(inputXmlFile);
-            } else {
-                doc = builder.parse(new FileInputStream(inputXmlFile));
+    public static String getInputFormat(String inputXmlFile) {
+        if (inputXmlFile.toLowerCase().endsWith(".docx")) {
+            return "docx";
+        } else {
+            DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
+            try {
+                DocumentBuilder builder = fact.newDocumentBuilder();
+                Document doc;
+                if (inputXmlFile.toLowerCase().startsWith("http") || inputXmlFile.toLowerCase().startsWith("www.")) {
+                    doc = builder.parse(inputXmlFile);
+                } else {
+                    doc = builder.parse(new FileInputStream(inputXmlFile));
+                }
+                Node node = doc.getDocumentElement();
+                String root = node.getNodeName();
+                if (root.endsWith("-standard") || root.equals("metanorma-collection")) {
+                    return "metanorma";
+                } else if (root.equals("rfc"))  {
+                    return "rfc";
+                } else {
+                    return "sts";
+                }
+            } catch (ParserConfigurationException | SAXException | IOException ex) {
+                logger.severe(ex.toString());
             }
-            Node node = doc.getDocumentElement();
-            String root = node.getNodeName();
-            if (root.endsWith("-standard") || root.equals("metanorma-collection")) {
-                return "metanorma";
-            } else if (root.equals("rfc"))  {
-                return "rfc";
-            } else {
-                return "sts";
-            }
-        } catch (ParserConfigurationException | SAXException | IOException ex) {
-            logger.severe(ex.toString());
         }
         return "";
     }
