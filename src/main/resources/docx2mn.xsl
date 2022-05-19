@@ -187,7 +187,16 @@
 	<!-- ============================= -->
 	<!-- Table processing -->
 	<!-- ============================= -->
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Tabletitle']">
+		<xsl:text>.</xsl:text>
+		<xsl:apply-templates/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
 	<xsl:template match="w:tbl">
+	
+		<!-- Step 1: convert docx table to HTML-like table -->
 		<xsl:variable name="table_">
 			<table>
 				<xsl:apply-templates/>
@@ -197,18 +206,23 @@
 		
 		<!-- DEBUG=<xsl:apply-templates select="$table" mode="print_as_xml"/> -->
 		
+		<!-- process HTML-like table -->
 		<xsl:choose>
 			<!-- no border, paragraph is 'dl' item and columns count = 2 -->
 			<xsl:when test="count($table//td[@border = '1']) = 0 and $table//p/@dl = 'true' and count($table/table/colgroup/col) = 2">
 				<xsl:apply-templates select="$table/node()" mode="dl"/>
 			</xsl:when>
 			<xsl:otherwise>
+				<!-- DEBUG=<xsl:apply-templates select="$table" mode="print_as_xml"/> -->
 				<xsl:apply-templates select="$table/node()" />
 			</xsl:otherwise>
 		</xsl:choose>
 		
 	</xsl:template>
 	
+	<!-- ===================== -->
+	<!-- create HTML-like table -->
+	<!-- ===================== -->
 	<xsl:template match="w:tblGrid">
 		<colgroup>
 			<xsl:apply-templates/>
@@ -218,7 +232,6 @@
 	<xsl:template match="w:gridCol">
 		<col><xsl:value-of select="@w:w"/></col>
 	</xsl:template>
-	
 	
 	<xsl:template match="w:tr">
 		<tr>
@@ -231,6 +244,29 @@
 			<xsl:if test="w:tcPr/w:tcBorders">
 				<xsl:attribute name="border">1</xsl:attribute>
 			</xsl:if>
+			<xsl:if test="w:tcPr/w:gridSpan">
+				<xsl:attribute name="colspan"><xsl:value-of select="w:tcPr/w:gridSpan/@w:val"/></xsl:attribute>
+			</xsl:if>
+			
+			<xsl:if test="w:tcPr/w:vMerge/@w:val = 'restart'">
+				<xsl:variable name="curr_row_number" select="count(ancestor::w:tr[1]/preceding-sibling::w:tr) + 1"/>
+				<xsl:variable name="next_restart_row_number_" select="count(ancestor::w:tr[1]/following-sibling::w:tr[w:tc/w:tcPr/w:vMerge/@w:val = 'restart']/preceding-sibling::w:tr) + 1"/>
+				<xsl:variable name="next_restart_row_number">
+					<xsl:choose>
+						<xsl:when test="$next_restart_row_number_ = '1'">
+							<xsl:value-of select="count(ancestor::w:tr[1]/following-sibling::w:tr/preceding-sibling::w:tr) + 2"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$next_restart_row_number_"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				
+				<xsl:attribute name="curr_row_number"><xsl:value-of select="$curr_row_number"/></xsl:attribute>
+				<xsl:attribute name="next_restart_row_number"><xsl:value-of select="$next_restart_row_number"/></xsl:attribute>
+				<xsl:attribute name="rowspan"><xsl:value-of select="$next_restart_row_number - $curr_row_number"/></xsl:attribute>
+			</xsl:if>
+			
 			<xsl:apply-templates/>
 		</td>
 	</xsl:template>
@@ -243,6 +279,159 @@
 			</xsl:if>
 			<xsl:apply-templates/>
 		</p>
+	</xsl:template>
+	<!-- ===================== -->
+	<!-- END create HTML-like table -->
+	<!-- ===================== -->
+	
+	
+	<xsl:template match="table">
+		
+		<xsl:call-template name="insertTableProperties"/>
+		
+		<xsl:call-template name="insertTableSeparator"/>
+		
+		<xsl:text>===</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		
+		<xsl:apply-templates />
+		
+		<xsl:text>&#xa;</xsl:text>
+		
+		<xsl:call-template name="insertTableSeparator"/>
+		<xsl:text>===</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		
+	</xsl:template>
+	
+	<xsl:template name="insertTableProperties">
+		<xsl:text>[</xsl:text>
+		<xsl:text>cols="</xsl:text>
+		<xsl:variable name="cols-count" select="count(colgroup/col)"/>
+		<xsl:choose>
+			<xsl:when test="$cols-count = 1">1</xsl:when> <!-- cols="1" -->
+			<xsl:otherwise>
+				<xsl:for-each select="colgroup/col">
+					<xsl:value-of select="."/>
+					<xsl:if test="position() != last()">,</xsl:if>
+				</xsl:for-each>
+			</xsl:otherwise>
+		</xsl:choose>
+		<xsl:text>"</xsl:text>
+		
+		<xsl:text>]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template name="insertTableSeparator">
+		<xsl:choose>
+			<xsl:when test="ancestor::table"><xsl:text>!</xsl:text></xsl:when> <!-- for nesting tables -->
+			<xsl:otherwise><xsl:text>|</xsl:text></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template name="insertCellSeparator">
+		<xsl:choose>
+			<xsl:when test="count(ancestor::table) &gt; 1"><xsl:text>!</xsl:text></xsl:when> <!-- for nesting tables -->
+			<xsl:otherwise><xsl:text>|</xsl:text></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template match="col"/>
+	
+	<xsl:template match="tr">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="td">
+		<xsl:call-template name="spanProcessing"/>		
+		<xsl:call-template name="alignmentProcessing"/>
+		<xsl:call-template name="complexFormatProcessing"/>
+		<xsl:call-template name="insertCellSeparator"/>
+		<xsl:choose>
+			<xsl:when test="position() = last() and normalize-space() = '' and not(*)"></xsl:when>
+			<xsl:otherwise>
+				<xsl:apply-templates />
+			</xsl:otherwise>
+		</xsl:choose>
+		<xsl:choose>
+			<xsl:when test="position() = last() and ../following-sibling::tr">
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:when>
+			<xsl:when test="position() = last()">
+				<xsl:text></xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text> </xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template name="spanProcessing">		
+		<xsl:if test="@colspan &gt; 1 or @rowspan &gt; 1">
+			<xsl:choose>
+				<xsl:when test="@colspan &gt; 1 and @rowspan &gt; 1">
+					<xsl:value-of select="@colspan"/><xsl:text>.</xsl:text><xsl:value-of select="@rowspan"/>
+				</xsl:when>
+				<xsl:when test="@colspan &gt; 1">
+					<xsl:value-of select="@colspan"/>
+				</xsl:when>
+				<xsl:when test="@rowspan &gt; 1">
+					<xsl:text>.</xsl:text><xsl:value-of select="@rowspan"/>
+				</xsl:when>
+			</xsl:choose>			
+			<xsl:text>+</xsl:text>
+		</xsl:if>
+		<!-- <xsl:if test="list or def-list">a</xsl:if> -->
+	</xsl:template>
+	
+	<xsl:template name="alignmentProcessing">
+		<xsl:if test="(@align and @align != 'left') or (@valign and @valign != 'top')">
+			
+			<xsl:variable name="align">
+				<xsl:call-template name="getAlignFormat"/>
+			</xsl:variable>
+			
+			<xsl:variable name="valign">
+				<xsl:call-template name="getVAlignFormat"/>
+			</xsl:variable>
+			
+			<xsl:value-of select="$align"/>
+			<xsl:value-of select="$valign"/>
+			
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template name="complexFormatProcessing">
+		<xsl:if test=".//graphic or .//inline-graphic or .//list or .//def-list or
+			.//named-content[@content-type = 'ace-tag'][contains(@specific-use, '_start') or contains(@specific-use, '_end')] or
+			.//styled-content[@style = 'addition' or @style-type = 'addition'] or
+			.//styled-content[@style = 'text-alignment: center']">a</xsl:if> <!-- AsciiDoc prefix before table cell -->
+	</xsl:template>
+	
+	<xsl:template name="getAlignFormat">
+		<xsl:choose>
+			<xsl:when test="@align = 'center'">^</xsl:when>
+			<xsl:when test="@align = 'right'">&gt;</xsl:when>
+			<!-- <xsl:otherwise>&lt;</xsl:otherwise> --><!-- left -->
+		</xsl:choose>
+	</xsl:template>
+	<xsl:template name="getVAlignFormat">
+		<xsl:choose>
+			<xsl:when test="@valign = 'middle'">.^</xsl:when>
+			<xsl:when test="@valign = 'bottom'">.&gt;</xsl:when>
+			<!-- <xsl:otherwise>&lt;</xsl:otherwise> --> <!-- top -->
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template match="td/p | th/p">
+		<xsl:if test="preceding-sibling::* or normalize-space(preceding-sibling::node()[1]) != ''">
+			<xsl:text> +</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+		<xsl:apply-templates/>
+		<!-- <xsl:text>&#xa;</xsl:text> -->
 	</xsl:template>
 	
 	<!-- ============================= -->
