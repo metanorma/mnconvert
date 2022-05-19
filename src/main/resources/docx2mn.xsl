@@ -58,6 +58,13 @@
 		Note
 		Example
 		Source
+		Tabletitle
+		Tablebody0
+		zzCopyright
+		zzContents
+		TOC1
+		TOC2
+		TOC3
 	-->
 	
 	
@@ -85,9 +92,29 @@
 	</xsl:template>
 	
 	
+	<!-- ============================= -->
+	<!-- Ignore processing -->
+	<!-- ============================= -->
 	
 	<!-- no need to output term's num (example '3.1') -->
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'TermNum']"/>
+	
+	<!-- skip copyright information text -->
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCopyright']"/>
+	
+	<!-- skip 'Contents' title -->
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzContents']"/>
+	
+	
+	<!-- skip ToC items text -->
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'TOC1']"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'TOC2']"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'TOC3']"/>
+	
+	
+	<!-- ============================= -->
+	<!-- END Ignore processing -->
+	<!-- ============================= -->
 	
 	
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Terms']">
