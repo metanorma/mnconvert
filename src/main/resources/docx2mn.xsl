@@ -159,7 +159,13 @@
 		<xsl:text>[.source]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&lt;&lt;</xsl:text>
-		<xsl:apply-templates/>
+		<xsl:variable name="source">
+			<xsl:apply-templates/>
+		</xsl:variable>
+		<xsl:value-of select="normalize-space($source)"/>
+		<xsl:if test="not(contains($source, '&gt;&gt;'))">
+			<xsl:text>&gt;&gt;</xsl:text>
+		</xsl:if>
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
 	
@@ -177,6 +183,103 @@
 	<!-- END Term's source processing -->
 	<!-- ============================= -->
 	
+	
+	<!-- ============================= -->
+	<!-- Table processing -->
+	<!-- ============================= -->
+	<xsl:template match="w:tbl">
+		<xsl:variable name="table_">
+			<table>
+				<xsl:apply-templates/>
+			</table>
+		</xsl:variable>
+		<xsl:variable name="table" select="xalan:nodeset($table_)"/>
+		
+		<!-- DEBUG=<xsl:apply-templates select="$table" mode="print_as_xml"/> -->
+		
+		<xsl:choose>
+			<!-- no border, paragraph is 'dl' item and columns count = 2 -->
+			<xsl:when test="count($table//td[@border = '1']) = 0 and $table//p/@dl = 'true' and count($table/table/colgroup/col) = 2">
+				<xsl:apply-templates select="$table/node()" mode="dl"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:apply-templates select="$table/node()" />
+			</xsl:otherwise>
+		</xsl:choose>
+		
+	</xsl:template>
+	
+	<xsl:template match="w:tblGrid">
+		<colgroup>
+			<xsl:apply-templates/>
+		</colgroup>
+	</xsl:template>
+	
+	<xsl:template match="w:gridCol">
+		<col><xsl:value-of select="@w:w"/></col>
+	</xsl:template>
+	
+	
+	<xsl:template match="w:tr">
+		<tr>
+			<xsl:apply-templates/>
+		</tr>
+	</xsl:template>
+	
+	<xsl:template match="w:tc">
+		<td>
+			<xsl:if test="w:tcPr/w:tcBorders">
+				<xsl:attribute name="border">1</xsl:attribute>
+			</xsl:if>
+			<xsl:apply-templates/>
+		</td>
+	</xsl:template>
+	
+	<xsl:template match="w:tc/w:p">
+		<p>
+			<xsl:if test="w:pPr/w:pStyle/@w:val = 'Tablebody0'">
+				<!-- definition list item -->
+				<xsl:attribute name="dl">true</xsl:attribute>
+			</xsl:if>
+			<xsl:apply-templates/>
+		</p>
+	</xsl:template>
+	
+	<!-- ============================= -->
+	<!-- END Table processing -->
+	<!-- ============================= -->
+	
+	<!-- ============================= -->
+	<!-- Definition list processing -->
+	<!-- ============================= -->
+	<xsl:template match="/" mode="dl">
+		<xsl:apply-templates mode="dl"/>
+	</xsl:template>
+	
+	<xsl:template match="table" mode="dl">
+		<xsl:apply-templates select="tr" mode="dl"/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="tr" mode="dl">
+		<xsl:apply-templates select="td[1]" mode="dl"/>
+		<xsl:text>:: </xsl:text>
+		<xsl:apply-templates select="td[2]" mode="dl"/>
+		<xsl:text>&#xa;&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="td" mode="dl">
+		<xsl:apply-templates mode="dl"/>
+	</xsl:template>
+	
+	<xsl:template match="td/p" mode="dl">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	
+	<!-- ============================= -->
+	<!-- END Definition list processing -->
+	<!-- ============================= -->
 		
 	
 	<xsl:template match="w:t">
@@ -194,6 +297,24 @@
 					<xsl:with-param name="count" select="$count - 1" />
 				</xsl:call-template>
 		</xsl:if>
+	</xsl:template>
+	
+	
+	<xsl:template match="*" mode="print_as_xml">
+		<xsl:text>&#xa;&lt;</xsl:text>
+		<xsl:value-of select="local-name()"/>
+		<xsl:for-each select="@*">
+			<xsl:text> </xsl:text>
+			<xsl:value-of select="local-name()"/>
+			<xsl:text>="</xsl:text>
+			<xsl:value-of select="."/>
+			<xsl:text>"</xsl:text>
+		</xsl:for-each>
+		<xsl:text>&gt;</xsl:text>
+		<xsl:apply-templates mode="print_as_xml"/>
+		<xsl:text>&lt;/</xsl:text>
+		<xsl:value-of select="local-name()"/>
+		<xsl:text>&gt;</xsl:text>
 	</xsl:template>
 	
 </xsl:stylesheet>
