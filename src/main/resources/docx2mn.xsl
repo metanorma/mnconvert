@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
 					xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+					xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+					xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
+					xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+					xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"
 					xmlns:mml="http://www.w3.org/1998/Math/MathML" 
 					xmlns:xlink="http://www.w3.org/1999/xlink" 
 					xmlns:xalan="http://xml.apache.org/xalan" 
@@ -20,6 +24,11 @@
 	<xsl:param name="outpath"/>
 
 	<xsl:param name="imagesdir" select="'images'"/>
+	
+	<!-- input xml file 'word\_rels\document.xml.rels' -->
+	<!-- xml with relationships -->
+	<xsl:param name="rels"/>
+	<xsl:variable name="rels_xml" select="document($rels)"/>
 
 
 	<!-- .docx zip content:
@@ -497,6 +506,73 @@
 	<!-- END Definition list processing -->
 	<!-- ============================= -->
 		
+		
+	<!-- ============================= -->
+	<!-- Figure processing -->
+	<!-- ============================= -->
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'FigureGraphic']">
+	
+		<xsl:apply-templates select="following-sibling::w:p[w:pPr/w:pStyle/@w:val = 'Figuretitle0'][1]">
+			<xsl:with-param name="process">true</xsl:with-param>
+		</xsl:apply-templates>
+		
+		<!--
+		<xsl:text>====</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		-->
+		
+		
+		<xsl:apply-templates />
+	
+		<!--
+		<xsl:text>====</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		-->
+		<xsl:text>&#xa;</xsl:text>
+	
+	</xsl:template>
+		
+	<xsl:variable name="em_dash">—</xsl:variable>
+	<xsl:variable name="en_dash">–</xsl:variable>
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Figuretitle0']">
+		<xsl:param name="process">false</xsl:param>
+		<xsl:if test="$process = 'true'">
+			<xsl:text>.</xsl:text>
+			<xsl:variable name="title">
+				<xsl:apply-templates />
+			</xsl:variable>
+			<!-- remove 'Figure N —' -->
+			<xsl:choose>
+				<xsl:when test="contains($title, $em_dash)">
+					<xsl:value-of select="normalize-space(substring-after($title, $em_dash))"/>
+				</xsl:when>
+				<xsl:when test="contains($title, $en_dash)">
+					<xsl:value-of select="normalize-space(substring-after($title, $en_dash))"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$title"/>
+				</xsl:otherwise>
+			</xsl:choose>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="pic:blipFill/a:blip">
+		<!-- Example: r:embed="rId205" -->
+		<xsl:variable name="rId" select="@r:embed"/>
+		<!-- Example: <Relationship Id="rId205" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.png"/> -->
+		<xsl:variable name="target" select="$rels_xml//rels:Relationship[@Id = $rId]/@Target"/>
+		
+		<xsl:variable name="filename" select="java:replaceAll(java:java.lang.String.new($target),'.*/(.*)$','$1')"/>
+		<xsl:text>image::</xsl:text><xsl:value-of select="$filename"/><xsl:text>[]</xsl:text>
+		<xsl:text>&#xa;&#xa;</xsl:text>
+		
+	</xsl:template>
+		
+	<!-- ============================= -->
+	<!-- END Figure processing -->
+	<!-- ============================= -->
 	
 	<xsl:template match="w:t">
 		<xsl:apply-templates />
