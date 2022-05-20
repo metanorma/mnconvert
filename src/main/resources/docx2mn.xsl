@@ -79,6 +79,9 @@
 		TOC1
 		TOC2
 		TOC3
+		zzCover
+		ListContinue
+		ListNumber
 	-->
 	
 	
@@ -108,8 +111,6 @@
 	<!-- ============================= -->
 	<!-- Cover page data processing -->
 	<!-- ============================= -->
-	
-	
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCover'][1]" priority="2">
 		<!-- parsing strings -->
 		<xsl:variable name="regex_iso_tc">^ISO(\s|\h)+(TC(\s|\h)+\d+/WG(\s|\h)+\d+)$</xsl:variable>
@@ -612,12 +613,92 @@
 	<xsl:template match="td/p" mode="dl">
 		<xsl:apply-templates />
 	</xsl:template>
-	
-	
 	<!-- ============================= -->
 	<!-- END Definition list processing -->
 	<!-- ============================= -->
 		
+	
+	<!-- ============================= -->
+	<!-- lists processing -->
+	<!-- ============================= -->
+	
+	<!-- Unordered list (ul) -->
+	<xsl:template match="w:p[starts-with(w:pPr/w:pStyle/@w:val, 'ListContinue')]">
+		<xsl:variable name="level_" select="java:replaceAll(java:java.lang.String.new(w:pPr/w:pStyle/@w:val),'ListContinue(.*)','$1')"/>
+		<xsl:variable name="level">
+			<xsl:choose>
+				<xsl:when test="$level_ = ''">1</xsl:when>
+				<xsl:otherwise><xsl:value-of select="$level_"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:variable name="text">
+			<xsl:apply-templates/>
+		</xsl:variable>
+		
+		<xsl:variable name="listitem_label">
+			<xsl:choose>
+				<xsl:when test="(.//*[self::w:t or self::w:delText or self::w:insText])[1] = $em_dash">.</xsl:when> <!-- unordered list (ul) -->
+				<xsl:otherwise>*</xsl:otherwise> <!-- ordered list (ol) -->
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:if test="normalize-space($text) != ''">
+			<!-- <xsl:text>DEBUG level=</xsl:text><xsl:value-of select="$level"/><xsl:text>&#xa;</xsl:text> -->
+			
+			<xsl:call-template name="repeat">
+				<xsl:with-param name="char" select="'.'"/>
+				<xsl:with-param name="count" select="$level"/>
+			</xsl:call-template>
+			<xsl:text> </xsl:text>
+			
+			<xsl:value-of select="$text"/>
+			<xsl:text>&#xa;&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template> <!-- ul -->
+	
+
+	<!-- Ordered list (ol) -->
+	<xsl:template match="w:p[starts-with(w:pPr/w:pStyle/@w:val, 'ListNumber')]">
+		<xsl:variable name="level_" select="java:replaceAll(java:java.lang.String.new(w:pPr/w:pStyle/@w:val),'ListNumber(.*)','$1')"/>
+		<xsl:variable name="level">
+			<xsl:choose>
+				<xsl:when test="$level_ = ''">1</xsl:when>
+				<xsl:otherwise><xsl:value-of select="$level_"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:variable name="text">
+			<xsl:apply-templates/>
+		</xsl:variable>
+		
+		<xsl:if test="normalize-space($text) != ''">
+			<!-- <xsl:text>DEBUG level=</xsl:text><xsl:value-of select="$level"/><xsl:text>&#xa;</xsl:text> -->
+			<xsl:call-template name="repeat">
+				<xsl:with-param name="char" select="'*'"/>
+				<xsl:with-param name="count" select="$level"/>
+			</xsl:call-template>
+			<xsl:text> </xsl:text>
+			
+			<xsl:value-of select="$text"/>
+			<xsl:text>&#xa;&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template> <!-- ol -->
+	
+	<!-- text in list: list item label or body -->
+	<xsl:template match="w:p[starts-with(w:pPr/w:pStyle/@w:val, 'ListContinue') or starts-with(w:pPr/w:pStyle/@w:val, 'ListNumber')]//*[self::w:t or self::w:delText or self::w:insText]">
+		<xsl:choose>
+			<xsl:when test="ancestor::w:r/following-sibling::w:r[1][w:tab]"><!-- skip list item label --></xsl:when>
+			<xsl:otherwise>
+				<!-- process list item body -->
+				<xsl:apply-templates/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+		
+	<!-- ============================= -->
+	<!-- END lists processing -->
+	<!-- ============================= -->
 		
 	<!-- ============================= -->
 	<!-- Figure processing -->
