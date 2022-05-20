@@ -39,6 +39,11 @@
 	
 
 	<xsl:template match="/">
+		<!-- DEBUG
+		<xsl:variable name="env">
+			<xsl:copy-of select="xalan:checkEnvironment()"/>
+		</xsl:variable>
+		<xsl:apply-templates select="xalan:nodeset($env)" mode="print_as_xml"/> -->
 		<xsl:apply-templates/>
 	</xsl:template>
 	
@@ -99,7 +104,114 @@
 		<xsl:apply-templates/>
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
+
+	<!-- ============================= -->
+	<!-- Cover page data processing -->
+	<!-- ============================= -->
 	
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCover'][1]" priority="2">
+		<!-- parsing strings -->
+		<xsl:variable name="regex_iso_tc">^ISO(\s|\h)+(TC(\s|\h)+\d+/WG(\s|\h)+\d+)$</xsl:variable>
+		<xsl:variable name="regex_tc_keyvalue">^(.+)(\s|\h)+(.+)$</xsl:variable>
+		<xsl:variable name="regex_iso_number">^ISO(/IEC)?(\s|\h)+(\d+.*)</xsl:variable>
+		<xsl:variable name="regex_date">^Date:(\s|\h)?(.*)</xsl:variable> <!-- \d{4}-\d{2}-\d{2}$ -->
+		
+		<xsl:variable name="bibdata_items_">
+			<xsl:for-each select="//w:p[w:pPr/w:pStyle/@w:val = 'zzCover']">
+				<xsl:variable name="text">
+					<xsl:apply-templates select="w:r/w:t | w:ins/w:r/w:t"/>
+				</xsl:variable>
+				<xsl:choose>
+					<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_iso_tc, normalize-space(.)) = 'true'">
+						<xsl:variable name="tc" select="java:replaceAll(java:java.lang.String.new($text),$regex_iso_tc,'$2')"/>
+						<xsl:variable name="tc_components">
+							<xsl:call-template name="split">
+								<xsl:with-param name="pText" select="$tc"/>
+							</xsl:call-template>
+						</xsl:variable>
+						<!-- <xsl:copy-of select="$tc_components"/> -->
+						<xsl:for-each select="xalan:nodeset($tc_components)//item">
+							<item name="tc">
+								<xsl:attribute name="key">
+									<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regex_tc_keyvalue,'$1')"/>
+								</xsl:attribute>
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regex_tc_keyvalue,'$3')"/>
+							</item>
+						</xsl:for-each>
+					</xsl:when>
+					<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_iso_number, normalize-space(.)) = 'true'">
+						<item name="docnumber"><xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),$regex_iso_number,'$3')"/></item>
+					</xsl:when>
+					<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_date, normalize-space(.)) = 'true'">
+						<item name="date"><xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),$regex_date,'$2')"/></item>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:if test="normalize-space($text) != ''">
+							<item name="title-main-en"><xsl:value-of select="$text"/></item>
+						</xsl:if>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:variable name="bibdata_items" select="xalan:nodeset($bibdata_items_)"/>
+		
+		<!-- <xsl:apply-templates select="$bibdata_items" mode="print_as_xml"/> -->
+		
+		<xsl:text>:docnumber: </xsl:text><xsl:value-of select="$bibdata_items//item[@name = 'docnumber']"/>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>:date: </xsl:text><xsl:value-of select="$bibdata_items//item[@name = 'date']"/>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>:copyright-year: </xsl:text><xsl:value-of select="substring($bibdata_items//item[@name = 'date'],1,4)"/>
+		<xsl:text>&#xa;</xsl:text>
+		
+		<xsl:text>:title-main-en: </xsl:text><xsl:value-of select="$bibdata_items//item[@name = 'title-main-en']"/>
+		<xsl:text>&#xa;</xsl:text>
+		
+		
+		<xsl:for-each select="$bibdata_items//item[not(@name = 'docnumber' or @name = 'date' or @name = 'title-main-en')]">
+			<xsl:choose>
+				<xsl:when test="@name = 'tc' and (@key = 'TC' or @key = 'WG')">
+					<xsl:choose>
+						<xsl:when test="@key = 'TC'">
+							<xsl:text>:technical-committee-number: </xsl:text><xsl:value-of select="."/>
+						</xsl:when>
+						<xsl:when test="@key = 'WG'">
+							<xsl:text>:workgroup-type: WG</xsl:text>
+							<xsl:text>&#xa;</xsl:text>
+							<xsl:text>:workgroup-number: </xsl:text><xsl:value-of select="."/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:text>:</xsl:text><xsl:value-of select="@name"/><xsl:text>: </xsl:text><xsl:value-of select="."/>
+				</xsl:otherwise>
+			</xsl:choose>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:for-each>
+		
+		
+		<xsl:text>:mn-document-class: iso</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>:mn-output-extensions: xml,html,doc,pdf,rxl</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>:local-cache-only:</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>:data-uri-image:</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>:imagesdir: images</xsl:text>
+		<xsl:text>&#xa;&#xa;</xsl:text>
+		
+	</xsl:template>
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCover']"/>
+	
+	<!-- ignore delText in bibdata fields -->
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCover']/w:del"/>
+	
+	<!-- ============================= -->
+	<!-- END Cover page data processing -->
+	<!-- ============================= -->
 	
 	<!-- ============================= -->
 	<!-- Ignore processing -->
@@ -521,7 +633,6 @@
 		<xsl:text>&#xa;</xsl:text>
 		-->
 		
-		
 		<xsl:apply-templates />
 	
 		<!--
@@ -591,6 +702,20 @@
 		</xsl:if>
 	</xsl:template>
 	
+	<xsl:template name="split">
+		<xsl:param name="pText" select="."/>
+		<xsl:param name="sep" select="'/'"/>
+		<xsl:if test="string-length($pText) &gt; 0">
+			<item>
+				<xsl:variable name="value" select="substring-before(concat($pText, $sep), $sep)"/>
+				<xsl:value-of select="normalize-space(translate($value, '&#xA0;', ' '))"/>
+			</item>
+			<xsl:call-template name="split">
+				<xsl:with-param name="pText" select="substring-after($pText, $sep)"/>
+				<xsl:with-param name="sep" select="$sep"/>
+			</xsl:call-template>
+		</xsl:if>
+	</xsl:template>
 	
 	<xsl:template match="*" mode="print_as_xml">
 		<xsl:text>&#xa;&lt;</xsl:text>
