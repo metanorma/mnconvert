@@ -788,7 +788,12 @@
 	<!-- ============================= -->
 	<!-- Bibliography entry processing -->
 	<!-- ============================= -->
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'BiblioEntry0']">
+	
+	<!-- style RefNorm is using for Normative References,
+		style BiblioEntry0 is using for bibliography -->
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'BiblioEntry0' or w:pPr/w:pStyle/@w:val = 'RefNorm']">
+		
+		<xsl:variable name="bib_style" select="w:pPr/w:pStyle/@w:val"/>
 		
 		<!-- Example: * [[[ISO712,ISO 712]]], _Cereals and cereal products - Determination of moisture content - Reference method_ -->
 		
@@ -839,13 +844,24 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:text>[[[</xsl:text>
-						<xsl:text>bibref</xsl:text>
+						<xsl:choose>
+							<xsl:when test="$bib_style = 'BiblioEntry0'"><xsl:text>bibref</xsl:text></xsl:when>
+							<xsl:otherwise>ref</xsl:otherwise>
+						</xsl:choose>
+						
 						<xsl:choose>
 							<xsl:when test="$bibitem/bibnumber">
 								<xsl:value-of select="$bibitem/bibnumber"/>
 							</xsl:when>
 							<xsl:otherwise>
-								<xsl:number count="w:p[w:pPr/w:pStyle/@w:val = 'BiblioEntry0']"/>
+								<xsl:choose>
+									<xsl:when test="$bib_style = 'BiblioEntry0'">
+										<xsl:number count="w:p[w:pPr/w:pStyle/@w:val = 'BiblioEntry0']"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:number count="w:p[w:pPr/w:pStyle/@w:val = 'RefNorm']"/>
+									</xsl:otherwise>
+								</xsl:choose>
 							</xsl:otherwise>
 						</xsl:choose>
 					<xsl:text>]]], </xsl:text>
@@ -858,8 +874,6 @@
 					<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),'^\[\](\s|\h)*(.*)$','$2')"/>
 				</xsl:otherwise>
 			</xsl:choose>
-		
-			
 			
 		
 			<xsl:text>&#xa;&#xa;</xsl:text>
@@ -867,7 +881,7 @@
 	</xsl:template>
 	
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'BiblioEntry0']/w:r[w:rPr/w:rStyle]/w:t">
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'BiblioEntry0' or w:pPr/w:pStyle/@w:val = 'RefNorm']//w:r[w:rPr/w:rStyle]/*[self::w:t or self::w:insText or self::w:delText]">
 		<xsl:variable name="style" select="ancestor::w:r[1]/w:rPr/w:rStyle/@w:val"/>
 		<xsl:element name="{$style}">
 			<xsl:apply-templates/>
