@@ -82,6 +82,7 @@
 		zzCover
 		ListContinue
 		ListNumber
+		Figurenote
 	-->
 	
 	
@@ -265,15 +266,16 @@
 	<!-- ============================= -->
 	<!-- Note processing -->
 	<!-- ============================= -->
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Note']">
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Note' or w:pPr/w:pStyle/@w:val = 'Figurenote']">
 		<xsl:text>NOTE: </xsl:text>
-		<xsl:apply-templates/>
+		<xsl:variable name="text">
+			<xsl:apply-templates/>
+		</xsl:variable>
+		<xsl:variable name="note1" select="java:replaceAll(java:java.lang.String.new($text),'^Note(\s|\h)+(\d+)? to entry:(\s|\h)+(.*)','$4')"/>
+		<xsl:variable name="note2" select="java:replaceAll(java:java.lang.String.new($note1),'^NOTE(\s|\h)+(\d+(\s|\h)+)?(.*)','$4')"/>
 		
+		<xsl:value-of select="$note2"/>
 		<xsl:text>&#xa;&#xa;</xsl:text>
-	</xsl:template>
-	
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Note']/w:r/w:t">
-		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),'^Note(\s|\h)+\d+ to entry:(\s|\h)+(.*)','$3')"/>
 	</xsl:template>
 	<!-- ============================= -->
 	<!-- End Note processing -->
@@ -285,16 +287,13 @@
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Example']">
 		<xsl:text>====</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:apply-templates/>
+		<xsl:variable name="text">
+			<xsl:apply-templates/>
+		</xsl:variable>
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),'^EXAMPLE(\s|\h)+(\d+(\s|\h)+)?(.*)','$4')"/>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>====</xsl:text>
 		<xsl:text>&#xa;&#xa;</xsl:text>
-	</xsl:template>
-	
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Example']/w:r/w:t[text() = 'EXAMPLE']" priority="2"/>
-	
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Example']/w:r/w:t">
-		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),'^EXAMPLE(\s|\h)+(\d)*(\s|\h)+(.*)','$4')"/>
 	</xsl:template>
 	<!-- ============================= -->
 	<!-- End Example processing -->
@@ -650,7 +649,7 @@
 				<xsl:with-param name="char" select="'.'"/>
 				<xsl:with-param name="count" select="$level"/>
 			</xsl:call-template>
-			<xsl:text> </xsl:text>
+			<!-- <xsl:text> </xsl:text> -->
 			
 			<xsl:value-of select="$text"/>
 			<xsl:text>&#xa;&#xa;</xsl:text>
@@ -678,7 +677,7 @@
 				<xsl:with-param name="char" select="'*'"/>
 				<xsl:with-param name="count" select="$level"/>
 			</xsl:call-template>
-			<xsl:text> </xsl:text>
+			<!-- <xsl:text> </xsl:text> -->
 			
 			<xsl:value-of select="$text"/>
 			<xsl:text>&#xa;&#xa;</xsl:text>
@@ -770,6 +769,9 @@
 		<xsl:apply-templates />
 	</xsl:template>
 	
+	<xsl:template match="w:tab[not(parent::w:tabs)]">
+		<xsl:text> </xsl:text>
+	</xsl:template>
 	
 	<xsl:template name="repeat">
 		<xsl:param name="char" select="'='"/>
