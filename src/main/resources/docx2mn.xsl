@@ -98,14 +98,33 @@
 	<!-- END 1st level section's titles processing -->
 	<!-- ============================= -->
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Heading1' or @w:val = 'Heading2' or @w:val = 'Heading3' or @w:val = 'Heading4' or @w:val = 'Heading5' or @w:val = 'Heading6']]">
-		<xsl:variable name="level" select="number(substring-after(w:pPr/w:pStyle/@w:val, 'Heading'))"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Heading1' or @w:val = 'Heading2' or @w:val = 'Heading3' or @w:val = 'Heading4' or @w:val = 'Heading5' or @w:val = 'Heading6' or @w:val = 'BiblioTitle']]">
+	
+		<xsl:variable name="text">
+			<xsl:apply-templates/>
+		</xsl:variable>
+	
+		<xsl:if test="$text = 'Normative references' or w:pPr/w:pStyle/@w:val = 'BiblioTitle'">
+			<xsl:text>[bibliography]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+		
+		<xsl:variable name="level_" select="substring-after(w:pPr/w:pStyle/@w:val, 'Heading')"/>
+		
+		<xsl:variable name="level">
+			<xsl:choose>
+				<xsl:when test="$level_ = ''">1</xsl:when>
+				<xsl:otherwise><xsl:value-of select="number($level_)"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
 		<xsl:call-template name="repeat">
 			<xsl:with-param name="count" select="$level + 1"/>
 		</xsl:call-template>
 		<xsl:text> </xsl:text>
 		
-		<xsl:apply-templates/>
+		<xsl:value-of select="$text"/>
+		
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
 
@@ -765,12 +784,111 @@
 	<!-- END Figure processing -->
 	<!-- ============================= -->
 	
+	
+	<!-- ============================= -->
+	<!-- Bibliography entry processing -->
+	<!-- ============================= -->
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'BiblioEntry0']">
+		
+		<!-- Example: * [[[ISO712,ISO 712]]], _Cereals and cereal products - Determination of moisture content - Reference method_ -->
+		
+		<xsl:variable name="bibitem_">
+			<xsl:apply-templates />
+		</xsl:variable>
+		<xsl:variable name="bibitem" select="xalan:nodeset($bibitem_)"/>
+		
+		<!-- DEBUG:
+		<xsl:apply-templates select="xalan:nodeset($bibitem_)" mode="print_as_xml"/>
+		<xsl:text>&#xa;</xsl:text> -->
+		
+		
+		<xsl:if test="normalize-space($bibitem) != ''">
+			<xsl:text>* </xsl:text>
+			
+			<xsl:choose>
+				<xsl:when test="$bibitem/stdpublisher or $bibitem/stddocNumber"> <!-- if 'standard' bibitem -->
+					
+					<xsl:variable name="id_">
+						<xsl:for-each select="$bibitem/node()[not(local-name() = 'bibnumber' or local-name() = 'stddocTitle')]">
+							<xsl:value-of select="translate(.,'&#xa0;[],',' ')"/> <!-- replace a0 to space, remove [, ] and comman -->
+						</xsl:for-each>
+					</xsl:variable>
+					<xsl:variable name="id" select="translate(normalize-space($id_),':/ ','___')"/> <!-- replace :,/ and space to underscore _ -->
+				
+					<xsl:variable name="reference_text">
+						<xsl:for-each select="$bibitem/node()[not(local-name() = 'bibnumber' or local-name() = 'stddocTitle')]">
+							<xsl:choose>
+								<xsl:when test="normalize-space() = '[' or normalize-space() = ']' or normalize-space() = ','"><!-- skip --></xsl:when>
+								<xsl:otherwise><xsl:value-of select="translate(.,'&#xa0;', ' ')"/></xsl:otherwise>
+							</xsl:choose>
+						</xsl:for-each>
+					</xsl:variable>
+				
+					<xsl:text>[[[</xsl:text>
+						<xsl:value-of select="$id"/>
+						<xsl:text>,</xsl:text>
+						<xsl:value-of select="$reference_text"/>
+					<xsl:text>]]]</xsl:text>
+					<xsl:for-each select="$bibitem/stddocTitle[1]"> <!-- standard's title -->
+						<xsl:text>, </xsl:text>
+						<xsl:value-of select="."/>
+						<xsl:for-each select="following-sibling::node()">
+							<xsl:value-of select="."/>
+						</xsl:for-each>
+					</xsl:for-each>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:text>[[[</xsl:text>
+						<xsl:text>bibref</xsl:text>
+						<xsl:choose>
+							<xsl:when test="$bibitem/bibnumber">
+								<xsl:value-of select="$bibitem/bibnumber"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:number count="w:p[w:pPr/w:pStyle/@w:val = 'BiblioEntry0']"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					<xsl:text>]]], </xsl:text>
+					<xsl:variable name="text">
+						<xsl:for-each select="$bibitem/node()[not(self::bibnumber)]">
+							<xsl:value-of select="."/>
+						</xsl:for-each>
+					</xsl:variable>
+					<!-- remove [] at start -->
+					<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),'^\[\](\s|\h)*(.*)$','$2')"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		
+			
+			
+		
+			<xsl:text>&#xa;&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'BiblioEntry0']/w:r[w:rPr/w:rStyle]/w:t">
+		<xsl:variable name="style" select="ancestor::w:r[1]/w:rPr/w:rStyle/@w:val"/>
+		<xsl:element name="{$style}">
+			<xsl:apply-templates/>
+		</xsl:element>
+	</xsl:template>
+	
+	<!-- ============================= -->
+	<!-- END Bibliography entry processing -->
+	<!-- ============================= -->
+	
+	
 	<xsl:template match="w:t">
 		<xsl:apply-templates />
 	</xsl:template>
 	
 	<xsl:template match="w:tab[not(parent::w:tabs)]">
 		<xsl:text> </xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="w:noBreakHyphen">
+		<xsl:text>-</xsl:text>
 	</xsl:template>
 	
 	<xsl:template name="repeat">
