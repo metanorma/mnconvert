@@ -922,6 +922,63 @@
 	<!-- ============================= -->
 	
 	
+	<!-- ============================= -->
+	<!-- Annex processing -->
+	<!-- ============================= -->
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'ANNEX']">
+		<!-- [[AnnexA]] -->
+		<!-- Example [appendix,obligation=normative] -->
+		
+		<xsl:variable name="id" select="translate((.//w:t)[1],' ','')"/>
+		<xsl:text>[[</xsl:text>
+		<xsl:value-of select="$id"/>
+		<xsl:text>]]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		
+		<xsl:variable name="obligation_">
+			<xsl:choose>
+				<xsl:when test=".//w:t[translate(text(), '()','') = 'normative']">normative</xsl:when>
+				<xsl:when test=".//w:t[translate(text(), '()','') = 'informative']">informative</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="obligation">
+			<xsl:if test="normalize-space($obligation_) != ''">
+				<xsl:text>,obligation=</xsl:text><xsl:value-of select="$obligation_"/>
+			</xsl:if>
+		</xsl:variable>
+		
+		<xsl:text>[appendix</xsl:text><xsl:value-of select="$obligation"/><xsl:text>]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		
+		<xsl:text>== </xsl:text>
+		
+		<xsl:apply-templates select="(.//w:t)[position() &gt; 2]"/>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		
+	</xsl:template>
+	
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'a2' or @w:val = 'a3' or @w:val = 'a4' or @w:val = 'a5' or @w:val = 'a6']]">
+		<xsl:variable name="level" select="substring-after(w:pPr/w:pStyle/@w:val, 'a')"/>
+	
+		<xsl:call-template name="repeat">
+			<xsl:with-param name="count" select="$level + 1"/>
+		</xsl:call-template>
+		<xsl:text> </xsl:text>
+		
+		<xsl:apply-templates/>
+		
+		<xsl:text>&#xa;&#xa;</xsl:text>
+	
+	</xsl:template>
+	
+	
+	<!-- ============================= -->
+	<!-- END Annex processing -->
+	<!-- ============================= -->
+	
+	
 	<xsl:template match="w:t">
 		<xsl:apply-templates />
 	</xsl:template>
