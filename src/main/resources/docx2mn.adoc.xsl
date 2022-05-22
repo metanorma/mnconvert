@@ -27,9 +27,21 @@
 	
 	<!-- input xml file 'word\_rels\document.xml.rels' -->
 	<!-- xml with relationships -->
+	<xsl:param name="rels_file"/>
+	<!-- or Nodes (programmatically called from mn2convert) -->
 	<xsl:param name="rels"/>
-	<xsl:variable name="rels_xml" select="document($rels)"/>
-
+	
+	<xsl:variable name="rels_xml_">
+		<xsl:choose>
+			<xsl:when test="$rels_file != ''">
+				<xsl:copy-of select="document($rels_file)"/> 
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy-of select="$rels"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	<xsl:variable name="rels_xml" select="xalan:nodeset($rels_xml_)"/>
 
 	<!-- .docx zip content:
 	
