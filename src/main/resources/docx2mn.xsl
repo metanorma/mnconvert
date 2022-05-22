@@ -44,9 +44,38 @@
 			<xsl:copy-of select="xalan:checkEnvironment()"/>
 		</xsl:variable>
 		<xsl:apply-templates select="xalan:nodeset($env)" mode="print_as_xml"/> -->
-		<xsl:apply-templates/>
+		
+		<xsl:variable name="xml_cleaned">
+			<xsl:apply-templates mode="clean"/>
+		</xsl:variable>
+		
+		<xsl:apply-templates select="xalan:nodeset($xml_cleaned)/node()"/>
+		
 	</xsl:template>
 	
+	
+	<!-- ==================================== -->
+	<!-- XML cleaning -->
+	<!-- ==================================== -->
+	<xsl:template match="@*|node()" mode="clean">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="clean"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<!-- remove deleted text on the cover page -->
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCover']/w:del" mode="clean"/>
+	
+	<!-- remove deleted items in the Normative References and Bibliography -->
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'BiblioEntry0' or w:pPr/w:pStyle/@w:val = 'RefNorm']/w:del" mode="clean"/>
+	
+	<!-- remove deleted 'obligation' for Annex -->
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'ANNEX']/w:del[contains(., 'normative') or contains(., 'informative')]" />
+	
+	
+	<!-- ==================================== -->
+	<!-- END XML cleaning -->
+	<!-- ==================================== -->
 	
 	<xsl:template match="w:p">
 		<xsl:apply-templates/>
