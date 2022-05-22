@@ -9,6 +9,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -16,6 +23,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -115,10 +124,10 @@ public class DOCX2MN_XsltConverter extends XsltConverter {
             
         //Source srcXSL = null;
 
-        File fXMLin = new File(inputFilePath);
+        File fDOCXin = new File(inputFilePath);
         File fileOut = new File(outputFilePath);
         
-        String inputFolder = fXMLin.getAbsoluteFile().getParent();
+        String inputFolder = fDOCXin.getAbsoluteFile().getParent();
         String outputFolder = fileOut.getAbsoluteFile().getParent();
 
         String bibdataFileName = fileOut.getName();
@@ -144,38 +153,51 @@ public class DOCX2MN_XsltConverter extends XsltConverter {
 
         TransformerFactory factory = TransformerFactory.newInstance();
         Transformer transformer = factory.newTransformer();
-        //Source src = new StreamSource(fXMLin);
-        Source src = new SAXSource(rdr, new InputSource(new FileInputStream(fXMLin)));
-
+        
         logger.info("Transforming...");
 
 
-        if (outputFormat.equals("adoc")) {
-            src = new SAXSource(rdr, new InputSource(new FileInputStream(fXMLin)));
-            
-            Source srcXSL;
-            if (fileXSL != null) { //external xsl
-                srcXSL = new StreamSource(fileXSL);
-            } else { // internal xsl
-                srcXSL = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), "docx2mn.adoc.xsl"));
-                // for xsl:include processing (load xsl from jar)
-                factory.setURIResolver(new XSLT_ResourceResolver());
-            }
+        String strDocumentXML = Util.unzipFileToString(Paths.get(inputFilePath), "document.xml");
+        
+        String strRelsXML = Util.unzipFileToString(Paths.get(inputFilePath), "document.xml.rels");
+        
 
-            transformer = factory.newTransformer(srcXSL);
-            transformer.setParameter("docfile_name", bibdataFileName);
-            transformer.setParameter("docfile_ext", bibdataFileExt);
-            transformer.setParameter("pathSeparator", File.separator);
-            transformer.setParameter("outpath", outputFolder);
-            transformer.setParameter("imagesdir", imagesDir);
-            transformer.setParameter("debug", isDebugMode);
+        Source src = new SAXSource(rdr, new InputSource(new StringReader(strDocumentXML)));
 
-            StringWriter resultWriter = new StringWriter();
-            StreamResult sr = new StreamResult(resultWriter);
-
-            transformer.transform(src, sr);
-            
+        Source srcXSL;
+        if (fileXSL != null) { //external xsl
+            srcXSL = new StreamSource(fileXSL);
+        } else { // internal xsl
+            srcXSL = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), "docx2mn.adoc.xsl"));
+            // for xsl:include processing (load xsl from jar)
+            factory.setURIResolver(new XSLT_ResourceResolver());
         }
+
+        transformer = factory.newTransformer(srcXSL);
+        transformer.setParameter("docfile_name", bibdataFileName);
+        transformer.setParameter("docfile_ext", bibdataFileExt);
+        transformer.setParameter("pathSeparator", File.separator);
+        transformer.setParameter("outpath", outputFolder);
+        transformer.setParameter("imagesdir", imagesDir);
+        transformer.setParameter("debug", isDebugMode);
+
+        try {
+            InputSource xmlRelsIS = new InputSource(new StringReader(strRelsXML));
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder;
+            dBuilder = dbFactory.newDocumentBuilder();
+            Document xmlRelsDocument = dBuilder.parse(xmlRelsIS);
+            NodeList xmlRelsDocumentNodeList = xmlRelsDocument.getDocumentElement().getChildNodes();
+            transformer.setParameter("rels", xmlRelsDocumentNodeList);
+        } catch (ParserConfigurationException ex) {
+            logger.log(Level.SEVERE, "Can''t read relationships file: {0}", ex.toString());
+        }
+
+        StringWriter resultWriter = new StringWriter();
+        StreamResult sr = new StreamResult(resultWriter);
+
+        transformer.transform(src, sr);
+        
 
         Task.copyImages(inputFolder, imagesDir, outputFolder);
     }
