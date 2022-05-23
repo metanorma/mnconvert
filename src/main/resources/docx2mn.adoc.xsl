@@ -31,6 +31,10 @@
 	<!-- or Nodes (programmatically called from mn2convert) -->
 	<xsl:param name="rels"/>
 	
+	
+	<xsl:variable name="docfile" select="concat($outpath,$pathSeparator,'document.adoc')"/>
+	<xsl:variable name="sectionsFolder">sections</xsl:variable>
+	
 	<xsl:variable name="rels_xml_">
 		<xsl:choose>
 			<xsl:when test="$rels_file != ''">
@@ -57,37 +61,139 @@
 		</xsl:variable>
 		<xsl:apply-templates select="xalan:nodeset($env)" mode="print_as_xml"/> -->
 		
-		<xsl:variable name="xml_cleaned">
-			<xsl:apply-templates mode="clean"/>
+		<xsl:variable name="xml_update1">
+			<xsl:apply-templates mode="update1"/>
 		</xsl:variable>
 		
-		<xsl:apply-templates select="xalan:nodeset($xml_cleaned)/node()"/>
+		<xsl:variable name="xml_update2">
+			<xsl:apply-templates select="xalan:nodeset($xml_update1)" mode="update2"/>
+		</xsl:variable>
+		
+		<!-- <xsl:apply-templates select="xalan:nodeset($xml_update2)" mode="print_as_xml"/> -->
+		
+		<redirect:open file="{$docfile}"/>
+		
+		<xsl:apply-templates select="xalan:nodeset($xml_update2)/node()"/>
+		
+		<redirect:close file="{$docfile}"/>
 		
 	</xsl:template>
 	
 	
 	<!-- ==================================== -->
-	<!-- XML cleaning -->
+	<!-- XML update 1 -->
 	<!-- ==================================== -->
-	<xsl:template match="@*|node()" mode="clean">
+	<xsl:template match="@*|node()" mode="update1">
 		<xsl:copy>
-			<xsl:apply-templates select="@*|node()" mode="clean"/>
+			<xsl:apply-templates select="@*|node()" mode="update1"/>
 		</xsl:copy>
 	</xsl:template>
 	
+	<!-- XML cleaning -->
 	<!-- remove deleted text on the cover page -->
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCover']/w:del" mode="clean"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCover']/w:del" mode="update1"/>
 	
 	<!-- remove deleted items in the Normative References and Bibliography -->
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'BiblioEntry0' or w:pPr/w:pStyle/@w:val = 'RefNorm']/w:del" mode="clean"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'BiblioEntry0' or w:pPr/w:pStyle/@w:val = 'RefNorm']/w:del" mode="update1"/>
 	
 	<!-- remove deleted 'obligation' for Annex -->
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'ANNEX']/w:del[contains(., 'normative') or contains(., 'informative')]" />
-	
-	
-	<!-- ==================================== -->
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'ANNEX']/w:del[contains(., 'normative') or contains(., 'informative')]" mode="update1"/>
 	<!-- END XML cleaning -->
+	
+	<!-- add tag <startsection/> -->
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'ForewordTitle' or @w:val = 'IntroTitle']]" mode="update1">
+		<startsection id="{generate-id()}"/>
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="update1"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Heading1' or @w:val = 'BiblioTitle']]" mode="update1">
+		<startsection id="{generate-id()}"/>
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="update1"/>
+		</xsl:copy>
+	</xsl:template>
+
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'ANNEX']" mode="update1">
+		<startsection id="{generate-id()}"/>
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="update1"/>
+		</xsl:copy>
+	</xsl:template>
 	<!-- ==================================== -->
+	<!-- END XML update 1 -->
+	<!-- ==================================== -->
+	
+	
+	<!-- ==================================== -->
+	<!-- XML update 2 -->
+	<!-- ==================================== -->
+	<xsl:template match="@*|node()" mode="update2">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="update2"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="startsection" mode="update2">
+		<xsl:variable name="curr_id" select="@id"/>
+		<section>
+			<xsl:copy-of select="following-sibling::*[preceding-sibling::startsection[1][@id = $curr_id]][not(self::startsection)]"/>
+		</section>
+	</xsl:template>
+	
+	<xsl:template match="node()[not(self::startsection)][preceding-sibling::startsection]" mode="update2"/>
+	
+	<!-- ==================================== -->
+	<!-- END XML update 2 -->
+	<!-- ==================================== -->
+	
+	<!-- output each section into a separate file -->
+	<xsl:template match="section">
+	
+		<xsl:variable name="section_name">
+			<xsl:choose>
+				<xsl:when test="w:p[w:pPr/w:pStyle[@w:val = 'ForewordTitle']]">00-foreword</xsl:when>
+				<xsl:when test="w:p[w:pPr/w:pStyle[@w:val = 'IntroTitle']]">00-introduction</xsl:when>
+				<xsl:when test="w:p[w:pPr/w:pStyle[@w:val = 'BiblioTitle']]">99-bibliography</xsl:when>
+				<xsl:when test="w:p[w:pPr/w:pStyle[@w:val = 'Heading1']]">
+					<xsl:variable name="section_number_" select="count(preceding-sibling::section[not(w:p[w:pPr/w:pStyle[@w:val = 'ForewordTitle' or @w:val = 'IntroTitle']])]) + 1"/>
+					<xsl:variable name="section_number" select="format-number($section_number_, '00')"/>
+					<xsl:variable name="first_text_" select="normalize-space(w:p[1])"/>
+					<xsl:variable name="first_text">
+						<xsl:choose>
+							<xsl:when test="$first_text_ = 'Normative references'">normref</xsl:when>
+							<xsl:when test="contains($first_text_, ' ')"><xsl:value-of select="substring-before($first_text_, ' ')"/></xsl:when>
+							<xsl:otherwise><xsl:value-of select="$first_text_"/></xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+					<xsl:value-of select="concat($section_number,'_',java:toLowerCase(java:java.lang.String.new($first_text)))"/>
+				</xsl:when>
+				<xsl:when test="w:p[w:pPr/w:pStyle[@w:val = 'ANNEX']]">
+					<xsl:variable name="first_text_" select="java:toLowerCase(java:java.lang.String.new(normalize-space((.//*[self::w:r or self::w:ins])[1])))"/>
+					<xsl:variable name="annex_letter" select="translate(substring-after($first_text_, ' '),' ','')"/>
+					<xsl:variable name="first_text" select="translate($first_text_, ' ', '_')"/>
+					<xsl:value-of select="concat('a',$annex_letter,'-',$first_text)"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="normalize-space(w:p[1])"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+	
+		<xsl:variable name="filename" select="concat($sectionsFolder,$pathSeparator,$section_name,'.adoc')"/>
+	
+		<redirect:write file="{$docfile}">
+			<xsl:text>include::</xsl:text><xsl:value-of select="$filename"/><xsl:text>[]</xsl:text>
+			<xsl:text>&#xa;&#xa;</xsl:text>
+		</redirect:write>
+		
+		<redirect:write file="{concat($outpath,$pathSeparator,$filename)}">
+			<xsl:apply-templates />
+		</redirect:write>
+	
+	</xsl:template>
+	<!-- end 'section' -->
 	
 	<xsl:template match="w:p">
 		<xsl:apply-templates/>
@@ -125,6 +231,7 @@
 		ListNumber
 		Figurenote
 	-->
+	
 	
 	
 	<!-- ============================= -->
@@ -220,49 +327,53 @@
 		
 		<!-- <xsl:apply-templates select="$bibdata_items" mode="print_as_xml"/> -->
 		
-		<xsl:text>:docnumber: </xsl:text><xsl:value-of select="$bibdata_items//item[@name = 'docnumber']"/>
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>:date: </xsl:text><xsl:value-of select="$bibdata_items//item[@name = 'date']"/>
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>:copyright-year: </xsl:text><xsl:value-of select="substring($bibdata_items//item[@name = 'date'],1,4)"/>
-		<xsl:text>&#xa;</xsl:text>
+		<redirect:write file="{$docfile}">
 		
-		<xsl:text>:title-main-en: </xsl:text><xsl:value-of select="$bibdata_items//item[@name = 'title-main-en']"/>
-		<xsl:text>&#xa;</xsl:text>
-		
-		
-		<xsl:for-each select="$bibdata_items//item[not(@name = 'docnumber' or @name = 'date' or @name = 'title-main-en')]">
-			<xsl:choose>
-				<xsl:when test="@name = 'tc' and (@key = 'TC' or @key = 'WG')">
-					<xsl:choose>
-						<xsl:when test="@key = 'TC'">
-							<xsl:text>:technical-committee-number: </xsl:text><xsl:value-of select="."/>
-						</xsl:when>
-						<xsl:when test="@key = 'WG'">
-							<xsl:text>:workgroup-type: WG</xsl:text>
-							<xsl:text>&#xa;</xsl:text>
-							<xsl:text>:workgroup-number: </xsl:text><xsl:value-of select="."/>
-						</xsl:when>
-					</xsl:choose>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:text>:</xsl:text><xsl:value-of select="@name"/><xsl:text>: </xsl:text><xsl:value-of select="."/>
-				</xsl:otherwise>
-			</xsl:choose>
+			<xsl:text>:docnumber: </xsl:text><xsl:value-of select="$bibdata_items//item[@name = 'docnumber']"/>
 			<xsl:text>&#xa;</xsl:text>
-		</xsl:for-each>
+			<xsl:text>:date: </xsl:text><xsl:value-of select="$bibdata_items//item[@name = 'date']"/>
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:text>:copyright-year: </xsl:text><xsl:value-of select="substring($bibdata_items//item[@name = 'date'],1,4)"/>
+			<xsl:text>&#xa;</xsl:text>
+			
+			<xsl:text>:title-main-en: </xsl:text><xsl:value-of select="$bibdata_items//item[@name = 'title-main-en']"/>
+			<xsl:text>&#xa;</xsl:text>
+			
+			
+			<xsl:for-each select="$bibdata_items//item[not(@name = 'docnumber' or @name = 'date' or @name = 'title-main-en')]">
+				<xsl:choose>
+					<xsl:when test="@name = 'tc' and (@key = 'TC' or @key = 'WG')">
+						<xsl:choose>
+							<xsl:when test="@key = 'TC'">
+								<xsl:text>:technical-committee-number: </xsl:text><xsl:value-of select="."/>
+							</xsl:when>
+							<xsl:when test="@key = 'WG'">
+								<xsl:text>:workgroup-type: WG</xsl:text>
+								<xsl:text>&#xa;</xsl:text>
+								<xsl:text>:workgroup-number: </xsl:text><xsl:value-of select="."/>
+							</xsl:when>
+						</xsl:choose>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:text>:</xsl:text><xsl:value-of select="@name"/><xsl:text>: </xsl:text><xsl:value-of select="."/>
+					</xsl:otherwise>
+				</xsl:choose>
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:for-each>
+			
+			
+			<xsl:text>:mn-document-class: iso</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:text>:mn-output-extensions: xml,html,doc,pdf,rxl</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:text>:local-cache-only:</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:text>:data-uri-image:</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:text>:imagesdir: images</xsl:text>
+			<xsl:text>&#xa;&#xa;</xsl:text>
 		
-		
-		<xsl:text>:mn-document-class: iso</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>:mn-output-extensions: xml,html,doc,pdf,rxl</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>:local-cache-only:</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>:data-uri-image:</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>:imagesdir: images</xsl:text>
-		<xsl:text>&#xa;&#xa;</xsl:text>
+		</redirect:write>
 		
 	</xsl:template>
 	
