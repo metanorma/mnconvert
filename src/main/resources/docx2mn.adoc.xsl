@@ -98,6 +98,10 @@
 	
 	<!-- remove deleted 'obligation' for Annex -->
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'ANNEX']/w:del[contains(., 'normative') or contains(., 'informative')]" mode="update1"/>
+	
+	<!-- remove Standard title before Scope -->
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzSTDTitle']" mode="update1"/>
+	
 	<!-- END XML cleaning -->
 	
 	<!-- add tag <startsection/> -->
@@ -230,6 +234,7 @@
 		ListContinue
 		ListNumber
 		Figurenote
+		zzSTDTitle
 	-->
 	
 	
