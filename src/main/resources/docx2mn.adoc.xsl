@@ -530,7 +530,7 @@
 	<!-- ============================= -->
 	<!-- Note processing -->
 	<!-- ============================= -->
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Note' or w:pPr/w:pStyle/@w:val = 'Figurenote']">
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'note']"> <!--  or w:pPr/w:pStyle/@w:val = 'Figurenote' -->
 		<xsl:text>NOTE: </xsl:text>
 		<xsl:variable name="text">
 			<xsl:apply-templates/>
