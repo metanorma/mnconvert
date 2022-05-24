@@ -168,7 +168,7 @@
 				<xsl:when test="w:p[w:pPr/w:pStyle[@w:val = 'Heading1']]">
 					<xsl:variable name="section_number_" select="count(preceding-sibling::section[not(w:p[w:pPr/w:pStyle[@w:val = 'ForewordTitle' or @w:val = 'IntroTitle']])]) + 1"/>
 					<xsl:variable name="section_number" select="format-number($section_number_, '00')"/>
-					<xsl:variable name="first_text_" select="normalize-space(w:p[1])"/>
+					<xsl:variable name="first_text_" select="java:replaceAll(java:java.lang.String.new(normalize-space(w:p[1])),'^\d*(.*)','$1')"/> <!-- remove digits at start -->
 					<xsl:variable name="first_text">
 						<xsl:choose>
 							<xsl:when test="$first_text_ = 'Normative references'">normref</xsl:when>
@@ -264,7 +264,7 @@
 	<!-- END 1st level section's titles processing -->
 	<!-- ============================= -->
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Heading1' or @w:val = 'Heading2' or @w:val = 'Heading3' or @w:val = 'Heading4' or @w:val = 'Heading5' or @w:val = 'Heading6' or @w:val = 'BiblioTitle']]">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Heading1' or @w:val = 'Heading2' or @w:val = 'Heading3' or @w:val = 'Heading4' or @w:val = 'Heading5' or @w:val = 'Heading6' or @w:val = 'Heading7' or @w:val = 'BiblioTitle']]">
 	
 		<xsl:variable name="text">
 			<xsl:apply-templates/>
@@ -284,12 +284,25 @@
 			</xsl:choose>
 		</xsl:variable>
 		
-		<xsl:call-template name="repeat">
-			<xsl:with-param name="count" select="$level + 1"/>
-		</xsl:call-template>
+		<xsl:choose>
+			<xsl:when test="$level &lt;= 5">
+				<xsl:call-template name="repeat">
+					<xsl:with-param name="count" select="$level + 1"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise> <!-- more 5 -->
+				<!-- [level=n] -->
+				<xsl:text>[level=</xsl:text><xsl:value-of select="$level"/><xsl:text>]</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:call-template name="repeat">
+					<xsl:with-param name="count" select="6"/>
+				</xsl:call-template>
+			</xsl:otherwise>
+		</xsl:choose>
+		
 		<xsl:text> </xsl:text>
 		
-		<xsl:value-of select="$text"/>
+		<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(normalize-space($text)),'^(\d(\.\d)*)*(.*)','$3'))"/> <!-- remove digits (or digit(.digit)+) at start -->
 		
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
