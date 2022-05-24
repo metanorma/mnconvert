@@ -248,6 +248,11 @@
 		ListNumber
 		Figurenote
 		zzSTDTitle
+		FigureTitle
+		AnnexFigureTitle
+		AltTerms
+		DeprecatedTerms
+		Definition
 	-->
 	
 	
@@ -441,6 +446,9 @@
 	<!-- ============================= -->
 	
 	
+	<!-- ============================= -->
+	<!-- Terms processing -->
+	<!-- ============================= -->
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Terms']">
 	
 		<!-- determine level -->
@@ -461,8 +469,63 @@
 		
 		<xsl:apply-templates/>
 		
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:if test="following-sibling::w:p[1][not(w:pPr/w:pStyle/@w:val = 'AltTerms' or w:pPr/w:pStyle/@w:val = 'DeprecatedTerms')]">
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'AltTerms']">
+		<xsl:text>alt:[</xsl:text>
+		<xsl:apply-templates/>
+		<xsl:text>]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:if test="following-sibling::w:p[1][not(w:pPr/w:pStyle/@w:val = 'AltTerms' or w:pPr/w:pStyle/@w:val = 'DeprecatedTerms')]">
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'DeprecatedTerms']">
+		<xsl:variable name="text">
+			<xsl:apply-templates/>
+		</xsl:variable>
+		<xsl:text>deprecated:[</xsl:text>
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),'^DEPRECATED:(\s|\h)+(.*)','$2')"/>
+		<xsl:text>]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:if test="following-sibling::w:p[1][not(w:pPr/w:pStyle/@w:val = 'AltTerms' or w:pPr/w:pStyle/@w:val = 'DeprecatedTerms')]">
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Definition']">
+		<xsl:variable name="text">
+			<xsl:apply-templates />
+		</xsl:variable>
+		
+		<xsl:variable name="regex_domain">^(&lt;(.*)&gt;)?(\s|\h)*(.*)</xsl:variable>
+		
+		<xsl:variable name="domain" select="normalize-space(java:replaceAll(java:java.lang.String.new($text), $regex_domain, '$2'))"/>
+		
+		<xsl:variable name="definition" select="java:replaceAll(java:java.lang.String.new($text), $regex_domain, '$4')"/>
+		
+		<xsl:if test="$domain != ''">
+			<xsl:text>domain:[</xsl:text>
+			<xsl:value-of select="$domain"/>
+			<xsl:text>]</xsl:text>
+			<xsl:text>&#xa;&#xa;</xsl:text>
+		</xsl:if>
+		
+		<xsl:value-of select="$definition"/>
+		
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
+	
+	<!-- ============================= -->
+	<!-- END Terms processing -->
+	<!-- ============================= -->
+	
+	
 	
 	<!-- ============================= -->
 	<!-- Note processing -->
