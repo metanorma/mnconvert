@@ -19,6 +19,11 @@
 	
 	<xsl:param name="debug">false</xsl:param>
 	
+	<xsl:param name="docfile_name">document</xsl:param> <!-- Example: iso-tc154-8601-1-en , or document -->
+	
+	<xsl:param name="docfile_ext">adoc</xsl:param>
+	
+	
 	<xsl:param name="pathSeparator" select="'/'"/>
 	
 	<xsl:param name="outpath"/>
@@ -32,7 +37,7 @@
 	<xsl:param name="rels"/>
 	
 	
-	<xsl:variable name="docfile" select="concat($outpath,$pathSeparator,'document.adoc')"/>
+	<xsl:variable name="docfile" select="concat($outpath,$pathSeparator,$docfile_name, '.', $docfile_ext)"/>
 	<xsl:variable name="sectionsFolder">sections</xsl:variable>
 	
 	<xsl:variable name="rels_xml_">
@@ -174,10 +179,19 @@
 					<xsl:value-of select="concat($section_number,'_',java:toLowerCase(java:java.lang.String.new($first_text)))"/>
 				</xsl:when>
 				<xsl:when test="w:p[w:pPr/w:pStyle[@w:val = 'ANNEX']]">
-					<xsl:variable name="first_text_" select="java:toLowerCase(java:java.lang.String.new(normalize-space((.//*[self::w:r or self::w:ins])[1])))"/>
+					<!-- <xsl:variable name="first_text_" select="java:toLowerCase(java:java.lang.String.new(normalize-space((.//*[self::w:r or self::w:ins])[1])))"/>
 					<xsl:variable name="annex_letter" select="translate(substring-after($first_text_, ' '),' ','')"/>
 					<xsl:variable name="first_text" select="translate($first_text_, ' ', '_')"/>
-					<xsl:value-of select="concat('a',$annex_letter,'-',$first_text)"/>
+					<xsl:value-of select="concat('a',$annex_letter,'-',$first_text)"/> -->
+					
+					<!-- Annex letter generation -->
+					<xsl:variable name="alphabet" select="'abcdefghijklmnopqrstuvwxyz'"/>
+					<xsl:variable name="annex_number" select="count(preceding-sibling::section/w:p[w:pPr/w:pStyle[@w:val = 'ANNEX']]) + 1"/>
+					<xsl:variable name="addon" select="format-number($annex_number div 26,'0')"/>
+					<xsl:variable name="addon_letter" select="substring($alphabet, $addon, 1)"/>
+					<xsl:variable name="annex_letter" select="concat($addon_letter, substring($alphabet, $annex_number mod 26, 1))"/>
+					
+					<xsl:value-of select="concat('a',$annex_letter,'-annex-',$annex_letter)"/>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:value-of select="normalize-space(w:p[1])"/>
@@ -218,6 +232,7 @@
 		Heading4
 		Heading5
 		Heading6
+		Heading7
 		TermNum
 		Terms
 		Note
@@ -227,9 +242,7 @@
 		Tablebody0
 		zzCopyright
 		zzContents
-		TOC1
-		TOC2
-		TOC3
+		TOCx
 		zzCover
 		ListContinue
 		ListNumber
@@ -407,9 +420,7 @@
 	
 	
 	<!-- skip ToC items text -->
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'TOC1']"/>
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'TOC2']"/>
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'TOC3']"/>
+	<xsl:template match="w:p[starts-with(w:pPr/w:pStyle/@w:val, 'TOC')]"/>
 	
 	
 	<!-- ============================= -->
@@ -1058,7 +1069,8 @@
 		<!-- [[AnnexA]] -->
 		<!-- Example [appendix,obligation=normative] -->
 		
-		<xsl:variable name="id" select="translate((.//w:t)[1],' ','')"/>
+		<!-- <xsl:variable name="id" select="translate((.//w:t)[1],' ','')"/> -->
+		<xsl:variable name="id" select="translate(w:bookmarkStart/@w:name,' ','')"/>
 		<xsl:text>[[</xsl:text>
 		<xsl:value-of select="$id"/>
 		<xsl:text>]]</xsl:text>
@@ -1080,8 +1092,8 @@
 		<xsl:text>&#xa;</xsl:text>
 		
 		<xsl:text>== </xsl:text>
-		
 		<xsl:apply-templates select="(.//w:t)[position() &gt; 2]"/>
+		
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		
