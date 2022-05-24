@@ -432,6 +432,7 @@
 	
 	<!-- skip copyright information text -->
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCopyright']"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzaddress']"/>
 	
 	<!-- skip 'Contents' title -->
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzContents']"/>
