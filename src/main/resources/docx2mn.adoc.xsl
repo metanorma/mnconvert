@@ -185,12 +185,12 @@
 			</xsl:choose>
 		</xsl:variable>
 	
-		<xsl:variable name="filename" select="concat($sectionsFolder,$pathSeparator,$section_name,'.adoc')"/>
-	
 		<redirect:write file="{$docfile}">
-			<xsl:text>include::</xsl:text><xsl:value-of select="$filename"/><xsl:text>[]</xsl:text>
+			<xsl:text>include::</xsl:text><xsl:value-of select="concat($sectionsFolder,'/',$section_name,'.adoc')"/><xsl:text>[]</xsl:text>
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</redirect:write>
+		
+		<xsl:variable name="filename" select="concat($sectionsFolder,$pathSeparator,$section_name,'.adoc')"/>
 		
 		<redirect:write file="{concat($outpath,$pathSeparator,$filename)}">
 			<xsl:apply-templates />
@@ -330,9 +330,10 @@
 		</xsl:variable>
 		<xsl:variable name="bibdata_items" select="xalan:nodeset($bibdata_items_)"/>
 		
-		<!-- <xsl:apply-templates select="$bibdata_items" mode="print_as_xml"/> -->
-		
 		<redirect:write file="{$docfile}">
+			
+			<!-- DEBUG:
+			<xsl:apply-templates select="$bibdata_items" mode="print_as_xml"/> -->
 		
 			<xsl:text>:docnumber: </xsl:text><xsl:value-of select="$bibdata_items//item[@name = 'docnumber']"/>
 			<xsl:text>&#xa;</xsl:text>
@@ -341,7 +342,7 @@
 			<xsl:text>:copyright-year: </xsl:text><xsl:value-of select="substring($bibdata_items//item[@name = 'date'],1,4)"/>
 			<xsl:text>&#xa;</xsl:text>
 			
-			<xsl:text>:title-main-en: </xsl:text><xsl:value-of select="$bibdata_items//item[@name = 'title-main-en']"/>
+			<xsl:text>:title-main-en: </xsl:text><xsl:value-of select="$bibdata_items//item[@name = 'title-main-en'][last()]"/>
 			<xsl:text>&#xa;</xsl:text>
 			
 			

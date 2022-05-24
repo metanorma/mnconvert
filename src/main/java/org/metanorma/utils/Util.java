@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -328,7 +329,7 @@ public class Util {
                             total -= read;
                         }
                         
-                        strResult = new String(bytes);
+                        strResult = new String(bytes, StandardCharsets.UTF_8);
                         break;
                     }
                 }
