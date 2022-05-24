@@ -903,31 +903,22 @@
 	<!-- ============================= -->
 	<!-- Figure processing -->
 	<!-- ============================= -->
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'FigureGraphic']">
 	
-		<xsl:apply-templates select="following-sibling::w:p[w:pPr/w:pStyle/@w:val = 'Figuretitle0'][1]">
+	<xsl:template match="w:p[w:r/w:drawing]">
+		
+		<xsl:apply-templates select="following-sibling::w:p[w:pPr/w:pStyle/@w:val = 'FigureTitle' or w:pPr/w:pStyle/@w:val = 'AnnexFigureTitle'][1]">
 			<xsl:with-param name="process">true</xsl:with-param>
 		</xsl:apply-templates>
 		
-		<!--
-		<xsl:text>====</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
-		-->
-		
 		<xsl:apply-templates />
-	
-		<!--
-		<xsl:text>====</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
-		-->
-		<xsl:text>&#xa;</xsl:text>
-	
-	</xsl:template>
 		
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
 	<xsl:variable name="em_dash">—</xsl:variable>
 	<xsl:variable name="en_dash">–</xsl:variable>
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Figuretitle0']">
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'FigureTitle' or w:pPr/w:pStyle/@w:val = 'AnnexFigureTitle']">
 		<xsl:param name="process">false</xsl:param>
 		<xsl:if test="$process = 'true'">
 			<xsl:text>.</xsl:text>
