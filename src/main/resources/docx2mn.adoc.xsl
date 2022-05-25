@@ -36,7 +36,9 @@
 	<xsl:param name="rels_file"/>
 	<!-- or Nodes (programmatically called from mn2convert) -->
 	<xsl:param name="rels"/>
-	
+
+	<xsl:variable name="em_dash">—</xsl:variable>
+	<xsl:variable name="en_dash">–</xsl:variable>
 	
 	<xsl:variable name="docfile" select="concat($outpath,$pathSeparator,$docfile_name, '.', $docfile_ext)"/>
 	<xsl:variable name="sectionsFolder">sections</xsl:variable>
@@ -255,6 +257,7 @@
 		DeprecatedTerms
 		Definition
 		Formula
+		tabletitle
 	-->
 	
 	
@@ -603,9 +606,25 @@
 	<!-- Table processing -->
 	<!-- ============================= -->
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Tabletitle']">
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Tabletitle' or w:pPr/w:pStyle/@w:val = 'tabletitle']">
 		<xsl:text>.</xsl:text>
-		<xsl:apply-templates/>
+		
+		<xsl:variable name="title">
+			<xsl:apply-templates/>
+		</xsl:variable>
+		
+		<xsl:choose>
+			<xsl:when test="contains($title, $em_dash)">
+				<xsl:value-of select="normalize-space(substring-after($title, $em_dash))"/>
+			</xsl:when>
+			<xsl:when test="contains($title, $en_dash)">
+				<xsl:value-of select="normalize-space(substring-after($title, $en_dash))"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$title"/>
+			</xsl:otherwise>
+		</xsl:choose>
+		
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
@@ -981,8 +1000,7 @@
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
-	<xsl:variable name="em_dash">—</xsl:variable>
-	<xsl:variable name="en_dash">–</xsl:variable>
+	
 	
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'FigureTitle' or w:pPr/w:pStyle/@w:val = 'AnnexFigureTitle']">
 		<xsl:param name="process">false</xsl:param>
