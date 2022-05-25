@@ -606,7 +606,7 @@
 	<!-- Table processing -->
 	<!-- ============================= -->
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Tabletitle' or w:pPr/w:pStyle/@w:val = 'tabletitle']">
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Tabletitle' or w:pPr/w:pStyle/@w:val = 'tabletitle' or w:pPr/w:pStyle/@w:val = 'AnnexTableTitle']">
 		<xsl:text>.</xsl:text>
 		
 		<xsl:variable name="title">
