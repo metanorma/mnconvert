@@ -5,6 +5,7 @@
 					xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
 					xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
 					xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"
+					xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"
 					xmlns:mml="http://www.w3.org/1998/Math/MathML" 
 					xmlns:xlink="http://www.w3.org/1999/xlink" 
 					xmlns:xalan="http://xml.apache.org/xalan" 
@@ -253,6 +254,7 @@
 		AltTerms
 		DeprecatedTerms
 		Definition
+		Formula
 	-->
 	
 	
@@ -1021,6 +1023,87 @@
 	<!-- END Figure processing -->
 	<!-- ============================= -->
 	
+	<!-- ============================= -->
+	<!-- Formula processing -->
+	<!-- ============================= -->
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Formula']/m:oMath">
+		
+		<!-- last 'w:r' is formula number -->
+		<!-- Example:
+		<w:r>
+			<w:rPr>
+				<w:lang w:eastAsia="en-US"/>
+			</w:rPr>
+			<w:tab/>
+			<w:t>(A.1)</w:t>
+		</w:r>
+		-->
+		<xsl:variable name="numbered" select="normalize-space(../w:r[last()] != '' and translate(../w:r[last()],'().0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ','') = '')"/>
+		
+		<xsl:text>[stem</xsl:text>
+		<xsl:if test="$numbered = 'false'">
+			<xsl:text>%unnumbered</xsl:text>
+		</xsl:if>
+		<xsl:text>]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>++++</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:variable name="text">
+			<xsl:apply-templates />
+		</xsl:variable>
+		<xsl:value-of select="$text"/>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>++++</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Formula']/w:r[last()]">
+		<!-- if number for formula -->
+		<xsl:variable name="numbered" select="normalize-space(. != '' and translate(.,'().0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ','') = '')"/>
+		<xsl:if test="$numbered = 'false'">
+			<xsl:apply-templates />
+		</xsl:if>
+	</xsl:template>
+	
+	<!-- inlined math -->
+	<xsl:template match="m:oMath[not(ancestor::w:p[w:pPr/w:pStyle/@w:val = 'Formula'])]">
+	
+		<xsl:variable name="text">
+			<xsl:apply-templates />
+		</xsl:variable>
+		<xsl:text>stem:[</xsl:text>
+		<xsl:value-of select="$text"/>
+		<xsl:text>]</xsl:text>
+		
+		<!-- add space after stem -->
+		<xsl:if test="java:org.metanorma.utils.RegExHelper.matches('.*(\s|\h)$', $text) = 'true'"><xsl:text> </xsl:text></xsl:if>
+		
+	</xsl:template>
+	
+	<xsl:template match="m:oMathPara">
+		<xsl:choose>
+			<xsl:when test="ancestor::w:tc">
+				<xsl:if test="preceding-sibling::*[not(self::w:pPr)]">
+					<xsl:text> +</xsl:text>
+					<xsl:text>&#xa;</xsl:text>
+				</xsl:if>
+				<xsl:apply-templates/>
+				<xsl:if test="following-sibling::*">
+					<xsl:text> +</xsl:text>
+					<xsl:text>&#xa;</xsl:text>
+				</xsl:if>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:apply-templates/>
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<!-- ============================= -->
+	<!-- END Formula processing -->
+	<!-- ============================= -->
 	
 	<!-- ============================= -->
 	<!-- Bibliography entry processing -->
