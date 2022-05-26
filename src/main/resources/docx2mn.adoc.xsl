@@ -258,6 +258,7 @@
 		Definition
 		Formula
 		tabletitle
+		AdmittedTerm
 	-->
 	
 	
@@ -563,17 +564,17 @@
 		<xsl:apply-templates/>
 		
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:if test="following-sibling::w:p[1][not(w:pPr/w:pStyle/@w:val = 'AltTerms' or w:pPr/w:pStyle/@w:val = 'DeprecatedTerms')]">
+		<xsl:if test="following-sibling::w:p[1][not(w:pPr/w:pStyle[@w:val = 'AltTerms' or @w:val = 'AdmittedTerm' or @w:val = 'DeprecatedTerms'])]">
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 	</xsl:template>
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'AltTerms']">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'AltTerms' or @w:val = 'AdmittedTerm']]">
 		<xsl:text>alt:[</xsl:text>
 		<xsl:apply-templates/>
 		<xsl:text>]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:if test="following-sibling::w:p[1][not(w:pPr/w:pStyle/@w:val = 'AltTerms' or w:pPr/w:pStyle/@w:val = 'DeprecatedTerms')]">
+		<xsl:if test="following-sibling::w:p[1][not(w:pPr/w:pStyle[@w:val = 'AltTerms' or @w:val = 'AdmittedTerm' or @w:val = 'DeprecatedTerms'])]">
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 	</xsl:template>
@@ -586,7 +587,7 @@
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),'^DEPRECATED:(\s|\h)+(.*)','$2')"/>
 		<xsl:text>]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:if test="following-sibling::w:p[1][not(w:pPr/w:pStyle/@w:val = 'AltTerms' or w:pPr/w:pStyle/@w:val = 'DeprecatedTerms')]">
+		<xsl:if test="following-sibling::w:p[1][not(w:pPr/w:pStyle[@w:val = 'AltTerms' or @w:val = 'AdmittedTerm' or @w:val = 'DeprecatedTerms'])]">
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 	</xsl:template>
