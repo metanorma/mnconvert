@@ -261,6 +261,7 @@
 		AdmittedTerm
 		Note
 		Figuretitle0
+		Code
 	-->
 	
 	
@@ -1211,6 +1212,28 @@
 	
 	<!-- ============================= -->
 	<!-- END Formula processing -->
+	<!-- ============================= -->
+	
+	
+	<!-- ============================= -->
+	<!-- Source code processing -->
+	<!-- ============================= -->
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Code']]">
+		<xsl:text>[source]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>--</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:apply-templates />
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>--</xsl:text>
+		<xsl:text>&#xa;&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Code']]//w:br">
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	<!-- ============================= -->
+	<!-- END Source code processing -->
 	<!-- ============================= -->
 	
 	<!-- ============================= -->
