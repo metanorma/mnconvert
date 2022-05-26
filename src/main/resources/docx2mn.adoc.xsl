@@ -238,7 +238,7 @@
 		Heading7
 		TermNum
 		Terms
-		Note
+		note
 		Example
 		Source
 		Tabletitle
@@ -259,6 +259,8 @@
 		Formula
 		tabletitle
 		AdmittedTerm
+		Note
+		Figuretitle0
 	-->
 	
 	
@@ -624,7 +626,7 @@
 	<!-- ============================= -->
 	<!-- Note processing -->
 	<!-- ============================= -->
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'note']"> <!--  or w:pPr/w:pStyle/@w:val = 'Figurenote' -->
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'note' or @w:val = 'Note' or @w:val = 'Figurenote']]">
 		<xsl:text>NOTE: </xsl:text>
 		<xsl:variable name="text">
 			<xsl:apply-templates/>
@@ -661,7 +663,7 @@
 	<!-- ============================= -->
 	<!-- Term's source processing -->
 	<!-- ============================= -->
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Source']">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Source']]">
 		<xsl:text>[.source]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&lt;&lt;</xsl:text>
@@ -1079,7 +1081,7 @@
 	
 	<xsl:template match="w:p[w:r/w:drawing]">
 		
-		<xsl:apply-templates select="following-sibling::w:p[w:pPr/w:pStyle/@w:val = 'FigureTitle' or w:pPr/w:pStyle/@w:val = 'AnnexFigureTitle'][1]">
+		<xsl:apply-templates select="following-sibling::w:p[w:pPr/w:pStyle[@w:val = 'FigureTitle' or @w:val = 'Figuretitle0' or @w:val = 'AnnexFigureTitle']][1]">
 			<xsl:with-param name="process">true</xsl:with-param>
 		</xsl:apply-templates>
 		
@@ -1090,7 +1092,7 @@
 	
 	
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'FigureTitle' or w:pPr/w:pStyle/@w:val = 'AnnexFigureTitle']">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'FigureTitle' or @w:val = 'Figuretitle0' or @w:val = 'AnnexFigureTitle']]">
 		<xsl:param name="process">false</xsl:param>
 		<xsl:if test="$process = 'true'">
 			<xsl:text>.</xsl:text>
