@@ -102,7 +102,7 @@
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCover']/w:del" mode="update1"/>
 	
 	<!-- remove deleted items in the Normative References and Bibliography -->
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'BiblioEntry0' or w:pPr/w:pStyle/@w:val = 'RefNorm']/w:del" mode="update1"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm']]/w:del" mode="update1"/>
 	
 	<!-- remove deleted 'obligation' for Annex -->
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'ANNEX']/w:del[contains(., 'normative') or contains(., 'informative')]" mode="update1"/>
@@ -262,6 +262,8 @@
 		Note
 		Figuretitle0
 		Code
+		BiblioEntry0
+		BiblioEntry
 	-->
 	
 	
@@ -1242,7 +1244,7 @@
 	
 	<!-- style RefNorm is using for Normative References,
 		style BiblioEntry0 is using for bibliography -->
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'BiblioEntry0' or w:pPr/w:pStyle/@w:val = 'RefNorm']">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm']]">
 		
 		<xsl:variable name="bib_style" select="w:pPr/w:pStyle/@w:val"/>
 		
@@ -1254,7 +1256,7 @@
 		<xsl:variable name="bibitem" select="xalan:nodeset($bibitem_)"/>
 		
 		<!-- DEBUG:
-		<xsl:apply-templates select="xalan:nodeset($bibitem_)" mode="print_as_xml"/>
+		<xsl:apply-templates select="$bibitem" mode="print_as_xml"/>
 		<xsl:text>&#xa;</xsl:text> -->
 		
 		
@@ -1265,7 +1267,7 @@
 				<xsl:when test="$bibitem/stdpublisher or $bibitem/stddocNumber"> <!-- if 'standard' bibitem -->
 					
 					<xsl:variable name="id_">
-						<xsl:for-each select="$bibitem/node()[not(local-name() = 'bibnumber' or local-name() = 'stddocTitle')]">
+						<xsl:for-each select="$bibitem/node()[not(local-name() = 'bibnumber' or local-name() = 'stddocTitle') or following-sibling::*[self::w:tab]]">
 							<xsl:value-of select="translate(.,'&#xa0;[],',' ')"/> <!-- replace a0 to space, remove [, ] and comman -->
 						</xsl:for-each>
 					</xsl:variable>
@@ -1296,7 +1298,7 @@
 				<xsl:otherwise>
 					<xsl:text>[[[</xsl:text>
 						<xsl:choose>
-							<xsl:when test="$bib_style = 'BiblioEntry0'"><xsl:text>bibref</xsl:text></xsl:when>
+							<xsl:when test="$bib_style = 'BiblioEntry0' or $bib_style = 'BiblioEntry'"><xsl:text>bibref</xsl:text></xsl:when>
 							<xsl:otherwise>ref</xsl:otherwise>
 						</xsl:choose>
 						
@@ -1306,8 +1308,8 @@
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:choose>
-									<xsl:when test="$bib_style = 'BiblioEntry0'">
-										<xsl:number count="w:p[w:pPr/w:pStyle/@w:val = 'BiblioEntry0']"/>
+									<xsl:when test="$bib_style = 'BiblioEntry0' or $bib_style = 'BiblioEntry'">
+										<xsl:number count="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry']]"/>
 									</xsl:when>
 									<xsl:otherwise>
 										<xsl:number count="w:p[w:pPr/w:pStyle/@w:val = 'RefNorm']"/>
@@ -1331,8 +1333,10 @@
 		</xsl:if>
 	</xsl:template>
 	
+	<!-- skip bibliography number -->
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm']]/w:r[1][following-sibling::*[1][w:tab]]"/>
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'BiblioEntry0' or w:pPr/w:pStyle/@w:val = 'RefNorm']//w:r[w:rPr/w:rStyle]/*[self::w:t or self::w:insText or self::w:delText]">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm']]//w:r[w:rPr/w:rStyle]/*[self::w:t or self::w:insText or self::w:delText]">
 		<xsl:variable name="style" select="ancestor::w:r[1]/w:rPr/w:rStyle/@w:val"/>
 		<xsl:element name="{$style}">
 			<xsl:apply-templates/>
