@@ -322,25 +322,90 @@
 	<!-- ============================= -->
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCover'][1]" priority="2">
 		<!-- parsing strings -->
-		<xsl:variable name="regex_iso_tc">^ISO(\s|\h)+(TC(\s|\h)+\d+/WG(\s|\h)+\d+)$</xsl:variable>
+		
+		<!-- Example: Reference number of working document: 17301 -->
+		<xsl:variable name="regex_docnumber">^Reference number of working document:(\s|\h)*(.*)</xsl:variable>
+		
+		<!-- Example: Date: 2016-05-01 -->
+		<xsl:variable name="regex_revdate">^Date:(\s|\h)*(.*)</xsl:variable> <!-- \d{4}-\d{2}-\d{2}$ -->
+		
+		<!-- Example: Committee identification: ISO/TC 34/SC 4  -->
+		<xsl:variable name="regex_committee">^Committee identification:(\s|\h)*(.*)</xsl:variable>
+		<xsl:variable name="regex_iso_tc">^ISO(/IEC)?(\s|\h|/)+(.*)</xsl:variable>
+		
+		<!-- Example: Secretariat: SAC  -->
+		<xsl:variable name="regex_secretariat">^Secretariat:(\s|\h)*(.*)</xsl:variable>
+		
+		
+		<xsl:variable name="regex_iso_tc2">^ISO(/IEC)?(\s|\h|/)+(TC(\s|\h)+\d+/WG(\s|\h)+\d+)$</xsl:variable>
+		
 		<xsl:variable name="regex_tc_keyvalue">^(.+)(\s|\h)+(.+)$</xsl:variable>
 		<xsl:variable name="regex_iso_number">^ISO(/IEC)?(\s|\h)+(\d+.*)</xsl:variable>
-		<xsl:variable name="regex_date">^Date:(\s|\h)?(.*)</xsl:variable> <!-- \d{4}-\d{2}-\d{2}$ -->
+		
 		
 		<xsl:variable name="bibdata_items_">
 			<xsl:for-each select="//w:p[w:pPr/w:pStyle/@w:val = 'zzCover']">
 				<xsl:variable name="text">
-					<xsl:apply-templates select="w:r/w:t | w:ins/w:r/w:t"/>
+					<xsl:apply-templates select=".//w:t"/> <!--  | w:ins/w:r/w:t -->
 				</xsl:variable>
 				<xsl:choose>
-					<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_iso_tc, normalize-space(.)) = 'true'">
+					<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_docnumber, normalize-space(.)) = 'true'">
+						<item name="docnumber"><xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),$regex_docnumber,'$2')"/></item>
+					</xsl:when>
+					<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_revdate, normalize-space(.)) = 'true'">
+						<item name="revdate"><xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),$regex_revdate,'$2')"/></item>
+					</xsl:when>
+					<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_committee, normalize-space(.)) = 'true'">
+						
+						<xsl:variable name="tc" select="java:replaceAll(java:java.lang.String.new(.),$regex_iso_tc,'$3')"/>
+						<!-- tc=<xsl:value-of select="$tc"/> -->
+						<xsl:variable name="tc_parts">
+							<xsl:call-template name="split">
+								<xsl:with-param name="pText" select="$tc"/>
+							</xsl:call-template>
+						</xsl:variable>
+						<xsl:variable name="tc_components">
+							<xsl:for-each select="xalan:nodeset($tc_parts)//item">
+								<item name="tc">
+									<xsl:attribute name="key">
+										<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regex_tc_keyvalue,'$1')"/>
+									</xsl:attribute>
+									<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regex_tc_keyvalue,'$3')"/>
+								</item>
+							</xsl:for-each>
+						</xsl:variable>
+						<xsl:for-each select="xalan:nodeset($tc_components)//item">
+							<xsl:choose>
+								<xsl:when test="@key = 'TC'">
+									<item name="technical-committee-number"><xsl:value-of select="."/></item>
+								</xsl:when>
+								<xsl:when test="@key = 'SC'">
+									<item name="subcommittee-number"><xsl:value-of select="."/></item>
+								</xsl:when>
+								<xsl:when test="@key = 'WG'">
+									<item name="workgroup-type">WG</item>
+									<item name="workgroup-number"><xsl:value-of select="."/></item>
+								</xsl:when>
+							</xsl:choose>
+						</xsl:for-each>
+						
+						<!-- <item name="committee">
+							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),$regex_committee,'$2')"/>
+						</item> -->
+					</xsl:when>
+					<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_secretariat, normalize-space(.)) = 'true'">
+						<item name="secretariat"><xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),$regex_secretariat,'$2')"/></item>
+					</xsl:when>
+					
+					<xsl:when test="starts-with(., 'Reference number of project')"><!-- skip --></xsl:when>
+					
+					<!-- <xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_iso_tc2, normalize-space(.)) = 'true'">
 						<xsl:variable name="tc" select="java:replaceAll(java:java.lang.String.new($text),$regex_iso_tc,'$2')"/>
 						<xsl:variable name="tc_components">
 							<xsl:call-template name="split">
 								<xsl:with-param name="pText" select="$tc"/>
 							</xsl:call-template>
 						</xsl:variable>
-						<!-- <xsl:copy-of select="$tc_components"/> -->
 						<xsl:for-each select="xalan:nodeset($tc_components)//item">
 							<item name="tc">
 								<xsl:attribute name="key">
@@ -349,16 +414,51 @@
 								<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regex_tc_keyvalue,'$3')"/>
 							</item>
 						</xsl:for-each>
-					</xsl:when>
-					<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_iso_number, normalize-space(.)) = 'true'">
+					</xsl:when> -->
+					<!-- <xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_iso_number, normalize-space(.)) = 'true'">
 						<item name="docnumber"><xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),$regex_iso_number,'$3')"/></item>
-					</xsl:when>
-					<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_date, normalize-space(.)) = 'true'">
-						<item name="date"><xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),$regex_date,'$2')"/></item>
-					</xsl:when>
+					</xsl:when> -->
+					
 					<xsl:otherwise>
 						<xsl:if test="normalize-space($text) != ''">
-							<item name="title-main-en"><xsl:value-of select="$text"/></item>
+							<xsl:variable name="lang">
+								<xsl:choose>
+									<xsl:when test="translate($text,'éàèùâêîôûç','') != $text">fr</xsl:when>
+									<xsl:otherwise>en</xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
+							
+							<xsl:variable name="title_parts">
+								<xsl:call-template name="split">
+									<xsl:with-param name="pText" select="$text"/>
+									<xsl:with-param name="sep" select="'—'"/>
+								</xsl:call-template>
+							</xsl:variable>
+							
+							<xsl:for-each select="xalan:nodeset($title_parts)//item">
+								<xsl:choose>
+									<xsl:when test="position() = 1">
+										<item name="title-intro-{$lang}"><xsl:value-of select="."/></item>
+									</xsl:when>
+									<xsl:when test="position() = 2">
+										<item name="title-main-{$lang}"><xsl:value-of select="."/></item>
+									</xsl:when>
+									<xsl:when test="position() = 3">
+										<item name="title-part-{$lang}">
+											<xsl:variable name="regex_title_part">(Part|Partie)(\s|\h)+(\d)+:(.*)</xsl:variable>
+											<xsl:attribute name="number">
+												<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(.), $regex_title_part, '$3'))"/>
+											</xsl:attribute>
+											<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(.), $regex_title_part, '$4'))"/>
+										</item>
+									</xsl:when>
+									<xsl:otherwise> <!-- for any case -->
+										<item name="title-main-{$lang}"><xsl:value-of select="."/></item>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:for-each>
+							
+							
 						</xsl:if>
 					</xsl:otherwise>
 				</xsl:choose>
@@ -371,38 +471,27 @@
 			<!-- DEBUG:
 			<xsl:apply-templates select="$bibdata_items" mode="print_as_xml"/> -->
 		
-			<xsl:text>:docnumber: </xsl:text><xsl:value-of select="$bibdata_items//item[@name = 'docnumber']"/>
-			<xsl:text>&#xa;</xsl:text>
-			<xsl:text>:date: </xsl:text><xsl:value-of select="$bibdata_items//item[@name = 'date']"/>
-			<xsl:text>&#xa;</xsl:text>
-			<xsl:text>:copyright-year: </xsl:text><xsl:value-of select="substring($bibdata_items//item[@name = 'date'],1,4)"/>
-			<xsl:text>&#xa;</xsl:text>
-			
-			<xsl:text>:title-main-en: </xsl:text><xsl:value-of select="$bibdata_items//item[@name = 'title-main-en'][last()]"/>
-			<xsl:text>&#xa;</xsl:text>
-			
-			
-			<xsl:for-each select="$bibdata_items//item[not(@name = 'docnumber' or @name = 'date' or @name = 'title-main-en')]">
-				<xsl:choose>
-					<xsl:when test="@name = 'tc' and (@key = 'TC' or @key = 'WG')">
-						<xsl:choose>
-							<xsl:when test="@key = 'TC'">
-								<xsl:text>:technical-committee-number: </xsl:text><xsl:value-of select="."/>
-							</xsl:when>
-							<xsl:when test="@key = 'WG'">
-								<xsl:text>:workgroup-type: WG</xsl:text>
-								<xsl:text>&#xa;</xsl:text>
-								<xsl:text>:workgroup-number: </xsl:text><xsl:value-of select="."/>
-							</xsl:when>
-						</xsl:choose>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:text>:</xsl:text><xsl:value-of select="@name"/><xsl:text>: </xsl:text><xsl:value-of select="."/>
-					</xsl:otherwise>
-				</xsl:choose>
+			<xsl:for-each select="$bibdata_items/item">
+
+				<xsl:text>:</xsl:text><xsl:value-of select="@name"/><xsl:text>: </xsl:text>
+				<xsl:value-of select="normalize-space(.)"/>
 				<xsl:text>&#xa;</xsl:text>
+				
+				<xsl:if test="@name = 'docnumber'">
+					<xsl:variable name="part_number" select="../item[starts-with(@name,'title-part-')]/@number"/>
+					<xsl:if test="$part_number != ''">
+						<xsl:text>:partnumber: </xsl:text>
+						<xsl:value-of select="$part_number"/>
+						<xsl:text>&#xa;</xsl:text>
+					</xsl:if>
+				</xsl:if>
+				
+				<xsl:if test="@name = 'revdate'">
+					<xsl:text>:copyright-year: </xsl:text><xsl:value-of select="substring(.,1,4)"/>
+					<xsl:text>&#xa;</xsl:text>
+				</xsl:if>
+				
 			</xsl:for-each>
-			
 			
 			<xsl:text>:mn-document-class: iso</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
@@ -421,9 +510,6 @@
 	
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCover']"/>
 	
-	<!-- ignore delText in bibdata fields -->
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCover']/w:del"/>
-	
 	<!-- ============================= -->
 	<!-- END Cover page data processing -->
 	<!-- ============================= -->
@@ -437,6 +523,7 @@
 	
 	<!-- skip copyright information text -->
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCopyright']"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzAddress']"/>
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzaddress']"/>
 	
 	<!-- skip 'Contents' title -->
