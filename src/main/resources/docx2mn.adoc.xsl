@@ -278,6 +278,9 @@
 		Code
 		BiblioEntry0
 		BiblioEntry
+		figure
+		tablefootnote
+		Tableheader
 	-->
 	
 	
@@ -778,6 +781,9 @@
 	
 	<xsl:template match="w:tr">
 		<tr>
+			<xsl:if test=".//w:p[w:pPr/w:pStyle/@w:val = 'Tableheader']">
+				<xsl:attribute name="header">true</xsl:attribute>
+			</xsl:if>
 			<xsl:apply-templates/>
 		</tr>
 	</xsl:template>
@@ -890,6 +896,29 @@
 		</xsl:choose>
 		<xsl:text>"</xsl:text>
 		
+		
+		<xsl:variable name="options">
+			<xsl:if test=".//tr[@header = 'true']">
+				<option>header</option>
+			</xsl:if>
+			<!-- <xsl:if test="ancestor::table-wrap/table-wrap-foot[count(*[local-name() != 'fn-group' and local-name() != 'fn' and local-name() != 'non-normative-note']) != 0]">
+				<option>footer</option>
+			</xsl:if> -->
+		</xsl:variable>
+		<xsl:if test="count(xalan:nodeset($options)/option) != 0">
+			<xsl:text>,</xsl:text>
+			<xsl:text>options="</xsl:text>
+				<xsl:for-each select="xalan:nodeset($options)/option">
+					<xsl:value-of select="."/>
+					<xsl:if test="position() != last()">,</xsl:if>
+				</xsl:for-each>
+			<xsl:text>"</xsl:text>
+			<xsl:if test="count(.//tr[@header = 'true']) &gt; 1">
+				<xsl:text>,headerrows=</xsl:text>
+				<xsl:value-of select="count(.//tr[@header = 'true'])"/>
+			</xsl:if>
+		</xsl:if>
+		
 		<xsl:text>]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
@@ -912,6 +941,9 @@
 	
 	<xsl:template match="tr">
 		<xsl:apply-templates />
+		<xsl:if test="@header = 'true' and not(following-sibling::tr[@header = 'true'])">
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 	</xsl:template>
 	
 	<!-- ignore table's row with note(s) -->
@@ -1135,6 +1167,10 @@
 	<!-- ============================= -->
 	<!-- Figure processing -->
 	<!-- ============================= -->
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'figure']]">
+		<xsl:apply-templates />
+	</xsl:template>
 	
 	<xsl:template match="w:p[w:r/w:drawing]">
 		
