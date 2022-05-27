@@ -283,6 +283,7 @@
 		Tableheader
 		Tablebody
 		TableISO
+		FigureGraphic
 	-->
 	
 	
@@ -1170,7 +1171,7 @@
 	<!-- Figure processing -->
 	<!-- ============================= -->
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'figure']][.//w:drawing]">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'figure' or @w:val = 'FigureGraphic']][.//w:drawing]">
 		<xsl:apply-templates />
 	</xsl:template>
 	
