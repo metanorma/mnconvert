@@ -629,7 +629,7 @@
 	<!-- ============================= -->
 	<!-- Note processing -->
 	<!-- ============================= -->
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'note' or @w:val = 'Note' or @w:val = 'Figurenote']]">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'note' or @w:val = 'note1' or @w:val = 'Note' or @w:val = 'Figurenote']]" name="note">
 		<xsl:text>NOTE: </xsl:text>
 		<xsl:variable name="text">
 			<xsl:apply-templates/>
@@ -807,6 +807,21 @@
 			<xsl:apply-templates/>
 		</p>
 	</xsl:template>
+	
+	<xsl:template match="w:tc/w:p[w:pPr/w:pStyle[@w:val = 'Note']]">
+		<tablenote>
+			<xsl:apply-templates />
+		</tablenote>
+	</xsl:template>
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'tablefootnote']]">
+		<tablefootnote>
+			<xsl:attribute name="ref">
+				<xsl:value-of select="w:r[w:rPr/w:rStyle/@w:val = 'tablefootnoteref']"/>
+			</xsl:attribute>
+			<xsl:apply-templates />
+		</tablefootnote>
+	</xsl:template>
 	<!-- ===================== -->
 	<!-- END create HTML-like table -->
 	<!-- ===================== -->
@@ -821,7 +836,12 @@
 		<xsl:text>===</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		
-		<xsl:apply-templates />
+		<xsl:variable name="table_">
+			<xsl:apply-templates />
+		</xsl:variable>
+		<xsl:variable name="table" select="xalan:nodeset($table_)"/>
+		
+		<xsl:copy-of select="$table"/>
 		
 		<xsl:text>&#xa;</xsl:text>
 		
@@ -830,7 +850,13 @@
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		
+		<!-- insert Table's notes -->
+		<xsl:apply-templates select=".//tablenote">
+			<xsl:with-param name="process">true</xsl:with-param>
+		</xsl:apply-templates>
+		
 	</xsl:template>
+	
 	
 	<xsl:template name="insertTableProperties">
 		<xsl:text>[</xsl:text>
@@ -870,6 +896,9 @@
 	<xsl:template match="tr">
 		<xsl:apply-templates />
 	</xsl:template>
+	
+	<!-- ignore table's row with note(s) -->
+	<xsl:template match="tr[td/tablenote or td/tablefootnote]"/>
 	
 	<xsl:template match="td">
 		<xsl:call-template name="spanProcessing"/>		
@@ -959,6 +988,22 @@
 		</xsl:if>
 		<xsl:apply-templates/>
 		<!-- <xsl:text>&#xa;</xsl:text> -->
+	</xsl:template>
+	
+	<xsl:template match="tablefootnote">
+		<xsl:param name="process">false</xsl:param>
+		<xsl:if test="$process = 'true'">
+			<xsl:text> footnote:[</xsl:text>
+			<xsl:apply-templates />
+			<xsl:text>]</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="tablenote">
+		<xsl:param name="process">false</xsl:param>
+		<xsl:if test="$process = 'true'">
+			<xsl:call-template name="note"/>
+		</xsl:if>
 	</xsl:template>
 	
 	<!-- ============================= -->
