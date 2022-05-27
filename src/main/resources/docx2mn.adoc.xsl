@@ -281,6 +281,8 @@
 		figure
 		tablefootnote
 		Tableheader
+		Tablebody
+		TableISO
 	-->
 	
 	
@@ -755,7 +757,7 @@
 		<!-- process HTML-like table -->
 		<xsl:choose>
 			<!-- no border, paragraph is 'dl' item and columns count = 2 -->
-			<xsl:when test="count($table//td[@border = '1']) = 0 and $table//p/@dl = 'true' and count($table/table/colgroup/col) = 2">
+			<xsl:when test="(count($table//td[@border = '1']) = 0 and $table//p/@dl = 'true' and count($table/table/colgroup/col) = 2) or not(w:tblPr/w:tblStyle/@w:val = 'TableISO')"> <!-- style 'TableISO' means table, not definition list -->
 				<xsl:apply-templates select="$table/node()" mode="dl"/>
 			</xsl:when>
 			<xsl:otherwise>
@@ -1168,7 +1170,7 @@
 	<!-- Figure processing -->
 	<!-- ============================= -->
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'figure']]">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'figure']][.//w:drawing]">
 		<xsl:apply-templates />
 	</xsl:template>
 	
