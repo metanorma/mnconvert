@@ -284,6 +284,7 @@
 		Tablebody
 		TableISO
 		FigureGraphic
+		BodyTextindent1
 	-->
 	
 	
@@ -1329,6 +1330,39 @@
 	</xsl:template>
 	<!-- ============================= -->
 	<!-- END Source code processing -->
+	<!-- ============================= -->
+	
+	
+	<!-- ============================= -->
+	<!-- Admonitions and quote processing -->
+	<!-- ============================= -->
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BodyTextindent1']]">
+		<xsl:variable name="regex_admonition">^(NOTE|IMPORTANT|WARNING|CAUTION)(\s|\h)+—(\s|\h)+(.*)</xsl:variable>
+		<xsl:variable name="text">
+			<xsl:apply-templates />
+		</xsl:variable>
+		
+		<xsl:choose>
+			<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_admonition, $text) = 'true'">
+				<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),$regex_admonition,'$1')"/>
+				<xsl:text>: </xsl:text>
+				<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),$regex_admonition,'$4')"/>
+			</xsl:when>
+			<xsl:otherwise> <!-- quote -->
+				<xsl:text>[quote]</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>_____</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:value-of select="$text"/>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>_____</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
+		<xsl:text>&#xa;&#xa;</xsl:text>
+	</xsl:template>
+	<!-- ============================= -->
+	<!-- END Admonitions and quote processing -->
 	<!-- ============================= -->
 	
 	
