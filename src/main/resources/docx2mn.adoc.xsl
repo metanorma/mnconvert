@@ -55,12 +55,26 @@
 	</xsl:variable>
 	<xsl:variable name="rels_xml" select="xalan:nodeset($rels_xml_)"/>
 
+	<xsl:variable name="bookmarks_">
+		<xsl:for-each select=".//w:bookmarkStart">
+			<bookmark name="{@w:name}" style="{preceding-sibling::w:pPr/w:pStyle/@w:val}"/>
+		</xsl:for-each>
+	</xsl:variable>
+	<xsl:variable name="bookmarks" select="xalan:nodeset($bookmarks_)"/>
+	
+	<xsl:variable name="hyperlinks_">
+		<xsl:for-each select=".//w:hyperlink">
+			<hyperlink anchor="{@w:anchor}" style="{$bookmarks/bookmark[@name = current()/@w:anchor]/@style}"/>
+		</xsl:for-each>
+	</xsl:variable>
+	<xsl:variable name="hyperlinks" select="xalan:nodeset($hyperlinks_)"/>
+
 	<!-- .docx zip content:
 	
 		./word/document.xml - document body (entry point for this template)
+		./word/_rels/document.xml.rels - relationships
 		
 	-->
-	
 
 	<xsl:template match="/">
 		<!-- DEBUG
@@ -510,6 +524,8 @@
 			<xsl:text>:imagesdir: images</xsl:text>
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		
+			<xsl:apply-templates select="$hyperlinks" mode="print_as_xml"/>
+		
 		</redirect:write>
 		
 	</xsl:template>
@@ -795,6 +811,7 @@
 			</xsl:if>
 			
 			<xsl:apply-templates/>
+			
 		</td>
 	</xsl:template>
 	
@@ -815,12 +832,12 @@
 	</xsl:template>
 	
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'tablefootnote']]">
-		<tablefootnote>
+		<tablefootnotebody>
 			<xsl:attribute name="ref">
 				<xsl:value-of select="w:r[w:rPr/w:rStyle/@w:val = 'tablefootnoteref']"/>
 			</xsl:attribute>
 			<xsl:apply-templates />
-		</tablefootnote>
+		</tablefootnotebody>
 	</xsl:template>
 	<!-- ===================== -->
 	<!-- END create HTML-like table -->
@@ -898,7 +915,7 @@
 	</xsl:template>
 	
 	<!-- ignore table's row with note(s) -->
-	<xsl:template match="tr[td/tablenote or td/tablefootnote]"/>
+	<xsl:template match="tr[td/tablenote or td/tablefootnotebody]"/>
 	
 	<xsl:template match="td">
 		<xsl:call-template name="spanProcessing"/>		
@@ -990,14 +1007,6 @@
 		<!-- <xsl:text>&#xa;</xsl:text> -->
 	</xsl:template>
 	
-	<xsl:template match="tablefootnote">
-		<xsl:param name="process">false</xsl:param>
-		<xsl:if test="$process = 'true'">
-			<xsl:text> footnote:[</xsl:text>
-			<xsl:apply-templates />
-			<xsl:text>]</xsl:text>
-		</xsl:if>
-	</xsl:template>
 	
 	<xsl:template match="tablenote">
 		<xsl:param name="process">false</xsl:param>
@@ -1282,6 +1291,34 @@
 	<!-- ============================= -->
 	<!-- END Source code processing -->
 	<!-- ============================= -->
+	
+	
+	<!-- ============================= -->
+	<!-- Hyperlink processing -->
+	<!-- ============================= -->
+	<xsl:template match="w:hyperlink">
+		<xsl:variable name="style" select="$hyperlinks/hyperlink[@anchor = current()/@w:anchor]/@style"/>
+		<xsl:choose>
+			<xsl:when test="$style = 'tablefootnote'">
+				<xsl:text> footnote:[</xsl:text>
+					<xsl:apply-templates select="ancestor::w:tbl[1]//w:r[preceding-sibling::w:bookmarkStart[@w:name = current()/@w:anchor]]"/>
+				<xsl:text>]</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:apply-templates />
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<!-- remove 'a' from footnote body -->
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'tablefootnote']]/w:r[w:rPr/w:rStyle/@w:val = 'tablefootnoteref']"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'tablefootnote']]/w:r/w:tab" priority="2"/>
+	
+	<!-- ============================= -->
+	<!-- END Hyperlink processing -->
+	<!-- ============================= -->
+	
+	
 	
 	<!-- ============================= -->
 	<!-- Bibliography entry processing -->
