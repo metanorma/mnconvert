@@ -1404,6 +1404,11 @@
 					<xsl:apply-templates select="ancestor::w:tbl[1]//w:r[preceding-sibling::w:bookmarkStart[@w:name = current()/@w:anchor]]"/>
 				<xsl:text>]</xsl:text>
 			</xsl:when>
+			<xsl:when test="count(w:r) = 1 and w:r/w:rPr/w:rStyle[@w:val = 'citeapp' or @w:val = 'citefig' or @w:val = 'citesec' or @w:val = 'citetbl']">
+				<xsl:text>&lt;&lt;</xsl:text>
+				<xsl:value-of select="@w:anchor"/>
+				<xsl:text>&gt;&gt;</xsl:text>
+			</xsl:when>
 			<xsl:otherwise>
 				<xsl:apply-templates />
 			</xsl:otherwise>
