@@ -5,14 +5,11 @@ import org.metanorma.utils.Util;
 import static org.metanorma.Constants.*;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -199,6 +196,8 @@ public class DOCX2MN_XsltConverter extends XsltConverter {
         transformer.transform(src, sr);
         
 
-        Task.copyImages(inputFolder, imagesDir, outputFolder);
+        Task.copyImagesFromZIP(Paths.get(inputFilePath), imagesDir, outputFolder);
+        
     }
+    
 }

@@ -69,6 +69,8 @@
 	</xsl:variable>
 	<xsl:variable name="hyperlinks" select="xalan:nodeset($hyperlinks_)"/>
 
+	<xsl:variable name="taskCopyImagesFilename" select="concat($outpath, $pathSeparator, 'task.copyImages.adoc')"/>
+
 	<!-- .docx zip content:
 	
 		./word/document.xml - document body (entry point for this template)
@@ -96,6 +98,10 @@
 		<redirect:open file="{$docfile}"/>
 		
 		<xsl:apply-templates select="xalan:nodeset($xml_update2)/node()"/>
+		
+		<redirect:write file="{$docfile}">
+			<xsl:call-template name="insertTaskImageList"/>
+		</redirect:write>
 		
 		<redirect:close file="{$docfile}"/>
 		
@@ -531,7 +537,7 @@
 			<xsl:text>:imagesdir: images</xsl:text>
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		
-			<xsl:apply-templates select="$hyperlinks" mode="print_as_xml"/>
+			<!-- <xsl:apply-templates select="$hyperlinks" mode="print_as_xml"/> -->
 		
 		</redirect:write>
 		
@@ -1222,6 +1228,27 @@
 		<xsl:text>image::</xsl:text><xsl:value-of select="$filename"/><xsl:text>[]</xsl:text>
 		<xsl:text>&#xa;&#xa;</xsl:text>
 		
+	</xsl:template>
+		
+	<xsl:template name="insertTaskImageList"> 
+		<xsl:variable name="imageList">
+			<xsl:for-each select="//pic:blipFill/a:blip">
+				<xsl:variable name="rId" select="@r:embed"/>
+				<!-- Example: <Relationship Id="rId205" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.png"/> -->
+				<xsl:variable name="target" select="$rels_xml//rels:Relationship[@Id = $rId]/@Target"/>
+				<xsl:variable name="filename" select="java:replaceAll(java:java.lang.String.new($target),'.*/(.*)$','$1')"/>
+				<image>image::<xsl:value-of select="$filename"/><xsl:text>&#xa;</xsl:text></image>
+			</xsl:for-each>
+		</xsl:variable>
+		
+		<xsl:if test="xalan:nodeset($imageList)//image">
+			<redirect:write file="{$taskCopyImagesFilename}"> <!-- this list will be processed and deleted in java program -->
+				<xsl:for-each select="xalan:nodeset($imageList)//image">
+					<!-- <xsl:text>copy</xsl:text><xsl:value-of select="."/> -->
+					<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),'image::','copyimage::')"/>
+				</xsl:for-each>
+			</redirect:write>
+		</xsl:if>
 	</xsl:template>
 		
 	<!-- ============================= -->
