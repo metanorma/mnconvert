@@ -1653,10 +1653,99 @@
 	<!-- END Annex processing -->
 	<!-- ============================= -->
 	
-	
-	<xsl:template match="w:t">
+	<xsl:template match="w:t[ancestor::w:p[w:pPr/w:pStyle[@w:val = 'Terms' or @w:val = 'Heading1' or @w:val = 'Heading2' or @w:val = 'Heading3' or @w:val = 'Heading4' or @w:val = 'Heading5' or @w:val = 'Heading6' or @w:val = 'Heading7' or @w:val = 'BiblioTitle']]]" priority="2">
 		<xsl:apply-templates />
 	</xsl:template>
+	
+	<xsl:template match="w:t">
+		<xsl:variable name="tags">
+			<xsl:apply-templates select="preceding-sibling::w:rPr/w:i | preceding-sibling::w:rPr/w:b | preceding-sibling::w:rPr/w:vertAlign[@w:val = 'subscript'] | 
+			preceding-sibling::w:rPr/w:vertAlign[@w:val = 'superscript'] | preceding-sibling::w:rPr/w:u" mode="richtext"/>
+		</xsl:variable>
+		
+		<xsl:call-template name="insertRichText">
+			<xsl:with-param name="text">
+				<xsl:apply-templates />
+			</xsl:with-param>
+			<xsl:with-param name="tags" select="$tags"/>
+		</xsl:call-template>
+		
+	</xsl:template>
+	
+	
+	<!-- ============================= -->
+	<!-- Rich text processing -->
+	<!-- ============================= -->
+	<xsl:template match="w:b" mode="richtext">
+		<bold/>
+	</xsl:template>
+	
+	<xsl:template match="w:i" mode="richtext">
+		<italic/>
+	</xsl:template>
+	
+	<xsl:template match="w:vertAlign[@w:val = 'subscript']" mode="richtext">
+		<sub/>
+	</xsl:template>
+	
+	<xsl:template match="w:vertAlign[@w:val = 'superscript']" mode="richtext">
+		<sup/>
+	</xsl:template>
+	
+	<xsl:template match="w:u" mode="richtext">
+		<underline/>
+	</xsl:template>
+	
+	<xsl:template name="insertRichText">
+		<xsl:param name="text"/>
+		<xsl:param name="tags"/>
+		<xsl:param name="pos">1</xsl:param>
+		
+		<xsl:variable name="curr_tag" select="normalize-space(local-name(xalan:nodeset($tags)/*[position() = $pos]))"/>
+		<!-- <xsl:apply-templates select="xalan:nodeset($tags)" mode="print_as_xml"/>
+		curr_tag='<xsl:value-of select="$curr_tag"/>' -->
+		<xsl:choose>
+			<xsl:when test="$curr_tag != ''">
+				<xsl:variable name="adoc_tags">
+				<xsl:choose>
+					<xsl:when test="$curr_tag = 'bold'">
+						<tag>*</tag>
+						<tag>*</tag>
+					</xsl:when>
+					<xsl:when test="$curr_tag = 'italic'">
+						<tag>_</tag>
+						<tag>_</tag>
+					</xsl:when>
+					<xsl:when test="$curr_tag = 'sub'">
+						<tag>~</tag>
+						<tag>~</tag>
+					</xsl:when>
+					<xsl:when test="$curr_tag = 'sup'">
+						<tag>^</tag>
+						<tag>^</tag>
+					</xsl:when>
+					<xsl:when test="$curr_tag = 'underline'">
+						<tag>[underline]#</tag>
+						<tag>#</tag>
+					</xsl:when>
+				</xsl:choose>
+				</xsl:variable>
+				<xsl:value-of select="xalan:nodeset($adoc_tags)/*[1]"/>
+					<xsl:call-template name="insertRichText">
+						<xsl:with-param name="text" select="$text"/>
+						<xsl:with-param name="tsgs" select="$tags"/>
+						<xsl:with-param name="pos" select="$pos + 1"/>
+					</xsl:call-template>
+				<xsl:value-of select="xalan:nodeset($adoc_tags)/*[2]"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$text"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	<!-- ============================= -->
+	<!-- END Rich text processing -->
+	<!-- ============================= -->
 	
 	<xsl:template match="w:tab[not(parent::w:tabs)]">
 		<xsl:text> </xsl:text>
