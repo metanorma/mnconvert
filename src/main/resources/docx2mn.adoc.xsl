@@ -1657,6 +1657,11 @@
 		<xsl:apply-templates />
 	</xsl:template>
 	
+	<xsl:variable name="text_modified">, modified – </xsl:variable>
+	<xsl:template match="w:t[ancestor::w:p[w:pPr/w:pStyle/@w:val = 'Source']][starts-with(., $text_modified)]">
+		<xsl:text>,</xsl:text><xsl:value-of select="substring-after(., $text_modified)"/>
+	</xsl:template>
+	
 	<xsl:template match="w:t">
 		<xsl:variable name="tags">
 			<xsl:apply-templates select="preceding-sibling::w:rPr/w:i | preceding-sibling::w:rPr/w:b | preceding-sibling::w:rPr/w:vertAlign[@w:val = 'subscript'] | 
