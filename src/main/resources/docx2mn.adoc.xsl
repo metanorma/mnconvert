@@ -1415,6 +1415,21 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<!-- Example: HYPERLINK "" \l "figureC-1" -->
+	<xsl:template match="w:r/w:instrText">
+		<xsl:variable name="text" select="."/>
+		<xsl:variable name="quot">"</xsl:variable>
+		<xsl:variable name="regex_hyperlink">.*<xsl:value-of select="$quot"/>(.*)<xsl:value-of select="$quot"/></xsl:variable>
+		<xsl:variable name="hyperlink" select="normalize-space(java:replaceAll(java:java.lang.String.new($text),$regex_hyperlink,'$1'))"/>
+		<xsl:if test="$hyperlink != ''">
+			<xsl:text>&lt;&lt;</xsl:text>
+			<xsl:value-of select="$hyperlink"/>
+			<xsl:text>&gt;&gt;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="w:r[w:rPr/w:rStyle[@w:val = 'citeapp' or @w:val = 'citefig' or @w:val = 'citesec' or @w:val = 'citetbl']][preceding-sibling::w:r[contains(w:instrText,'HYPERLINK')]]"/>
+	
 	<!-- remove 'a' from footnote body -->
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'tablefootnote']]/w:r[w:rPr/w:rStyle/@w:val = 'tablefootnoteref']"/>
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'tablefootnote']]/w:r/w:tab" priority="2"/>
