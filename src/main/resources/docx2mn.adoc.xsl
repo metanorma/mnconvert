@@ -698,14 +698,14 @@
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Source']]">
 		<xsl:text>[.source]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>&lt;&lt;</xsl:text>
+		<!-- <xsl:text>&lt;&lt;</xsl:text> -->
 		<xsl:variable name="source">
 			<xsl:apply-templates/>
 		</xsl:variable>
 		<xsl:value-of select="normalize-space($source)"/>
-		<xsl:if test="not(contains($source, '&gt;&gt;'))">
+		<!-- <xsl:if test="not(contains($source, '&gt;&gt;'))">
 			<xsl:text>&gt;&gt;</xsl:text>
-		</xsl:if>
+		</xsl:if> -->
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
 	
@@ -1398,15 +1398,60 @@
 	<!-- ============================= -->
 	<xsl:template match="w:hyperlink">
 		<xsl:variable name="style" select="$hyperlinks/hyperlink[@anchor = current()/@w:anchor]/@style"/>
+		
+		<xsl:variable name="style_parent" select="ancestor::w:p/w:pPr/w:pStyle/@w:val"/>
+		
 		<xsl:choose>
-			<xsl:when test="$style = 'tablefootnote'">
+			<xsl:when test="$style = 'tablefootnote'"> <!-- hyperlink to the footnote -->
 				<xsl:text> footnote:[</xsl:text>
 					<xsl:apply-templates select="ancestor::w:tbl[1]//w:r[preceding-sibling::w:bookmarkStart[@w:name = current()/@w:anchor]]"/>
 				<xsl:text>]</xsl:text>
 			</xsl:when>
-			<xsl:when test="count(w:r) = 1 and w:r/w:rPr/w:rStyle[@w:val = 'citeapp' or @w:val = 'citefig' or @w:val = 'citesec' or @w:val = 'citetbl']">
+			<xsl:when test="count(w:r) = 1 and w:r/w:rPr/w:rStyle[@w:val = 'citeapp' or @w:val = 'citefig' or @w:val = 'citesec' or @w:val = 'citetbl']"> <!-- hyperlink to Annex, Figure, Clause or Table -->
 				<xsl:text>&lt;&lt;</xsl:text>
 				<xsl:value-of select="@w:anchor"/>
+				<xsl:text>&gt;&gt;</xsl:text>
+			</xsl:when>
+			<xsl:when test="w:r[w:rPr/w:rStyle/@w:val = 'stdpublisher'] and w:r[w:rPr/w:rStyle/@w:val = 'stddocNumber']"> <!-- hyperlink to the standard -->
+			
+				<xsl:variable name="id_">
+					<xsl:for-each select="node()[not(w:rPr/w:rStyle[@w:val = 'citesec' or @w:val = 'citetbl' or @w:val = 'citefig' or @w:val = 'citeapp' or @w:val = 'citebox' or @w:val = 'citeeq' or @w:val = 'citesection'])]">
+						<xsl:value-of select="translate(.,'&#xa0;,',' ')"/> <!-- replace a0 to space, and remove comma -->
+					</xsl:for-each>
+				</xsl:variable>
+				<xsl:variable name="id" select="translate(normalize-space($id_),':/ ','___')"/> <!-- replace :,/ and space to underscore _ -->
+				
+				
+				<xsl:variable name="localities">
+					<xsl:for-each select="node()[w:rPr/w:rStyle[@w:val = 'citesec' or @w:val = 'citetbl' or @w:val = 'citefig' or @w:val = 'citeapp' or @w:val = 'citebox' or @w:val = 'citeeq' or @w:val = 'citesection']]"> <!-- locality processing -->
+						<xsl:variable name="style_locality" select="w:rPr/w:rStyle/@w:val"/>
+						<locality>
+							<xsl:choose>
+								<xsl:when test="$style_locality = 'citesec'">clause</xsl:when>
+								<xsl:when test="$style_locality = 'citetbl'">table</xsl:when>
+								<xsl:when test="$style_locality = 'citefig'">figure</xsl:when>
+								<xsl:when test="$style_locality = 'citeapp'">annex</xsl:when>
+								<xsl:when test="$style_locality = 'citebox'">box</xsl:when>
+								<xsl:when test="$style_locality = 'citeeq'">equation</xsl:when>
+								<xsl:when test="$style_locality = 'citesection'">section</xsl:when>
+							</xsl:choose>
+							<xsl:text>=</xsl:text>
+							<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(.),'^(Clause|Table|Figure|Annex|Box|Equation|Section)(.*)$','$2'))"/> <!-- remove Clause, Table, ... at start -->
+						</locality>
+					</xsl:for-each>
+				</xsl:variable>
+				
+				<!-- Example: <<ISO_12345>> -->
+				<!-- <xsl:if test="not($style_parent = 'Source'" -->
+				<xsl:text>&lt;&lt;</xsl:text>
+				<xsl:value-of select="$id"/>
+				
+				<xsl:for-each select="xalan:nodeset($localities)//locality">
+					<xsl:if test="position() = 1">,</xsl:if>
+					<xsl:value-of select="."/>
+					<xsl:if test="position() != last()">,</xsl:if>
+				</xsl:for-each>
+				
 				<xsl:text>&gt;&gt;</xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
@@ -1433,6 +1478,7 @@
 	<!-- remove 'a' from footnote body -->
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'tablefootnote']]/w:r[w:rPr/w:rStyle/@w:val = 'tablefootnoteref']"/>
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'tablefootnote']]/w:r/w:tab" priority="2"/>
+	
 	
 	<!-- ============================= -->
 	<!-- END Hyperlink processing -->
