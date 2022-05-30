@@ -1112,8 +1112,8 @@
 		
 		<xsl:variable name="listitem_label">
 			<xsl:choose>
-				<xsl:when test="(.//*[self::w:t or self::w:delText or self::w:insText])[1] = $em_dash">.</xsl:when> <!-- unordered list (ul) -->
-				<xsl:otherwise>*</xsl:otherwise> <!-- ordered list (ol) -->
+				<xsl:when test="(.//*[self::w:t or self::w:delText or self::w:insText])[1] = $em_dash">*</xsl:when> <!-- unordered list (ul) -->
+				<xsl:otherwise>.</xsl:otherwise> <!-- ordered list (ol) -->
 			</xsl:choose>
 		</xsl:variable>
 		
@@ -1121,7 +1121,7 @@
 			<!-- <xsl:text>DEBUG level=</xsl:text><xsl:value-of select="$level"/><xsl:text>&#xa;</xsl:text> -->
 			
 			<xsl:call-template name="repeat">
-				<xsl:with-param name="char" select="'.'"/>
+				<xsl:with-param name="char" select="$listitem_label"/>
 				<xsl:with-param name="count" select="$level"/>
 			</xsl:call-template>
 			<!-- <xsl:text> </xsl:text> -->
