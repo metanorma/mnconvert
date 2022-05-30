@@ -1352,7 +1352,7 @@
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Code']]//w:br">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Code']]//w:br" priority="2">
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	<!-- ============================= -->
@@ -1758,6 +1758,11 @@
 	
 	<xsl:template match="w:noBreakHyphen">
 		<xsl:text>-</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="w:br[not(@w:type = 'page')]">
+		<xsl:text> +</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
 	<xsl:template name="repeat">
