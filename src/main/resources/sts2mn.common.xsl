@@ -1363,7 +1363,10 @@
 				<xsl:attribute name="unnumbered">true</xsl:attribute>
 			</xsl:if>
 			<xsl:attribute name="filename">
-				<xsl:if test="@xlink:href and not(processing-instruction('isoimg-id'))">
+				
+				<!-- Example: <graphic xlink:href="fig_A.2"><?isoimg-id 14812_ed1figA2.EPS?></graphic> -->
+				
+				<xsl:if test="@xlink:href and not(processing-instruction('isoimg-id')) or (@xlink:href and $organization = 'ISO')">
 					<xsl:variable name="image_link" select="@xlink:href"/>
 					<xsl:choose>
 						<xsl:when test="contains($image_link, 'base64,')">
@@ -1379,9 +1382,12 @@
 					</xsl:choose>
 				</xsl:if>
 				
-				<xsl:apply-templates select="processing-instruction('isoimg-id')" mode="pi_isoimg-id">
-					<xsl:with-param name="copymode" select="$copymode"/>
-				</xsl:apply-templates>
+				<xsl:if test="not(@xlink:href and $organization = 'ISO')">
+					<xsl:apply-templates select="processing-instruction('isoimg-id')" mode="pi_isoimg-id">
+						<xsl:with-param name="copymode" select="$copymode"/>
+					</xsl:apply-templates>
+				</xsl:if>
+				
 			</xsl:attribute>
 			
 			<xsl:apply-templates mode="model_graphic"/>
