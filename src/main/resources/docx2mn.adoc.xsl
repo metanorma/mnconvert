@@ -246,6 +246,11 @@
 		<xsl:apply-templates/>
 	</xsl:template>
 	
+	<xsl:template match="w:jc[@w:val = 'left']">
+		<xsl:text>[align=left]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
 	<!-- Processing for styles
 		ForewordTitle
 		IntroTitle
