@@ -296,6 +296,7 @@
 		TableISO
 		FigureGraphic
 		BodyTextindent1
+		Hyperlink
 	-->
 	
 	
@@ -1406,6 +1407,9 @@
 		
 		<xsl:variable name="style_parent" select="ancestor::w:p/w:pPr/w:pStyle/@w:val"/>
 		
+		<!-- From: https://www.baeldung.com/java-email-validation-regex#regular-expression-by-rfc-5322-for-email-validation -->
+		<xsl:variable name="regex_email">^[a-zA-Z0-9_!#$%&amp;'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$</xsl:variable>
+		
 		<xsl:choose>
 			<xsl:when test="$style = 'tablefootnote'"> <!-- hyperlink to the footnote -->
 				<xsl:text> footnote:[</xsl:text>
@@ -1416,6 +1420,11 @@
 				<xsl:text>&lt;&lt;</xsl:text>
 				<xsl:value-of select="@w:anchor"/>
 				<xsl:text>&gt;&gt;</xsl:text>
+			</xsl:when>
+			<xsl:when test="count(w:r) = 1 and w:r/w:rPr/w:rStyle[@w:val = 'Hyperlink'] and java:org.metanorma.utils.RegExHelper.matches($regex_email, normalize-space(.)) = 'true'">
+				<xsl:text>mailto:</xsl:text>
+				<xsl:apply-templates />
+				<xsl:text>[]</xsl:text>
 			</xsl:when>
 			<xsl:when test="w:r[w:rPr/w:rStyle/@w:val = 'stdpublisher'] and w:r[w:rPr/w:rStyle/@w:val = 'stddocNumber']"> <!-- hyperlink to the standard -->
 			
