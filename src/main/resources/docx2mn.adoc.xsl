@@ -255,11 +255,19 @@
 	<!-- end 'section' -->
 	
 	<xsl:template match="w:p | p">
-		<xsl:apply-templates/>
-		<xsl:text>&#xa;</xsl:text>
+	
+		<xsl:variable name="text">
+			<xsl:apply-templates/>
+		</xsl:variable>
 		
-		<xsl:if test="following-sibling::*[local-name() = 'p']">
+		<xsl:value-of select="$text"/>
+		
+		<xsl:if test="normalize-space($text) != ''">
 			<xsl:text>&#xa;</xsl:text>
+			
+			<xsl:if test="following-sibling::*[local-name() = 'p']">
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:if>
 		</xsl:if>
 	</xsl:template>
 	
@@ -336,6 +344,8 @@
 	<!-- ============================= -->
 	
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Heading1' or @w:val = 'Heading2' or @w:val = 'Heading3' or @w:val = 'Heading4' or @w:val = 'Heading5' or @w:val = 'Heading6' or @w:val = 'Heading7' or @w:val = 'BiblioTitle']]">
+	
+		<xsl:call-template name="setId"/>
 	
 		<xsl:variable name="text">
 			<xsl:apply-templates/>
@@ -1611,7 +1621,7 @@
 						</xsl:for-each>
 					</xsl:variable>
 					<!-- remove [] at start -->
-					<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),'^\[\](\s|\h)*(.*)$','$2')"/>
+					<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($text),'^\[\](\s|\h)*(.*)$','$2'))"/>
 				</xsl:otherwise>
 			</xsl:choose>
 			
@@ -1643,11 +1653,7 @@
 		<!-- Example [appendix,obligation=normative] -->
 		
 		<!-- <xsl:variable name="id" select="translate((.//w:t)[1],' ','')"/> -->
-		<xsl:variable name="id" select="translate(w:bookmarkStart/@w:name,' ','')"/>
-		<xsl:text>[[</xsl:text>
-		<xsl:value-of select="$id"/>
-		<xsl:text>]]</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
+		<xsl:call-template name="setId"/>
 		
 		<xsl:variable name="obligation_">
 			<xsl:choose>
@@ -1681,16 +1687,32 @@
 		</xsl:call-template>
 		<xsl:text> </xsl:text>
 		
-		<xsl:apply-templates/>
+		<xsl:variable name="text">
+			<xsl:apply-templates/>
+		</xsl:variable>
+		
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(normalize-space($text)),'^([A-Z](\.\d)+(\s|h)+)(.*)','$4')"/> <!-- remove A.1 at start -->
 		
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	
 	</xsl:template>
 	
 	
+	
+	
 	<!-- ============================= -->
 	<!-- END Annex processing -->
 	<!-- ============================= -->
+	
+	<xsl:template name="setId">
+		<xsl:variable name="id" select="translate(w:bookmarkStart/@w:name,' ','')"/>
+		<xsl:if test="$id != '' and not(starts-with($id, '_'))">
+			<xsl:text>[[</xsl:text>
+			<xsl:value-of select="$id"/>
+			<xsl:text>]]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
 	
 	<xsl:template match="w:t[ancestor::w:p[w:pPr/w:pStyle[@w:val = 'Terms' or @w:val = 'Heading1' or @w:val = 'Heading2' or @w:val = 'Heading3' or @w:val = 'Heading4' or @w:val = 'Heading5' or @w:val = 'Heading6' or @w:val = 'Heading7' or @w:val = 'BiblioTitle']]]" priority="2">
 		<xsl:apply-templates />
@@ -1706,7 +1728,7 @@
 	<xsl:template match="w:t">
 		<xsl:variable name="tags">
 			<xsl:apply-templates select="preceding-sibling::w:rPr/w:i | preceding-sibling::w:rPr/w:b | preceding-sibling::w:rPr/w:vertAlign[@w:val = 'subscript'] | 
-			preceding-sibling::w:rPr/w:vertAlign[@w:val = 'superscript'] | preceding-sibling::w:rPr/w:u" mode="richtext"/>
+			preceding-sibling::w:rPr/w:vertAlign[@w:val = 'superscript'] | preceding-sibling::w:rPr/w:u | preceding-sibling::w:rPr/w:smallCaps" mode="richtext"/>
 		</xsl:variable>
 		
 		<xsl:call-template name="insertRichText">
@@ -1742,6 +1764,10 @@
 		<underline/>
 	</xsl:template>
 	
+	<xsl:template match="w:smallCaps" mode="richtext">
+		<smallcaps/>
+	</xsl:template>
+	
 	<xsl:template name="insertRichText">
 		<xsl:param name="text"/>
 		<xsl:param name="tags"/>
@@ -1772,6 +1798,10 @@
 					</xsl:when>
 					<xsl:when test="$curr_tag = 'underline'">
 						<tag>[underline]#</tag>
+						<tag>#</tag>
+					</xsl:when>
+					<xsl:when test="$curr_tag = 'smallcaps'">
+						<tag>[smallcap]#</tag>
 						<tag>#</tag>
 					</xsl:when>
 				</xsl:choose>
@@ -1805,6 +1835,15 @@
 		<xsl:text> +</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
+	
+	<!-- Example:
+	<w:r>
+		<w:t xml:space="preserve"> </w:t>
+	</w:r>
+	-->
+	<xsl:template match="w:r[w:t and normalize-space(w:t) = ''][not(following-sibling::*)]"/>
+	<xsl:template match="w:t[normalize-space() = ''][not(../following-sibling::*)]"/>
+	
 	
 	<xsl:template match="w:commentReference">
 	
