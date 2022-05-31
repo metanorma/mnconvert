@@ -1554,7 +1554,7 @@
 				<xsl:when test="$bibitem/stdpublisher or $bibitem/stddocNumber"> <!-- if 'standard' bibitem -->
 					
 					<xsl:variable name="id_">
-						<xsl:for-each select="$bibitem/node()[not(local-name() = 'bibnumber' or local-name() = 'stddocTitle') or following-sibling::*[self::w:tab]]">
+						<xsl:for-each select="$bibitem/node()[not(local-name() = 'bibnumber' or local-name() = 'stddocTitle' or local-name() = 'FootnoteReference') or following-sibling::*[self::w:tab]]">
 							<xsl:value-of select="translate(.,'&#xa0;[],',' ')"/> <!-- replace a0 to space, remove [, ] and comman -->
 						</xsl:for-each>
 					</xsl:variable>
@@ -1570,9 +1570,9 @@
 					</xsl:variable>
 				
 					<xsl:text>[[[</xsl:text>
-						<xsl:value-of select="$id"/>
+						<xsl:value-of select="java:replaceAll(java:java.lang.String.new($id),'—','--')"/>
 						<xsl:text>,</xsl:text>
-						<xsl:value-of select="$reference_text"/>
+						<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($reference_text),'—','--'))"/> <!-- replace dash to double minus -->
 					<xsl:text>]]]</xsl:text>
 					<xsl:for-each select="$bibitem/stddocTitle[1]"> <!-- standard's title -->
 						<xsl:text>, </xsl:text>
@@ -1581,7 +1581,7 @@
 							<xsl:value-of select="."/>
 						</xsl:for-each>
 					</xsl:for-each>
-				</xsl:when>
+				</xsl:when> <!-- end 'stardard' item -->
 				<xsl:otherwise>
 					<xsl:text>[[[</xsl:text>
 						<xsl:choose>
