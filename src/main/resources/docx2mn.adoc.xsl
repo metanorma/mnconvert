@@ -87,6 +87,13 @@
 	</xsl:variable>
 	<xsl:variable name="hyperlinks" select="xalan:nodeset($hyperlinks_)"/>
 
+	<!-- <xsl:variable name="anchors_">
+		<xsl:for-each select="//@w:anchor">
+			
+		</xsl:for-each>
+	</xsl:variable>
+	<xsl:variable name="anchors" select="xalan:nodeset($anchors_)"/> -->
+
 	<xsl:variable name="taskCopyImagesFilename" select="concat($outpath, $pathSeparator, 'task.copyImages.adoc')"/>
 
 	<!-- .docx zip content:
@@ -686,6 +693,53 @@
 		
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
+	
+	<!-- process sequence 'paddy (3.1) from ...' -->
+	
+	<!-- remove '(':
+		<w:r>
+				<w:rPr>
+					<w:lang w:eastAsia="en-US"/>
+				</w:rPr>
+				<w:t xml:space="preserve"> (</w:t>
+			</w:r>
+	-->
+	<xsl:template match="w:r[normalize-space(w:t) = '('][preceding-sibling::*[self::w:r/w:rPr/w:i] and following-sibling::*[1][self::w:hyperlink]]"/>
+	
+	<!-- remove ')' after hyperlink -->
+	<xsl:template match="w:r[starts-with(w:t, ')')][preceding-sibling::*[1][self::w:hyperlink] and preceding-sibling::*[2][normalize-space(w:t) = '('] and preceding-sibling::*[3][self::w:r/w:rPr/w:i]]/w:t">
+		<xsl:value-of select="substring(., 2)"/>
+	</xsl:template>
+	
+	<!-- enclose term name into 'term:[name]':
+		<w:r>
+			<w:rPr>
+				<w:i/>
+				<w:iCs/>
+				<w:lang w:eastAsia="en-US"/>
+			</w:rPr>
+			<w:t>paddy</w:t>
+		</w:r>
+	-->
+	<xsl:template match="w:r[w:rPr/w:i][following-sibling::*[1][self::w:r[normalize-space(w:t) = '(']]]	[following-sibling::*[2][self::w:hyperlink]]">
+		<xsl:text>term:[</xsl:text>
+		<xsl:value-of select="."/>
+		<xsl:text>]</xsl:text>
+	</xsl:template>
+	
+	<!-- remove term's number:
+	<w:hyperlink w:anchor="paddy" w:history="1">
+				<w:r>
+					<w:rPr>
+						<w:rStyle w:val="Hyperlink"/>
+						<w:lang w:eastAsia="en-US"/>
+					</w:rPr>
+					<w:t>3.1</w:t>
+				</w:r>
+			</w:hyperlink>
+	-->
+	<xsl:template match="w:hyperlink[preceding-sibling::*[1][self::w:r[normalize-space(w:t) = '(']]][preceding-sibling::*[2][self::w:r/w:rPr/w:i]]"/>
+		
 	
 	<!-- ============================= -->
 	<!-- END Terms processing -->
