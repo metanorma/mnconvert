@@ -1155,7 +1155,7 @@
 		<xsl:if test="normalize-space($text) != ''">
 			<!-- <xsl:text>DEBUG level=</xsl:text><xsl:value-of select="$level"/><xsl:text>&#xa;</xsl:text> -->
 			<xsl:call-template name="repeat">
-				<xsl:with-param name="char" select="'*'"/>
+				<xsl:with-param name="char" select="'.'"/>
 				<xsl:with-param name="count" select="$level"/>
 			</xsl:call-template>
 			<!-- <xsl:text> </xsl:text> -->
@@ -1330,6 +1330,9 @@
 					<xsl:text> +</xsl:text>
 					<xsl:text>&#xa;</xsl:text>
 				</xsl:if>
+			</xsl:when>
+			<xsl:when test="ancestor::w:p/w:pPr/w:pStyle/@w:val = 'AdmittedTerm'">
+				<xsl:apply-templates/>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:text>&#xa;</xsl:text>
@@ -1671,9 +1674,11 @@
 		<xsl:apply-templates />
 	</xsl:template>
 	
-	<xsl:variable name="text_modified">, modified – </xsl:variable>
+	<xsl:variable name="text_modified">, modified –</xsl:variable>
 	<xsl:template match="w:t[ancestor::w:p[w:pPr/w:pStyle/@w:val = 'Source']][starts-with(., $text_modified)]">
-		<xsl:text>,</xsl:text><xsl:value-of select="substring-after(., $text_modified)"/>
+		<xsl:text>, </xsl:text>
+		<xsl:variable name="modified_text" select="substring-after(., $text_modified)"/>
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(normalize-space($modified_text)),'(.*)\]$','$1')"/> <!-- remove ']' at end -->
 	</xsl:template>
 	
 	<xsl:template match="w:t">
