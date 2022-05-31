@@ -37,6 +37,12 @@
 	<!-- or Nodes (programmatically called from mn2convert) -->
 	<xsl:param name="rels"/>
 
+	<!-- input xml file 'word\comments.xml' -->
+	<!-- xml with comments -->
+	<xsl:param name="comments_file"/>
+	<!-- xml with comments (comments.xml) -->
+	<xsl:param name="comments"/>
+
 	<xsl:variable name="em_dash">—</xsl:variable>
 	<xsl:variable name="en_dash">–</xsl:variable>
 	
@@ -54,6 +60,18 @@
 		</xsl:choose>
 	</xsl:variable>
 	<xsl:variable name="rels_xml" select="xalan:nodeset($rels_xml_)"/>
+
+	<xsl:variable name="comments_xml_">
+		<xsl:choose>
+			<xsl:when test="$comments_file != ''">
+				<xsl:copy-of select="document($comments_file)"/> 
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy-of select="$comments"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	<xsl:variable name="comments_xml" select="xalan:nodeset($comments_xml_)"/>
 
 	<xsl:variable name="bookmarks_">
 		<xsl:for-each select=".//w:bookmarkStart">
@@ -236,9 +254,13 @@
 	</xsl:template>
 	<!-- end 'section' -->
 	
-	<xsl:template match="w:p">
+	<xsl:template match="w:p | p">
 		<xsl:apply-templates/>
-		<xsl:text>&#xa;&#xa;</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		
+		<xsl:if test="following-sibling::*[local-name() = 'p']">
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 	</xsl:template>
 	
 	
@@ -1782,6 +1804,51 @@
 	<xsl:template match="w:br[not(@w:type = 'page')]">
 		<xsl:text> +</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="w:commentReference">
+	
+		<!-- Example:
+		[reviewer=ISO,date=2017-01-01,from=foreword,to=foreword]
+		****
+		A Foreword shall appear in each document. The generic text is shown here. It does not contain requirements, recommendations or permissions.
+
+		For further information on the Foreword, see *ISO/IEC Directives, Part 2, 2016, Clause 12.*
+		****
+		-->
+		
+		<xsl:variable name="id" select="@w:id"/>
+		
+		<xsl:variable name="comment_" select="$comments_xml//comment[@id = $id]"/>
+		<xsl:variable name="comment" select="xalan:nodeset($comment_)"/>
+		
+		<xsl:variable name="options">
+			<option name="reviewer"><xsl:value-of select="$comment/@author"/></option>
+			<option name="date"><xsl:value-of select="substring($comment/@date,1,10)"/></option>
+			<option name="from"><xsl:value-of select="ancestor::w:p/w:commentRangeStart/@w:id"/></option>
+			<option name="to"><xsl:value-of select="ancestor::w:p/w:commentRangeEnd/@w:id"/></option>
+		</xsl:variable>
+		<xsl:for-each select="xalan:nodeset($options)//option[normalize-space() != '']">
+			<xsl:if test="position() = 1">
+				<xsl:text>[</xsl:text>
+			</xsl:if>
+			<xsl:value-of select="@name"/>
+			<xsl:text>=</xsl:text>
+			<xsl:value-of select="."/>
+			<xsl:if test="position() != last()">
+				<xsl:text>,</xsl:text>
+			</xsl:if>
+			<xsl:if test="position() = last()">
+				<xsl:text>]&#xa;</xsl:text>
+			</xsl:if>
+		</xsl:for-each>
+		
+		<xsl:text>****</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:apply-templates select="$comment"/>
+		<xsl:text>****</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		
 	</xsl:template>
 	
 	<xsl:template name="repeat">

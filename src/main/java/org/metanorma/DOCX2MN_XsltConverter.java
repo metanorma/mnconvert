@@ -158,6 +158,7 @@ public class DOCX2MN_XsltConverter extends XsltConverter {
         
         String strRelsXML = Util.unzipFileToString(Paths.get(inputFilePath), "document.xml.rels");
         
+        String strCommentsXML = Util.unzipFileToString(Paths.get(inputFilePath), "comments.xml");
 
         Source src = new SAXSource(rdr, new InputSource(new StringReader(strDocumentXML)));
 
@@ -190,6 +191,18 @@ public class DOCX2MN_XsltConverter extends XsltConverter {
             logger.log(Level.SEVERE, "Can''t read relationships file: {0}", ex.toString());
         }
 
+        try {
+            InputSource xmlCommentsIS = new InputSource(new StringReader(strCommentsXML));
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder;
+            dBuilder = dbFactory.newDocumentBuilder();
+            Document xmlCommentsDocument = dBuilder.parse(xmlCommentsIS);
+            NodeList xmlCommentsDocumentNodeList = xmlCommentsDocument.getDocumentElement().getChildNodes();
+            transformer.setParameter("comments", xmlCommentsDocumentNodeList);
+        } catch (ParserConfigurationException ex) {
+            logger.log(Level.SEVERE, "Can''t read relationships file: {0}", ex.toString());
+        }
+        
         StringWriter resultWriter = new StringWriter();
         StreamResult sr = new StreamResult(resultWriter);
 
