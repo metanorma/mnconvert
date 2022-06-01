@@ -159,7 +159,9 @@ public class DOCX2MN_XsltConverter extends XsltConverter {
         String strRelsXML = Util.unzipFileToString(Paths.get(inputFilePath), "document.xml.rels");
         
         String strCommentsXML = Util.unzipFileToString(Paths.get(inputFilePath), "comments.xml");
-
+        
+        String strFootnotesXML = Util.unzipFileToString(Paths.get(inputFilePath), "footnotes.xml");
+        
         Source src = new SAXSource(rdr, new InputSource(new StringReader(strDocumentXML)));
 
         Source srcXSL;
@@ -179,28 +181,19 @@ public class DOCX2MN_XsltConverter extends XsltConverter {
         transformer.setParameter("imagesdir", imagesDir);
         transformer.setParameter("debug", isDebugMode);
 
-        try {
-            InputSource xmlRelsIS = new InputSource(new StringReader(strRelsXML));
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder;
-            dBuilder = dbFactory.newDocumentBuilder();
-            Document xmlRelsDocument = dBuilder.parse(xmlRelsIS);
-            NodeList xmlRelsDocumentNodeList = xmlRelsDocument.getDocumentElement().getChildNodes();
+        NodeList xmlRelsDocumentNodeList = getNodeList(strRelsXML);
+        if (xmlRelsDocumentNodeList != null) {
             transformer.setParameter("rels", xmlRelsDocumentNodeList);
-        } catch (ParserConfigurationException ex) {
-            logger.log(Level.SEVERE, "Can''t read relationships file: {0}", ex.toString());
         }
-
-        try {
-            InputSource xmlCommentsIS = new InputSource(new StringReader(strCommentsXML));
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder;
-            dBuilder = dbFactory.newDocumentBuilder();
-            Document xmlCommentsDocument = dBuilder.parse(xmlCommentsIS);
-            NodeList xmlCommentsDocumentNodeList = xmlCommentsDocument.getDocumentElement().getChildNodes();
+        
+        NodeList xmlCommentsDocumentNodeList = getNodeList(strCommentsXML);
+        if (xmlCommentsDocumentNodeList != null) {
             transformer.setParameter("comments", xmlCommentsDocumentNodeList);
-        } catch (ParserConfigurationException ex) {
-            logger.log(Level.SEVERE, "Can''t read relationships file: {0}", ex.toString());
+        }
+        
+        NodeList xmlFootnotesDocumentNodeList = getNodeList(strFootnotesXML);
+        if (xmlFootnotesDocumentNodeList != null) {
+            transformer.setParameter("footnotes", xmlFootnotesDocumentNodeList);
         }
         
         StringWriter resultWriter = new StringWriter();
@@ -211,6 +204,21 @@ public class DOCX2MN_XsltConverter extends XsltConverter {
 
         Task.copyImagesFromZIP(Paths.get(inputFilePath), imagesDir, outputFolder);
         
+    }
+    
+    private NodeList getNodeList(String strXML) {
+        try {
+            InputSource xmlIS = new InputSource(new StringReader(strXML));
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder;
+            dBuilder = dbFactory.newDocumentBuilder();
+            Document xmlDocument = dBuilder.parse(xmlIS);
+            NodeList xmlDocumentNodeList = xmlDocument.getDocumentElement().getChildNodes();
+            return xmlDocumentNodeList;
+        } catch (IOException | SAXException | ParserConfigurationException ex) {
+            logger.log(Level.SEVERE, "Can''t read xml string: {0}", ex.toString());
+        }
+        return null;
     }
     
 }

@@ -42,6 +42,12 @@
 	<xsl:param name="comments_file"/>
 	<!-- xml with comments (comments.xml) -->
 	<xsl:param name="comments"/>
+	
+	<!-- input xml file 'word\footnotes.xml' -->
+	<!-- xml with footnotes -->
+	<xsl:param name="footnotes_file"/>
+	<!-- xml with footenotes (footnotes.xml) -->
+	<xsl:param name="footnotes"/>
 
 	<xsl:variable name="em_dash">—</xsl:variable>
 	<xsl:variable name="en_dash">–</xsl:variable>
@@ -72,6 +78,18 @@
 		</xsl:choose>
 	</xsl:variable>
 	<xsl:variable name="comments_xml" select="xalan:nodeset($comments_xml_)"/>
+
+	<xsl:variable name="footnotes_xml_">
+		<xsl:choose>
+			<xsl:when test="$footnotes_file != ''">
+				<xsl:copy-of select="document($footnotes_file)"/> 
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy-of select="$footnotes"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	<xsl:variable name="footnotes_xml" select="xalan:nodeset($footnotes_xml_)"/>
 
 	<xsl:variable name="bookmarks_">
 		<xsl:for-each select=".//w:bookmarkStart">
@@ -1609,7 +1627,7 @@
 		<!-- Example: * [[[ISO712,ISO 712]]], _Cereals and cereal products - Determination of moisture content - Reference method_ -->
 		
 		<xsl:variable name="bibitem_">
-			<xsl:apply-templates />
+			<xsl:apply-templates mode="bibitem"/>
 		</xsl:variable>
 		<xsl:variable name="bibitem" select="xalan:nodeset($bibitem_)"/>
 		
@@ -1625,14 +1643,14 @@
 				<xsl:when test="$bibitem/stdpublisher or $bibitem/stddocNumber"> <!-- if 'standard' bibitem -->
 					
 					<xsl:variable name="id_">
-						<xsl:for-each select="$bibitem/node()[not(local-name() = 'bibnumber' or local-name() = 'stddocTitle' or local-name() = 'FootnoteReference') or following-sibling::*[self::w:tab]]">
+						<xsl:for-each select="$bibitem/node()[not(local-name() = 'bibnumber' or local-name() = 'stddocTitle' or local-name() = 'FootnoteReference') or following-sibling::*[self::w:tab]]"> <!-- or contains(.,'footnote:[') -->
 							<xsl:value-of select="translate(.,'&#xa0;[],',' ')"/> <!-- replace a0 to space, remove [, ] and comman -->
 						</xsl:for-each>
 					</xsl:variable>
 					<xsl:variable name="id" select="translate(normalize-space($id_),':/ ','___')"/> <!-- replace :,/ and space to underscore _ -->
 				
 					<xsl:variable name="reference_text">
-						<xsl:for-each select="$bibitem/node()[not(local-name() = 'bibnumber' or local-name() = 'stddocTitle')]">
+						<xsl:for-each select="$bibitem/node()[not(local-name() = 'bibnumber' or local-name() = 'stddocTitle' or local-name() = 'FootnoteReference')]"> <!-- contains(.,'footnote:[') -->
 							<xsl:choose>
 								<xsl:when test="normalize-space() = '[' or normalize-space() = ']' or normalize-space() = ','"><!-- skip --></xsl:when>
 								<xsl:otherwise><xsl:value-of select="translate(.,'&#xa0;', ' ')"/></xsl:otherwise>
@@ -1645,6 +1663,9 @@
 						<xsl:text>,</xsl:text>
 						<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($reference_text),'—','--'))"/> <!-- replace dash to double minus -->
 					<xsl:text>]]]</xsl:text>
+					
+					<xsl:value-of select="$bibitem/FootnoteReference"/>
+					
 					<xsl:for-each select="$bibitem/stddocTitle[1]"> <!-- standard's title -->
 						<xsl:text>, </xsl:text>
 						<xsl:value-of select="."/>
@@ -1686,18 +1707,37 @@
 				</xsl:otherwise>
 			</xsl:choose>
 			
-		
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</xsl:if>
 	</xsl:template>
 	
 	<!-- skip bibliography number -->
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm']]/w:r[1][following-sibling::*[1][w:tab]]"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm']]/w:r[1][following-sibling::*[1][w:tab]]" priority="2" mode="bibitem"/>
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm']]//w:r[w:rPr/w:rStyle]/*[self::w:t or self::w:insText or self::w:delText]">
-		<xsl:variable name="style" select="ancestor::w:r[1]/w:rPr/w:rStyle/@w:val"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm']]//w:r[not(w:rPr/w:rStyle)]" mode="bibitem">
+		<xsl:element name="text">
+			<xsl:apply-templates select="."/>
+		</xsl:element>
+	</xsl:template>
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm']]//w:r[w:rPr/w:rStyle/@w:val = 'FootnoteReference'][w:footnoteReference and not(w:t)]" priority="2" mode="bibitem">
+		<xsl:element name="FootnoteReference">
+			<xsl:call-template name="footnoteReference"/>
+		</xsl:element>
+	</xsl:template>
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm']]//w:r[w:rPr/w:rStyle]/*[self::w:t or self::w:insText or self::w:delText]" priority="2" mode="bibitem">
+		<xsl:variable name="style_" select="ancestor::w:r[1]/w:rPr/w:rStyle/@w:val"/>
+		<xsl:variable name="style">
+			<xsl:choose>
+				<xsl:when test="normalize-space($style_) = ''">text</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$style_"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
 		<xsl:element name="{$style}">
-			<xsl:apply-templates/>
+			<xsl:apply-templates />
 		</xsl:element>
 	</xsl:template>
 	
@@ -1882,6 +1922,48 @@
 	</xsl:template>
 	<!-- ============================= -->
 	<!-- END Rich text processing -->
+	<!-- ============================= -->
+	
+	<!-- ============================= -->
+	<!-- Footnote processing -->
+	<!-- ============================= -->
+	<!-- Example:
+		<w:r>
+			<w:rPr>
+				<w:rStyle w:val="FootnoteReference"/>
+			</w:rPr>
+			<w:footnoteReference w:id="1"/>
+		</w:r>
+	-->
+	<xsl:template match="w:r[w:rPr/w:rStyle/@w:val = 'FootnoteReference'][w:footnoteReference and not(w:t)]" name="footnoteReference">
+		<xsl:text> footnote:[</xsl:text>
+		
+		<xsl:variable name="id" select="w:footnoteReference/@w:id" />
+		
+		<xsl:variable name="footnote_" select="$footnotes_xml//footnote[@id = $id]"/>
+		<xsl:variable name="footnote" select="xalan:nodeset($footnote_)"/>
+		<xsl:apply-templates select="$footnote"/>
+		
+		<xsl:text>]</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="r[rPr/rStyle/@val = 'FootnoteReference']"/>
+	
+	<xsl:template match="footnote/p" priority="2">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<!-- Example:
+	<w:r>
+		<w:rPr>
+			<w:rStyle w:val="FootnoteReference"/>
+		</w:rPr>
+		<w:t>
+	-->
+	<xsl:template match="w:r[w:rPr/w:rStyle/@w:val = 'FootnoteReference'][w:t = ')' and not(w:footnoteReference)]"/>
+	
+	<!-- ============================= -->
+	<!-- END Footnote processing -->
 	<!-- ============================= -->
 	
 	<xsl:template match="w:tab[not(parent::w:tabs)]">
