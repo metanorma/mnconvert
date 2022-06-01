@@ -1556,7 +1556,14 @@
 				</xsl:for-each>
 				
 				<xsl:text>&gt;&gt;</xsl:text>
-			</xsl:when>
+			</xsl:when> <!-- end hyperlink to the standard -->
+			
+			<xsl:when test="w:r[w:rPr/w:rStyle/@w:val = 'stddocNumber']"> <!-- hyperlink to non-standard bibliography item -->
+				<xsl:text>&lt;&lt;</xsl:text>
+				<xsl:value-of select="@w:anchor"/>
+				<xsl:text>&gt;&gt;</xsl:text>
+			</xsl:when> <!-- end hyperlink to non-standard bibliography item -->
+			
 			<xsl:otherwise>
 				<xsl:apply-templates />
 			</xsl:otherwise>
