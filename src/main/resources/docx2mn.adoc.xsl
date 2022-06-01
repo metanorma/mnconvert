@@ -1534,14 +1534,6 @@
 				<xsl:text>[]</xsl:text>
 			</xsl:when>
 			<xsl:when test="w:r[w:rPr/w:rStyle/@w:val = 'stdpublisher'] and w:r[w:rPr/w:rStyle/@w:val = 'stddocNumber']"> <!-- hyperlink to the standard -->
-			
-				<xsl:variable name="id_">
-					<xsl:for-each select="node()[not(w:rPr/w:rStyle[@w:val = 'citesec' or @w:val = 'citetbl' or @w:val = 'citefig' or @w:val = 'citeapp' or @w:val = 'citebox' or @w:val = 'citeeq' or @w:val = 'citesection'])]">
-						<xsl:value-of select="translate(.,'&#xa0;,',' ')"/> <!-- replace a0 to space, and remove comma -->
-					</xsl:for-each>
-				</xsl:variable>
-				<xsl:variable name="id" select="translate(normalize-space($id_),':/ ','___')"/> <!-- replace :,/ and space to underscore _ -->
-				
 				
 				<xsl:variable name="localities">
 					<xsl:for-each select="node()[w:rPr/w:rStyle[@w:val = 'citesec' or @w:val = 'citetbl' or @w:val = 'citefig' or @w:val = 'citeapp' or @w:val = 'citebox' or @w:val = 'citeeq' or @w:val = 'citesection']]"> <!-- locality processing -->
@@ -1565,13 +1557,24 @@
 				<!-- Example: <<ISO_12345>> -->
 				<!-- <xsl:if test="not($style_parent = 'Source'" -->
 				<xsl:text>&lt;&lt;</xsl:text>
-				<xsl:value-of select="$id"/>
 				
-				<xsl:for-each select="xalan:nodeset($localities)//locality">
-					<xsl:if test="position() = 1">,</xsl:if>
-					<xsl:value-of select="."/>
-					<xsl:if test="position() != last()">,</xsl:if>
-				</xsl:for-each>
+					<xsl:value-of select="@w:anchor"/>
+					
+					<xsl:if test="not(@w:anchor)">
+						<xsl:variable name="id_">
+							<xsl:for-each select="node()[not(w:rPr/w:rStyle[@w:val = 'citesec' or @w:val = 'citetbl' or @w:val = 'citefig' or @w:val = 'citeapp' or @w:val = 'citebox' or @w:val = 'citeeq' or @w:val = 'citesection'])]">
+								<xsl:value-of select="translate(.,'&#xa0;,',' ')"/> <!-- replace a0 to space, and remove comma -->
+							</xsl:for-each>
+						</xsl:variable>
+						<xsl:variable name="id" select="translate(normalize-space($id_),':/ ','___')"/> <!-- replace :,/ and space to underscore _ -->
+						<xsl:value-of select="$id"/>
+					</xsl:if>
+				
+					<xsl:for-each select="xalan:nodeset($localities)//locality">
+						<xsl:if test="position() = 1">,</xsl:if>
+						<xsl:value-of select="."/>
+						<xsl:if test="position() != last()">,</xsl:if>
+					</xsl:for-each>
 				
 				<xsl:text>&gt;&gt;</xsl:text>
 			</xsl:when> <!-- end hyperlink to the standard -->
@@ -1642,26 +1645,35 @@
 			<xsl:choose>
 				<xsl:when test="$bibitem/stdpublisher or $bibitem/stddocNumber"> <!-- if 'standard' bibitem -->
 					
-					<xsl:variable name="id_">
-						<xsl:for-each select="$bibitem/node()[not(local-name() = 'bibnumber' or local-name() = 'stddocTitle' or local-name() = 'FootnoteReference') or following-sibling::*[self::w:tab]]"> <!-- or contains(.,'footnote:[') -->
-							<xsl:value-of select="translate(.,'&#xa0;[],',' ')"/> <!-- replace a0 to space, remove [, ] and comman -->
-						</xsl:for-each>
-					</xsl:variable>
-					<xsl:variable name="id" select="translate(normalize-space($id_),':/ ','___')"/> <!-- replace :,/ and space to underscore _ -->
-				
-					<xsl:variable name="reference_text">
-						<xsl:for-each select="$bibitem/node()[not(local-name() = 'bibnumber' or local-name() = 'stddocTitle' or local-name() = 'FootnoteReference')]"> <!-- contains(.,'footnote:[') -->
-							<xsl:choose>
-								<xsl:when test="normalize-space() = '[' or normalize-space() = ']' or normalize-space() = ','"><!-- skip --></xsl:when>
-								<xsl:otherwise><xsl:value-of select="translate(.,'&#xa0;', ' ')"/></xsl:otherwise>
-							</xsl:choose>
-						</xsl:for-each>
-					</xsl:variable>
+					
 				
 					<xsl:text>[[[</xsl:text>
-						<xsl:value-of select="java:replaceAll(java:java.lang.String.new($id),'—','--')"/>
+					
+						<xsl:value-of select="$bibitem/id"/>
+						
+						<xsl:if test="not($bibitem/id)">
+							<xsl:variable name="id_">
+								<xsl:for-each select="$bibitem/node()[not(local-name() = 'bibnumber' or local-name() = 'stddocTitle' or local-name() = 'FootnoteReference') or following-sibling::*[self::w:tab]]"> <!-- or contains(.,'footnote:[') -->
+									<xsl:value-of select="translate(.,'&#xa0;[],',' ')"/> <!-- replace a0 to space, remove [, ] and comman -->
+								</xsl:for-each>
+							</xsl:variable>
+							<xsl:variable name="id" select="translate(normalize-space($id_),':/ ','___')"/> <!-- replace :,/ and space to underscore _ -->
+							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($id),'—','--')"/>
+						</xsl:if>
+						
 						<xsl:text>,</xsl:text>
+						
+						<xsl:variable name="reference_text">
+							<xsl:for-each select="$bibitem/node()[not(local-name() = 'id' or local-name() = 'bibnumber' or local-name() = 'stddocTitle' or local-name() = 'FootnoteReference')]"> <!-- contains(.,'footnote:[') -->
+								<xsl:choose>
+									<xsl:when test="normalize-space() = '[' or normalize-space() = ']' or normalize-space() = ','"><!-- skip --></xsl:when>
+									<xsl:otherwise><xsl:value-of select="translate(.,'&#xa0;', ' ')"/></xsl:otherwise>
+								</xsl:choose>
+							</xsl:for-each>
+						</xsl:variable>
+						
 						<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($reference_text),'—','--'))"/> <!-- replace dash to double minus -->
+						
 					<xsl:text>]]]</xsl:text>
 					
 					<xsl:value-of select="$bibitem/FootnoteReference"/>
@@ -1676,29 +1688,34 @@
 				</xsl:when> <!-- end 'stardard' item -->
 				<xsl:otherwise>
 					<xsl:text>[[[</xsl:text>
-						<xsl:choose>
-							<xsl:when test="$bib_style = 'BiblioEntry0' or $bib_style = 'BiblioEntry'"><xsl:text>bibref</xsl:text></xsl:when>
-							<xsl:otherwise>ref</xsl:otherwise>
-						</xsl:choose>
+					
+						<xsl:value-of select="$bibitem/id"/>
 						
-						<xsl:choose>
-							<xsl:when test="$bibitem/bibnumber">
-								<xsl:value-of select="$bibitem/bibnumber"/>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:choose>
-									<xsl:when test="$bib_style = 'BiblioEntry0' or $bib_style = 'BiblioEntry'">
-										<xsl:number count="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry']]"/>
-									</xsl:when>
-									<xsl:otherwise>
-										<xsl:number count="w:p[w:pPr/w:pStyle/@w:val = 'RefNorm']"/>
-									</xsl:otherwise>
-								</xsl:choose>
-							</xsl:otherwise>
-						</xsl:choose>
+						<xsl:if test="not($bibitem/id)">
+							<xsl:choose>
+								<xsl:when test="$bib_style = 'BiblioEntry0' or $bib_style = 'BiblioEntry'"><xsl:text>bibref</xsl:text></xsl:when>
+								<xsl:otherwise>ref</xsl:otherwise>
+							</xsl:choose>
+							
+							<xsl:choose>
+								<xsl:when test="$bibitem/bibnumber">
+									<xsl:value-of select="$bibitem/bibnumber"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:choose>
+										<xsl:when test="$bib_style = 'BiblioEntry0' or $bib_style = 'BiblioEntry'">
+											<xsl:number count="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry']]"/>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:number count="w:p[w:pPr/w:pStyle/@w:val = 'RefNorm']"/>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:if>
 					<xsl:text>]]], </xsl:text>
 					<xsl:variable name="text">
-						<xsl:for-each select="$bibitem/node()[not(self::bibnumber)]">
+						<xsl:for-each select="$bibitem/node()[not(self::bibnumber or self::id)]">
 							<xsl:value-of select="."/>
 						</xsl:for-each>
 					</xsl:variable>
@@ -1713,6 +1730,12 @@
 	
 	<!-- skip bibliography number -->
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm']]/w:r[1][following-sibling::*[1][w:tab]]" priority="2" mode="bibitem"/>
+	
+	<xsl:template match="w:bookmarkStart" mode="bibitem">
+		<xsl:element name="id">
+			<xsl:value-of select="@w:name"/>
+		</xsl:element>
+	</xsl:template>
 	
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm']]//w:r[not(w:rPr/w:rStyle)]" mode="bibitem">
 		<xsl:element name="text">
