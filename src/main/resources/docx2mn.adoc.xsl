@@ -114,6 +114,10 @@
 
 	<xsl:variable name="taskCopyImagesFilename" select="concat($outpath, $pathSeparator, 'task.copyImages.adoc')"/>
 
+
+	<!-- for OMML to MathML conversion -->
+	<xsl:include href="OMML2MML.XSL"/>
+
 	<!-- .docx zip content:
 	
 		./word/document.xml - document body (entry point for this template)
@@ -1390,14 +1394,34 @@
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>++++</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:variable name="text">
-			<xsl:apply-templates />
-		</xsl:variable>
-		<xsl:value-of select="$text"/>
+		
+		<xsl:call-template name="insertMath"/>
+		
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>++++</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
+	
+	<!-- insert OMML as MathML or AsciiMath (if OMML is simple like 'R=3%' or 'r') -->
+	<xsl:template name="insertMath">
+		<xsl:variable name="simpleMath" select="normalize-space(count(*) = count(m:r))"/>
+		
+		<xsl:choose>
+			<xsl:when test="$simpleMath = 'true'"> <!-- insert as AsciiMath -->
+				<xsl:variable name="text">
+					<xsl:apply-templates />
+				</xsl:variable>
+				<xsl:value-of select="$text"/>
+			</xsl:when>
+			<xsl:otherwise> <!-- insert as MathML -->
+				<xsl:variable name="math">
+					<xsl:apply-templates select="." mode="math"/>
+				</xsl:variable>
+				<xsl:apply-templates select="xalan:nodeset($math)" mode="print_as_xml"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
 	
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Formula']/w:r[last()]">
 		<!-- if number for formula -->
@@ -1410,15 +1434,20 @@
 	<!-- inlined math -->
 	<xsl:template match="m:oMath[not(ancestor::w:p[w:pPr/w:pStyle/@w:val = 'Formula'])]">
 	
-		<xsl:variable name="text">
-			<xsl:apply-templates />
-		</xsl:variable>
 		<xsl:text>stem:[</xsl:text>
-		<xsl:value-of select="$text"/>
-		<xsl:text>]</xsl:text>
 		
-		<!-- add space after stem -->
-		<xsl:if test="java:org.metanorma.utils.RegExHelper.matches('.*(\s|\h)$', $text) = 'true'"><xsl:text> </xsl:text></xsl:if>
+		<xsl:variable name="math">
+			<xsl:call-template name="insertMath"/>
+		</xsl:variable>
+		<xsl:copy-of select="$math"/>
+		
+		<xsl:text>]</xsl:text>
+	
+		<xsl:if test="not(contains($math,'&lt;math'))"> <!-- for AsciiMath -->
+			<xsl:variable name="text" select="."/>
+			<!-- add space after stem -->
+			<xsl:if test="java:org.metanorma.utils.RegExHelper.matches('.*(\s|\h)$', $text) = 'true'"><xsl:text> </xsl:text></xsl:if>
+		</xsl:if>
 		
 	</xsl:template>
 	
@@ -2027,6 +2056,9 @@
 		<xsl:variable name="comment_" select="$comments_xml//comment[@id = $id]"/>
 		<xsl:variable name="comment" select="xalan:nodeset($comment_)"/>
 		
+		<!--DEBUG&#xa;
+		<xsl:apply-templates select="$comment" mode="print_as_xml"/>-->
+		
 		<xsl:variable name="options">
 			<option name="reviewer"><xsl:value-of select="$comment/@author"/></option>
 			<option name="date"><xsl:value-of select="substring($comment/@date,1,10)"/></option>
@@ -2086,6 +2118,9 @@
 	<xsl:template match="*" mode="print_as_xml">
 		<xsl:text>&#xa;&lt;</xsl:text>
 		<xsl:value-of select="local-name()"/>
+		<xsl:if test="local-name() = 'math'">
+			<xsl:text> xmlns="http://www.w3.org/1998/Math/MathML"</xsl:text>
+		</xsl:if>
 		<xsl:for-each select="@*">
 			<xsl:text> </xsl:text>
 			<xsl:value-of select="local-name()"/>

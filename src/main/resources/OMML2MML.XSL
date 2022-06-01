@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mml="http://www.w3.org/1998/Math/MathML"
 	xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math">
-  <xsl:output method="xml" encoding="UTF-16" />
+  <!-- <xsl:output method="xml" encoding="UTF-16" /> -->
 
   <!-- %% Global Definitions -->
 
@@ -152,11 +152,20 @@
   </xsl:template>
 
   <!-- Templates -->
-  <xsl:template match="/">
+  <!-- <xsl:template match="/">
+    <mml:math>
+      <xsl:apply-templates select="*" />
+    </mml:math>
+  </xsl:template> -->
+	
+	<xsl:template match="m:oMath" mode="math">
     <mml:math>
       <xsl:apply-templates select="*" />
     </mml:math>
   </xsl:template>
+
+	<!-- ignore empty last m:t -->
+	<xsl:template match="m:oMath/m:r[m:t and normalize-space() = ''][not(following-sibling::*)]"/>
 
   <xsl:template match="m:borderBox">
 
@@ -249,7 +258,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="*">
+  <xsl:template match="*[namespace-uri() = 'http://www.w3.org/1998/Math/MathML']">
     <xsl:apply-templates select="*" />
   </xsl:template>
 
