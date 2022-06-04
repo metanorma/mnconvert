@@ -506,7 +506,10 @@
 				<adapted/>
 			</xsl:if>
 			<xsl:if test="java:org.metanorma.utils.RegExHelper.matches($regex_modified_from_text, normalize-space(.)) = 'true'">
-				<modified_from/>
+				<!-- <modified_from/> -->
+				<modified>
+					<xsl:text>,</xsl:text>
+				</modified>
 			</xsl:if>
 			<xsl:if test="java:org.metanorma.utils.RegExHelper.matches($regex_quoted_from_text, normalize-space(.)) = 'true'">
 				<quoted/>

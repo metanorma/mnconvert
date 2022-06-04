@@ -1633,9 +1633,9 @@
 				<xsl:when test="$model_term_source/adapted">
 					<xsl:attribute name="status">adapted</xsl:attribute>
 				</xsl:when>
-				<xsl:when test="$model_term_source/modified_from">
+				<!-- <xsl:when test="$model_term_source/modified_from">
 					<xsl:attribute name="status">modified</xsl:attribute>
-				</xsl:when>
+				</xsl:when> -->
 				<xsl:when test="$model_term_source/quoted">
 					<xsl:attribute name="status">quoted</xsl:attribute>
 				</xsl:when>
@@ -1655,9 +1655,9 @@
 				<xsl:when test="$model_term_source/adapted">
 					<xsl:text>Adapted from: </xsl:text>
 				</xsl:when>
-				<xsl:when test="$model_term_source/modified_from">
+				<!-- <xsl:when test="$model_term_source/modified_from">
 					<xsl:text>Modified from: </xsl:text>
-				</xsl:when>
+				</xsl:when> -->
 				<xsl:when test="$model_term_source/quoted">
 					<xsl:text>Quoted from: </xsl:text>
 				</xsl:when>
