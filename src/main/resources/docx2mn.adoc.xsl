@@ -346,6 +346,8 @@
 		Note
 		Figuretitle0
 		Code
+		Code-
+		Code- -
 		BiblioEntry0
 		BiblioEntry
 		figure
@@ -1483,7 +1485,7 @@
 	<!-- ============================= -->
 	<!-- Source code processing -->
 	<!-- ============================= -->
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Code']]">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Code' or @w:val = 'Code-' or @w:val = 'Code--']]">
 		<xsl:text>[source]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>--</xsl:text>
@@ -1494,7 +1496,7 @@
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Code']]//w:br" priority="2">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Code' or @w:val = 'Code-' or @w:val = 'Code--']]//w:br" priority="2">
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	<!-- ============================= -->
