@@ -324,6 +324,9 @@
 		Terms
 		note
 		Example
+		Exampleindent
+		Examplecontinued
+		Exampleindentcontinued
 		Source
 		Tabletitle
 		Tablebody0
@@ -792,7 +795,7 @@
 	<!-- ============================= -->
 	<!-- Example processing -->
 	<!-- ============================= -->
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Example']">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Example' or @w:val = 'Exampleindent' or @w:val = 'Exampleindent2']]">
 		<xsl:text>====</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:variable name="text">
@@ -800,6 +803,18 @@
 		</xsl:variable>
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),'^EXAMPLE(\s|\h)+(\d+(\s|\h)+)?(.*)','$4')"/>
 		<xsl:text>&#xa;</xsl:text>
+		<xsl:if test="not(following-sibling::w:p[2][w:pPr/w:pStyle[@w:val = 'Examplecontinued' or @w:val = 'Exampleindentcontinued' or @w:val = 'Exampleindent2continued']])">
+			<xsl:text>====</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Examplecontinued' or @w:val = 'Exampleindentcontinued'' or @w:val = 'Exampleindent2continued']]">
+		<xsl:variable name="text">
+			<xsl:apply-templates/>
+		</xsl:variable>
+		<xsl:value-of select="$text"/>
 		<xsl:text>====</xsl:text>
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
