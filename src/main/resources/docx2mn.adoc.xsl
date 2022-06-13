@@ -323,6 +323,12 @@
 		TermNum
 		Terms
 		note
+		Note
+		Noteindent
+		Noteindent2
+		Notecontinued
+		Noteindentcontinued
+		Noteindent2continued
 		Example
 		Exampleindent
 		Examplecontinued
@@ -346,7 +352,6 @@
 		Formula
 		tabletitle
 		AdmittedTerm
-		Note
 		Figuretitle0
 		Code
 		Code-
@@ -630,6 +635,7 @@
 	
 	<!-- skip copyright information text -->
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCopyright']"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzcopyrighthdr']"/>
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzAddress']"/>
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzaddress']"/>
 	
@@ -777,8 +783,20 @@
 	<!-- ============================= -->
 	<!-- Note processing -->
 	<!-- ============================= -->
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'note' or @w:val = 'note1' or @w:val = 'Note' or @w:val = 'Figurenote']]" name="note">
-		<xsl:text>NOTE: </xsl:text>
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'note' or @w:val = 'note1' or @w:val = 'Note' or @w:val = 'NoteIndent' or @w:val = 'NoteIndent2' or @w:val = 'Figurenote']]" name="note">
+	
+		<xsl:choose>
+			<xsl:when test="following-sibling::w:p[2][w:pPr/w:pStyle[@w:val = 'Notecontinued' or @w:val = 'Noteindentcontinued' or @w:val = 'Noteindent2continued']]">
+				<xsl:text>[NOTE]</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>====</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text>NOTE: </xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
+		
 		<xsl:variable name="text">
 			<xsl:apply-templates/>
 		</xsl:variable>
@@ -786,6 +804,15 @@
 		<xsl:variable name="note2" select="java:replaceAll(java:java.lang.String.new($note1),'^NOTE(\s|\h)+(\d+(\s|\h)+)?(.*)','$4')"/>
 		
 		<xsl:value-of select="$note2"/>
+		<xsl:text>&#xa;&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Notecontinued' or @w:val = 'Noteindentcontinued' or @w:val = 'Noteindent2continued']]">
+		<xsl:variable name="text">
+			<xsl:apply-templates/>
+		</xsl:variable>
+		<xsl:value-of select="$text"/>
+		<xsl:text>====</xsl:text>
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
 	<!-- ============================= -->
@@ -810,7 +837,7 @@
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Examplecontinued' or @w:val = 'Exampleindentcontinued'' or @w:val = 'Exampleindent2continued']]">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Examplecontinued' or @w:val = 'Exampleindentcontinued' or @w:val = 'Exampleindent2continued']]">
 		<xsl:variable name="text">
 			<xsl:apply-templates/>
 		</xsl:variable>
