@@ -1260,7 +1260,7 @@
 	<!-- ============================= -->
 	
 	<!-- Unordered list (ul) -->
-	<xsl:template match="w:p[starts-with(w:pPr/w:pStyle/@w:val, 'ListContinue')]">
+	<xsl:template match="w:p[starts-with(w:pPr/w:pStyle/@w:val, 'ListContinue') or starts-with(w:pPr/w:pStyle/@w:val, 'MsoListContinue')]">
 		<xsl:variable name="level_" select="java:replaceAll(java:java.lang.String.new(w:pPr/w:pStyle/@w:val),'ListContinue(.*)','$1')"/>
 		<xsl:variable name="level">
 			<xsl:choose>
@@ -1296,7 +1296,7 @@
 	
 
 	<!-- Ordered list (ol) -->
-	<xsl:template match="w:p[starts-with(w:pPr/w:pStyle/@w:val, 'ListNumber')]">
+	<xsl:template match="w:p[starts-with(w:pPr/w:pStyle/@w:val, 'ListNumber') or starts-with(w:pPr/w:pStyle/@w:val, 'MsoListNumber')]">
 		<xsl:variable name="level_" select="java:replaceAll(java:java.lang.String.new(w:pPr/w:pStyle/@w:val),'ListNumber(.*)','$1')"/>
 		<xsl:variable name="level">
 			<xsl:choose>
@@ -1323,7 +1323,7 @@
 	</xsl:template> <!-- ol -->
 	
 	<!-- text in list: list item label or body -->
-	<xsl:template match="w:p[starts-with(w:pPr/w:pStyle/@w:val, 'ListContinue') or starts-with(w:pPr/w:pStyle/@w:val, 'ListNumber')]//*[self::w:t or self::w:delText or self::w:insText]">
+	<xsl:template match="w:p[starts-with(w:pPr/w:pStyle/@w:val, 'ListContinue') or starts-with(w:pPr/w:pStyle/@w:val, 'ListNumber') or starts-with(w:pPr/w:pStyle/@w:val, 'MsoListNumber') or starts-with(w:pPr/w:pStyle/@w:val, 'MsoListContinue')]//*[self::w:t or self::w:delText or self::w:insText]">
 		<xsl:choose>
 			<xsl:when test="ancestor::w:r/following-sibling::w:r[1][w:tab]"><!-- skip list item label --></xsl:when>
 			<xsl:otherwise>
