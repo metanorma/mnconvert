@@ -373,6 +373,8 @@
 		ISOCodeitalic
 		addition
 		deletion
+		dl
+		figdl
 	-->
 	
 	
@@ -931,6 +933,9 @@
 		<xsl:choose>
 			<!-- no border, paragraph is 'dl' item and columns count = 2 -->
 			<xsl:when test="(count($table//td[@border = '1']) = 0 and $table//p/@dl = 'true' and count($table/table/colgroup/col) = 2) or not(w:tblPr/w:tblStyle/@w:val = 'TableISO')"> <!-- style 'TableISO' means table, not definition list -->
+				<xsl:apply-templates select="$table/node()" mode="dl"/>
+			</xsl:when>
+			<xsl:when test="w:tblPr/w:tblStyle/@w:val = 'dl' or w:tblPr/w:tblStyle/@w:val = 'figdl'">
 				<xsl:apply-templates select="$table/node()" mode="dl"/>
 			</xsl:when>
 			<xsl:otherwise>
