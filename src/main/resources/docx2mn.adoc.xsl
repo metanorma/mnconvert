@@ -371,6 +371,8 @@
 		ISOCode
 		ISOCodebold
 		ISOCodeitalic
+		addition
+		deletion
 	-->
 	
 	
@@ -1996,6 +1998,14 @@
 	
 	<xsl:template match="w:r[w:rPr/w:rStyle[@w:val = 'biburl']]">
 		<xsl:apply-templates /><xsl:text>[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="w:r[w:rPr/w:rStyle[@w:val = 'addition']]">
+		<xsl:text>add:[</xsl:text><xsl:apply-templates /><xsl:text>]</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="w:r[w:rPr/w:rStyle[@w:val = 'deletion']]">
+		<xsl:text>del:[</xsl:text><xsl:apply-templates /><xsl:text>]</xsl:text>
 	</xsl:template>
 	
 	<xsl:template name="insertRichText">
