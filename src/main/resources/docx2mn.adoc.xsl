@@ -331,6 +331,7 @@
 		Noteindent2continued
 		Example
 		Exampleindent
+		Figureexample
 		Examplecontinued
 		Exampleindentcontinued
 		Source
@@ -823,7 +824,7 @@
 	<!-- ============================= -->
 	<!-- Example processing -->
 	<!-- ============================= -->
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Example' or @w:val = 'Exampleindent' or @w:val = 'Exampleindent2']]">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Example' or @w:val = 'Exampleindent' or @w:val = 'Exampleindent2' or @w:val = 'Exampleindent2' or @w:val = 'Figureexample']]">
 		<xsl:text>====</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:variable name="text">
