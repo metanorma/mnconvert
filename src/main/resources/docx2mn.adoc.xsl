@@ -346,13 +346,14 @@
 		zzSTDTitle
 		FigureTitle
 		AnnexFigureTitle
+		Figuretitle
+		Figuretitle0
 		AltTerms
 		DeprecatedTerms
 		Definition
 		Formula
 		tabletitle
 		AdmittedTerm
-		Figuretitle0
 		Code
 		Code-
 		Code- -
@@ -1342,7 +1343,7 @@
 	
 	<xsl:template match="w:p[w:r/w:drawing]">
 		
-		<xsl:apply-templates select="following-sibling::w:p[w:pPr/w:pStyle[@w:val = 'FigureTitle' or @w:val = 'Figuretitle0' or @w:val = 'AnnexFigureTitle']][1]">
+		<xsl:apply-templates select="following-sibling::w:p[w:pPr/w:pStyle[@w:val = 'FigureTitle' or @w:val = 'Figuretitle' or @w:val = 'Figuretitle0' or @w:val = 'AnnexFigureTitle']][1]">
 			<xsl:with-param name="process">true</xsl:with-param>
 		</xsl:apply-templates>
 		
@@ -1353,7 +1354,7 @@
 	
 	
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'FigureTitle' or @w:val = 'Figuretitle0' or @w:val = 'AnnexFigureTitle']]">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'FigureTitle' or @w:val = 'Figuretitle' or @w:val = 'Figuretitle0' or @w:val = 'AnnexFigureTitle']]">
 		<xsl:param name="process">false</xsl:param>
 		<xsl:if test="$process = 'true'">
 			<xsl:text>.</xsl:text>
