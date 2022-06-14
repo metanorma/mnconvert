@@ -1601,7 +1601,19 @@
 					<xsl:apply-templates select="ancestor::w:tbl[1]//w:r[preceding-sibling::w:bookmarkStart[@w:name = current()/@w:anchor]]"/>
 				<xsl:text>]</xsl:text>
 			</xsl:when>
-			<xsl:when test="count(w:r) = 1 and w:r/w:rPr/w:rStyle[@w:val = 'citeapp' or @w:val = 'citefig' or @w:val = 'citesec' or @w:val = 'citetbl']"> <!-- hyperlink to Annex, Figure, Clause or Table -->
+			<xsl:when test="count(w:r) = 1 and w:r/w:rPr/w:rStyle[
+				 @w:val = 'citeapp' or 
+				 @w:val = 'citebase' or 
+				 @w:val = 'citebib' or 
+				 @w:val = 'citebox' or 
+				 @w:val = 'citeen' or 
+				 @w:val = 'citeeq' or 
+				 @w:val = 'citefig' or 
+				 @w:val = 'citefn' or 
+				 @w:val = 'citesec' or 
+				 @w:val = 'citesection' or
+				 @w:val = 'citetbl' or
+				 @w:val = 'citetfn']"> <!-- hyperlink to Annex, Figure, Clause or Table, etc. -->
 				<xsl:text>&lt;&lt;</xsl:text>
 				<xsl:value-of select="@w:anchor"/>
 				<xsl:text>&gt;&gt;</xsl:text>
@@ -1982,6 +1994,9 @@
 		<xsl:text>_`</xsl:text><xsl:apply-templates /><xsl:text>`_</xsl:text>
 	</xsl:template>
 	
+	<xsl:template match="w:r[w:rPr/w:rStyle[@w:val = 'biburl']]">
+		<xsl:apply-templates /><xsl:text>[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
+	</xsl:template>
 	
 	<xsl:template name="insertRichText">
 		<xsl:param name="text"/>
