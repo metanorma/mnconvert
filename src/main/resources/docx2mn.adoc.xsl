@@ -647,6 +647,8 @@
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzcopyrighthdr']"/>
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzAddress']"/>
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzaddress']"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzWarningHdr']"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzwarning']"/>
 	
 	<!-- skip 'Contents' title -->
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzContents']"/>
