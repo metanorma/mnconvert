@@ -368,6 +368,9 @@
 		FigureGraphic
 		BodyTextindent1
 		Hyperlink
+		ISOCode
+		ISOCodebold
+		ISOCodeitalic
 	-->
 	
 	
@@ -1966,6 +1969,19 @@
 	<xsl:template match="w:smallCaps" mode="richtext">
 		<smallcaps/>
 	</xsl:template>
+	
+	<xsl:template match="w:r[w:rPr/w:rStyle[@w:val = 'ISOCode']]">
+		<xsl:text>`</xsl:text><xsl:apply-templates /><xsl:text>`</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="w:r[w:rPr/w:rStyle[@w:val = 'ISOCodebold']]">
+		<xsl:text>*`</xsl:text><xsl:apply-templates /><xsl:text>`*</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="w:r[w:rPr/w:rStyle[@w:val = 'ISOCodeitalic']]">
+		<xsl:text>_`</xsl:text><xsl:apply-templates /><xsl:text>`_</xsl:text>
+	</xsl:template>
+	
 	
 	<xsl:template name="insertRichText">
 		<xsl:param name="text"/>
