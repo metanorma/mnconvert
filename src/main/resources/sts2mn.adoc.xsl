@@ -47,7 +47,7 @@
 		</xsl:choose>
 	</xsl:variable>  -->
 	
-	<xsl:variable name="one_document_" select="count(//standard/front/*[contains(local-name(), '-meta')]) = 1"/>
+	<xsl:variable name="one_document_" select="count(//standard/front/*[contains(local-name(), '-meta')]) = 1 or //standards-document"/>
 	<xsl:variable name="one_document" select="normalize-space($one_document_)"/>
 	
 	<xsl:variable name="language" select="//standard/front/*/doc-ident/language"/>
@@ -71,6 +71,7 @@
 			<xsl:when test="normalize-space(//standard/front/*/doc-ident/sdo) != ''">
 				<xsl:value-of  select="java:toLowerCase(java:java.lang.String.new(//standard/front/*/doc-ident/sdo))"/>
 			</xsl:when>
+			<xsl:when test="//standards-document">ieee</xsl:when>
 			<xsl:otherwise>iso</xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable>
@@ -234,7 +235,7 @@
 		<redirect:close file="{$outpath}/{$docfile}"/>
 	</xsl:template>
 	
-	<xsl:template match="standard">
+	<xsl:template match="standard | standards-document">
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
 		<redirect:open file="{$outpath}/{$docfile}"/>
 		<xsl:apply-templates />
@@ -245,7 +246,7 @@
 	<!-- <xsl:template match="adoption/text() | adoption-front/text()"/> -->
 	
 	<!-- <xsl:template match="/*"> -->
-	<xsl:template match="//standard/front | //adoption/adoption-front">
+	<xsl:template match="//standard/front | //adoption/adoption-front | //standards-document/front">
 	
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
 	
@@ -468,7 +469,7 @@
 	<xsl:template name="insertCommonAttributes">
 		<xsl:text>:mn-document-class: </xsl:text><xsl:value-of select="$sdo"/>
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>:mn-output-extensions: xml,html</xsl:text> <!-- ,doc,html_alt -->
+		<xsl:text>:mn-output-extensions: xml,html,doc,pdf,rxl</xsl:text> <!-- ,doc,html_alt -->
 		<xsl:text>&#xa;</xsl:text>
 		
 		<xsl:text>:local-cache-only:</xsl:text>
@@ -512,7 +513,9 @@
 		<!-- = ISO 8601-1 -->
 		<xsl:apply-templates select="std-ident"/> <!-- * -> iso-meta -->
 		<!-- :docnumber: 8601 -->
-		<xsl:apply-templates select="std-ident/doc-number"/>		
+		<xsl:apply-templates select="std-ident/doc-number"/>
+		<xsl:apply-templates select="std-designation[@content-type = 'full']" mode="docnumber"/>
+		
 		<!-- :publisher: ISO;IEC -->
 		<xsl:apply-templates select="std-ident/originator"/>
 		<!-- :partnumber: 1 -->
@@ -542,10 +545,12 @@
 		:title-intro-fr: Date et l'heure
 		:title-main-fr: Représentations pour l'échange d'information
 		:title-part-fr: Règles de base -->
-		<xsl:apply-templates select="title-wrap"/>		
+		<xsl:apply-templates select="title-wrap"/>
+		<xsl:apply-templates select="std-title-group"/>
+		
 		<!-- :doctype: international-standard -->
 		<xsl:variable name="doctype">
-			<xsl:apply-templates select="std-ident/doc-type"/>		
+			<xsl:apply-templates select="std-ident/doc-type | ancestor::standards-document/@content-type"/>		
 		</xsl:variable>
 		<xsl:text>:doctype: </xsl:text>
 			<xsl:choose>
@@ -555,6 +560,7 @@
 				<xsl:when test="$doctype = 'AMD' or $doctype = 'amd'">amendment</xsl:when>
 				<xsl:when test="$doctype = 'DIR' or $doctype = 'dir'">directive</xsl:when>
 				<xsl:when test="$doctype = 'IS' or $doctype = 'is'">international-standard</xsl:when>
+				<xsl:when test="$doctype = 'standard'">standard</xsl:when>
 				<xsl:otherwise><xsl:value-of select="$doctype"/></xsl:otherwise>
 			</xsl:choose>
 		<xsl:text>&#xa;</xsl:text>
@@ -563,9 +569,9 @@
 		:docsubstage: 60 -->		
 		<xsl:apply-templates select="doc-ident/release-version"/>
 		
-		<xsl:if test="ics">
+		<xsl:if test="ics[normalize-space() != '']">
 			<xsl:text>:library-ics: </xsl:text>
-			<xsl:for-each select="ics">
+			<xsl:for-each select="ics[normalize-space() != '']">
 				<xsl:value-of select="."/><xsl:if test="position() != last()">,</xsl:if>
 			</xsl:for-each>
 			<xsl:text>&#xa;</xsl:text>
@@ -606,6 +612,11 @@
 		
 		<!-- :secretariat: SAC -->
 		<xsl:apply-templates select="secretariat"/>
+		
+		<!-- :committee: -->
+		<!-- :society: -->
+		<xsl:apply-templates select="std-sponsor"/>
+		
 		
 		<!-- ==================== -->
 		<!-- std-xref processing  -->
@@ -717,6 +728,16 @@
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 
+		<!-- :stdid-pdf: -->
+		<xsl:apply-templates select="product-num[@publication-format = 'online']"/>
+		<!-- :stdid-print: -->
+		<xsl:apply-templates select="product-num[@publication-format = 'print']"/>
+		<!-- :isbn-pdf: -->
+		<xsl:apply-templates select="isbn[@publication-format = 'online']"/>
+		<!-- :isbn-print: -->
+		<xsl:apply-templates select="isbn[@publication-format = 'print']"/>
+
+
 	</xsl:template>
 	
 	<xsl:template name="getCoverPageImage">
@@ -786,7 +807,6 @@
 		<!-- <xsl:value-of select="java:replaceAll(java:java.lang.String.new($value), concat(':', $copyright-year, '$'), '')"/>  -->
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($value), concat($regex_part, $regex_copyright-year, '$'), '')"/> 
 	</xsl:template>
-	
 	
 	<xsl:template match="std-ident[ancestor::front or ancestor::adoption-front]/part-number[normalize-space(.) != '']">		
 		<xsl:text>:partnumber: </xsl:text><xsl:value-of select="."/>
@@ -1210,6 +1230,56 @@
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
+		
+	<xsl:variable name="regex_ieee_number">^.*?(\d+)-(\d+)$</xsl:variable>
+	<xsl:template match="std-designation[@content-type = 'full']" mode="docnumber">
+		<xsl:text>:docnumber: </xsl:text><xsl:value-of select="java:replaceAll(java:java.lang.String.new(.), $regex_ieee_number, '$1')"/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="product-num[@publication-format = 'online']">
+		<xsl:text>:stdid-pdf: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="product-num[@publication-format = 'print']">
+		<xsl:text>:stdid-print: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="isbn[@publication-format = 'online']">
+		<xsl:text>:isbn-pdf: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="isbn[@publication-format = 'print']">
+		<xsl:text>:isbn-print: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="std-title-group">
+		<xsl:apply-templates select="std-main-title"/>
+	</xsl:template>
+	
+	<xsl:template match="std-title-group/std-main-title">
+		<xsl:text>:title-main: </xsl:text><xsl:apply-templates />
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="std-sponsor">
+		<xsl:apply-templates select="committee"/>
+		<xsl:apply-templates select="society"/>
+	</xsl:template>
+	
+	<xsl:template match="std-sponsor/committee">
+		<xsl:text>:committee: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="std-sponsor/society">
+		<xsl:text>:society: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
 	
 	<!-- =========== -->
 	<!-- end bibdata (standard/front) -->
