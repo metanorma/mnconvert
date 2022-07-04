@@ -514,6 +514,9 @@
 		<xsl:param name="include_std_meta">false</xsl:param>
 		<xsl:param name="originator"/>
 		
+		<!-- = Title -->
+		<xsl:apply-templates select="std-title-group/std-main-title"/>
+		
 		<!-- = ISO 8601-1 -->
 		<xsl:apply-templates select="std-ident"/> <!-- * -> iso-meta -->
 		<!-- :docnumber: 8601 -->
@@ -534,7 +537,7 @@
 		<!-- :published-date: -->
 		<xsl:apply-templates select="pub-date"/>
 		
-		<!-- :approval-date: -->
+		<!-- :confirmed-date: -->
 		<xsl:apply-templates select="approval/approval-date"/>
 		
 		<!-- :date: release 2020-01-01 -->
@@ -545,6 +548,10 @@
 		
 		<!-- :language: en -->
 		<xsl:apply-templates select="doc-ident/language"/>
+		<xsl:if test="$organization = 'IEEE'">
+			<xsl:text>:language: en</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 		<!-- :title-intro-en: Date and time
 		:title-main-en: Representations for information interchange
 		:title-part-en: Basic rules
@@ -552,7 +559,7 @@
 		:title-main-fr: Représentations pour l'échange d'information
 		:title-part-fr: Règles de base -->
 		<xsl:apply-templates select="title-wrap"/>
-		<xsl:apply-templates select="std-title-group"/>
+		<!-- <xsl:apply-templates select="std-title-group"/> -->
 		
 		<!-- :doctype: international-standard -->
 		<xsl:variable name="doctype">
@@ -745,6 +752,9 @@
 		<!-- :isbn-print: -->
 		<xsl:apply-templates select="isbn[@publication-format = 'print']"/>
 
+		<!-- :wg_chair: :wg_vicechair:  :wg_members: etc. -->
+		<xsl:apply-templates select="contrib-group"/>
+		
 
 	</xsl:template>
 	
@@ -1240,8 +1250,13 @@
 	</xsl:template>
 	
 	<xsl:template match="permissions/copyright-statement">
-		<xsl:text>:semantic-metadata-copyright-statement: </xsl:text><xsl:value-of select="."/>
-		<xsl:text>&#xa;</xsl:text>
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEEE'"><!-- skip --></xsl:when>
+			<xsl:otherwise>
+				<xsl:text>:semantic-metadata-copyright-statement: </xsl:text><xsl:value-of select="."/>
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 		
@@ -1272,11 +1287,13 @@
 	</xsl:template>
 	
 	<xsl:template match="std-title-group">
-		<xsl:apply-templates select="std-main-title"/>
+		<!-- <xsl:apply-templates select="std-main-title"/> -->
 	</xsl:template>
 	
 	<xsl:template match="std-title-group/std-main-title">
-		<xsl:text>:title-main: </xsl:text><xsl:apply-templates />
+		<!-- <xsl:text>:title-main: </xsl:text> -->
+		<xsl:variable name="title"><xsl:apply-templates /></xsl:variable>
+		<xsl:text>= </xsl:text><xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($title),'^IEEE Standard for (.*)','$1'))"/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
@@ -1291,14 +1308,14 @@
 	</xsl:template>
 	
 	<xsl:template match="std-sponsor/society">
-		<xsl:text>:society: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>:society: </xsl:text><xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(.),'^IEEE (.*)','$1'))"/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="approval/approval-date">
 		<xsl:variable name="date" select="normalize-space(@iso-8601-date)"/>
 		<xsl:if test="$date != ''">
-			<xsl:text>:approval-date: </xsl:text><xsl:value-of select="$date"/>
+			<xsl:text>:confirmed-date: </xsl:text><xsl:value-of select="$date"/>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 	</xsl:template>
@@ -1310,9 +1327,117 @@
 	
 	<xsl:template match="kwd-group/kwd">
 		<xsl:value-of select="."/>
-		<xsl:if test="following-sibling::*"><xsl:text>; </xsl:text></xsl:if>
+		<xsl:if test="following-sibling::*"><xsl:text>, </xsl:text></xsl:if>
 	</xsl:template>
 	
+	<xsl:template match="contrib-group[@content-type = 'Working Group']">
+		<xsl:apply-templates mode="working_group"/>
+	</xsl:template>
+	
+	<xsl:template match="contrib-group/contrib[@contrib-type = 'chair']" mode="working_group">
+		<xsl:text>:wg-chair: </xsl:text><xsl:apply-templates/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="contrib-group/contrib[@contrib-type = 'vice-chair']" mode="working_group">
+		<xsl:text>:wg-vicechair: </xsl:text><xsl:apply-templates/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	
+	<xsl:template match="contrib-group[@content-type = '']">
+		<xsl:apply-templates mode="other_group"/>
+	</xsl:template>
+	
+	<!-- organizations -->
+	<xsl:template match="contrib-group/contrib[@contrib-type = 'member'][preceding-sibling::contrib[@contrib-type = 'chair' or @contrib-type = 'vice-chair']]" mode="working_group">
+		<!-- for first only -->
+		<xsl:if test="not(preceding-sibling::contrib[@contrib-type = 'member'])">
+			<xsl:text>:wg-members: </xsl:text>
+			<xsl:apply-templates />
+			<!-- process next -->
+			<xsl:for-each select="following-sibling::contrib">
+				<xsl:text>; </xsl:text>
+				<xsl:apply-templates />
+			</xsl:for-each>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	<!-- persons -->
+	<xsl:template match="contrib-group/contrib[@contrib-type = 'member'][not(preceding-sibling::contrib[@contrib-type = 'chair' or @contrib-type = 'vice-chair'])]" mode="working_group">
+		<!-- for first only -->
+		<xsl:if test="not(preceding-sibling::contrib[@contrib-type = 'member'])">
+			<xsl:text>:wg-members-persons: </xsl:text>
+			<xsl:apply-templates />
+			<!-- process next -->
+			<xsl:for-each select="following-sibling::contrib">
+				<xsl:text>; </xsl:text>
+				<xsl:apply-templates />
+			</xsl:for-each>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="contrib-group[not(contrib[@contrib-type = 'chair' or @contrib-type = 'vice-chair'])]/contrib" mode="other_group">
+		<xsl:if test="not(preceding-sibling::contrib[@contrib-type = 'member'])">
+			<xsl:text>:balloting-group-members: </xsl:text>
+			<xsl:apply-templates/>
+			<!-- process next -->
+			<xsl:for-each select="following-sibling::contrib">
+				<xsl:text>; </xsl:text>
+				<xsl:apply-templates />
+			</xsl:for-each>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="contrib-group[contrib[@contrib-type = 'chair' or @contrib-type = 'vice-chair']]/contrib[@contrib-type = 'chair']" mode="other_group" priority="2">
+		<xsl:text>:std-board-chair: </xsl:text><xsl:apply-templates/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="contrib-group[contrib[@contrib-type = 'chair' or @contrib-type = 'vice-chair']]/contrib[@contrib-type = 'vice-chair']" mode="other_group" priority="2">
+		<xsl:text>:std-board-vicechair: </xsl:text><xsl:apply-templates/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="contrib-group[contrib[@contrib-type = 'chair' or @contrib-type = 'vice-chair']]/contrib[@contrib-type = 'past-chair']" mode="other_group" priority="2">
+		<xsl:text>:std-board-pastchair: </xsl:text><xsl:apply-templates/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="contrib-group[contrib[@contrib-type = 'chair' or @contrib-type = 'vice-chair']]/contrib[@contrib-type = 'secretary']" mode="other_group" priority="2">
+		<xsl:text>:std-board-secretary: </xsl:text><xsl:apply-templates/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="contrib-group[contrib[@contrib-type = 'chair' or @contrib-type = 'vice-chair']]/contrib" mode="other_group">
+		<xsl:if test="not(preceding-sibling::contrib[@contrib-type = 'member'])">
+			<xsl:text>:std-board-members: </xsl:text><xsl:apply-templates/>
+			<!-- process next -->
+			<xsl:for-each select="following-sibling::contrib">
+				<xsl:text>; </xsl:text>
+				<xsl:apply-templates />
+			</xsl:for-each>
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="contrib-group/contrib//given-names">
+		<xsl:apply-templates/><xsl:text> </xsl:text>
+	</xsl:template>
+	<xsl:template match="contrib-group/contrib/role"/>
+	
+	<xsl:template match="contrib-group/contrib/name-alternatives">
+		<xsl:apply-templates/>
+		<xsl:apply-templates select="ancestor::contrib[1]/@emeritus"/>
+	</xsl:template>
+	
+	<xsl:template match="contrib-group/contrib/@emeritus[. = 'yes']">
+		<xsl:text>*</xsl:text>
+	</xsl:template>
 	<!-- =========== -->
 	<!-- end bibdata (standard/front) -->
 	<!-- =========== -->
