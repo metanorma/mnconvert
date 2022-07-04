@@ -233,8 +233,8 @@ public class mnconvert {
                 if (inputFormat != null) {
                     inputFormat = inputFormat.toLowerCase();
                 } else {
-                    // determine input xml file format
-                    inputFormat = Util.getXMLFormat(argXmlIn);
+                    // determine input file format (xml or docx)
+                    inputFormat = Util.getInputFormat(argXmlIn);
                 }
 
                 XsltConverter converter = null;
