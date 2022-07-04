@@ -56,6 +56,7 @@
 		<xsl:choose>
 			<xsl:when test="/standard/front/nat-meta/std-ident/originator = 'PAS'">PAS</xsl:when>
 			<xsl:when test="/standard/front/nat-meta/@originator = 'BSI' or /standard/front/iso-meta/secretariat = 'BSI'">BSI</xsl:when>
+			<xsl:when test="/standards-document">IEEE</xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="/standard/front/*/doc-ident/sdo"/>
 			</xsl:otherwise>
@@ -443,18 +444,21 @@
 					<xsl:when test="$one_document = 'false' and ((contains(@id, '_euro') or title = 'European foreword'))"/> <!-- skip European Foreword and another European clauses --> <!-- $demomode = 'true' and  -->
 					<xsl:when test="$one_document = 'false' and (not(contains(@id, '_nat') or title = 'National foreword' or contains(@id, '_euro') or title = 'European foreword'))"/> <!-- skip Foreword and another clauses --> <!-- $demomode = 'true' and  -->
 					<xsl:otherwise>
-						<redirect:write file="{$outpath}/{$filename}">
-							<xsl:text>&#xa;</xsl:text>
-							<xsl:if test="title = 'National foreword' or title = 'European foreword'">
-								<xsl:text>[.preface]</xsl:text>
+						<xsl:variable name="section_text"><xsl:apply-templates select="."/></xsl:variable>
+						<xsl:if test="normalize-space($section_text) != ''">
+							<redirect:write file="{$outpath}/{$filename}">
 								<xsl:text>&#xa;</xsl:text>
-							</xsl:if>
-							<xsl:apply-templates select="."/>
-						</redirect:write>
-						<redirect:write file="{$outpath}/{$docfile}">
-							<xsl:text>include::</xsl:text><xsl:value-of select="$filename"/><xsl:text>[]</xsl:text>
-							<xsl:text>&#xa;&#xa;</xsl:text>
-						</redirect:write>
+								<xsl:if test="title = 'National foreword' or title = 'European foreword'">
+									<xsl:text>[.preface]</xsl:text>
+									<xsl:text>&#xa;</xsl:text>
+								</xsl:if>
+								<xsl:value-of select="$section_text"/>
+							</redirect:write>
+							<redirect:write file="{$outpath}/{$docfile}">
+								<xsl:text>include::</xsl:text><xsl:value-of select="$filename"/><xsl:text>[]</xsl:text>
+								<xsl:text>&#xa;&#xa;</xsl:text>
+							</redirect:write>
+						</xsl:if>
 					</xsl:otherwise>
 				</xsl:choose>
 				
@@ -527,9 +531,11 @@
 		<!-- :copyright-year: 2019 -->
 		<xsl:apply-templates select="permissions/copyright-year"/>
 		
-		
 		<!-- :published-date: -->
 		<xsl:apply-templates select="pub-date"/>
+		
+		<!-- :approval-date: -->
+		<xsl:apply-templates select="approval/approval-date"/>
 		
 		<!-- :date: release 2020-01-01 -->
 		<xsl:apply-templates select="release-date"/>
@@ -617,6 +623,8 @@
 		<!-- :society: -->
 		<xsl:apply-templates select="std-sponsor"/>
 		
+		<!-- :keywords: -->
+		<xsl:apply-templates select="kwd-group"/>
 		
 		<!-- ==================== -->
 		<!-- std-xref processing  -->
@@ -856,8 +864,14 @@
 	</xsl:template>
 	
 	<xsl:template match="pub-date[ancestor::front or ancestor::adoption-front]">
-		<xsl:if test="normalize-space() != ''">
-			<xsl:text>:published-date: </xsl:text><xsl:value-of select="."/>
+		<xsl:variable name="date">
+			<xsl:choose>
+				<xsl:when test="normalize-space(@iso-8601-date) != ''"><xsl:value-of select="@iso-8601-date"/></xsl:when>
+				<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:if test="normalize-space($date) != ''">
+			<xsl:text>:published-date: </xsl:text><xsl:value-of select="$date"/>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 	</xsl:template>
@@ -1281,17 +1295,40 @@
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
+	<xsl:template match="approval/approval-date">
+		<xsl:variable name="date" select="normalize-space(@iso-8601-date)"/>
+		<xsl:if test="$date != ''">
+			<xsl:text>:approval-date: </xsl:text><xsl:value-of select="$date"/>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="kwd-group">
+		<xsl:text>:keywords: </xsl:text><xsl:apply-templates/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="kwd-group/kwd">
+		<xsl:value-of select="."/>
+		<xsl:if test="following-sibling::*"><xsl:text>; </xsl:text></xsl:if>
+	</xsl:template>
+	
 	<!-- =========== -->
 	<!-- end bibdata (standard/front) -->
 	<!-- =========== -->
 	
 	<xsl:template match="front/notes" priority="2">
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>[.preface,type="front_notes"]</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>== {blank}</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:apply-templates />
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEEE'"><!-- skip --></xsl:when>
+			<xsl:otherwise>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>[.preface,type="front_notes"]</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>== {blank}</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:apply-templates />
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="front/sec[@sec-type = 'publication_info']" priority="2">
@@ -1317,6 +1354,8 @@
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:apply-templates />
 	</xsl:template>
+	
+	<xsl:template match="front/sec[participants-sec]"/> <!-- skip -->
 	
 	<xsl:template match="body/sec[@sec-type = 'intro']" priority="2">
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
@@ -1361,7 +1400,7 @@
 	<!-- ======================== -->
 	<!-- Normative references -->
 	<!-- ======================== -->
-	<xsl:template match="body/sec[@sec-type = 'norm-refs'] | front/sec[@sec-type = 'norm-refs']" priority="2">
+	<xsl:template match="body/sec[@sec-type = 'norm-refs'] | front/sec[@sec-type = 'norm-refs'] | body/sec[title = 'Normative references']" priority="2">
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$sectionsFolder}/02-normrefs.adoc">
 			<xsl:text>&#xa;</xsl:text>
@@ -1400,10 +1439,10 @@
 	<!-- Terms and definitions -->
 	<!-- ======================== -->
 	<!-- first element in Terms and definitions section -->
-	<xsl:template match="sec[@sec-type = 'terms']/title | sec[@sec-type = 'terms']//sec/title" priority="2">
+	<xsl:template match="sec[@sec-type = 'terms']/title | sec[@sec-type = 'terms']//sec/title | sec[.//std-def-list]/title" priority="2">
 	
 		<xsl:call-template name="title"/>
-	
+		
 		<xsl:if test="ancestor::sec[java:toLowerCase(java:java.lang.String.new(title)) = 'terms and definitions']">
 			<xsl:text>[.boilerplate]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
@@ -1427,6 +1466,38 @@
 		</xsl:if>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
+	
+	<xsl:template match="std-def-list | std-def-list/std-def-list-item">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="std-def-list-item/term">
+		<xsl:variable name="level">
+			<xsl:for-each select="ancestor::std-def-list-item[1]">
+				<xsl:call-template name="getLevel"/>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:value-of select="$level"/><xsl:text> </xsl:text>
+		<xsl:variable name="term"><xsl:apply-templates /></xsl:variable>
+		<xsl:variable name="regex_term_preferred">^(.*)\((.+)\)$</xsl:variable>
+		<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($term),$regex_term_preferred,'$1'))"/>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:variable name="preferred" select="normalize-space(java:replaceAll(java:java.lang.String.new($term),$regex_term_preferred,'$2'))"/>
+		<xsl:if test="$preferred != '' and $preferred != $term">
+			<xsl:text>preferred:[</xsl:text><xsl:value-of select="$preferred"/><xsl:text>]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="std-def-list-item/x[normalize-space() = ':']"/>
+	
+	<xsl:template match="std-def-list-item/def">
+		<xsl:apply-templates />	
+	</xsl:template>
+	
+	
 	<!-- ======================== -->
 	<!-- END Terms and definitions -->
 	<!-- ======================== -->
@@ -4304,7 +4375,7 @@
 				
 					<xsl:variable name="level_total" select="count(ancestor::*)"/>
 		
-					<xsl:variable name="level_standard" select="count(ancestor::standard/ancestor::*)"/>
+					<xsl:variable name="level_standard" select="count(ancestor::standard/ancestor::*) + count(ancestor::standards-document/ancestor::*)"/>
 					
 					<xsl:variable name="label" select="normalize-space(preceding-sibling::*[1][self::label])"/>
 				
@@ -4362,7 +4433,9 @@
 	<!-- level from the element 'label' - count '.' -->
 	<xsl:template name="getLevelFromLabel">
 		<xsl:param name="label" select="label"/>
-		<xsl:value-of select="string-length($label) - string-length(translate($label, '.', '')) + 2"/>
+		<!-- remove last '.' -->
+		<xsl:variable name="label_" select="normalize-space(java:replaceAll(java:java.lang.String.new($label),'^(.+).$','$1'))"/>
+		<xsl:value-of select="string-length($label_) - string-length(translate($label_, '.', '')) + 2"/>
 	</xsl:template>
 	
 	<xsl:template name="getLevelListItem">
