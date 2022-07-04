@@ -425,18 +425,53 @@
 
 		<xsl:if test="$split-bibdata != 'true'">
 			
+			
+			<xsl:if test="$organization = 'IEEE'">
+				<xsl:for-each select="std-meta/abstract">
+					<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
+					<xsl:variable name="section_name" select="local-name()"/>
+					<xsl:variable name="filename">
+						<xsl:value-of select="$sectionsFolder"/><xsl:text>/00-</xsl:text>
+						<xsl:value-of select="$section_name"/><xsl:text>.</xsl:text><xsl:value-of select="$docfile_ext"/>
+					</xsl:variable>
+					
+					<redirect:write file="{$outpath}/{$filename}">
+						<xsl:text>&#xa;</xsl:text>
+						<xsl:text>[abstract]</xsl:text>
+						<xsl:text>&#xa;</xsl:text>
+						<xsl:text>== Abstract</xsl:text>
+						<xsl:text>&#xa;</xsl:text>
+						<xsl:text>&#xa;</xsl:text>
+						<xsl:apply-templates select="."/>
+					</redirect:write>
+					<redirect:write file="{$outpath}/{$docfile}">
+						<xsl:text>include::</xsl:text><xsl:value-of select="$filename"/><xsl:text>[]</xsl:text>
+						<xsl:text>&#xa;&#xa;</xsl:text>
+					</redirect:write>
+				</xsl:for-each>
+			</xsl:if>
+			
 			<!-- if in front there are another elements, except xxx-meta -->
 			<xsl:for-each select="*[local-name() != 'iso-meta' and local-name() != 'nat-meta' and local-name() != 'reg-meta' and local-name() != 'std-meta']">
 				<xsl:variable name="number_"><xsl:number /></xsl:variable>
 				<xsl:variable name="number" select="format-number($number_, '00')"/>
 				<xsl:variable name="section_name">
 					<xsl:value-of select="@sec-type"/>
-					<xsl:if test="not(@sec-type)"><xsl:value-of select="@id"/></xsl:if>
+					<xsl:if test="not(@sec-type)">
+						<xsl:choose>
+							<xsl:when test="$organization = 'IEEE' and title = 'Introduction'">introduction</xsl:when>
+							<xsl:otherwise><xsl:value-of select="@id"/></xsl:otherwise>
+						</xsl:choose>
+					</xsl:if>
 					<xsl:if test="not(@sec-type) and not(@id)"><xsl:value-of select="local-name()"/></xsl:if>
 				</xsl:variable>
 				<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 				<xsl:variable name="filename">
-					<xsl:value-of select="$sectionsFolder"/><xsl:text>/00-</xsl:text><xsl:value-of select="$number"/>-<xsl:value-of select="$section_name"/><xsl:text>.</xsl:text><xsl:value-of select="$docfile_ext"/>
+					<xsl:value-of select="$sectionsFolder"/><xsl:text>/00-</xsl:text>
+					<xsl:if test="$organization != 'IEEE'">
+						<xsl:value-of select="$number"/><xsl:text>-</xsl:text>
+					</xsl:if>
+					<xsl:value-of select="$section_name"/><xsl:text>.</xsl:text><xsl:value-of select="$docfile_ext"/>
 				</xsl:variable>
 				
 				<xsl:choose>
@@ -4450,17 +4485,22 @@
 	</xsl:template>
 	
 	<xsl:template match="boxed-text">
-		<xsl:text>[[boxed-text_</xsl:text><xsl:number level="any"/><xsl:text>]]</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>[%unnumbered]</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>|===</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:apply-templates />
-		<xsl:text>|===</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEEE' and ancestor::front and ancestor::sec[title = 'Introduction']"><!-- skip --></xsl:when>
+			<xsl:otherwise>
+				<xsl:text>[[boxed-text_</xsl:text><xsl:number level="any"/><xsl:text>]]</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>[%unnumbered]</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>|===</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:apply-templates />
+				<xsl:text>|===</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="styled-content[@style = 'addition' or @style-type = 'addition']">
@@ -4825,7 +4865,7 @@
 			<xsl:text>]]</xsl:text>
 		</xsl:if>
 		
-		<xsl:if test="title and not(label) and not(@sec-type) and not(ancestor::*[@sec-type]) and not(title = 'Index')"> <!--  and count(*) = count(title) + count(sec) -->
+		<xsl:if test="title and not(label) and not(@sec-type) and not(ancestor::*[@sec-type]) and not(title = 'Index') and not($organization = 'IEEE')"> <!--  and count(*) = count(title) + count(sec) -->
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:text>[discrete</xsl:text>
 				<xsl:if test="java:org.metanorma.utils.RegExHelper.matches($regexSectionTitle, normalize-space(title)) = 'true'">
