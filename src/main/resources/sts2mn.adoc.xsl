@@ -787,7 +787,11 @@
 		<!-- :isbn-print: -->
 		<xsl:apply-templates select="isbn[@publication-format = 'print']"/>
 
-		<!-- :wg_chair: :wg_vicechair:  :wg_members: etc. -->
+		<!-- :working-group: -->
+		<xsl:apply-templates select="(../sec/participants-sec/p[contains(text(), ' Working Group ')])[1]"/>
+		<!-- :balloting-group: -->
+		<xsl:apply-templates select="(../sec/participants-sec/p[contains(text(), ' balloting group ')])[1]"/>
+		<!-- :wg-chair: :wg-vicechair:  :wg-members: etc. -->
 		<xsl:apply-templates select="contrib-group"/>
 		
 
@@ -1365,6 +1369,18 @@
 		<xsl:if test="following-sibling::*"><xsl:text>, </xsl:text></xsl:if>
 	</xsl:template>
 	
+	<xsl:template match="sec/participants-sec/p[contains(., ' Working Group ')]">
+		<xsl:text>:working-group: </xsl:text>
+		<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(.),'^.* the (.+) Working Group .*$','$1'))"/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="sec/participants-sec/p[contains(., ' balloting group ')]">
+		<xsl:text>:balloting-group: </xsl:text>
+		<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(.),'^.* entity (.+) balloting group .*$','$1'))"/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
 	<xsl:template match="contrib-group[@content-type = 'Working Group']">
 		<xsl:apply-templates mode="working_group"/>
 	</xsl:template>
@@ -1455,7 +1471,6 @@
 				<xsl:text>; </xsl:text>
 				<xsl:apply-templates />
 			</xsl:for-each>
-			<xsl:text>&#xa;</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 	</xsl:template>
