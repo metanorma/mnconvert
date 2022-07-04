@@ -1166,7 +1166,17 @@
 	</xsl:template>
 	
 	<xsl:template match="fig/caption/p" mode="model_fig">
-		<non-normative-note><xsl:apply-templates mode="model_fig"/></non-normative-note>
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEEE'">
+				<title_main>
+					<xsl:apply-templates mode="model_fig"/>
+				</title_main>
+			</xsl:when>
+			<xsl:otherwise>
+				<non-normative-note><xsl:apply-templates mode="model_fig"/></non-normative-note>
+			</xsl:otherwise>
+		</xsl:choose>
+		
 	</xsl:template>
 	
 	<xsl:template match="fig/*[self::table-wrap or self::array][count(table/col) + count(table/colgroup/col) = 1 and .//graphic]" mode="model_fig">
@@ -1378,7 +1388,7 @@
 						<xsl:otherwise>
 							<xsl:if test="$copymode = 'false' and $OUTPUT_FORMAT = 'xml'"><xsl:value-of select="$imagesdir"/><xsl:text>/</xsl:text></xsl:if>
 							<xsl:value-of select="$image_link"/>
-							<xsl:if test="not(contains($image_link, '.png')) and not(contains($image_link, '.jpg')) and not(contains($image_link, '.bmp'))">
+							<xsl:if test="not(contains($image_link, '.png')) and not(contains($image_link, '.jpg')) and not(contains($image_link, '.bmp')) and not(contains($image_link, '.tif'))">
 								<xsl:text>.png</xsl:text>
 							</xsl:if>
 						</xsl:otherwise>
