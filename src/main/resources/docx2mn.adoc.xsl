@@ -2086,16 +2086,16 @@
 		
 		<xsl:variable name="id" select="w:footnoteReference/@w:id" />
 		
-		<xsl:variable name="footnote_" select="$footnotes_xml//footnote[@id = $id]"/>
+		<xsl:variable name="footnote_" select="$footnotes_xml//w:footnote[@w:id = $id]"/>
 		<xsl:variable name="footnote" select="xalan:nodeset($footnote_)"/>
 		<xsl:apply-templates select="$footnote"/>
 		
 		<xsl:text>]</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="r[rPr/rStyle/@val = 'FootnoteReference']"/>
+	<!-- <xsl:template match="w:r[w:rPr/w:rStyle/@w:val = 'FootnoteReference']"/> -->
 	
-	<xsl:template match="footnote/p" priority="2">
+	<xsl:template match="w:footnote/w:p" priority="2">
 		<xsl:apply-templates />
 	</xsl:template>
 	
@@ -2147,15 +2147,15 @@
 		
 		<xsl:variable name="id" select="@w:id"/>
 		
-		<xsl:variable name="comment_" select="$comments_xml//comment[@id = $id]"/>
+		<xsl:variable name="comment_" select="$comments_xml//w:comment[@w:id = $id]"/>
 		<xsl:variable name="comment" select="xalan:nodeset($comment_)"/>
 		
 		<!--DEBUG&#xa;
 		<xsl:apply-templates select="$comment" mode="print_as_xml"/>-->
 		
 		<xsl:variable name="options">
-			<option name="reviewer"><xsl:value-of select="$comment/@author"/></option>
-			<option name="date"><xsl:value-of select="substring($comment/@date,1,10)"/></option>
+			<option name="reviewer"><xsl:value-of select="$comment/@w:author"/></option>
+			<option name="date"><xsl:value-of select="substring($comment/@w:date,1,10)"/></option>
 			<option name="from"><xsl:value-of select="ancestor::w:p/w:commentRangeStart/@w:id"/></option>
 			<option name="to"><xsl:value-of select="ancestor::w:p/w:commentRangeEnd/@w:id"/></option>
 		</xsl:variable>

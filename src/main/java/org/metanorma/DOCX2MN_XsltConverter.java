@@ -210,6 +210,7 @@ public class DOCX2MN_XsltConverter extends XsltConverter {
         try {
             InputSource xmlIS = new InputSource(new StringReader(strXML));
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            dbFactory.setNamespaceAware(true);
             DocumentBuilder dBuilder;
             dBuilder = dbFactory.newDocumentBuilder();
             Document xmlDocument = dBuilder.parse(xmlIS);
