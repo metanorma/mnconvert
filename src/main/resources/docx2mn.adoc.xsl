@@ -323,7 +323,7 @@
 		<xsl:apply-templates/>
 	</xsl:template>
 	
-	<xsl:template match="w:jc[@w:val = 'left']">
+	<xsl:template match="w:jc[@w:val = 'left'][not(ancestor::w:tc)]">
 		<xsl:text>[align=left]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
@@ -816,6 +816,9 @@
 	<!-- ============================= -->
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'note' or @w:val = 'note1' or @w:val = 'Note' or @w:val = 'NoteIndent' or @w:val = 'NoteIndent2' or @w:val = 'Figurenote']]" name="note">
 	
+		
+		<xsl:call-template name="setId"/>
+		
 		<xsl:choose>
 			<xsl:when test="following-sibling::w:p[2][w:pPr/w:pStyle[@w:val = 'Notecontinued' or @w:val = 'Noteindentcontinued' or @w:val = 'Noteindent2continued']]">
 				<xsl:text>[NOTE]</xsl:text>
@@ -990,6 +993,8 @@
 		</tr>
 	</xsl:template>
 	
+	<xsl:template match="w:tc[w:tcPr/w:vMerge[not(@w:val = 'restart')]][not(w:p/w:r)]"/>
+	
 	<xsl:template match="w:tc">
 		<td>
 			<xsl:if test="w:tcPr/w:tcBorders">
@@ -999,16 +1004,18 @@
 				<xsl:attribute name="colspan"><xsl:value-of select="w:tcPr/w:gridSpan/@w:val"/></xsl:attribute>
 			</xsl:if>
 			
+			<xsl:attribute name="valign"><xsl:value-of select="w:tcPr/w:vAlign/@w:val"/></xsl:attribute>		
+			
 			<xsl:if test="w:tcPr/w:vMerge/@w:val = 'restart'">
 				<xsl:variable name="curr_row_number" select="count(ancestor::w:tr[1]/preceding-sibling::w:tr) + 1"/>
-				<xsl:variable name="next_restart_row_number_" select="count(ancestor::w:tr[1]/following-sibling::w:tr[w:tc/w:tcPr/w:vMerge/@w:val = 'restart']/preceding-sibling::w:tr) + 1"/>
+				<xsl:variable name="next_restart_row_number_" select="count(ancestor::w:tr[1]/following-sibling::w:tr[w:tc/w:tcPr/w:vMerge]/preceding-sibling::w:tr) + 1"/> <!-- /@w:val = 'restart' -->
 				<xsl:variable name="next_restart_row_number">
 					<xsl:choose>
 						<xsl:when test="$next_restart_row_number_ = '1'">
 							<xsl:value-of select="count(ancestor::w:tr[1]/following-sibling::w:tr/preceding-sibling::w:tr) + 2"/>
 						</xsl:when>
 						<xsl:otherwise>
-							<xsl:value-of select="$next_restart_row_number_"/>
+							<xsl:value-of select="$next_restart_row_number_ + 1"/>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
@@ -1035,9 +1042,23 @@
 	
 	<xsl:template match="w:tc/w:p[w:pPr/w:pStyle[@w:val = 'Note']]">
 		<tablenote>
+			<xsl:attribute name="id">
+				<xsl:call-template name="setId"/>
+			</xsl:attribute>
 			<xsl:apply-templates />
 		</tablenote>
 	</xsl:template>
+	
+	<!-- Example:
+		<w:r>	
+			<w:rPr>
+				<w:rStyle w:val="tablefootnoteref"/>
+			</w:rPr>
+			<w:t>d</w:t>
+		</w:r>
+	-->
+	<!-- <xsl:template match="w:r[w:rPr/w:rStyle[@w:val = 'tablefootnoteref']]"/> -->
+	
 	
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'tablefootnote']]">
 		<tablefootnotebody>
@@ -1152,8 +1173,21 @@
 	<xsl:template match="tr[td/tablenote or td/tablefootnotebody]"/>
 	
 	<xsl:template match="td">
-		<xsl:call-template name="spanProcessing"/>		
-		<xsl:call-template name="alignmentProcessing"/>
+		<xsl:variable name="span">
+			<xsl:call-template name="spanProcessing"/>
+		</xsl:variable>
+		<xsl:value-of select="$span"/>
+		<xsl:variable name="alignment">
+			<xsl:call-template name="alignmentProcessing"/>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="$span != '' and starts-with($alignment, '.')">
+				<xsl:value-of select="substring($alignment,2)"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$alignment"/>
+			</xsl:otherwise>
+		</xsl:choose>
 		<xsl:call-template name="complexFormatProcessing"/>
 		<xsl:call-template name="insertCellSeparator"/>
 		<xsl:choose>
@@ -1175,7 +1209,7 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	<xsl:template name="spanProcessing">		
+	<xsl:template name="spanProcessing">
 		<xsl:if test="@colspan &gt; 1 or @rowspan &gt; 1">
 			<xsl:choose>
 				<xsl:when test="@colspan &gt; 1 and @rowspan &gt; 1">
@@ -1194,7 +1228,7 @@
 	</xsl:template>
 	
 	<xsl:template name="alignmentProcessing">
-		<xsl:if test="(@align and @align != 'left') or (@valign and @valign != 'top')">
+		<xsl:if test="(@align and @align != 'left') or (@valign and @valign != 'top' and @valign != '')">
 			
 			<xsl:variable name="align">
 				<xsl:call-template name="getAlignFormat"/>
@@ -1227,6 +1261,7 @@
 	<xsl:template name="getVAlignFormat">
 		<xsl:choose>
 			<xsl:when test="@valign = 'middle'">.^</xsl:when>
+			<xsl:when test="@valign = 'center'">.^</xsl:when>
 			<xsl:when test="@valign = 'bottom'">.&gt;</xsl:when>
 			<!-- <xsl:otherwise>&lt;</xsl:otherwise> --> <!-- top -->
 		</xsl:choose>
@@ -1245,7 +1280,11 @@
 	<xsl:template match="tablenote">
 		<xsl:param name="process">false</xsl:param>
 		<xsl:if test="$process = 'true'">
-			<xsl:call-template name="note"/>
+			<xsl:value-of select="@id"/>
+			<xsl:variable name="tablenote">
+				<xsl:call-template name="note"/>
+			</xsl:variable>
+			<xsl:value-of select="$tablenote"/>
 		</xsl:if>
 	</xsl:template>
 	
@@ -1698,7 +1737,7 @@
 				<xsl:text>&gt;&gt;</xsl:text>
 			</xsl:when> <!-- end hyperlink to the standard -->
 			
-			<xsl:when test="w:r[w:rPr/w:rStyle/@w:val = 'stddocNumber']"> <!-- hyperlink to non-standard bibliography item -->
+			<xsl:when test="w:r/w:rPr/w:rStyle[@w:val = 'stddocNumber' or (@w:val = 'Hyperlink' and ancestor::w:hyperlink/@w:anchor != '')]"> <!-- hyperlink to non-standard bibliography item -->
 				<xsl:text>&lt;&lt;</xsl:text>
 				<xsl:value-of select="@w:anchor"/>
 				<xsl:text>&gt;&gt;</xsl:text>
@@ -1975,9 +2014,11 @@
 	
 	<xsl:template match="w:t" name="t">
 		<xsl:variable name="tags">
-			<xsl:apply-templates select="preceding-sibling::w:rPr/w:i | preceding-sibling::w:rPr/w:b | preceding-sibling::w:rPr/w:vertAlign[@w:val = 'subscript'] | 
-			preceding-sibling::w:rPr/w:vertAlign[@w:val = 'superscript'] | preceding-sibling::w:rPr/w:u | preceding-sibling::w:rPr/w:smallCaps |
-			preceding-sibling::w:rPr/w:rStyle[@w:val = 'stddocTitle']" mode="richtext"/>
+			<xsl:if test="not(ancestor::w:p[w:pPr/w:pStyle/@w:val = 'zzCover'])">
+				<xsl:apply-templates select="preceding-sibling::w:rPr/w:i | preceding-sibling::w:rPr/w:b | preceding-sibling::w:rPr/w:vertAlign[@w:val = 'subscript'] | 
+				preceding-sibling::w:rPr/w:vertAlign[@w:val = 'superscript'] | preceding-sibling::w:rPr/w:u | preceding-sibling::w:rPr/w:smallCaps |
+				preceding-sibling::w:rPr/w:rStyle[@w:val = 'stddocTitle']" mode="richtext"/>
+			</xsl:if>
 		</xsl:variable>
 		
 		<xsl:call-template name="insertRichText">
@@ -1994,7 +2035,10 @@
 	<!-- Rich text processing -->
 	<!-- ============================= -->
 	<xsl:template match="w:b" mode="richtext">
-		<bold/>
+		<xsl:choose>
+			<xsl:when test="ancestor::w:p/w:pPr/w:pStyle/@w:val = 'Tableheader'"><!-- skip bold in the table header --></xsl:when>
+			<xsl:otherwise><bold/></xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="w:i" mode="richtext">
