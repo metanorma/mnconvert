@@ -1551,6 +1551,10 @@
 	<!-- inlined math -->
 	<xsl:template match="m:oMath[not(ancestor::w:p[w:pPr/w:pStyle/@w:val = 'Formula'])]">
 	
+		<xsl:if test="preceding-sibling::*[1][self::w:r][normalize-space(w:t/text()) = 'where']">
+			<xsl:text>&#xa;&#xa;</xsl:text>
+		</xsl:if>
+	
 		<xsl:text>stem:[</xsl:text>
 		
 		<xsl:variable name="math">
@@ -1560,10 +1564,29 @@
 		
 		<xsl:text>]</xsl:text>
 	
+		<xsl:variable name="isWhere" select="normalize-space(preceding-sibling::*[1][self::w:r][normalize-space(w:t/text()) = 'where'] and following-sibling::*[1][self::w:r])"/>
+	
 		<xsl:if test="not(contains($math,'&lt;math'))"> <!-- for AsciiMath -->
 			<xsl:variable name="text" select="."/>
 			<!-- add space after stem -->
-			<xsl:if test="java:org.metanorma.utils.RegExHelper.matches('.*(\s|\h)$', $text) = 'true'"><xsl:text> </xsl:text></xsl:if>
+			<xsl:if test="java:org.metanorma.utils.RegExHelper.matches('.*(\s|\h)$', $text) = 'true' and $isWhere = 'false'"><xsl:text> </xsl:text></xsl:if>
+		</xsl:if>
+		
+		<!-- Example:
+			<w:r>
+				...
+				<w:t xml:space="preserve">where </w:t>
+			</w:r>
+			<m:oMath>
+				...
+			</m:oMath>
+			<w:r>
+				...
+				<w:t>is the repeatability limit.</w:t>
+			</w:r>
+		-->
+		<xsl:if test="$isWhere = 'true'">
+			<xsl:text>:: </xsl:text>
 		</xsl:if>
 		
 	</xsl:template>
@@ -1740,6 +1763,12 @@
 			<xsl:when test="w:r/w:rPr/w:rStyle[@w:val = 'stddocNumber' or (@w:val = 'Hyperlink' and ancestor::w:hyperlink/@w:anchor != '')]"> <!-- hyperlink to non-standard bibliography item -->
 				<xsl:text>&lt;&lt;</xsl:text>
 				<xsl:value-of select="@w:anchor"/>
+				<xsl:if test="w:r/w:rPr/w:rStyle/@w:val = 'Hyperlink'">
+					<xsl:variable name="text"><xsl:apply-templates select=".//w:t/text()"/></xsl:variable>
+					<xsl:if test="java:org.metanorma.utils.RegExHelper.matches('^\[\d+\]$', normalize-space($text)) = 'false'"> <!-- skip [10] -->
+						<xsl:text>,</xsl:text><xsl:value-of select="$text"/>
+					</xsl:if>
+				</xsl:if>
 				<xsl:text>&gt;&gt;</xsl:text>
 			</xsl:when> <!-- end hyperlink to non-standard bibliography item -->
 			
