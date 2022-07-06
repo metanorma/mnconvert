@@ -48,6 +48,12 @@
 	<xsl:param name="footnotes_file"/>
 	<!-- xml with footenotes (footnotes.xml) -->
 	<xsl:param name="footnotes"/>
+	
+	<!-- input xml file 'word\styles.xml' -->
+	<!-- xml with styles -->
+	<xsl:param name="styles_file"/>
+	<!-- xml with styles (styles.xml) -->
+	<xsl:param name="styles"/>
 
 	<xsl:variable name="em_dash">—</xsl:variable>
 	<xsl:variable name="en_dash">–</xsl:variable>
@@ -90,6 +96,18 @@
 		</xsl:choose>
 	</xsl:variable>
 	<xsl:variable name="footnotes_xml" select="xalan:nodeset($footnotes_xml_)"/>
+	
+	<xsl:variable name="styles_xml_">
+		<xsl:choose>
+			<xsl:when test="$styles_file != ''">
+				<xsl:copy-of select="document($styles_file)"/> 
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy-of select="$styles"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	<xsl:variable name="styles_xml" select="xalan:nodeset($styles_xml_)"/>
 
 	<xsl:variable name="bookmarks_">
 		<xsl:for-each select=".//w:bookmarkStart">
@@ -398,8 +416,10 @@
 		<xsl:variable name="text">
 			<xsl:apply-templates/>
 		</xsl:variable>
-	
-		<xsl:if test="$text = 'Normative references' or w:pPr/w:pStyle/@w:val = 'BiblioTitle'">
+		
+		<xsl:if test="$text = 'Normative references' or
+			java:org.metanorma.utils.RegExHelper.matches('^\d+(\s|\h)+Normative references$', normalize-space($text)) = 'true' or 
+			w:pPr/w:pStyle/@w:val = 'BiblioTitle'">
 			<xsl:text>[bibliography]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
@@ -1777,11 +1797,15 @@
 					
 					<xsl:value-of select="$bibitem/FootnoteReference"/>
 					
+					<!-- <xsl:apply-templates select="$bibitem" mode="print_as_xml"/> -->
+					
 					<xsl:for-each select="$bibitem/stddocTitle[1]"> <!-- standard's title -->
 						<xsl:text>, </xsl:text>
-						<xsl:value-of select="."/>
+						<!-- <xsl:value-of select="."/> -->
+						<xsl:apply-templates />
 						<xsl:for-each select="following-sibling::node()">
-							<xsl:value-of select="."/>
+							<!-- <xsl:value-of select="."/> -->
+							<xsl:apply-templates />
 						</xsl:for-each>
 					</xsl:for-each>
 				</xsl:when> <!-- end 'stardard' item -->
@@ -1859,7 +1883,8 @@
 			</xsl:choose>
 		</xsl:variable>
 		<xsl:element name="{$style}">
-			<xsl:apply-templates />
+			<xsl:call-template name="t"/>
+			<!-- <xsl:apply-templates /> -->
 		</xsl:element>
 	</xsl:template>
 	
@@ -1948,10 +1973,11 @@
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(normalize-space($modified_text)),'(.*)\]$','$1')"/> <!-- remove ']' at end -->
 	</xsl:template>
 	
-	<xsl:template match="w:t">
+	<xsl:template match="w:t" name="t">
 		<xsl:variable name="tags">
 			<xsl:apply-templates select="preceding-sibling::w:rPr/w:i | preceding-sibling::w:rPr/w:b | preceding-sibling::w:rPr/w:vertAlign[@w:val = 'subscript'] | 
-			preceding-sibling::w:rPr/w:vertAlign[@w:val = 'superscript'] | preceding-sibling::w:rPr/w:u | preceding-sibling::w:rPr/w:smallCaps" mode="richtext"/>
+			preceding-sibling::w:rPr/w:vertAlign[@w:val = 'superscript'] | preceding-sibling::w:rPr/w:u | preceding-sibling::w:rPr/w:smallCaps |
+			preceding-sibling::w:rPr/w:rStyle[@w:val = 'stddocTitle']" mode="richtext"/>
 		</xsl:variable>
 		
 		<xsl:call-template name="insertRichText">
@@ -1989,6 +2015,22 @@
 	
 	<xsl:template match="w:smallCaps" mode="richtext">
 		<smallcaps/>
+	</xsl:template>
+	
+	<xsl:template match="w:rStyle" mode="richtext">
+		<xsl:variable name="val" select="@w:val"/>
+			<!-- Example: 
+			<w:style w:type="character" w:customStyle="1" w:styleId="stddocTitle">
+				<w:name w:val="std_docTitle"/>
+				<w:rPr>
+					<w:rFonts w:ascii="Cambria" w:hAnsi="Cambria" w:hint="default"/>
+					<w:i/>
+					<w:iCs w:val="0"/>
+					<w:bdr w:val="none" w:sz="0" w:space="0" w:color="auto" w:frame="1"/>
+					<w:shd w:val="clear" w:color="auto" w:fill="FDE9D9"/>
+				</w:rPr>
+			</w:style> -->
+		<xsl:apply-templates select="$styles//w:style[@w:styleId = $val]/w:rPr" mode="richtext"/>
 	</xsl:template>
 	
 	<xsl:template match="w:r[w:rPr/w:rStyle[@w:val = 'ISOCode']]">

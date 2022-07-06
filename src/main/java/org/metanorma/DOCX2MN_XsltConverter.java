@@ -162,6 +162,8 @@ public class DOCX2MN_XsltConverter extends XsltConverter {
         
         String strFootnotesXML = Util.unzipFileToString(Paths.get(inputFilePath), "footnotes.xml");
         
+        String strStylesXML = Util.unzipFileToString(Paths.get(inputFilePath), "styles.xml");
+        
         Source src = new SAXSource(rdr, new InputSource(new StringReader(strDocumentXML)));
 
         Source srcXSL;
@@ -194,6 +196,11 @@ public class DOCX2MN_XsltConverter extends XsltConverter {
         NodeList xmlFootnotesDocumentNodeList = getNodeList(strFootnotesXML);
         if (xmlFootnotesDocumentNodeList != null) {
             transformer.setParameter("footnotes", xmlFootnotesDocumentNodeList);
+        }
+        
+        NodeList xmlStylesDocumentNodeList = getNodeList(strStylesXML);
+        if (xmlStylesDocumentNodeList != null) {
+            transformer.setParameter("styles", xmlStylesDocumentNodeList);
         }
         
         StringWriter resultWriter = new StringWriter();
