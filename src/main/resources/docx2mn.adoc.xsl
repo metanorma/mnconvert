@@ -2056,6 +2056,15 @@
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'a2' or @w:val = 'a3' or @w:val = 'a4' or @w:val = 'a5' or @w:val = 'a6']]">
 	
 		<xsl:call-template name="setId"/>
+		
+		<xsl:variable name="text">
+			<xsl:apply-templates/>
+		</xsl:variable>
+		
+		<xsl:if test="java:org.metanorma.utils.RegExHelper.matches('^Appendix(\s|\h)+(\d+)(\s|\h)+.*', normalize-space($text)) = 'true'">
+			<xsl:text>[%appendix]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 	
 		<xsl:variable name="level" select="substring-after(w:pPr/w:pStyle/@w:val, 'a')"/>
 	
@@ -2064,11 +2073,12 @@
 		</xsl:call-template>
 		<xsl:text> </xsl:text>
 		
-		<xsl:variable name="text">
-			<xsl:apply-templates/>
-		</xsl:variable>
 		
-		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(normalize-space($text)),'^([A-Z](\.\d)+(\s|h)+)(.*)','$4')"/> <!-- remove A.1 at start -->
+		<xsl:variable name="title1" select="java:replaceAll(java:java.lang.String.new(normalize-space($text)),'^([A-Z](\.\d)+(\s|h)+)(.*)','$4')"/> <!-- remove A.1 at start -->
+		
+		<xsl:variable name="title2" select="java:replaceAll(java:java.lang.String.new(normalize-space($title1)),'^(Appendix(\s|\h)+(\d)+(\s|h)+)(.*)','$5')"/> <!-- remove Appendix at start -->
+		
+		<xsl:value-of select="$title2"/>
 		
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	
