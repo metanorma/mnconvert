@@ -860,17 +860,31 @@
 	
 		<xsl:call-template name="setId"/>
 		
-		<xsl:text>====</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:variable name="text">
+		<xsl:variable name="text_">
 			<xsl:apply-templates/>
 		</xsl:variable>
-		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),'^EXAMPLE(\s|\h)+(—(\s|\h)+)?(\d+(\s|\h)+)?(.*)','$6')"/> <!-- remove 'EXAMPLE ' and 'EXAMPLE — ' at start -->
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:if test="not(following-sibling::w:p[2][w:pPr/w:pStyle[@w:val = 'Examplecontinued' or @w:val = 'Exampleindentcontinued' or @w:val = 'Exampleindent2continued']])">
-			<xsl:text>====</xsl:text>
-			<xsl:text>&#xa;</xsl:text>
-		</xsl:if>
+		<xsl:variable name="text" select="java:replaceAll(java:java.lang.String.new($text_),'^EXAMPLE(\s|\h)+(—(\s|\h)+)?(\d+(\s|\h)+)?(.*)','$6')"/> <!-- remove 'EXAMPLE ' and 'EXAMPLE — ' at start -->
+		
+		<xsl:choose>
+			<xsl:when test="following-sibling::*[1][self::w:p[w:pPr/w:pStyle[@w:val = 'Code']]]">
+				<xsl:text>.</xsl:text><xsl:value-of select="$text"/>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>====</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text>====</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:value-of select="$text"/>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:if test="not(following-sibling::w:p[2][w:pPr/w:pStyle[@w:val = 'Examplecontinued' or @w:val = 'Exampleindentcontinued' or @w:val = 'Exampleindent2continued']])">
+					<xsl:text>====</xsl:text>
+					<xsl:text>&#xa;</xsl:text>
+				</xsl:if>
+			</xsl:otherwise>
+		</xsl:choose>
+		
+		
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
@@ -1691,7 +1705,14 @@
 		<xsl:apply-templates />
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>--</xsl:text>
-		<xsl:text>&#xa;&#xa;</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		
+		<xsl:if test="preceding-sibling::*[1][self::w:p[w:pPr/w:pStyle[@w:val = 'Example' or @w:val = 'Exampleindent' or @w:val = 'Exampleindent2' or @w:val = 'Exampleindent2' or @w:val = 'Figureexample']]]">
+			<xsl:text>====</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+		
+		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Code' or @w:val = 'Code-' or @w:val = 'Code--']]//w:br" priority="2">
@@ -2335,7 +2356,7 @@
 	<!-- END Footnote processing -->
 	<!-- ============================= -->
 	
-	<xsl:template match="w:tab[not(parent::w:tabs)]">
+	<xsl:template match="w:tab[not(parent::w:tabs)][following-sibling::* or ../following-sibling::*]">
 		<xsl:text> </xsl:text>
 	</xsl:template>
 	
