@@ -1008,12 +1008,20 @@
 	</xsl:template>
 	
 	<xsl:template match="w:tr">
-		<tr>
-			<xsl:if test=".//w:p[w:pPr/w:pStyle/@w:val = 'Tableheader']">
-				<xsl:attribute name="header">true</xsl:attribute>
-			</xsl:if>
-			<xsl:apply-templates/>
-		</tr>
+		<xsl:choose>
+			<xsl:when test="./w:tc//w:rStyle/@w:val = 'tablefootnoteref' and ancestor::w:tbl/preceding-sibling::*[1][self::w:p[w:pPr/w:pStyle/@w:val = 'figure']] and ancestor::w:tbl/preceding-sibling::*[2][self::w:p[w:pPr/w:pStyle/@w:val = 'FigureGraphic']]">
+			<!-- skip footnote in the table after Figure -->
+			</xsl:when>
+			<xsl:otherwise>
+				<tr>
+					<xsl:if test=".//w:p[w:pPr/w:pStyle/@w:val = 'Tableheader']">
+						<xsl:attribute name="header">true</xsl:attribute>
+					</xsl:if>
+					<xsl:apply-templates/>
+				</tr>
+			</xsl:otherwise>
+		</xsl:choose>
+	
 	</xsl:template>
 	
 	<xsl:template match="w:tc[w:tcPr/w:vMerge[not(@w:val = 'restart')]][not(w:p/w:r)]"/>
@@ -1453,6 +1461,9 @@
 							<xsl:copy-of select="."/>
 						</xsl:if>
 					</xsl:when>
+					<xsl:when test="self::w:tbl">
+						<xsl:apply-templates select="w:tr[w:tc//w:rStyle[@w:val = 'tablefootnoteref']]/w:tc[2]" mode="figure_footnote"/>
+					</xsl:when>
 					<xsl:otherwise><non_figure_node><!-- <xsl:copy-of select="."/> --></non_figure_node></xsl:otherwise>
 				</xsl:choose>
 			</xsl:for-each>
@@ -1478,7 +1489,18 @@
 		
 		<xsl:apply-templates />
 		
+		<!-- put Figure's footnote -->
+		<xsl:apply-templates select="$following_nodes/figure_footnote"/>
+		
 		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="w:tc" mode="figure_footnote">
+		<figure_footnote>
+			<xsl:text>footnote:[</xsl:text>
+			<xsl:apply-templates/>
+			<xsl:text>]&#xa;</xsl:text>
+		</figure_footnote>
 	</xsl:template>
 	
 	
