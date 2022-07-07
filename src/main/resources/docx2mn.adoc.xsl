@@ -921,6 +921,12 @@
 	<!-- ============================= -->
 	
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Tabletitle' or w:pPr/w:pStyle/@w:val = 'tabletitle' or w:pPr/w:pStyle/@w:val = 'AnnexTableTitle']">
+	
+		<!-- first table cell contains id for table -->
+		<xsl:for-each select="(following-sibling::w:tbl[1]//w:tc)[1]/w:p[1]">
+			<xsl:call-template name="setId"/>
+		</xsl:for-each>
+		
 		<xsl:text>.</xsl:text>
 		
 		<xsl:variable name="title">
@@ -1414,6 +1420,40 @@
 	</xsl:template>
 	
 	<xsl:template match="w:p[w:r/w:drawing]">
+		<xsl:call-template name="setId"/>
+		
+		<xsl:variable name="following_nodes_">
+			<!-- <xsl:if test="preceding-sibling::*[1][self::w:p[w:pPr/w:pStyle[@w:val = 'FigureTitle' or @w:val = 'Figuretitle' or @w:val = 'Figuretitle0' or @w:val = 'AnnexFigureTitle']]]">
+				<non_figure_node/>
+			</xsl:if> -->
+			<xsl:for-each select="following-sibling::*">
+				<xsl:choose>
+					<xsl:when test="self::w:p[w:r/w:drawing]">
+						<!-- <xsl:copy-of select="."/> -->
+					</xsl:when>
+					<xsl:when test="self::w:p[w:pPr/w:pStyle[@w:val = 'FigureTitle' or @w:val = 'Figuretitle' or @w:val = 'Figuretitle0' or @w:val = 'AnnexFigureTitle']]">
+						<xsl:if test="preceding-sibling::*[1][self::w:p[w:pPr/w:pStyle[@w:val = 'FigureTitle' or @w:val = 'Figuretitle' or @w:val = 'Figuretitle0' or @w:val = 'AnnexFigureTitle'] and w:pPr/w:keepNext]]"> <!-- means last sub-figure title, then next one is table sequence title -->
+							<xsl:copy-of select="."/>
+						</xsl:if>
+					</xsl:when>
+					<xsl:otherwise><non_figure_node><!-- <xsl:copy-of select="."/> --></non_figure_node></xsl:otherwise>
+				</xsl:choose>
+			</xsl:for-each>
+			<non_figure_node/> <!-- empty node just for point to the end -->
+		</xsl:variable>
+		<xsl:variable name="following_nodes" select="xalan:nodeset($following_nodes_)"/>
+		
+		<!-- <xsl:text>&#xa;DEBUG:</xsl:text>
+		<xsl:apply-templates select="$following_nodes" mode="print_as_xml"/>
+		<xsl:text>&#xa;</xsl:text> -->
+		
+		<!-- get latest figure name as main title for sub-figures sequence -->
+		<xsl:if test="starts-with(normalize-space(following-sibling::w:p[w:pPr/w:pStyle[@w:val = 'FigureTitle' or @w:val = 'Figuretitle' or @w:val = 'Figuretitle0' or @w:val = 'AnnexFigureTitle']][1]),'a)')">
+			<xsl:apply-templates select="$following_nodes/non_figure_node[1]/preceding-sibling::*[1][self::w:p[w:pPr/w:pStyle[@w:val = 'FigureTitle' or @w:val = 'Figuretitle' or @w:val = 'Figuretitle0' or @w:val = 'AnnexFigureTitle']]]">
+				<xsl:with-param name="process">true</xsl:with-param>
+				<xsl:with-param name="maintitle">true</xsl:with-param>
+			</xsl:apply-templates>
+		</xsl:if>
 		
 		<xsl:apply-templates select="following-sibling::w:p[w:pPr/w:pStyle[@w:val = 'FigureTitle' or @w:val = 'Figuretitle' or @w:val = 'Figuretitle0' or @w:val = 'AnnexFigureTitle']][1]">
 			<xsl:with-param name="process">true</xsl:with-param>
@@ -1428,6 +1468,7 @@
 	
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'FigureTitle' or @w:val = 'Figuretitle' or @w:val = 'Figuretitle0' or @w:val = 'AnnexFigureTitle']]">
 		<xsl:param name="process">false</xsl:param>
+		<xsl:param name="maintitle">false</xsl:param>
 		<xsl:if test="$process = 'true'">
 			<xsl:text>.</xsl:text>
 			<xsl:variable name="title">
@@ -1442,11 +1483,23 @@
 					<xsl:value-of select="normalize-space(substring-after($title, $en_dash))"/>
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:value-of select="$title"/>
+					<xsl:value-of select="java:replaceAll(java:java.lang.String.new($title),'^([a-z]\))(\s|\h)+','')"/> <!-- remove 'a) ' from 'a)... Figure title -->
 				</xsl:otherwise>
 			</xsl:choose>
 			<xsl:text>&#xa;</xsl:text>
+			
+			<xsl:if test="$maintitle = 'true'">
+				<xsl:text>====</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:if>
 		</xsl:if>
+		
+		<!-- closing ==== for sub-figures -->
+		<xsl:if test="preceding-sibling::*[1][self::w:p[w:pPr/w:pStyle[@w:val = 'FigureTitle' or @w:val = 'Figuretitle' or @w:val = 'Figuretitle0' or @w:val = 'AnnexFigureTitle']]]">
+			<xsl:text>====</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+		
 	</xsl:template>
 	
 	<xsl:template match="pic:blipFill/a:blip">
@@ -1490,6 +1543,10 @@
 	<!-- Formula processing -->
 	<!-- ============================= -->
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'Formula']/m:oMath">
+		
+		<xsl:for-each select="ancestor::w:p">
+			<xsl:call-template name="setId"/>
+		</xsl:for-each>
 		
 		<!-- last 'w:r' is formula number -->
 		<!-- Example:
@@ -1760,12 +1817,13 @@
 				<xsl:text>&gt;&gt;</xsl:text>
 			</xsl:when> <!-- end hyperlink to the standard -->
 			
-			<xsl:when test="w:r/w:rPr/w:rStyle[@w:val = 'stddocNumber' or (@w:val = 'Hyperlink' and ancestor::w:hyperlink/@w:anchor != '')]"> <!-- hyperlink to non-standard bibliography item -->
+			<xsl:when test="w:r/w:rPr/w:rStyle[@w:val = 'stddocNumber' or (@w:val = 'Hyperlink' and ancestor::w:hyperlink/@w:anchor != '')]"> <!-- stddocNumber - hyperlink to non-standard bibliography item -->
 				<xsl:text>&lt;&lt;</xsl:text>
 				<xsl:value-of select="@w:anchor"/>
 				<xsl:if test="w:r/w:rPr/w:rStyle/@w:val = 'Hyperlink'">
 					<xsl:variable name="text"><xsl:apply-templates select=".//w:t/text()"/></xsl:variable>
-					<xsl:if test="java:org.metanorma.utils.RegExHelper.matches('^\[\d+\]$', normalize-space($text)) = 'false'"> <!-- skip [10] -->
+					<xsl:if test="java:org.metanorma.utils.RegExHelper.matches('^\[\d+\]$', normalize-space($text)) = 'false' and
+					$style != 'Formula' and $style != ''"> <!-- skip [10], Formula ... -->
 						<xsl:text>,</xsl:text><xsl:value-of select="$text"/>
 					</xsl:if>
 				</xsl:if>
@@ -1869,11 +1927,11 @@
 					
 					<xsl:for-each select="$bibitem/stddocTitle[1]"> <!-- standard's title -->
 						<xsl:text>, </xsl:text>
-						<!-- <xsl:value-of select="."/> -->
-						<xsl:apply-templates />
+						<xsl:value-of select="."/>
+						<!-- <xsl:apply-templates /> -->
 						<xsl:for-each select="following-sibling::node()">
-							<!-- <xsl:value-of select="."/> -->
-							<xsl:apply-templates />
+							<xsl:value-of select="."/>
+							<!-- <xsl:apply-templates /> -->
 						</xsl:for-each>
 					</xsl:for-each>
 				</xsl:when> <!-- end 'stardard' item -->
@@ -1996,6 +2054,9 @@
 	
 	
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'a2' or @w:val = 'a3' or @w:val = 'a4' or @w:val = 'a5' or @w:val = 'a6']]">
+	
+		<xsl:call-template name="setId"/>
+	
 		<xsl:variable name="level" select="substring-after(w:pPr/w:pStyle/@w:val, 'a')"/>
 	
 		<xsl:call-template name="repeat">
