@@ -857,12 +857,15 @@
 	<!-- Example processing -->
 	<!-- ============================= -->
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'Example' or @w:val = 'Exampleindent' or @w:val = 'Exampleindent2' or @w:val = 'Exampleindent2' or @w:val = 'Figureexample']]">
+	
+		<xsl:call-template name="setId"/>
+		
 		<xsl:text>====</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:variable name="text">
 			<xsl:apply-templates/>
 		</xsl:variable>
-		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),'^EXAMPLE(\s|\h)+(\d+(\s|\h)+)?(.*)','$4')"/>
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),'^EXAMPLE(\s|\h)+(—(\s|\h)+)?(\d+(\s|\h)+)?(.*)','$6')"/> <!-- remove 'EXAMPLE ' and 'EXAMPLE — ' at start -->
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:if test="not(following-sibling::w:p[2][w:pPr/w:pStyle[@w:val = 'Examplecontinued' or @w:val = 'Exampleindentcontinued' or @w:val = 'Exampleindent2continued']])">
 			<xsl:text>====</xsl:text>
@@ -1716,7 +1719,11 @@
 				<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),$regex_admonition,'$4')"/>
 			</xsl:when>
 			<xsl:otherwise> <!-- quote -->
-				<xsl:text>[quote]</xsl:text>
+				<xsl:text>[quote</xsl:text>
+				<xsl:apply-templates select="following-sibling::w:p[1][w:pPr/w:pStyle/@w:val = 'quoteattribution']">
+					<xsl:with-param name="process">true</xsl:with-param>
+				</xsl:apply-templates>
+				<xsl:text>]</xsl:text>
 				<xsl:text>&#xa;</xsl:text>
 				<xsl:text>_____</xsl:text>
 				<xsl:text>&#xa;</xsl:text>
@@ -1727,6 +1734,22 @@
 		</xsl:choose>
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
+	
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'quoteattribution']]">
+		<xsl:param name="process">false</xsl:param>
+		<xsl:if test="$process = 'true'">
+			<xsl:variable name="components">
+				<xsl:for-each select="*">
+					<component><xsl:apply-templates select="."/></component>
+				</xsl:for-each>
+			</xsl:variable>
+			<xsl:for-each select="xalan:nodeset($components)/*">
+				<xsl:value-of select="java:replaceAll(java:java.lang.String.new(normalize-space(.)),'^(—(\s|\h))?(.*),$','$3')"/> <!-- Example: '— ISO,' to 'ISO' -->
+				<xsl:if test="position() != last()"><xsl:text>, </xsl:text></xsl:if>
+			</xsl:for-each>
+		</xsl:if>
+	</xsl:template>
+	
 	<!-- ============================= -->
 	<!-- END Admonitions and quote processing -->
 	<!-- ============================= -->
@@ -1793,8 +1816,14 @@
 				</xsl:variable>
 				
 				<!-- Example: <<ISO_12345>> -->
-				<!-- <xsl:if test="not($style_parent = 'Source'" -->
-				<xsl:text>&lt;&lt;</xsl:text>
+				<xsl:choose>
+					<xsl:when test="ancestor::w:p/w:pPr/w:pStyle/@w:val = 'quoteattribution'">
+						<xsl:text>"</xsl:text>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:text>&lt;&lt;</xsl:text>
+					</xsl:otherwise>
+				</xsl:choose>
 				
 					<xsl:value-of select="@w:anchor"/>
 					
@@ -1814,7 +1843,15 @@
 						<xsl:if test="position() != last()">,</xsl:if>
 					</xsl:for-each>
 				
-				<xsl:text>&gt;&gt;</xsl:text>
+				<xsl:choose>
+					<xsl:when test="ancestor::w:p/w:pPr/w:pStyle/@w:val = 'quoteattribution'">
+						<xsl:text>"</xsl:text>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:text>&gt;&gt;</xsl:text>
+					</xsl:otherwise>
+				</xsl:choose>
+				
 			</xsl:when> <!-- end hyperlink to the standard -->
 			
 			<xsl:when test="w:r/w:rPr/w:rStyle[@w:val = 'stddocNumber' or (@w:val = 'Hyperlink' and ancestor::w:hyperlink/@w:anchor != '')]"> <!-- stddocNumber - hyperlink to non-standard bibliography item -->
