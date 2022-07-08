@@ -214,17 +214,19 @@ public class DOCX2MN_XsltConverter extends XsltConverter {
     }
     
     private NodeList getNodeList(String strXML) {
-        try {
-            InputSource xmlIS = new InputSource(new StringReader(strXML));
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            dbFactory.setNamespaceAware(true);
-            DocumentBuilder dBuilder;
-            dBuilder = dbFactory.newDocumentBuilder();
-            Document xmlDocument = dBuilder.parse(xmlIS);
-            NodeList xmlDocumentNodeList = xmlDocument.getDocumentElement().getChildNodes();
-            return xmlDocumentNodeList;
-        } catch (IOException | SAXException | ParserConfigurationException ex) {
-            logger.log(Level.SEVERE, "Can''t read xml string: {0}", ex.toString());
+        if (!strXML.isEmpty()) {
+            try {
+                InputSource xmlIS = new InputSource(new StringReader(strXML));
+                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+                dbFactory.setNamespaceAware(true);
+                DocumentBuilder dBuilder;
+                dBuilder = dbFactory.newDocumentBuilder();
+                Document xmlDocument = dBuilder.parse(xmlIS);
+                NodeList xmlDocumentNodeList = xmlDocument.getDocumentElement().getChildNodes();
+                return xmlDocumentNodeList;
+            } catch (IOException | SAXException | ParserConfigurationException ex) {
+                logger.log(Level.SEVERE, "Can''t read xml string: {0}", ex.toString());
+            }
         }
         return null;
     }
