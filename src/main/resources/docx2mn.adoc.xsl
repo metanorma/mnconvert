@@ -193,7 +193,7 @@
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'ANNEX']/w:del[contains(., 'normative') or contains(., 'informative')]" mode="update1"/>
 	
 	<!-- remove Standard title before Scope -->
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzSTDTitle']" mode="update1"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'zzSTDTitle' or @w:val = 'zzSTDTitle1' or @w:val = 'zzSTDTitle2']]" mode="update1"/>
 	
 	<!-- END XML cleaning -->
 	
@@ -459,7 +459,7 @@
 	<!-- ============================= -->
 	<!-- Cover page data processing -->
 	<!-- ============================= -->
-	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCover'][1]" priority="2">
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCover'][1] | w:body/w:p[1][normalize-space(w:pPr/w:pStyle/@w:val) = '']" priority="2"> <!-- second template match for ISO simple template -->
 		<!-- parsing strings -->
 		
 		<!-- Example: Reference number of working document: 17301 -->
@@ -481,7 +481,9 @@
 		<xsl:variable name="regex_tc_keyvalue">^(.+)(\s|\h)+(.+)$</xsl:variable>
 		<xsl:variable name="regex_iso_number">^ISO(/IEC)?(\s|\h)+(\d+.*)</xsl:variable>
 		
+		<xsl:variable name="regex_edition">^(.*)(\s|\h)+edition$</xsl:variable>
 		
+		<!-- for ISO DIS template -->
 		<xsl:variable name="bibdata_items_">
 			<xsl:for-each select="//w:p[w:pPr/w:pStyle/@w:val = 'zzCover']">
 				<xsl:variable name="text">
@@ -597,11 +599,95 @@
 								</xsl:choose>
 							</xsl:for-each>
 							
-							
 						</xsl:if>
 					</xsl:otherwise>
 				</xsl:choose>
-			</xsl:for-each>
+			</xsl:for-each> <!-- //w:p[w:pPr/w:pStyle/@w:val = 'zzCover'] -->
+			
+			<!-- for ISO Simple template -->
+			<xsl:if test="//w:body/w:p[1][normalize-space(w:pPr/w:pStyle/@w:val) = '']">
+				<xsl:for-each select="//w:body/w:p[following-sibling::w:p[w:pPr/w:pStyle/@w:val = 'zzCopyright']]">
+					<xsl:variable name="text">
+						<xsl:apply-templates select=".//w:t"/> <!--  | w:ins/w:r/w:t -->
+					</xsl:variable>
+					
+					<xsl:choose>
+						<xsl:when test="position() = 1">
+							<item name="docnumber"><xsl:value-of select="."/></item>
+						</xsl:when>
+						<xsl:when test="position() = 2">
+							<item name="partnumber"><xsl:value-of select="substring-after(., '-')"/></item>
+						</xsl:when>
+						
+						<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_iso_tc, normalize-space($text)) = 'true'">
+							<xsl:variable name="tc" select="java:replaceAll(java:java.lang.String.new(.),$regex_iso_tc,'$3')"/>
+							<xsl:variable name="tc_parts">
+								<xsl:call-template name="split">
+									<xsl:with-param name="pText" select="$tc"/>
+								</xsl:call-template>
+							</xsl:variable>
+							<xsl:variable name="tc_components">
+								<xsl:for-each select="xalan:nodeset($tc_parts)//item">
+									<item name="tc">
+										<xsl:attribute name="key">
+											<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regex_tc_keyvalue,'$1')"/>
+										</xsl:attribute>
+										<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regex_tc_keyvalue,'$3')"/>
+									</item>
+								</xsl:for-each>
+							</xsl:variable>
+							<xsl:for-each select="xalan:nodeset($tc_components)//item">
+								<xsl:choose>
+									<xsl:when test="@key = 'TC'">
+										<item name="technical-committee-number"><xsl:value-of select="."/></item>
+									</xsl:when>
+									<xsl:when test="@key = 'SC'">
+										<item name="subcommittee-number"><xsl:value-of select="."/></item>
+									</xsl:when>
+									<xsl:when test="@key = 'WG'">
+										<item name="workgroup-type">WG</item>
+										<item name="workgroup-number"><xsl:value-of select="."/></item>
+									</xsl:when>
+								</xsl:choose>
+							</xsl:for-each>
+						</xsl:when> <!-- regex_iso_tc -->
+						
+						<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_secretariat, normalize-space($text)) = 'true'">
+							<item name="secretariat"><xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),$regex_secretariat,'$2')"/></item>
+						</xsl:when>
+						
+						<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_edition, normalize-space($text)) = 'true'">
+							<xsl:variable name="edition" select="java:replaceAll(java:java.lang.String.new($text),$regex_edition,'$1')"/>
+							<item name="edition">
+								<xsl:choose>
+									<xsl:when test="$edition = 'First'">1</xsl:when>
+									<xsl:when test="$edition = 'Second'">2</xsl:when>
+									<xsl:when test="$edition = 'Third'">3</xsl:when>
+									<xsl:when test="$edition = 'Fourth'">4</xsl:when>
+									<xsl:when test="$edition = 'Fifth'">5</xsl:when>
+									<xsl:when test="$edition = 'Sixth'">6</xsl:when>
+									<xsl:when test="$edition = 'Seventh'">7</xsl:when>
+									<xsl:when test="$edition = 'Eighth'">8</xsl:when>
+									<xsl:when test="$edition = 'Nineth'">9</xsl:when>
+									<xsl:when test="$edition = 'Tenth'">10</xsl:when>
+									<!-- to do: word to digit -->
+								</xsl:choose>
+							</item>
+						</xsl:when>
+						
+						<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($regex_revdate, normalize-space(.)) = 'true'">
+							<item name="revdate"><xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),$regex_revdate,'$2')"/></item>
+						</xsl:when>
+						
+						<xsl:otherwise>
+							<xsl:apply-templates />
+						</xsl:otherwise>
+						
+					</xsl:choose>
+					
+				</xsl:for-each> <!-- for ISO Simple template -->
+			</xsl:if>
+			
 		</xsl:variable>
 		<xsl:variable name="bibdata_items" select="xalan:nodeset($bibdata_items_)"/>
 		
@@ -609,27 +695,47 @@
 			
 			<!-- DEBUG:
 			<xsl:apply-templates select="$bibdata_items" mode="print_as_xml"/> -->
-		
+			
 			<xsl:for-each select="$bibdata_items/item">
-
-				<xsl:text>:</xsl:text><xsl:value-of select="@name"/><xsl:text>: </xsl:text>
-				<xsl:value-of select="normalize-space(.)"/>
-				<xsl:text>&#xa;</xsl:text>
-				
-				<xsl:if test="@name = 'docnumber'">
-					<xsl:variable name="part_number" select="../item[starts-with(@name,'title-part-')]/@number"/>
-					<xsl:if test="$part_number != ''">
-						<xsl:text>:partnumber: </xsl:text>
-						<xsl:value-of select="$part_number"/>
+			
+				<xsl:choose>
+					<xsl:when test="@name = 'title-intro-en' and preceding-sibling::item[@name = 'title-intro-en']">
+						<xsl:text>:title-intro-fr: </xsl:text>
+						<xsl:value-of select="normalize-space(.)"/>
 						<xsl:text>&#xa;</xsl:text>
-					</xsl:if>
-				</xsl:if>
-				
-				<xsl:if test="@name = 'revdate'">
-					<xsl:text>:copyright-year: </xsl:text><xsl:value-of select="substring(.,1,4)"/>
-					<xsl:text>&#xa;</xsl:text>
-				</xsl:if>
-				
+					</xsl:when>
+					<xsl:when test="@name = 'title-main-en' and preceding-sibling::item[@name = 'title-main-en']">
+						<xsl:text>:title-main-fr: </xsl:text>
+						<xsl:value-of select="normalize-space(.)"/>
+						<xsl:text>&#xa;</xsl:text>
+					</xsl:when>
+					<xsl:when test="@name = 'title-part-en' and preceding-sibling::item[@name = 'title-part-en']">
+						<xsl:text>:title-part-fr: </xsl:text>
+						<xsl:value-of select="normalize-space(.)"/>
+						<xsl:text>&#xa;</xsl:text>
+					</xsl:when>
+					
+					<xsl:otherwise>			
+					
+						<xsl:text>:</xsl:text><xsl:value-of select="@name"/><xsl:text>: </xsl:text>
+						<xsl:value-of select="normalize-space(.)"/>
+						<xsl:text>&#xa;</xsl:text>
+						
+						<xsl:if test="@name = 'docnumber'">
+							<xsl:variable name="part_number" select="../item[starts-with(@name,'title-part-')]/@number"/>
+							<xsl:if test="$part_number != ''">
+								<xsl:text>:partnumber: </xsl:text>
+								<xsl:value-of select="$part_number"/>
+								<xsl:text>&#xa;</xsl:text>
+							</xsl:if>
+						</xsl:if>
+						
+						<xsl:if test="@name = 'revdate'">
+							<xsl:text>:copyright-year: </xsl:text><xsl:value-of select="substring(.,1,4)"/>
+							<xsl:text>&#xa;</xsl:text>
+						</xsl:if>
+					</xsl:otherwise>
+				</xsl:choose>
 			</xsl:for-each>
 			
 			<xsl:text>:mn-document-class: iso</xsl:text>
@@ -650,6 +756,35 @@
 	</xsl:template>
 	
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCover']"/>
+	
+	<xsl:template match="w:r[w:rPr/w:rStyle[@w:val = 'title2' or @w:val = 'subtitle'  or @w:val = 'part']]">
+		<xsl:variable name="style" select="w:rPr/w:rStyle/@w:val"/>
+		<xsl:variable name="title_" select="."/>
+		<xsl:variable name="title" select="java:replaceAll(java:java.lang.String.new($title_),' — $','')"/>
+		<item>
+			
+			<xsl:variable name="title_lang">
+				<xsl:choose>
+					<xsl:when test="translate($title,'éàèùâêîôûç','') != $title">fr</xsl:when>
+					<xsl:otherwise>en</xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
+			
+			<xsl:attribute name="name">
+				<xsl:choose>
+					<xsl:when test="$style = 'title2'">title-intro</xsl:when>
+					<xsl:when test="$style = 'subtitle'">title-main</xsl:when>
+					<xsl:when test="$style = 'part'">title-part</xsl:when>
+				</xsl:choose>
+				<xsl:text>-</xsl:text><xsl:value-of select="$title_lang"/>
+			</xsl:attribute>
+			
+			<xsl:value-of select="$title"/>
+		</item>
+	</xsl:template>
+	
+	<xsl:template match="w:r[w:rPr/w:rStyle[@w:val = 'partlabel']]"/>
+	
 	
 	<!-- ============================= -->
 	<!-- END Cover page data processing -->
@@ -896,6 +1031,17 @@
 		<xsl:text>====</xsl:text>
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
+	
+	<!-- no need to skip, because there is case when it contains significant title:
+			<w:r>
+				<w:rPr>
+					<w:rStyle w:val="examplelabel"/>
+				</w:rPr>
+				<w:t>EXAMPLE — Sample Code</w:t>
+			</w:r>
+	-->
+	<!-- <xsl:template match="w:r[w:rPr/w:rStyle/@w:val = 'examplelabel']" /> -->
+	
 	<!-- ============================= -->
 	<!-- End Example processing -->
 	<!-- ============================= -->
