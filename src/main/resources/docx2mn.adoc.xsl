@@ -187,7 +187,7 @@
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'zzCover']/w:del" mode="update1"/>
 	
 	<!-- remove deleted items in the Normative References and Bibliography -->
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm' or @w:val = 'normref']]/w:del" mode="update1"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm' or @w:val = 'normref' or @w:val = 'biblio']]/w:del" mode="update1"/>
 	
 	<!-- remove deleted 'obligation' for Annex -->
 	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val = 'ANNEX']/w:del[contains(., 'normative') or contains(., 'informative')]" mode="update1"/>
@@ -2094,7 +2094,7 @@
 	
 	<!-- style RefNorm is using for Normative References,
 		style BiblioEntry0 is using for bibliography -->
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm' or @w:val = 'normref']]">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm' or @w:val = 'normref' or @w:val = 'biblio']]">
 		
 		<xsl:variable name="bib_style" select="w:pPr/w:pStyle/@w:val"/>
 		
@@ -2204,7 +2204,7 @@
 	</xsl:template>
 	
 	<!-- skip bibliography number -->
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm' or @w:val = 'normref']]/w:r[1][following-sibling::*[1][w:tab]]" priority="2" mode="bibitem"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm' or @w:val = 'normref' or @w:val = 'biblio']]/w:r[1][following-sibling::*[1][w:tab]]" priority="2" mode="bibitem"/>
 	
 	<xsl:template match="w:bookmarkStart" mode="bibitem">
 		<xsl:element name="id">
@@ -2212,19 +2212,19 @@
 		</xsl:element>
 	</xsl:template>
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm' or @w:val = 'normref']]//w:r[not(w:rPr/w:rStyle)]" mode="bibitem">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm' or @w:val = 'normref' or @w:val = 'biblio']]//w:r[not(w:rPr/w:rStyle)]" mode="bibitem">
 		<xsl:element name="text">
 			<xsl:apply-templates select="."/>
 		</xsl:element>
 	</xsl:template>
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm' or @w:val = 'normref']]//w:r[w:rPr/w:rStyle/@w:val = 'FootnoteReference'][w:footnoteReference and not(w:t)]" priority="2" mode="bibitem">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm' or @w:val = 'normref' or @w:val = 'biblio']]//w:r[w:rPr/w:rStyle/@w:val = 'FootnoteReference'][w:footnoteReference and not(w:t)]" priority="2" mode="bibitem">
 		<xsl:element name="FootnoteReference">
 			<xsl:call-template name="footnoteReference"/>
 		</xsl:element>
 	</xsl:template>
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm' or @w:val = 'normref']]//w:r[w:rPr/w:rStyle]/*[self::w:t or self::w:insText or self::w:delText]" priority="2" mode="bibitem">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BiblioEntry0' or @w:val = 'BiblioEntry' or @w:val = 'RefNorm' or @w:val = 'normref' or @w:val = 'biblio']]//w:r[w:rPr/w:rStyle]/*[self::w:t or self::w:insText or self::w:delText]" priority="2" mode="bibitem">
 		<xsl:variable name="style_" select="ancestor::w:r[1]/w:rPr/w:rStyle/@w:val"/>
 		<xsl:variable name="style">
 			<xsl:choose>
