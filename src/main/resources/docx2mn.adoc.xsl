@@ -1877,7 +1877,7 @@
 					<xsl:text>&#xa;</xsl:text>
 				</xsl:if>
 			</xsl:when>
-			<xsl:when test="ancestor::w:p/w:pPr/w:pStyle/@w:val = 'AdmittedTerm'">
+			<xsl:when test="ancestor::w:p/w:pPr/w:pStyle/@w:val = 'AdmittedTerm' or ancestor::w:p/w:pPr/w:pStyle/@w:val = 'AltTerms'">
 				<xsl:apply-templates/>
 			</xsl:when>
 			<xsl:otherwise>
