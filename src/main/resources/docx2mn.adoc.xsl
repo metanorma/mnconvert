@@ -54,6 +54,12 @@
 	<xsl:param name="styles_file"/>
 	<!-- xml with styles (styles.xml) -->
 	<xsl:param name="styles"/>
+	
+	<!-- input xml file 'word\numbering.xml' -->
+	<!-- xml with numbering -->
+	<xsl:param name="numbering_file"/>
+	<!-- xml with styles (styles.xml) -->
+	<xsl:param name="numbering"/>
 
 	<xsl:variable name="em_dash">—</xsl:variable>
 	<xsl:variable name="en_dash">–</xsl:variable>
@@ -108,6 +114,18 @@
 		</xsl:choose>
 	</xsl:variable>
 	<xsl:variable name="styles_xml" select="xalan:nodeset($styles_xml_)"/>
+	
+	<xsl:variable name="numbering_xml_">
+		<xsl:choose>
+			<xsl:when test="$numbering_file != ''">
+				<xsl:copy-of select="document($numbering_file)"/> 
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy-of select="$numbering"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	<xsl:variable name="numbering_xml" select="xalan:nodeset($numbering_xml_)"/>
 
 	<xsl:variable name="bookmarks_">
 		<xsl:for-each select=".//w:bookmarkStart">
@@ -323,7 +341,7 @@
 		<xsl:apply-templates/>
 	</xsl:template>
 	
-	<xsl:template match="w:jc[@w:val = 'left'][not(ancestor::w:tc)]">
+	<xsl:template match="w:jc[@w:val = 'left'][not(ancestor::w:tc)][../following-sibling::w:r]">
 		<xsl:text>[align=left]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
@@ -1505,11 +1523,11 @@
 	<!-- ============================= -->
 	
 	<!-- Unordered list (ul) -->
-	<xsl:template match="w:p[starts-with(w:pPr/w:pStyle/@w:val, 'ListContinue') or starts-with(w:pPr/w:pStyle/@w:val, 'MsoListContinue')]">
+	<xsl:template match="w:p[w:pPr/w:pStyle/@w:val[starts-with(., 'ListContinue') or starts-with(., 'MsoListContinue') or . = 'ListParagraph']]">
 		<xsl:variable name="level_" select="java:replaceAll(java:java.lang.String.new(w:pPr/w:pStyle/@w:val),'ListContinue(.*)','$1')"/>
 		<xsl:variable name="level">
 			<xsl:choose>
-				<xsl:when test="$level_ = ''">1</xsl:when>
+				<xsl:when test="$level_ = '' or $level_ = w:pPr/w:pStyle/@w:val">1</xsl:when>
 				<xsl:otherwise><xsl:value-of select="$level_"/></xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -1520,6 +1538,16 @@
 		
 		<xsl:variable name="listitem_label">
 			<xsl:choose>
+				<xsl:when test="w:pPr/w:pStyle/@w:val = 'ListParagraph'">
+					<xsl:variable name="numId" select="w:pPr/w:numPr/w:numId/@w:val"/>
+					<xsl:variable name="abstractNumId" select="$numbering//w:num[@w:numId = $numId]/w:abstractNumId/@w:val"/>
+					<xsl:variable name="numFmt" select="$numbering//w:abstractNum[@w:abstractNumId = $abstractNumId]//w:numFmt/@w:val"/>
+					<xsl:choose>
+						<!-- <xsl:when test="$numFmt = 'bullet'">*numid=<xsl:value-of select="$numId"/>,abstractNumId=<xsl:value-of select="$abstractNumId"/>,$numFmt=<xsl:value-of select="$numFmt"/></xsl:when> -->
+						<xsl:when test="$numFmt = 'bullet'">*</xsl:when>
+						<xsl:otherwise>.</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
 				<xsl:when test="(.//*[self::w:t or self::w:delText or self::w:insText])[1] = $em_dash">*</xsl:when> <!-- unordered list (ul) -->
 				<xsl:otherwise>.</xsl:otherwise> <!-- ordered list (ol) -->
 			</xsl:choose>
@@ -1532,7 +1560,10 @@
 				<xsl:with-param name="char" select="$listitem_label"/>
 				<xsl:with-param name="count" select="$level"/>
 			</xsl:call-template>
-			<!-- <xsl:text> </xsl:text> -->
+			
+			<xsl:if test="not(starts-with($text,' '))">
+				<xsl:text> </xsl:text>
+			</xsl:if>
 			
 			<xsl:value-of select="$text"/>
 			<xsl:text>&#xa;&#xa;</xsl:text>

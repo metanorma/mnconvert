@@ -164,6 +164,8 @@ public class DOCX2MN_XsltConverter extends XsltConverter {
         
         String strStylesXML = Util.unzipFileToString(Paths.get(inputFilePath), "styles.xml");
         
+        String strNumberingXML = Util.unzipFileToString(Paths.get(inputFilePath), "numbering.xml");
+        
         Source src = new SAXSource(rdr, new InputSource(new StringReader(strDocumentXML)));
 
         Source srcXSL;
@@ -201,6 +203,11 @@ public class DOCX2MN_XsltConverter extends XsltConverter {
         NodeList xmlStylesDocumentNodeList = getNodeList(strStylesXML);
         if (xmlStylesDocumentNodeList != null) {
             transformer.setParameter("styles", xmlStylesDocumentNodeList);
+        }
+        
+        NodeList xmlNumberingDocumentNodeList = getNodeList(strNumberingXML);
+        if (xmlNumberingDocumentNodeList != null) {
+            transformer.setParameter("numbering", xmlNumberingDocumentNodeList);
         }
         
         StringWriter resultWriter = new StringWriter();
