@@ -469,7 +469,9 @@
 		
 		<xsl:text> </xsl:text>
 		
-		<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(normalize-space($text)),'^(\d(\.\d)*)*(.*)','$3'))"/> <!-- remove digits (or digit(.digit)+) at start -->
+		<xsl:variable name="title1" select="normalize-space(java:replaceAll(java:java.lang.String.new(normalize-space($text)),'^(\d(\.\d)*)*(.*)','$3'))"/> <!-- remove digits (or digit(.digit)+) at start -->
+		<xsl:variable name="title2" select="normalize-space(java:replaceAll(java:java.lang.String.new(normalize-space($title1)),'^([A-Z](\.\d)+(\s|\h)+)*(.*)','$4'))"/> <!-- remove letter(.digit)+ at start -->
+		<xsl:value-of select="$title2"/>
 		
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
@@ -1565,7 +1567,7 @@
 				<xsl:text> </xsl:text>
 			</xsl:if>
 			
-			<xsl:value-of select="$text"/>
+			<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),'(\s)+$','')"/> <!-- remove spaces at the end of list item -->
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</xsl:if>
 	</xsl:template> <!-- ul -->
@@ -1926,8 +1928,9 @@
 	<!-- Admonitions and quote processing -->
 	<!-- ============================= -->
 	
+	<xsl:variable name="regex_admonition">^(NOTE|IMPORTANT|WARNING|CAUTION)(\s|\h)+—(\s|\h)+(.*)</xsl:variable>
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BodyTextindent1']]">
-		<xsl:variable name="regex_admonition">^(NOTE|IMPORTANT|WARNING|CAUTION)(\s|\h)+—(\s|\h)+(.*)</xsl:variable>
+
 		<xsl:variable name="text">
 			<xsl:apply-templates />
 		</xsl:variable>
@@ -1952,6 +1955,18 @@
 				<xsl:text>_____</xsl:text>
 			</xsl:otherwise>
 		</xsl:choose>
+		<xsl:text>&#xa;&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:variable name="regex_admonition_2">^\*+(NOTE|IMPORTANT|WARNING|CAUTION)(\s|\h)+—(\s|\h)+(.*)\*+$</xsl:variable>
+	<xsl:template match="w:p[not(w:pPr/w:pStyle)][w:r/w:rPr/w:b][java:org.metanorma.utils.RegExHelper.matches($regex_admonition, w:r/w:t) = 'true']">
+		<xsl:variable name="text">
+			<xsl:apply-templates select="w:r/w:t"/>
+		</xsl:variable>
+		
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text),$regex_admonition_2,'$1')"/>
+		<xsl:text>: </xsl:text>
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(java:replaceAll(java:java.lang.String.new($text),$regex_admonition_2,'$4')),'^\*+','')"/>
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
 	
@@ -2071,8 +2086,8 @@
 						<xsl:text>&gt;&gt;</xsl:text>
 					</xsl:otherwise>
 				</xsl:choose>
-				
 			</xsl:when> <!-- end hyperlink to the standard -->
+				
 			
 			<xsl:when test="w:r/w:rPr/w:rStyle[@w:val = 'stddocNumber' or (@w:val = 'Hyperlink' and ancestor::w:hyperlink/@w:anchor != '')]"> <!-- stddocNumber - hyperlink to non-standard bibliography item -->
 				<xsl:text>&lt;&lt;</xsl:text>
