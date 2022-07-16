@@ -1272,27 +1272,47 @@
 					<xsl:when test="$organization = 'BSI' and starts-with($related_comm_ref, $related_comm_ref_text)">
 						<xsl:value-of select="normalize-space(substring-after($related_comm_ref, $related_comm_ref_text))"/>
 					</xsl:when>
+					<xsl:when test="ext/editorialgroup/@identifier">
+						<xsl:value-of select="@identifier"/>
+					</xsl:when>
 					<xsl:when test="ext/editorialgroup/technical-committee and not(
 						ext/editorialgroup/subcommittee and 
 						ext/editorialgroup/workgroup )">
 						<xsl:value-of select="ext/editorialgroup/technical-committee/@number"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:variable name="abbreviation">
-							<xsl:for-each select="copyright/owner/organization/abbreviation">
-								<xsl:apply-templates select="." mode="front"/>
-								<xsl:if test="position() != last()">/</xsl:if>
-							</xsl:for-each>
-						</xsl:variable>
-						<xsl:if test="$abbreviation != $organization">
-							<xsl:value-of select="$abbreviation"/>
-							<xsl:if test="$organization != 'ISO'">
-								<xsl:text>/</xsl:text>
-							</xsl:if>
-							<xsl:if test="$organization = 'ISO'">
+
+						<xsl:choose>
+							<xsl:when test="ext/editorialgroup/agency">
+								<xsl:for-each select="ext/editorialgroup/agency">
+									<xsl:value-of select="."/>
+									<xsl:if test="position() != last()">/</xsl:if>
+								</xsl:for-each>
 								<xsl:text> </xsl:text>
-							</xsl:if>
-						</xsl:if>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:variable name="abbreviation">
+									<xsl:for-each select="copyright/owner/organization/abbreviation">
+									<xsl:apply-templates select="." mode="front"/>
+										<xsl:if test="position() != last()">/</xsl:if>
+									</xsl:for-each>
+								</xsl:variable>
+								
+								<xsl:if test="$abbreviation != $organization">
+									<xsl:value-of select="$abbreviation"/>
+									<xsl:if test="$organization != 'ISO'">
+										<xsl:text>/</xsl:text>
+									</xsl:if>
+									<xsl:if test="$organization = 'ISO'">
+										<xsl:text> </xsl:text>
+									</xsl:if>
+								</xsl:if>
+								
+							</xsl:otherwise>
+						</xsl:choose>
+							
+						
+						
 						<xsl:variable name="editorialgroup">
 							<item><xsl:apply-templates select="ext/editorialgroup/technical-committee" mode="front"/></item>
 							<item><xsl:apply-templates select="ext/editorialgroup/subcommittee" mode="front"/></item>
@@ -1884,9 +1904,11 @@
 																ext/ics/code | 
 																copyright/from |
 																ext/structuredidentifier |
+																ext/editorialgroup/agency |
 																ext/editorialgroup/technical-committee |
 																ext/editorialgroup/subcommittee |
 																ext/editorialgroup/workgroup |
+																ext/approvalgroup |
 																bibdata/relation |
 																bibdata/relation/bibitem |
 																bibdata/relation/description |
@@ -3544,6 +3566,10 @@
 
 	<xsl:template match="pre">
 		<preformat><xsl:apply-templates /></preformat>
+	</xsl:template>
+
+	<xsl:template match="span">
+		<xsl:apply-templates />
 	</xsl:template>
 
 	<!-- <xsl:template match="*[local-name() = 'definition']//*[local-name() = 'em']" priority="2"> -->

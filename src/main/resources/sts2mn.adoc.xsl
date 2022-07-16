@@ -2041,7 +2041,7 @@
 		<xsl:text>[.source</xsl:text>
 		<xsl:choose>
 			<xsl:when test="$model_term_source/adapted">%adapted</xsl:when>
-			<xsl:when test="$model_term_source/modified_from">%modified</xsl:when>
+			<!-- <xsl:when test="$model_term_source/modified_from">%modified</xsl:when> -->
 			<xsl:when test="$model_term_source/quoted">%quoted</xsl:when>
 		</xsl:choose>
 		<xsl:text>]</xsl:text>

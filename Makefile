@@ -97,7 +97,7 @@ xml2rfc.adoc: target/$(JAR_FILE) rfcsources documents
 #endif
 
 rfcsources:
-	wget -r -l 1 -nd -A ${SRCRFCMASK} -R rfc-*.xml -P ${SRCRFCDIR} https://www.rfc-editor.org/rfc/
+	wget -r -l 1 -nd -erobots=off -A ${SRCRFCMASK} -R rfc-*.xml -P ${SRCRFCDIR} https://www.rfc-editor.org/rfc/
 
 
 saxon.jar:
