@@ -2123,6 +2123,8 @@
 	
 	<xsl:template match="w:r[w:rPr/w:rStyle[@w:val = 'citeapp' or @w:val = 'citefig' or @w:val = 'citesec' or @w:val = 'citetbl']][preceding-sibling::w:r[contains(w:instrText,'HYPERLINK')]]"/>
 	
+	<xsl:template match="w:r[w:rPr/w:rStyle[@w:val = 'Hyperlink']][preceding-sibling::*[1][w:fldChar/@w:fldCharType = 'separate'] and following-sibling::*[1][w:fldChar/@w:fldCharType = 'end']]" priority="2"/>
+	
 	<!-- remove 'a' from footnote body -->
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'tablefootnote']]/w:r[w:rPr/w:rStyle/@w:val = 'tablefootnoteref']"/>
 	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'tablefootnote']]/w:r/w:tab" priority="2"/>
