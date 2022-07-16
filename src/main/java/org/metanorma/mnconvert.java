@@ -29,6 +29,8 @@ public class mnconvert {
     
     static final String CMD_STSorRFCtoMN = "java -jar " + APP_NAME + ".jar <input_xml_file> [options]";
     
+    static final String CMD_DOCXtoMN = "java -jar " + APP_NAME + ".jar <input_docx_file> [options]";
+    
     static String VER = Util.getAppVersion();
     
     static final Options optionsInfo = new Options() {
@@ -148,6 +150,28 @@ public class mnconvert {
         }
     };
     
+    // Mode 3. Docx to Metanorma Adoc conversion
+    static final Options optionsMainDocx = new Options() {
+        {
+            addOption(Option.builder("o")
+                    .longOpt("output")
+                    .desc("output file name")
+                    .hasArg()
+                    .required(false)
+                    .build());
+            addOption(Option.builder("d")
+                    .longOpt("debug")
+                    .desc("print additional debug information into output file")
+                    .required(false)
+                    .build());
+            addOption(Option.builder("v")
+                    .longOpt("version")
+                    .desc("display application version")
+                    .required(false)
+                    .build());            
+        }
+    };
+    
     static final String USAGE = getUsage();
     
     /**
@@ -233,8 +257,8 @@ public class mnconvert {
                 if (inputFormat != null) {
                     inputFormat = inputFormat.toLowerCase();
                 } else {
-                    // determine input xml file format
-                    inputFormat = Util.getXMLFormat(argXmlIn);
+                    // determine input file format (xml or docx)
+                    inputFormat = Util.getInputFormat(argXmlIn);
                 }
 
                 XsltConverter converter = null;
@@ -263,6 +287,12 @@ public class mnconvert {
                         {
                             RFC2MN_XsltConverter rfc2mn = new RFC2MN_XsltConverter();
                             converter = rfc2mn;
+                            break;
+                        }
+                    case "docx":
+                        {
+                            DOCX2MN_XsltConverter docx2mn = new DOCX2MN_XsltConverter();
+                            converter = docx2mn;
                             break;
                         }
                     default:
@@ -303,6 +333,8 @@ public class mnconvert {
         formatter.printHelp(pw, 80, CMD_STSCheckOnly, "", optionsSTSCheckOnly, 0, 0, "");
         pw.write("\nOR\n\n");
         formatter.printHelp(pw, 80, CMD_STSorRFCtoMN, "", optionsMain, 0, 0, "");
+        pw.write("\nOR\n\n");
+        formatter.printHelp(pw, 80, CMD_DOCXtoMN, "", optionsMainDocx, 0, 0, "");
         pw.flush();
         return stringWriter.toString();
     }
