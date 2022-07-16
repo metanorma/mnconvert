@@ -1180,7 +1180,7 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<tr>
-					<xsl:if test=".//w:p[w:pPr/w:pStyle/@w:val = 'Tableheader']">
+					<xsl:if test=".//w:p[w:pPr/w:pStyle/@w:val = 'Tableheader'] or w:trPr/w:tblHeader">
 						<xsl:attribute name="header">true</xsl:attribute>
 					</xsl:if>
 					<xsl:apply-templates/>
@@ -1237,7 +1237,7 @@
 		</p>
 	</xsl:template>
 	
-	<xsl:template match="w:tc/w:p[w:pPr/w:pStyle[@w:val = 'Note']]">
+	<xsl:template match="w:tc/w:p[w:pPr/w:pStyle[@w:val = 'Note' or @w:val = 'note1']]">
 		<tablenote>
 			<xsl:attribute name="id">
 				<xsl:call-template name="setId"/>
@@ -1257,7 +1257,7 @@
 	<!-- <xsl:template match="w:r[w:rPr/w:rStyle[@w:val = 'tablefootnoteref']]"/> -->
 	
 	
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'tablefootnote']]">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'tablefootnote' or @w:val = 'tablefootnote1']]">
 		<tablefootnotebody>
 			<xsl:attribute name="ref">
 				<xsl:value-of select="w:r[w:rPr/w:rStyle/@w:val = 'tablefootnoteref']"/>
@@ -2002,7 +2002,7 @@
 		<xsl:variable name="regex_email">^[a-zA-Z0-9_!#$%&amp;'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$</xsl:variable>
 		
 		<xsl:choose>
-			<xsl:when test="$style = 'tablefootnote'"> <!-- hyperlink to the footnote -->
+			<xsl:when test="$style = 'tablefootnote' or $style = 'tablefootnote1'"> <!-- hyperlink to the footnote -->
 				<xsl:text> footnote:[</xsl:text>
 					<xsl:apply-templates select="ancestor::w:tbl[1]//w:r[preceding-sibling::w:bookmarkStart[@w:name = current()/@w:anchor]]"/>
 				<xsl:text>]</xsl:text>
@@ -2126,8 +2126,8 @@
 	<xsl:template match="w:r[w:rPr/w:rStyle[@w:val = 'Hyperlink']][preceding-sibling::*[1][w:fldChar/@w:fldCharType = 'separate'] and following-sibling::*[1][w:fldChar/@w:fldCharType = 'end']]" priority="2"/>
 	
 	<!-- remove 'a' from footnote body -->
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'tablefootnote']]/w:r[w:rPr/w:rStyle/@w:val = 'tablefootnoteref']"/>
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'tablefootnote']]/w:r/w:tab" priority="2"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'tablefootnote' or @w:val = 'tablefootnote1']]/w:r[w:rPr/w:rStyle/@w:val = 'tablefootnoteref']"/>
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'tablefootnote' or @w:val = 'tablefootnote1']]/w:r/w:tab" priority="2"/>
 	
 	
 	<!-- ============================= -->
@@ -2410,7 +2410,7 @@
 	<!-- ============================= -->
 	<xsl:template match="w:b" mode="richtext">
 		<xsl:choose>
-			<xsl:when test="ancestor::w:p/w:pPr/w:pStyle/@w:val = 'Tableheader'"><!-- skip bold in the table header --></xsl:when>
+			<xsl:when test="ancestor::w:p/w:pPr/w:pStyle/@w:val = 'Tableheader' or ancestor::w:tr/w:trPr/w:tblHeader"><!-- skip bold in the table header --></xsl:when>
 			<xsl:otherwise><bold/></xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
