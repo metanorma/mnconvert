@@ -575,6 +575,10 @@
 		<!-- :issued-date: -->
 		<xsl:apply-templates select="approval/approval-date"/>
 		
+		<!-- :updates: -->
+		<!-- :semantic-metadata-related-article-edition: -->
+		<xsl:apply-templates select="std-title-group/alt-title/related-article"/>
+		
 		<!-- :date: release 2020-01-01 -->
 		<xsl:apply-templates select="release-date"/>
 		
@@ -1416,6 +1420,16 @@
 			<xsl:text>:issued-date: </xsl:text><xsl:value-of select="$date"/>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="alt-title/related-article[@related-article-type = 'revision-of']">
+		<xsl:text>:updates: </xsl:text><xsl:value-of select="std"/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="alt-title/related-article[@related-article-type = 'edition']">
+		<xsl:text>:semantic-metadata-related-article-edition: </xsl:text><xsl:value-of select="edition"/>
+		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="kwd-group">
