@@ -572,7 +572,7 @@
 		<!-- :published-date: -->
 		<xsl:apply-templates select="pub-date"/>
 		
-		<!-- :confirmed-date: -->
+		<!-- :issued-date: -->
 		<xsl:apply-templates select="approval/approval-date"/>
 		
 		<!-- :date: release 2020-01-01 -->
@@ -1356,20 +1356,41 @@
 		<xsl:apply-templates select="society"/>
 	</xsl:template>
 	
+	<xsl:variable name="regex_society">^IEEE (.*)</xsl:variable>
 	<xsl:template match="std-sponsor/committee">
-		<xsl:text>:committee: </xsl:text><xsl:value-of select="."/>
+		<xsl:variable name="committee_" select="normalize-space(.)"/>
+		<xsl:variable name="committee">
+			<xsl:choose>
+				<xsl:when test="contains($committee_,' Society') and contains($committee_,' of the ')">
+					<xsl:value-of select="substring-before($committee_,' of the ')"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$committee_"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:text>:committee: </xsl:text><xsl:value-of select="$committee"/>
 		<xsl:text>&#xa;</xsl:text>
+		<xsl:variable name="society">
+			<xsl:if test="contains($committee_,' Society') and contains($committee_,' of the ')">
+				<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(substring-after($committee_,' of the ')),$regex_society,'$1'))"/>
+			</xsl:if>
+		</xsl:variable>
+		<xsl:if test="normalize-space($society)">
+			<xsl:text>:society: </xsl:text><xsl:value-of select="$society"/>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="std-sponsor/society">
-		<xsl:text>:society: </xsl:text><xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(.),'^IEEE (.*)','$1'))"/>
+		<xsl:text>:society: </xsl:text><xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(.),$regex_society,'$1'))"/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="approval/approval-date">
 		<xsl:variable name="date" select="normalize-space(@iso-8601-date)"/>
 		<xsl:if test="$date != ''">
-			<xsl:text>:confirmed-date: </xsl:text><xsl:value-of select="$date"/>
+			<xsl:text>:issued-date: </xsl:text><xsl:value-of select="$date"/>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 	</xsl:template>
