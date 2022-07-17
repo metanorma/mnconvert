@@ -341,7 +341,7 @@
 		<xsl:apply-templates/>
 	</xsl:template>
 	
-	<xsl:template match="w:jc[@w:val = 'left'][not(ancestor::w:tc)][../following-sibling::w:r]">
+	<xsl:template match="w:jc[@w:val = 'left'][not(ancestor::w:tc) and not(preceding-sibling::w:pStyle/@w:val = 'Example')][../following-sibling::w:r]">
 		<xsl:text>[align=left]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
@@ -442,6 +442,11 @@
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 		
+		<xsl:if test="java:org.metanorma.utils.RegExHelper.matches('^Appendix(\s|\h)+(\d+)(\s|\h)+.*', normalize-space($text)) = 'true'">
+			<xsl:text>[%appendix]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+		
 		<xsl:variable name="level_" select="substring-after(w:pPr/w:pStyle/@w:val, 'Heading')"/>
 		
 		<xsl:variable name="level">
@@ -471,7 +476,9 @@
 		
 		<xsl:variable name="title1" select="normalize-space(java:replaceAll(java:java.lang.String.new(normalize-space($text)),'^(\d(\.\d)*)*(.*)','$3'))"/> <!-- remove digits (or digit(.digit)+) at start -->
 		<xsl:variable name="title2" select="normalize-space(java:replaceAll(java:java.lang.String.new(normalize-space($title1)),'^([A-Z](\.\d)+(\s|\h)+)*(.*)','$4'))"/> <!-- remove letter(.digit)+ at start -->
-		<xsl:value-of select="$title2"/>
+		<xsl:variable name="title3" select="normalize-space(java:replaceAll(java:java.lang.String.new(normalize-space($title2)),'^(Appendix(\s|\h)+(\d)+(\s|h)+)(.*)','$5'))"/> <!-- remove Appendix at start -->
+		
+		<xsl:value-of select="$title3"/>
 		
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
@@ -1929,7 +1936,7 @@
 	<!-- ============================= -->
 	
 	<xsl:variable name="regex_admonition">^(NOTE|IMPORTANT|WARNING|CAUTION)(\s|\h)+—(\s|\h)+(.*)</xsl:variable>
-	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BodyTextindent1']]">
+	<xsl:template match="w:p[w:pPr/w:pStyle[@w:val = 'BodyTextindent1'] or following-sibling::w:p[1][w:pPr/w:pStyle/@w:val = 'quoteattribution']]">
 
 		<xsl:variable name="text">
 			<xsl:apply-templates />
@@ -2090,7 +2097,16 @@
 				
 			
 			<xsl:when test="w:r/w:rPr/w:rStyle[@w:val = 'stddocNumber' or (@w:val = 'Hyperlink' and ancestor::w:hyperlink/@w:anchor != '')]"> <!-- stddocNumber - hyperlink to non-standard bibliography item -->
-				<xsl:text>&lt;&lt;</xsl:text>
+				
+				<xsl:choose>
+					<xsl:when test="ancestor::w:p/w:pPr/w:pStyle/@w:val = 'quoteattribution'">
+						<xsl:text>"</xsl:text>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:text>&lt;&lt;</xsl:text>
+					</xsl:otherwise>
+				</xsl:choose>
+				
 				<xsl:value-of select="@w:anchor"/>
 				<xsl:if test="w:r/w:rPr/w:rStyle/@w:val = 'Hyperlink'">
 					<xsl:variable name="text"><xsl:apply-templates select=".//w:t/text()"/></xsl:variable>
@@ -2099,7 +2115,16 @@
 						<xsl:text>,</xsl:text><xsl:value-of select="$text"/>
 					</xsl:if>
 				</xsl:if>
-				<xsl:text>&gt;&gt;</xsl:text>
+				
+				<xsl:choose>
+					<xsl:when test="ancestor::w:p/w:pPr/w:pStyle/@w:val = 'quoteattribution'">
+						<xsl:text>"</xsl:text>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:text>&gt;&gt;</xsl:text>
+					</xsl:otherwise>
+				</xsl:choose>
+				
 			</xsl:when> <!-- end hyperlink to non-standard bibliography item -->
 			
 			<xsl:otherwise>
