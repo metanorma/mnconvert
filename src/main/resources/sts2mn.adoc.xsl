@@ -748,6 +748,15 @@
 		<!-- :semantic-metadata-copyright-statement:  All rights of exploitation in any form and ... -->
 		<xsl:apply-templates select="permissions/copyright-statement"/>
 		
+		<!-- :semantic-metadata-xplore-article-id: 6457401 -->
+		<xsl:apply-templates select="xplore-article-id"/>
+		
+		<!-- :semantic-metadata-xplore-issue: ... -->
+		<xsl:apply-templates select="xplore-issued"/>
+		
+		<!-- :semantic-metadata-xplore-pub-id: ... -->
+		<xsl:apply-templates select="xplore-pub-id"/>
+		
 		<!-- relation bibitem -->
 		<xsl:if test="$include_iso_meta = 'true'">
 			<xsl:for-each select="ancestor::front/iso-meta">
@@ -1312,7 +1321,21 @@
 		</xsl:choose>
 	</xsl:template>
 	
-		
+	<xsl:template match="xplore-article-id[normalize-space() != '']">
+		<xsl:text>:semantic-metadata-xplore-article-id: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="xplore-issue[normalize-space() != '']">
+		<xsl:text>:semantic-metadata-xplore-issue: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="xplore-pub-id[normalize-space() != '']">
+		<xsl:text>:semantic-metadata-xplore-pub-id: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>	
+	
 	<xsl:variable name="regex_ieee_number">^.*?(\d+)-(\d+)$</xsl:variable>
 	<xsl:template match="std-designation[@content-type = 'full']" mode="docnumber">
 		<xsl:text>:docnumber: </xsl:text><xsl:value-of select="java:replaceAll(java:java.lang.String.new(.), $regex_ieee_number, '$1')"/>
@@ -1417,7 +1440,7 @@
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="contrib-group[@content-type = 'Working Group']">
+	<xsl:template match="contrib-group[contains(@content-type, 'Working Group')]">
 		<xsl:apply-templates mode="working_group"/>
 	</xsl:template>
 	
