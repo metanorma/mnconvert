@@ -598,7 +598,10 @@
 		
 		<!-- :doctype: international-standard -->
 		<xsl:variable name="doctype">
-			<xsl:apply-templates select="std-ident/doc-type | ancestor::standards-document/@content-type"/>		
+			<xsl:apply-templates select="std-ident/doc-type"/> <!--  |  ancestor::standards-document/@content-type -->
+		</xsl:variable>
+		<xsl:variable name="doctype2">
+			<xsl:apply-templates select="std-title-group/std-main-title" mode="doctype"/>
 		</xsl:variable>
 		<xsl:text>:doctype: </xsl:text>
 			<xsl:choose>
@@ -608,8 +611,8 @@
 				<xsl:when test="$doctype = 'AMD' or $doctype = 'amd'">amendment</xsl:when>
 				<xsl:when test="$doctype = 'DIR' or $doctype = 'dir'">directive</xsl:when>
 				<xsl:when test="$doctype = 'IS' or $doctype = 'is'">international-standard</xsl:when>
-				<xsl:when test="$doctype = 'standard'">standard</xsl:when>
-				<xsl:otherwise><xsl:value-of select="$doctype"/></xsl:otherwise>
+				<xsl:when test="normalize-space($doctype) != ''"><xsl:value-of select="$doctype"/></xsl:when>
+				<xsl:otherwise><xsl:value-of select="$doctype2"/></xsl:otherwise>
 			</xsl:choose>
 		<xsl:text>&#xa;</xsl:text>
 		
@@ -795,6 +798,17 @@
 		<xsl:apply-templates select="contrib-group"/>
 		
 
+	</xsl:template>
+	
+	<xsl:template match="std-title-group/std-main-title" mode="doctype">
+		<!-- <xsl:text>:title-main: </xsl:text> -->
+		<xsl:variable name="title"><xsl:apply-templates /></xsl:variable>
+		<xsl:variable name="doctype" select="normalize-space(java:replaceAll(java:java.lang.String.new($title),$regex_ieee_title,'$1'))"/>
+		<!-- Standard to standard
+			Guide to guide
+			Recommended Practice to recommended-practice
+		-->
+		<xsl:value-of select="java:toLowerCase(translate($doctype,'-',' '))"/>
 	</xsl:template>
 	
 	<xsl:template name="getCoverPageImage">
@@ -1329,10 +1343,11 @@
 		<!-- <xsl:apply-templates select="std-main-title"/> -->
 	</xsl:template>
 	
+	<xsl:variable name="regex_ieee_title">^IEEE (Standard|Guide|Recommended Practice) for (.*)</xsl:variable>
 	<xsl:template match="std-title-group/std-main-title">
 		<!-- <xsl:text>:title-main: </xsl:text> -->
 		<xsl:variable name="title"><xsl:apply-templates /></xsl:variable>
-		<xsl:text>= </xsl:text><xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($title),'^IEEE Standard for (.*)','$1'))"/>
+		<xsl:text>= </xsl:text><xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($title),$regex_ieee_title,'$2'))"/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
