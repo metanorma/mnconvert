@@ -3079,7 +3079,10 @@
 	</xsl:template>
 	
 	<xsl:template match="mixed-citation">
-		<xsl:text> </xsl:text><xsl:apply-templates/>
+		<xsl:if test="preceding-sibling::node()">
+			<xsl:text> </xsl:text>
+		</xsl:if>
+		<xsl:apply-templates/>
 	</xsl:template>
 		
 	<!-- =============== -->
@@ -3345,7 +3348,7 @@
 		</xsl:variable>
 		<xsl:choose>
 			<xsl:when test="$cols-count = 1">1</xsl:when> <!-- cols="1" -->
-			<xsl:when test="colgroup/col or col">				
+			<xsl:when test="colgroup/col[@width] or col[@width]">
 				<xsl:for-each select="colgroup/col | col">
 					<xsl:variable name="width" select="translate(@width, '%cm', '')"/>
 					<xsl:variable name="width_number" select="number($width)"/>
@@ -4356,6 +4359,10 @@
 		<xsl:value-of select="."/>
 		<xsl:text>]</xsl:text>
 	</xsl:template>
+	
+	<!-- Image of the table -->
+	<xsl:template match="table-wrap/graphic" priority="2"/>
+	
 	<!-- ================================== -->
 	<!-- graphic, inline-graphic processing -->
 	<!-- ================================== -->
@@ -4424,8 +4431,16 @@
 		<xsl:apply-templates />
 	</xsl:template>
 	
-	<xsl:template match="inline-formula">		
-		<xsl:text>stem:[</xsl:text>
+	<xsl:template match="inline-formula">
+		<xsl:choose>
+			<xsl:when test="tex-math">
+				<xsl:text>latexmath</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text>stem</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
+		<xsl:text>:[</xsl:text>
 		<xsl:variable name="math"><xsl:apply-templates /></xsl:variable>
 		<!-- <xsl:variable name="math01" select="java:replaceAll(java:java.lang.String.new($math),'\]','\]')"/> -->
 		<xsl:value-of select="$math"/>
@@ -4433,11 +4448,20 @@
 	</xsl:template>
 	
 	<xsl:template match="disp-formula">
+		<xsl:call-template name="setId"/>
 		<!-- <xsl:text>stem:[</xsl:text> -->
 		<xsl:if test="local-name(preceding-sibling::node()[normalize-space() != ''][1]) != 'p'">
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</xsl:if>
-		<xsl:text>[stem]</xsl:text>
+		<xsl:choose>
+			<xsl:when test="tex-math">
+				<xsl:text>[latexmath]</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text>[stem]</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
+		
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>++++</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
@@ -4480,10 +4504,16 @@
 	<!-- =============== -->
 	<!-- Definitions list (dl) -->
 	<!-- =============== -->
-	<xsl:template match="def-list">
+	<xsl:template match="def-list | variable-list">
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="variable-list/p">
+		<xsl:text>&#xa;&#xa;</xsl:text>
+		<xsl:apply-templates />
+		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="def-list/title">
@@ -4492,23 +4522,24 @@
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="def-item">
+	<xsl:template match="def-item | var-item">
 		<xsl:call-template name="setId">
 			<xsl:with-param name="newline">false</xsl:with-param>
 		</xsl:call-template>
 		<xsl:apply-templates />		
 	</xsl:template>
 	
-	<xsl:template match="def-item/term">
+	<xsl:template match="def-item/term | var-item/term">
 		<xsl:apply-templates/>
 		<xsl:if test="count(node()) = 0"><xsl:text> </xsl:text></xsl:if>
 		<xsl:text>:: </xsl:text>
 		<!-- <xsl:text>&#xa;</xsl:text> -->
 	</xsl:template>
 	
-	<xsl:template match="def-item/def">
+	<xsl:template match="def-item/def | var-item/def">
 		<xsl:apply-templates/>
 	</xsl:template>
+	
 	<!-- =============== -->
 	<!-- End Definitions list (dl) -->
 	<!-- =============== -->
