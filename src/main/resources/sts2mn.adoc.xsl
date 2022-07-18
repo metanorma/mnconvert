@@ -803,12 +803,17 @@
 		<!-- :isbn-print: -->
 		<xsl:apply-templates select="isbn[@publication-format = 'print']"/>
 
+		<!-- :semantic-metadata-collab-type-logo: -->
+		<!-- :semantic-metadata-collab: -->
+		<!-- :semantic-metadata-collab-type-accredited-by: -->
+		<xsl:apply-templates select="contrib-group[.//collab-alternatives]"/>
+
 		<!-- :working-group: -->
 		<xsl:apply-templates select="(../sec/participants-sec/p[contains(text(), ' Working Group ')])[1]"/>
 		<!-- :balloting-group: -->
 		<xsl:apply-templates select="(../sec/participants-sec/p[contains(text(), ' balloting group ')])[1]"/>
 		<!-- :wg-chair: :wg-vicechair:  :wg-members: etc. -->
-		<xsl:apply-templates select="contrib-group"/>
+		<xsl:apply-templates select="contrib-group[not(.//collab-alternatives)]"/>
 		
 
 	</xsl:template>
@@ -1440,6 +1445,30 @@
 	<xsl:template match="kwd-group/kwd">
 		<xsl:value-of select="."/>
 		<xsl:if test="following-sibling::*"><xsl:text>, </xsl:text></xsl:if>
+	</xsl:template>
+	
+	
+	<xsl:template match="contrib-group[.//collab-alternatives]" priority="2">
+		<xsl:apply-templates mode="collab-alternatives"/>
+	</xsl:template>
+	
+	<xsl:template match="contrib" mode="collab-alternatives">
+		<xsl:apply-templates mode="collab-alternatives"/>
+	</xsl:template>
+	
+	<xsl:template match="collab[@collab-type = 'logo']" mode="collab-alternatives">
+		<xsl:text>:semantic-metadata-collab-type-logo: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="collab[not(@collab-type)]" mode="collab-alternatives">
+		<xsl:text>:semantic-metadata-collab: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="collab[@collab-type = 'accredited-by']" mode="collab-alternatives">
+		<xsl:text>:semantic-metadata-collab-type-accredited-by: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="sec/participants-sec/p[contains(., ' Working Group ')]">
