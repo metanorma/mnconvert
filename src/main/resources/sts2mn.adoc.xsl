@@ -575,6 +575,9 @@
 		<!-- :issued-date: -->
 		<xsl:apply-templates select="approval/approval-date"/>
 		
+		<!-- :date: reaffirm -->
+		<xsl:apply-templates select="reaffirm-date"/>
+		
 		<!-- :updates: -->
 		<!-- :semantic-metadata-related-article-edition: -->
 		<xsl:apply-templates select="std-title-group/alt-title/related-article"/>
@@ -1430,6 +1433,14 @@
 		</xsl:if>
 	</xsl:template>
 	
+	<xsl:template match="reaffirm-date">
+		<xsl:variable name="date" select="normalize-space(@iso-8601-date)"/>
+		<xsl:if test="$date != ''">
+			<xsl:text>:date: reaffirm </xsl:text><xsl:value-of select="$date"/>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
 	<xsl:template match="alt-title/related-article[@related-article-type = 'revision-of']">
 		<xsl:text>:updates: </xsl:text><xsl:value-of select="std"/>
 		<xsl:text>&#xa;</xsl:text>
@@ -1643,6 +1654,12 @@
 	</xsl:template>
 	
 	<xsl:template match="front/sec[participants-sec]"/> <!-- skip -->
+	
+	<xsl:template match="front/ack">
+		<xsl:text>[.preface,heading=acknowledgements]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:apply-templates />
+	</xsl:template>
 	
 	<xsl:template match="body/sec[@sec-type = 'intro']" priority="2">
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
