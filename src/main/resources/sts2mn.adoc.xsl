@@ -4472,6 +4472,10 @@
 		<xsl:text>++++</xsl:text>
 		<!-- <xsl:text>]</xsl:text> -->
 		<xsl:text>&#xa;&#xa;</xsl:text>
+		
+		<xsl:apply-templates select="variable-list">
+			<xsl:with-param name="process">true</xsl:with-param>
+		</xsl:apply-templates>
 	</xsl:template>
 	<xsl:template match="disp-formula/text()[normalize-space()='']"/>
 	
@@ -4504,10 +4508,17 @@
 	<!-- =============== -->
 	<!-- Definitions list (dl) -->
 	<!-- =============== -->
-	<xsl:template match="def-list | variable-list">
+	<xsl:template match="def-list">
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="variable-list">
+		<xsl:param name="process">false</xsl:param>
+		<xsl:if test="$process = 'true'">
+			<xsl:apply-templates />
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="variable-list/p">
