@@ -672,6 +672,9 @@
 		<!-- :society: -->
 		<xsl:apply-templates select="std-sponsor"/>
 		
+		<!-- :semantic-metadata-partner-secretariat: -->
+		<xsl:apply-templates select="partner" />
+		
 		<!-- :keywords: -->
 		<xsl:apply-templates select="kwd-group"/>
 		
@@ -1434,6 +1437,13 @@
 	
 	<xsl:template match="alt-title/related-article[@related-article-type = 'edition']">
 		<xsl:text>:semantic-metadata-related-article-edition: </xsl:text><xsl:value-of select="edition"/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="partner/*">
+		<!-- Example: :semantic-metadata-partner-secretariat: -->
+		<xsl:text>:semantic-metadata-partner-</xsl:text><xsl:value-of select="local-name()"/><xsl:text>: </xsl:text>
+		<xsl:value-of select="."/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
