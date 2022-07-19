@@ -558,6 +558,9 @@
 		<xsl:apply-templates select="std-ident/doc-number"/>
 		<xsl:apply-templates select="std-designation[@content-type = 'full']" mode="docnumber"/>
 		
+		<!-- :docstatus: active -->
+		<xsl:apply-templates select="/*/@article-status"/>
+		
 		<!-- :publisher: ISO;IEC -->
 		<xsl:apply-templates select="std-ident/originator"/>
 		<!-- :partnumber: 1 -->
@@ -568,6 +571,8 @@
 		<xsl:apply-templates select="std-ident/version"/>
 		<!-- :copyright-year: 2019 -->
 		<xsl:apply-templates select="permissions/copyright-year"/>
+		
+		<xsl:apply-templates select="permissions/copyright-holder/@copyright-owner[. != 'IEEE']"/>
 		
 		<!-- :published-date: -->
 		<xsl:apply-templates select="pub-date"/>
@@ -630,9 +635,21 @@
 		<xsl:if test="ics[normalize-space() != '']">
 			<xsl:text>:library-ics: </xsl:text>
 			<xsl:for-each select="ics[normalize-space() != '']">
-				<xsl:value-of select="."/><xsl:if test="position() != last()">,</xsl:if>
+				<xsl:choose>
+					<xsl:when test="ics-code"><xsl:value-of select="ics-code"/></xsl:when>
+					<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+				</xsl:choose>
+				<xsl:if test="position() != last()">,</xsl:if>
 			</xsl:for-each>
 			<xsl:text>&#xa;</xsl:text>
+			<!-- <xsl:if test="ics/ics-desc">
+				<xsl:text>:semantic-metadata-ics-desc: </xsl:text>
+				<xsl:for-each select="ics[normalize-space() != '']">
+					<xsl:value-of select="ics-desc"/>
+					<xsl:if test="position() != last()">,</xsl:if>
+				</xsl:for-each>
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:if> -->
 		</xsl:if>
 		
 		<xsl:apply-templates select="custom-meta-group/custom-meta[meta-name = 'ISBN']/meta-value"/>
@@ -942,6 +959,12 @@
 	
 	<xsl:template match="permissions[ancestor::front or ancestor::adoption-front]/copyright-year[normalize-space(.) != '']">
 		<xsl:text>:copyright-year: </xsl:text><xsl:call-template name="getCopyrightYear"/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="copyright-holder/@copyright-owner">
+		<xsl:text>:copyright-holder: </xsl:text>
+		<xsl:value-of select="."/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
@@ -1357,6 +1380,12 @@
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
+	<xsl:template match="@article-status">
+		<xsl:text>:docstatus: </xsl:text>
+		<xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
 	<xsl:template match="product-num[@publication-format = 'online']">
 		<xsl:text>:stdid-pdf: </xsl:text><xsl:value-of select="."/>
 		<xsl:text>&#xa;</xsl:text>
@@ -1454,7 +1483,9 @@
 	<xsl:template match="partner/*">
 		<!-- Example: :semantic-metadata-partner-secretariat: -->
 		<xsl:text>:semantic-metadata-partner-</xsl:text><xsl:value-of select="local-name()"/><xsl:text>: </xsl:text>
+		<xsl:text>"</xsl:text>
 		<xsl:value-of select="."/>
+		<xsl:text>"</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	

@@ -236,6 +236,23 @@
 		</xsl:choose>
 	</xsl:variable>
 	
+	<xsl:variable name="publisher_abbreviation">
+		<xsl:choose>
+			<xsl:when test="$xml_step1/metanorma-collection">
+				<xsl:for-each select="$xml_step1/metanorma-collection/doc-container[1]/*/bibdata/contributor[role[@type='publisher']]/organization/abbreviation">
+					<xsl:value-of select="."/>
+					<xsl:if test="position() != last()">,</xsl:if>
+				</xsl:for-each>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:for-each select="$xml_step1/*/bibdata/contributor[role[@type='publisher']]/organization/abbreviation">
+					<xsl:value-of select="."/>
+					<xsl:if test="position() != last()">,</xsl:if>
+				</xsl:for-each>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	
 	<xsl:variable name="nat_meta_only">
 		<xsl:if test="not($xml/*/bibdata/relation[@type = 'adopted-from']) and $organization = 'BSI'">true</xsl:if>
 	</xsl:variable>
@@ -525,54 +542,103 @@
 	</xsl:template>
 	
 	<xsl:template match="/*" mode="xml">
+		<xsl:choose>
+			<xsl:when test="local-name() = 'ieee-standard'">
+				<standards-document xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink">
+				
+					<!-- attributes for the element standards-document -->
+					<xsl:variable name="stage" select="bibdata/status/stage"/>
+					<xsl:attribute name="article-status">
+						<xsl:choose>
+							<xsl:when test="$stage = 'active' or $stage = 'draft' or $stage = 'developing'">active</xsl:when>
+							<xsl:otherwise>inactive</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+					
+					<xsl:variable name="doctype" select="bibdata/ext/doctype"/>
+					
+					<xsl:variable name="subdoctype" select="bibdata/ext/subdoctype[normalize-space(@language) = '']"/> <!-- amendment, corrigendum, erratum -->
+					
+					<xsl:attribute name="content-type">
+						<xsl:choose>
+							<xsl:when test="$subdoctype = 'amendment' or $subdoctype = 'corrigendum'"><xsl:value-of select="$subdoctype"/></xsl:when>
+							<xsl:when test="$subdoctype = 'erratum'">errata</xsl:when>
+							<xsl:when test="$doctype = 'standard' or $doctype = 'guide' or $doctype = 'recommended-practice'"><xsl:value-of select="$doctype"/></xsl:when>
+							<xsl:otherwise><xsl:value-of select="$doctype"/></xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+					
+					<xsl:attribute name="dtd-version">1.7</xsl:attribute>
+					
+					<xsl:attribute name="revision">
+						<xsl:choose>
+							<xsl:when test="bibdata/relation[@type='updates']">yes</xsl:when>
+							<xsl:otherwise>no</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+					
+					<!-- To do: active-reserved, inactive-reserved, inactive-superseded, inactive-withdrawn -->
+					<xsl:attribute name="std-status">
+						<xsl:choose>
+							<xsl:when test="$stage = 'draft' and date[@type='issued']">approved-draft</xsl:when>
+							<xsl:when test="$stage = 'draft'">unapproved-draft</xsl:when>
+							<xsl:otherwise>active</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+				
+					<xsl:call-template name="insertXMLcontent"/>
+				</standards-document>
+			</xsl:when>
+			<xsl:otherwise>
+				<standard xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:tbx="urn:iso:std:iso:30042:ed-1" xmlns:xlink="http://www.w3.org/1999/xlink">
+					<xsl:call-template name="insertXMLcontent"/>
+				</standard>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template name="insertXMLcontent">
+		<!-- <debug><xsl:copy-of select="$xml"/></debug> -->
+			
+		<xsl:variable name="xmlContent_">
+			<xsl:call-template name="insertFront"/>
+			<xsl:call-template name="insertBody"/>
+		</xsl:variable>
+		<xsl:variable name="xmlContent" select="xalan:nodeset($xmlContent_)"/>
 		
-		<standard xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:tbx="urn:iso:std:iso:30042:ed-1" xmlns:xlink="http://www.w3.org/1999/xlink">
-			
-			<!-- <debug><xsl:copy-of select="$xml"/></debug> -->
-			
-			<xsl:variable name="xmlContent_">
-				<xsl:call-template name="insertFront"/>
-				<xsl:call-template name="insertBody"/>
-			</xsl:variable>
-			<xsl:variable name="xmlContent" select="xalan:nodeset($xmlContent_)"/>
-			
-			<xsl:variable name="existsSections" select="normalize-space(count($xmlContent//*[@sec-type = 'section-title']) &gt; 0)"/>
-			<xsl:choose>
-				<xsl:when test="$existsSections = 'true'">
-					<!-- <test1>
-						<xsl:value-of select="count($xmlContent//*[@sec-type = 'section-title'])"/>
-						<xsl:for-each select="$xmlContent//*[@sec-type = 'section-title']">
-							<item><xsl:value-of select="."/></item>
-						</xsl:for-each>
-					</test1> -->
-					
-					<xsl:variable name="xmlContent_step1">
-						<xsl:apply-templates select="$xmlContent" mode="section-title_step1" />
-					</xsl:variable>
-					
-					<xsl:variable name="xmlContent_step2">
-						<xsl:apply-templates select="xalan:nodeset($xmlContent_step1)" mode="section-title_step2" />
-					</xsl:variable>
-					
-					<xsl:copy-of select="$xmlContent_step2"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:copy-of select="$xmlContent"/>
-				</xsl:otherwise>
-			</xsl:choose>
-			
-			
-			<xsl:call-template name="insertBack"/>
-			
-			
-			<xsl:if test="normalize-space($debug) = 'true'">
-				<xsl:text disable-output-escaping="yes">&lt;!-- </xsl:text>
-				<xsl:value-of select="count($elements//element)"/>
-				<xsl:copy-of select="$elements"/>
-				<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
-			</xsl:if>
-		</standard>
+		<xsl:variable name="existsSections" select="normalize-space(count($xmlContent//*[@sec-type = 'section-title']) &gt; 0)"/>
+		<xsl:choose>
+			<xsl:when test="$existsSections = 'true'">
+				<!-- <test1>
+					<xsl:value-of select="count($xmlContent//*[@sec-type = 'section-title'])"/>
+					<xsl:for-each select="$xmlContent//*[@sec-type = 'section-title']">
+						<item><xsl:value-of select="."/></item>
+					</xsl:for-each>
+				</test1> -->
+				
+				<xsl:variable name="xmlContent_step1">
+					<xsl:apply-templates select="$xmlContent" mode="section-title_step1" />
+				</xsl:variable>
+				
+				<xsl:variable name="xmlContent_step2">
+					<xsl:apply-templates select="xalan:nodeset($xmlContent_step1)" mode="section-title_step2" />
+				</xsl:variable>
+				
+				<xsl:copy-of select="$xmlContent_step2"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy-of select="$xmlContent"/>
+			</xsl:otherwise>
+		</xsl:choose>
 		
+		<xsl:call-template name="insertBack"/>
+		
+		<xsl:if test="normalize-space($debug) = 'true'">
+			<xsl:text disable-output-escaping="yes">&lt;!-- </xsl:text>
+			<xsl:value-of select="count($elements//element)"/>
+			<xsl:copy-of select="$elements"/>
+			<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
+		</xsl:if>
 	</xsl:template>
 	
 	<!-- ======= -->
@@ -746,13 +812,23 @@
 					<xsl:when test="bibdata/relation[@type = 'adopted-from']">nat-meta</xsl:when>
 					<xsl:when test="$organization = 'BSI'">nat-meta</xsl:when>
 					<xsl:when test="$organization = 'IEC'">std-meta</xsl:when>
+					<xsl:when test="$organization_abbreviation = 'IEEE' or $publisher_abbreviation = 'IEEE'">std-meta</xsl:when>
 					<xsl:otherwise>iso-meta</xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
 			
-			<xsl:apply-templates select="bibdata" mode="front">
-				<xsl:with-param name="element_name" select="$element_name"/>
-			</xsl:apply-templates>
+			<xsl:choose>
+				<xsl:when test="$organization_abbreviation = 'IEEE' or $publisher_abbreviation = 'IEEE'">
+					<xsl:apply-templates select="bibdata" mode="front_ieee">
+						<xsl:with-param name="element_name" select="$element_name"/>
+					</xsl:apply-templates>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates select="bibdata" mode="front">
+						<xsl:with-param name="element_name" select="$element_name"/>
+					</xsl:apply-templates>
+				</xsl:otherwise>
+			</xsl:choose>
 			
 			<xsl:apply-templates select="preface/clause[@type = 'front_notes']" mode="front_notes"/>
 			
@@ -824,32 +900,32 @@
 	<!-- Publishing and copyright information block -->
 	<!-- ================================== -->
 	<xsl:template name="insert_publication_info">
-			<sec id="sec_pub_info_nat" sec-type="publication_info">
-				<xsl:variable name="data">
-					<xsl:apply-templates select="boilerplate/copyright-statement/*" mode="publication_info"/>
-				</xsl:variable>
-				<xsl:if test="not(xalan:nodeset($data)/label)">
-					<label/>
-				</xsl:if>
-				<xsl:copy-of select="$data"/>
-				<xsl:apply-templates select="bibdata/docidentifier[@type = 'ISBN']" mode="publication_info"/>
-				
-				<xsl:if test="bibdata/ext/ics">
-					<p><xsl:text>ICS </xsl:text>
-						<xsl:for-each select="bibdata/ext/ics">
-							<xsl:sort />
-							<xsl:value-of select="normalize-space()"/>
-							<xsl:if test="position() != last()">; </xsl:if>
-						</xsl:for-each>
-					</p>
-				</xsl:if>
-				
-				<xsl:apply-templates select="preface/clause[@type = 'related-refs']"  mode="publication_info"/>
-				
-				<xsl:apply-templates select="preface/clause[@type = 'corrigenda']"  mode="publication_info"/>
-				
-			</sec>
-		</xsl:template>
+		<sec id="sec_pub_info_nat" sec-type="publication_info">
+			<xsl:variable name="data">
+				<xsl:apply-templates select="boilerplate/copyright-statement/*" mode="publication_info"/>
+			</xsl:variable>
+			<xsl:if test="not(xalan:nodeset($data)/label)">
+				<label/>
+			</xsl:if>
+			<xsl:copy-of select="$data"/>
+			<xsl:apply-templates select="bibdata/docidentifier[@type = 'ISBN']" mode="publication_info"/>
+			
+			<xsl:if test="bibdata/ext/ics">
+				<p><xsl:text>ICS </xsl:text>
+					<xsl:for-each select="bibdata/ext/ics">
+						<xsl:sort />
+						<xsl:value-of select="normalize-space()"/>
+						<xsl:if test="position() != last()">; </xsl:if>
+					</xsl:for-each>
+				</p>
+			</xsl:if>
+			
+			<xsl:apply-templates select="preface/clause[@type = 'related-refs']"  mode="publication_info"/>
+			
+			<xsl:apply-templates select="preface/clause[@type = 'corrigenda']"  mode="publication_info"/>
+			
+		</sec>
+	</xsl:template>
 	
 	<xsl:template match="title" mode="publication_info">
 		<xsl:call-template name="title"/>
@@ -1485,7 +1561,332 @@
 			</xsl:if>
 		<!-- </iso-meta> </nat-meta> </std-meta> --> 
 		</xsl:element>
+	</xsl:template> <!-- bibdata mode="front" -->
+	
+	<!-- ============= -->
+	<!-- IEEE bibdata -->
+	<!-- ============= -->
+	<xsl:template match="bibdata" mode="front_ieee">
+		<xsl:param name="element_name"/>
+		
+		<!-- <std-meta> -->
+		<xsl:element name="{$element_name}">
+			
+			<xsl:variable name="bibdata"><xsl:copy-of select="."/></xsl:variable> <!-- for using bibdata in another context in 'for-each' iterations -->
+			
+			<xsl:variable name="std_prefix">IEEE Std </xsl:variable>
+			<xsl:variable name="trademark">&#x2122;</xsl:variable>
+			<xsl:variable name="number" select="docidentifier[@type = 'IEEE'][not(@scope)]"/>
+			<xsl:variable name="year" select="substring(normalize-space(date[@type = 'issued']),1,4)"/> <!-- approval date -->
+			
+			<std-designation content-type="full"><xsl:value-of select="concat($std_prefix,$number,'-',$year)"/></std-designation> <!-- Example: IEEE Std 1127-2013 -->
+			<std-designation content-type="full-tm"><xsl:value-of select="concat($std_prefix,$number,$trademark,'-',$year)"/></std-designation> <!-- Example: IEEE Std 1127&#x2122;-2013 -->
+			<std-designation content-type="std-num"><xsl:value-of select="concat($number,'-',$year)"/></std-designation> <!-- Example: 1127-2013 -->
+			<std-designation content-type="std-num-tm"><xsl:value-of select="concat($number,$trademark,'-',$year)"/></std-designation> <!-- Example:  1127&#x2122;-2013-->
+			<std-designation content-type="norm"/>
+			
+			<xplore-article-id><xsl:value-of select="../misc-container/semantic-metadata/xplore-article-id"/></xplore-article-id>
+			<xsl:variable name="xplore-issue" select="normalize-space(../misc-container/semantic-metadata/xplore-issue)"/>
+			<xsl:if test="$xplore-issue != ''">
+				<xplore-issue><xsl:value-of select="$xplore-issue"/></xplore-issue>
+			</xsl:if>
+			<xplore-pub-id><xsl:value-of select="../misc-container/semantic-metadata/xplore-pub-id"/></xplore-pub-id>
+			
+			<!-- <product-num publication-format="online"> -->
+			<xsl:apply-templates select="docidentifier[@type = 'IEEE' and @scope = 'PDF']" mode="front_ieee"/>
+			<!-- <product-num publication-format="print"> -->
+			<xsl:apply-templates select="docidentifier[@type = 'IEEE' and @scope = 'print']" mode="front_ieee"/>
+			
+			<xsl:apply-templates select="ext/ics/code" mode="front_ieee"/>
+			
+			<xsl:variable name="doctype_str">
+				<xsl:call-template name="capitalize">
+					<xsl:with-param name="str" select="translate(ext/doctype,'-',' ')"/>
+				</xsl:call-template>
+			</xsl:variable>
+			
+			<xsl:variable name="title">
+				<xsl:text>IEEE </xsl:text>
+				<xsl:value-of select="$doctype_str"/>
+				<xsl:text> for </xsl:text>
+				<xsl:apply-templates select="title/node()"/>
+			</xsl:variable>
+			
+			<std-title-group>
+				<std-main-title><xsl:copy-of select="$title"/></std-main-title>
+				<std-full-title><xsl:copy-of select="$title"/></std-full-title>
+				<xsl:if test="relation[@type = 'updates'] or ../misc-container/semantic-metadata/related-article-edition">
+					<alt-title>
+						<!-- <related-article related-article-type="revision-of">(Revision of <std>IEEE Std 1127-1998</std>)</related-article> -->
+						<xsl:apply-templates select="relation[@type = 'updates']" mode="front_ieee"/>
+						<!-- <related-article related-article-type="edition"><edition>2012 Edition</edition></related-article> -->
+						<xsl:apply-templates select="../misc-container/semantic-metadata/related-article-edition"/>
+					</alt-title>
+				</xsl:if>
+			</std-title-group>
+			
+			<xsl:if test="../misc-container/semantic-metadata/collab-type-logo or ../misc-container/semantic-metadata/collab or ../misc-container/semantic-metadata/collab-type-accredited-by">
+				<contrib-group>
+					<contrib id="contrib-collab1">
+						<collab-alternatives>
+							<xsl:apply-templates select="../misc-container/semantic-metadata/collab-type-logo"/>
+							<xsl:apply-templates select="../misc-container/semantic-metadata/collab"/>
+							<xsl:apply-templates select="../misc-container/semantic-metadata/collab-type-accredited-by"/>
+						</collab-alternatives>
+					</contrib>
+				</contrib-group>
+			</xsl:if>
+			
+			<contrib-group>
+				<!-- To do -->
+			</contrib-group>
+			
+			<!-- <isbn publication-format="online" specific-use="ISBN-13"> -->
+			<xsl:apply-templates select="docidentifier[@type = 'ISBN' and @scope = 'PDF']" mode="front_ieee"/>
+			<!-- <isbn publication-format="print" specific-use="ISBN-13"> -->
+			<xsl:apply-templates select="docidentifier[@type = 'ISBN' and @scope = 'print']" mode="front_ieee"/>
+			
+			<!-- <publisher> -->
+			<xsl:apply-templates select="../boilerplate/feedback-statement/clause[1]/p[1]" mode="front_ieee_publisher"/>
+			
+			<xsl:if test="ext/editorialgroup/committee or ext/editorialgroup/society">
+				<std-sponsor>
+					<xsl:text>Sponsor </xsl:text>
+					<xsl:variable name="items_">
+						<xsl:apply-templates select="ext/editorialgroup/committee" mode="front_ieee"/>
+						<xsl:apply-templates select="ext/editorialgroup/society" mode="front_ieee"/>
+					</xsl:variable>
+					<xsl:variable name="items" select="xalan:nodeset($items_)"/>
+					<xsl:for-each select="$items/*">
+						<xsl:copy-of select="."/>
+						<xsl:if test="position() != last()">
+							<xsl:text> of the </xsl:text>
+						</xsl:if>
+					</xsl:for-each>
+				</std-sponsor>
+			</xsl:if>
+			
+			<xsl:apply-templates select="../misc-container/semantic-metadata/partner-secretariat"/>
+			
+			<xsl:apply-templates select="date[@type = 'published'][1]" mode="front_ieee"/>
+			
+			<xsl:apply-templates select="date[@type = 'issued'][1]" mode="front_ieee"/>
+			
+			<xsl:apply-templates select="date[@type = 'reaffirm'][1]" mode="front_ieee"/>
+			
+			<!-- <supplementary-material) -->
+			<xsl:apply-templates select="../boilerplate/feedback-statement/clause[last()]" mode="front_ieee_supplementary_material"/>
+			
+			<permissions>
+				<xsl:apply-templates select="../boilerplate/feedback-statement/clause[2]" mode="front_ieee_permissions"/>
+				<xsl:apply-templates select="copyright/from" mode="front_ieee_permissions"/>
+				<xsl:apply-templates select="copyright/owner" mode="front_ieee_permissions"/>
+				<xsl:apply-templates select="../boilerplate/feedback-statement/clause[3]" mode="front_ieee_permissions_license"/>
+			</permissions>
+			
+			<xsl:apply-templates select="abstract" mode="front_ieee"/>
+			
+			<xsl:apply-templates select="keyword[1]">
+				<xsl:with-param name="process">true</xsl:with-param>
+			</xsl:apply-templates>
+			
+			<counts>
+				<fig-count count="{count(//figure)}"/>
+				<table-count count="{count(//table)}"/>
+				<equation-count count="{count(//disp-formula)}"/>
+				<ref-count count="{count(//xref)}"/>
+				<!-- <page-count count="50"/> -->
+			</counts>
+			
+		</xsl:element> <!-- </std-meta> -->
+		
 	</xsl:template>
+	
+	<xsl:template match="docidentifier[@type = 'IEEE' and @scope = 'PDF']" mode="front_ieee">
+		<product-num publication-format="online"><xsl:value-of select="."/></product-num>
+	</xsl:template>
+	
+	<xsl:template match="docidentifier[@type = 'IEEE' and @scope = 'print']" mode="front_ieee">
+		<product-num publication-format="print"><xsl:value-of select="."/></product-num>
+	</xsl:template>
+	
+	<xsl:template match="docidentifier[@type = 'ISBN' and @scope = 'PDF']" mode="front_ieee">
+		<isbn publication-format="online" specific-use="ISBN-13"><xsl:value-of select="."/></isbn>
+	</xsl:template>
+	
+	<xsl:template match="docidentifier[@type = 'ISBN' and @scope = 'print']" mode="front_ieee">
+		<isbn publication-format="print" specific-use="ISBN-13"><xsl:value-of select="."/></isbn>
+	</xsl:template>
+	
+	
+	<xsl:template match="ics/code" mode="front_ieee">
+		<xsl:variable name="pos"><xsl:number/></xsl:variable>
+		<ics>
+			<ics-code><xsl:value-of select="."/></ics-code>
+			<!-- <xsl:apply-templates select="ancestor::bibdata/../misc-container/semantic-metadata[ics-desc][$pos]/ics-desc"/> -->
+		</ics>
+	</xsl:template>
+	
+	<xsl:template match="semantic-metadata/ics-desc">
+		<ics-desc><xsl:value-of select="."/></ics-desc>
+	</xsl:template>
+	
+	<xsl:template match="relation[@type = 'updates']" mode="front_ieee">
+		<related-article related-article-type="revision-of">
+			<xsl:text>(Revision of </xsl:text>
+			<std><xsl:value-of select="bibitem/docidentifier"/></std>
+			<xsl:text>)</xsl:text>
+		</related-article>
+	</xsl:template>
+	
+	<xsl:template match="semantic-metadata/related-article-edition">
+		<related-article related-article-type="edition">
+			<edition><xsl:value-of select="."/></edition>
+		</related-article>
+	</xsl:template>
+	
+	<xsl:template match="semantic-metadata/collab-type-logo">
+		<collab collab-type="logo"><xsl:value-of select="."/></collab>
+	</xsl:template>
+	<xsl:template match="semantic-metadata/collab">
+		<collab><xsl:value-of select="."/></collab>
+	</xsl:template>
+	<xsl:template match="semantic-metadata/collab-type-accredited-by">
+		<collab collab-type="accredited-by"><xsl:value-of select="."/></collab>
+	</xsl:template>
+	
+	<xsl:template match="feedback-statement/clause/p" mode="front_ieee_publisher">
+		<publisher>
+			<publisher-name><xsl:value-of select="normalize-space(br/preceding-sibling::node())"/></publisher-name>
+			<publisher-loc><xsl:value-of select="normalize-space(br/following-sibling::node())"/></publisher-loc>
+		</publisher>
+	</xsl:template>
+	
+	<xsl:template match="ext/editorialgroup/committee | ext/editorialgroup/society" mode="front_ieee">
+		<xsl:copy-of select="."/>
+	</xsl:template>
+	
+	<xsl:template match="semantic-metadata/partner-secretariat">
+		<partner>
+			<secretariat><xsl:value-of select="."/></secretariat>
+		</partner>
+	</xsl:template>
+	
+	<xsl:template match="date[@type = 'published']" mode="front_ieee">
+		<pub-date date-type="published" iso-8601-date="{.}">
+			<xsl:call-template name="dateParts">
+				<xsl:with-param name="date" select="."/>
+			</xsl:call-template>
+		</pub-date>
+	</xsl:template>
+	
+	<xsl:template match="date[@type = 'issued']" mode="front_ieee">
+		<approval>
+			<approval-date date-type="approved" iso-8601-date="{.}">
+				<xsl:call-template name="dateParts">
+					<xsl:with-param name="date" select="."/>
+				</xsl:call-template>
+			</approval-date>
+			<stds-body>IEEE-SA Standards Board</stds-body>
+		</approval>
+	</xsl:template>
+	
+	<xsl:template match="date[@type = 'reaffirm']" mode="front_ieee">
+		<reaffirm-date iso-8601-date="{.}">
+			<xsl:call-template name="dateParts">
+				<xsl:with-param name="date" select="."/>
+			</xsl:call-template>
+		</reaffirm-date>
+	</xsl:template>
+	
+	<xsl:template name="dateParts">
+		<xsl:param name="date"/>
+		<xsl:variable name="day" select="substring($date,9,2)"/>
+		<xsl:variable name="month" select="substring($date,6,2)"/>
+		<xsl:variable name="monthStr">
+			<xsl:choose>
+				<xsl:when test="$month = '01'">January</xsl:when>
+				<xsl:when test="$month = '02'">February</xsl:when>
+				<xsl:when test="$month = '03'">March</xsl:when>
+				<xsl:when test="$month = '04'">April</xsl:when>
+				<xsl:when test="$month = '05'">May</xsl:when>
+				<xsl:when test="$month = '06'">June</xsl:when>
+				<xsl:when test="$month = '07'">July</xsl:when>
+				<xsl:when test="$month = '08'">August</xsl:when>
+				<xsl:when test="$month = '09'">September</xsl:when>
+				<xsl:when test="$month = '10'">October</xsl:when>
+				<xsl:when test="$month = '11'">November</xsl:when>
+				<xsl:when test="$month = '12'">December</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="year" select="substring($date,1,4)"/>
+		<day><xsl:value-of select="$day"/></day>
+		<month><xsl:value-of select="$monthStr"/></month>
+		<year><xsl:value-of select="$year"/></year>
+	</xsl:template>
+	
+	<xsl:template match="feedback-statement/clause" mode="front_ieee_supplementary_material">
+		<supplementary-material>
+			<xsl:apply-templates/>
+		</supplementary-material>
+	</xsl:template>
+	
+	<xsl:template match="feedback-statement/clause" mode="front_ieee_permissions">
+		<copyright-statement>
+			<xsl:apply-templates select="p" mode="front_ieee_permissions"/>
+		</copyright-statement>
+	</xsl:template>
+	<xsl:template match="feedback-statement/clause/p" mode="front_ieee_permissions">
+		<xsl:apply-templates/>
+	</xsl:template>
+	
+	<xsl:template match="copyright/from" mode="front_ieee_permissions">
+		<copyright-year><xsl:value-of select="."/></copyright-year>
+	</xsl:template>
+	
+	<xsl:template match="copyright/owner" mode="front_ieee_permissions">
+		<copyright-holder>
+			<xsl:attribute name="copyright-owner">
+				<xsl:value-of select="organization/abbreviation"/>
+				<xsl:if test="not(organization/abbreviation)">
+					<xsl:value-of select="organization/name"/>
+				</xsl:if>
+			</xsl:attribute>
+			<xsl:value-of select="ancestor::bibdata/contributor[role[@type = 'publisher']]/organization/abbreviation"/>
+		</copyright-holder>
+	</xsl:template>
+	
+	<xsl:template match="feedback-statement/clause" mode="front_ieee_permissions_license">
+		<license>
+			<xsl:apply-templates mode="front_ieee_permissions_license"/>
+		</license>
+	</xsl:template>
+	<xsl:template match="feedback-statement/clause/p" mode="front_ieee_permissions_license">
+		<license-p>
+			<xsl:apply-templates/>
+		</license-p>
+	</xsl:template>
+	
+	<xsl:template match="abstract" mode="front_ieee">
+		<abstract abstract-type="short" complex-abstract="no">
+			<p><xsl:apply-templates/></p>
+		</abstract>
+	</xsl:template>
+	
+	<xsl:template match="keyword">
+		<xsl:param name="process">false</xsl:param>
+		<xsl:if test="$process = 'true'">
+			<kwd-group kwd-group-type="AuthorFree">
+				<xsl:for-each select=". | following-sibling::keyword">
+					<kwd><xsl:value-of select="."/></kwd>
+				</xsl:for-each>
+			</kwd-group>
+		</xsl:if>
+	</xsl:template>
+		
+	<!-- ============= -->
+	<!-- End IEEE bibdata -->
+	<!-- ============= -->
 	
 	<xsl:template match="semantic-metadata/copyright-statement">
 		<copyright-statement><xsl:apply-templates/></copyright-statement>
