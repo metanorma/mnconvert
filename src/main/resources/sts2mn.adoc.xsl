@@ -1779,7 +1779,7 @@
 	
 		<xsl:call-template name="title"/>
 		
-		<xsl:if test="ancestor::sec[java:toLowerCase(java:java.lang.String.new(title)) = 'terms and definitions']">
+		<xsl:if test="ancestor::sec[java:toLowerCase(java:java.lang.String.new(title)) = 'terms and definitions'] or ancestor::sec[java:toLowerCase(java:java.lang.String.new(title)) = 'definitions'][.//std-def-list]">
 			<xsl:text>[.boilerplate]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:variable name="level">
