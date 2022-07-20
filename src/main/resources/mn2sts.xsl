@@ -70,11 +70,11 @@
 				<xsl:when test="parent::sections and self::clause and @type='intro'">0</xsl:when>
 				
 				<!-- Scope -->
-				<xsl:when test="parent::sections and self::clause and @type='scope'">1</xsl:when>
+				<xsl:when test="parent::sections and self::clause and (@type='scope' or @type='overview')">1</xsl:when>
 				
 				<!-- Normative References -->
 				<xsl:when test="ancestor:: bibliography and self::references and @normative='true'">
-					<xsl:value-of select="count(ancestor::*[contains(local-name(), '-standard')]/sections/clause[@type='scope']) + 1"/>
+					<xsl:value-of select="count(ancestor::*[contains(local-name(), '-standard')]/sections/clause[@type='scope' or @type='overview']) + 1"/>
 				</xsl:when>
 				
 				<!-- Terms and definitions -->
@@ -335,7 +335,7 @@
 			</xsl:variable>
 			
 			<xsl:variable name="section_bolded" select="($name = 'clause' or $name = 'terms' or
-			$name = 'section-title' or ($name = 'p' and @type = 'section-title')) and $section != ''"/>
+			$name = 'section-title' or ($name = 'p' and @type = 'section-title')) and $section != '' and $organization != 'IEEE'"/>
 			
 			<xsl:variable name="wrapper" select="$name"/>
 			
@@ -857,7 +857,7 @@
 				<xsl:apply-templates select="sections/clause[@type='intro']"/> <!-- [0] -->
 			
 				<!-- Scope -->
-				<xsl:apply-templates select="sections/clause[@type='scope']"/> <!-- [1] -->
+				<xsl:apply-templates select="sections/clause[@type='scope' or @type = 'overview']"/> <!-- [1] -->
 				
 				<!-- Normative References -->
 				<xsl:apply-templates select="bibliography/references[@normative='true'] | bibliography/clause[references[@normative='true']]"/>
@@ -872,6 +872,7 @@
 																																																local-name() != 'definitions' and 
 																																																not(@type='intro') and
 																																																not(@type='scope') and
+																																																not(@type='overview') and
 																																																not(self::clause and .//terms) and
 																																																not(self::clause and .//definitions)]" />
 			</body>	
@@ -3030,9 +3031,11 @@
 			<xsl:otherwise>
 				<sec id="{$id}">
 					<xsl:if test="normalize-space($sec_type) != ''">
-						<xsl:attribute name="sec-type">
-							<xsl:value-of select="$sec_type"/>
-						</xsl:attribute>
+						<xsl:if test="$organization != 'IEEE'">
+							<xsl:attribute name="sec-type">
+								<xsl:value-of select="$sec_type"/>
+							</xsl:attribute>
+						</xsl:if>
 					</xsl:if>
 					<xsl:choose>
 						<xsl:when test="ancestor::foreword"></xsl:when>
@@ -5259,6 +5262,11 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:value-of select="$label"/>
+					<xsl:if test="$organization = 'IEEE'">
+						<xsl:if test="not(contains($label,'.'))"> <!-- add dot for 1st level label only -->
+							<xsl:text>.</xsl:text>
+						</xsl:if>
+					</xsl:if>
 				</xsl:otherwise>
 			</xsl:choose>
 		</label>
