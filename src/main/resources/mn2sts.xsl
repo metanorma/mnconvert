@@ -1700,6 +1700,11 @@
 			
 		</xsl:element> <!-- </std-meta> -->
 		
+		<!-- <notes> -->
+		<xsl:apply-templates select="../boilerplate/legal-statement" mode="front_ieee_notes"/>
+		<!-- <sec id="participants1"><title>Participants</title> ... -->
+		<xsl:apply-templates select="../boilerplate/legal-statement/clause[@id = 'boilerplate-participants']" mode="front_ieee_participants"/>
+		
 	</xsl:template>
 	
 	<xsl:template match="docidentifier[@type = 'IEEE' and @scope = 'PDF']" mode="front_ieee">
@@ -1773,7 +1778,9 @@
 	</xsl:template>
 	
 	<xsl:template match="date[@type = 'published']" mode="front_ieee">
-		<pub-date date-type="published" iso-8601-date="{.}">
+		<pub-date>
+			<xsl:attribute name="date-type">published</xsl:attribute>
+			<xsl:attribute name="iso-8601-date"><xsl:value-of select="."/></xsl:attribute>
 			<xsl:call-template name="dateParts">
 				<xsl:with-param name="date" select="."/>
 			</xsl:call-template>
@@ -1782,7 +1789,9 @@
 	
 	<xsl:template match="date[@type = 'issued']" mode="front_ieee">
 		<approval>
-			<approval-date date-type="approved" iso-8601-date="{.}">
+			<approval-date>
+			<xsl:attribute name="date-type">approved</xsl:attribute>
+			<xsl:attribute name="iso-8601-date"><xsl:value-of select="."/></xsl:attribute>
 				<xsl:call-template name="dateParts">
 					<xsl:with-param name="date" select="."/>
 				</xsl:call-template>
@@ -1827,8 +1836,12 @@
 	
 	<xsl:template match="feedback-statement/clause" mode="front_ieee_supplementary_material">
 		<supplementary-material>
-			<xsl:apply-templates/>
+			<xsl:apply-templates mode="front_ieee_supplementary_material"/>
 		</supplementary-material>
+	</xsl:template>
+	
+	<xsl:template match="feedback-statement/clause/p" mode="front_ieee_supplementary_material">
+		<p><xsl:apply-templates/></p>
 	</xsl:template>
 	
 	<xsl:template match="feedback-statement/clause" mode="front_ieee_permissions">
@@ -1868,8 +1881,10 @@
 	</xsl:template>
 	
 	<xsl:template match="abstract" mode="front_ieee">
-		<abstract abstract-type="short" complex-abstract="no">
-			<p><xsl:apply-templates/></p>
+		<abstract>
+			<xsl:attribute name="abstract-type">short</xsl:attribute>
+			<xsl:attribute name="complex-abstract">no</xsl:attribute>
+			<xsl:apply-templates/>
 		</abstract>
 	</xsl:template>
 	
@@ -1884,6 +1899,80 @@
 		</xsl:if>
 	</xsl:template>
 		
+	<xsl:template match="legal-statement" mode="front_ieee_notes">
+		<notes>
+			<xsl:apply-templates mode="front_ieee_notes"/>
+		</notes>
+	</xsl:template>
+	<xsl:template match="legal-statement//clause[@id = 'boilerplate-participants']" mode="front_ieee_notes" priority="2"/> <!-- will be processed out of <notes> -->
+	<xsl:template match="legal-statement//clause" mode="front_ieee_notes">
+		<sec>
+			<xsl:apply-templates mode="front_ieee_notes"/>
+		</sec>
+	</xsl:template>
+	<xsl:template match="legal-statement//clause/title" mode="front_ieee_notes">
+		<xsl:copy>
+			<xsl:apply-templates/>
+		</xsl:copy>
+	</xsl:template>
+	<xsl:template match="legal-statement//clause/p" mode="front_ieee_notes">
+		<xsl:copy>
+			<xsl:apply-templates/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<!-- [@id = 'boilerplate-participants'] -->
+	<xsl:template match="legal-statement/clause" mode="front_ieee_participants">
+		<sec>
+			<!--  id="participants1" -->
+			<xsl:copy-of select="@id"/>
+			<xsl:apply-templates mode="front_ieee_participants"/>
+		</sec>
+	</xsl:template>
+	<xsl:template match="legal-statement/clause/title" mode="front_ieee_participants">
+		<xsl:copy>
+			<xsl:apply-templates/>
+		</xsl:copy>
+	</xsl:template>
+	<xsl:template match="legal-statement/clause/clause" mode="front_ieee_participants">
+		<participants-sec>
+			<xsl:apply-templates mode="front_ieee_participants"/>
+		</participants-sec>
+	</xsl:template>
+	<xsl:template match="legal-statement//clause/p[not(@type)]" mode="front_ieee_participants">
+		<xsl:copy>
+			<xsl:apply-templates/>
+		</xsl:copy>
+	</xsl:template>
+	<xsl:template match="legal-statement//clause/p[@type]" mode="front_ieee_participants">
+		<!-- To do -->
+		<officers>
+			<list list-type="simple">
+				<list-item>
+					<p>
+						<xref ref-type="contrib" rid="contrib1"/>
+					</p>
+				</list-item>
+				<list-item>
+					<p>
+						<xref ref-type="contrib" rid="contrib2"/>
+					</p>
+				</list-item>
+			</list>
+		</officers>
+		<list list-type="simple">
+			<list-item>
+				<p>
+					<xref ref-type="contrib" rid="contrib3"/>
+				</p>
+			</list-item>
+			<list-item>
+				<p>
+					<xref ref-type="contrib" rid="contrib4"/>
+				</p>
+			</list-item>
+		</list>
+	</xsl:template>
 	<!-- ============= -->
 	<!-- End IEEE bibdata -->
 	<!-- ============= -->
