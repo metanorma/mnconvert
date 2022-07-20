@@ -1687,6 +1687,7 @@
 	<xsl:template match="front/sec[participants-sec]"/> <!-- skip -->
 	
 	<xsl:template match="front/ack">
+		<xsl:call-template name="setId"/>
 		<xsl:text>[.preface,heading=acknowledgements]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:apply-templates />

@@ -226,16 +226,6 @@
 		</xsl:choose>
 	</xsl:variable>
 	
-	<xsl:variable name="organization">
-		<xsl:choose>
-			<xsl:when test="contains($organization_abbreviation,'BSI') or $organization_name = 'The British Standards Institution' or $organization_name = 'British Standards Institution'">BSI</xsl:when>
-			<xsl:when test="contains($organization_abbreviation,'ISO')">ISO</xsl:when>
-			<xsl:when test="contains($organization_abbreviation,'IEC')">IEC</xsl:when>
-			<xsl:when test="$organization_abbreviation != ''"><xsl:value-of select="$organization_abbreviation"/></xsl:when>
-			<xsl:when test="$organization_name != ''"><xsl:value-of select="$organization_name"/></xsl:when>
-		</xsl:choose>
-	</xsl:variable>
-	
 	<xsl:variable name="publisher_abbreviation">
 		<xsl:choose>
 			<xsl:when test="$xml_step1/metanorma-collection">
@@ -250,6 +240,17 @@
 					<xsl:if test="position() != last()">,</xsl:if>
 				</xsl:for-each>
 			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	
+	<xsl:variable name="organization">
+		<xsl:choose>
+			<xsl:when test="contains($organization_abbreviation,'BSI') or $organization_name = 'The British Standards Institution' or $organization_name = 'British Standards Institution'">BSI</xsl:when>
+			<xsl:when test="contains($organization_abbreviation,'ISO')">ISO</xsl:when>
+			<xsl:when test="contains($organization_abbreviation,'IEC')">IEC</xsl:when>
+			<xsl:when test="$organization_abbreviation = 'IEEE' or $publisher_abbreviation = 'IEEE'">IEEE</xsl:when>
+			<xsl:when test="$organization_abbreviation != ''"><xsl:value-of select="$organization_abbreviation"/></xsl:when>
+			<xsl:when test="$organization_name != ''"><xsl:value-of select="$organization_name"/></xsl:when>
 		</xsl:choose>
 	</xsl:variable>
 	
@@ -812,13 +813,13 @@
 					<xsl:when test="bibdata/relation[@type = 'adopted-from']">nat-meta</xsl:when>
 					<xsl:when test="$organization = 'BSI'">nat-meta</xsl:when>
 					<xsl:when test="$organization = 'IEC'">std-meta</xsl:when>
-					<xsl:when test="$organization_abbreviation = 'IEEE' or $publisher_abbreviation = 'IEEE'">std-meta</xsl:when>
+					<xsl:when test="$organization = 'IEEE'">std-meta</xsl:when>
 					<xsl:otherwise>iso-meta</xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
 			
 			<xsl:choose>
-				<xsl:when test="$organization_abbreviation = 'IEEE' or $publisher_abbreviation = 'IEEE'">
+				<xsl:when test="$organization = 'IEEE'">
 					<xsl:apply-templates select="bibdata" mode="front_ieee">
 						<xsl:with-param name="element_name" select="$element_name"/>
 					</xsl:apply-templates>
@@ -2570,7 +2571,22 @@
 		</xsl:copy>
 	</xsl:template>
 	
-	<xsl:template match="preface/*[not(self::abstract or @type = 'section-title' or self::section-title)]" mode="front_preface">
+	<xsl:template match="preface/acknowledgements" mode="front_preface" priority="2">
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEEE'">
+				<ack>
+					<xsl:copy-of select="@id"/>
+					<xsl:apply-templates select="title"/>
+					<xsl:apply-templates select="node()[not(self::title)]"/>
+				</ack>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:call-template name="preface_node"/> <!-- see below -->
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template match="preface/*[not(self::abstract or @type = 'section-title' or self::section-title)]" mode="front_preface" name="preface_node">
 		<xsl:param name="skipIntroduction">true</xsl:param>
 		<xsl:variable name="name" select="local-name()"/>
 		<xsl:choose>
@@ -2595,12 +2611,15 @@
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:attribute>
-					<xsl:attribute name="sec-type"><xsl:value-of select="$sec_type"/></xsl:attribute>
 					
-					<xsl:call-template name="insert_label">
-						<xsl:with-param name="label" select="@section"/>
-						<xsl:with-param name="isAddition" select="count(title/node()[normalize-space() != ''][1][self::add]) = 1"/>
-					</xsl:call-template>
+					<xsl:if test="$organization != 'IEEE'">
+						<xsl:attribute name="sec-type"><xsl:value-of select="$sec_type"/></xsl:attribute>
+					
+						<xsl:call-template name="insert_label">
+							<xsl:with-param name="label" select="@section"/>
+							<xsl:with-param name="isAddition" select="count(title/node()[normalize-space() != ''][1][self::add]) = 1"/>
+						</xsl:call-template>
+					</xsl:if>
 					
 					<xsl:apply-templates select="title"/>
 					
@@ -3348,10 +3367,10 @@
 					</xsl:when>
 					<xsl:otherwise>
 						<p>
-							<xsl:if test="$organization != 'BSI'">
+							<xsl:if test="$organization != 'BSI' and $organization != 'IEEE'">
 								<xsl:copy-of select="@id"/>
 							</xsl:if>
-							<xsl:apply-templates select="@*"/>
+							<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
 							<xsl:apply-templates />
 						</p>
 					</xsl:otherwise>
@@ -4286,11 +4305,22 @@
 	
 	<!-- https://github.com/metanorma/mn2sts/issues/8 -->
 	<xsl:template match="admonition">
-		<non-normative-note>
-			<xsl:copy-of select="@id"/>
-			<label><xsl:value-of select="java:toUpperCase(java:java.lang.String.new(@type))"/></label>
-			<xsl:apply-templates />
-		</non-normative-note>
+		<xsl:choose>
+			<xsl:when test="parent::introduction and $organization = 'IEEE'">
+				<boxed-text position="anchor">
+					<p>
+						<xsl:apply-templates />
+					</p>
+				</boxed-text>
+			</xsl:when>
+			<xsl:otherwise>
+				<non-normative-note>
+					<xsl:copy-of select="@id"/>
+					<label><xsl:value-of select="java:toUpperCase(java:java.lang.String.new(@type))"/></label>
+					<xsl:apply-templates />
+				</non-normative-note>
+			</xsl:otherwise>
+		</xsl:choose>		
 	</xsl:template>
 	
 	
