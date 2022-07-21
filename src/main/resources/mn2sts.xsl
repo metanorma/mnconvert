@@ -4840,7 +4840,13 @@
 				</graphic>
 			</xsl:when>
 			<xsl:otherwise>	
-				<fig id="{$id}" fig-type="figure">
+				<fig id="{$id}">
+					<xsl:if test="$organization != 'IEEE'">
+						<xsl:attribute name="fig-type">figure</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="$organization = 'IEEE'">
+						<xsl:attribute name="position">anchor</xsl:attribute>
+					</xsl:if>
 					<label>
 						<xsl:choose>
 							<xsl:when test="ancestor::amend/autonumber[@type = 'figure']">
@@ -4864,9 +4870,18 @@
 			<label><xsl:value-of select="$label"/></label>
 		</xsl:if>
 		<caption>
-			<title>
-				<xsl:apply-templates/>
-			</title>
+			<xsl:choose>
+				<xsl:when test="$organization = 'IEEE'">
+					<p>
+						<xsl:apply-templates/>
+					</p>
+				</xsl:when>
+				<xsl:otherwise>
+					<title>
+						<xsl:apply-templates/>
+					</title>
+				</xsl:otherwise>
+			</xsl:choose>
 		</caption>
 	</xsl:template>
 	
@@ -4892,9 +4907,18 @@
 		<!-- <xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable> -->
 		<!-- NISO STS TagLibrary: https://www.niso-sts.org/TagLibrary/niso-sts-TL-1-0-html/element/graphic.html -->
 		<graphic xlink:href="{@id}"> <!-- id="{$id}"  xlink:href="{$id}"-->
-			<xsl:copy-of select="@id"/>
+			<xsl:if test="$organization != 'IEEE'">
+				<xsl:copy-of select="@id"/>
+			</xsl:if>
 			<!-- <xsl:copy-of select="@mimetype"/> -->
-			<xsl:apply-templates select="@*"/>
+			<xsl:choose>
+				<xsl:when test="$organization = 'IEEE'">
+					<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates select="@*"/>
+				</xsl:otherwise>
+			</xsl:choose>
 			<!-- https://github.com/metanorma/mn-samples-bsi/issues/25 -->
 			<!-- <xsl:processing-instruction name="isoimg-id">
 				<xsl:value-of select="@src"/>
@@ -4905,7 +4929,14 @@
 	
   <xsl:template match="image[not(parent::figure)]">
     <graphic>
-			<xsl:apply-templates select="@*"/>
+			<xsl:choose>
+				<xsl:when test="$organization = 'IEEE'">
+					<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates select="@*"/>
+				</xsl:otherwise>
+			</xsl:choose>
 		</graphic>
   </xsl:template>
   
@@ -4916,7 +4947,9 @@
 	</xsl:template>
 	
 	<xsl:template match="image/@mimetype">
-		<xsl:copy-of select="."/>
+		<xsl:if test="$organization != 'IEEE'">
+			<xsl:copy-of select="."/>
+		</xsl:if>
 	</xsl:template> <!-- created image processing -->
 	<xsl:template match="image/@alt">
 		<xsl:element name="alt-text">
@@ -4935,6 +4968,24 @@
 		<xsl:if test="parent::th[strong]">
 			<xsl:text disable-output-escaping="yes">&lt;/bold&gt;</xsl:text>
 		</xsl:if>
+		
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEEE'">
+				<p>
+					<xsl:call-template name="insert_disp-formula"/>
+				</p>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:call-template name="insert_disp-formula"/>
+			</xsl:otherwise>
+		</xsl:choose>
+		
+		<xsl:if test="parent::th[strong]">
+			<xsl:text disable-output-escaping="yes">&lt;bold&gt;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template name="insert_disp-formula">
 		<disp-formula>
 			<!-- <xsl:variable name="current_id" select="../@id"/>		 -->
 			<!-- <xsl:variable name="id" select="$elements//element[@source_id = $current_id]/@id"/> -->
@@ -4947,16 +4998,13 @@
 			<xsl:if test="$isSemanticXML = 'true' and not(name)">
 				<xsl:variable name="formula_id" select="../@id"/>
 				<xsl:variable name="section" select="normalize-space(@section)"/>
-				<xsl:if test="$section != '' and not(unnumbered=  'true')">
+				<xsl:if test="$section != '' and not(unnumbered=  'true') and not($organization = 'IEEE')">
 					<label><xsl:value-of select="$section"/></label>
 				</xsl:if>
 			</xsl:if>
 			
 			<xsl:apply-templates />
 		</disp-formula>
-		<xsl:if test="parent::th[strong]">
-			<xsl:text disable-output-escaping="yes">&lt;bold&gt;</xsl:text>
-		</xsl:if>
 	</xsl:template>
 	
 	<!-- special case: <stem type="MathML"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>R</mi></math>< ! - - R - - > </stem><sub>1</sub> -->
@@ -4995,7 +5043,7 @@
 
 	<xsl:template match="sourcecode">
 		<xsl:choose>
-			<xsl:when test="$format = 'NISO'">
+			<xsl:when test="$format = 'NISO' and $organization != 'IEEE'">
 				<code>
 					<xsl:apply-templates select="@*"/>
 					<xsl:apply-templates/>

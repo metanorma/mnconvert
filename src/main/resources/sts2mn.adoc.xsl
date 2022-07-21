@@ -4435,6 +4435,9 @@
 	<xsl:template match="disp-quote/related-object"/>
 		
 	<xsl:template match="code | preformat">
+		<xsl:if test="preceding-sibling::node()[1][self::text()]">
+			<xsl:text>&#xa;&#xa;</xsl:text>
+		</xsl:if>
 		<xsl:text>[source</xsl:text>
 		<xsl:text>%unnumbered</xsl:text> <!-- otherwise source block gets numbered as a figure -->
 		<xsl:if test="@language">,<xsl:value-of select="@language"/></xsl:if>
