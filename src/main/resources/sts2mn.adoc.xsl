@@ -3414,7 +3414,7 @@
 			<xsl:if test="thead">
 				<option>header</option>
 			</xsl:if>
-			<xsl:if test="ancestor::table-wrap/table-wrap-foot[count(*[local-name() != 'fn-group' and local-name() != 'fn' and local-name() != 'non-normative-note']) != 0]">
+			<xsl:if test="ancestor::table-wrap/table-wrap-foot[count(*[local-name() != 'fn-group' and local-name() != 'fn' and local-name() != 'non-normative-note']) != 0] or tfoot">
 				<option>footer</option>
 			</xsl:if>
 			<!-- <xsl:if test="ancestor::table-wrap/@content-type = 'ace-table' or 
@@ -3455,6 +3455,7 @@
 	<xsl:template match="tfoot"/>
 	<xsl:template match="tfoot" mode="footer">		
 		<xsl:apply-templates />
+		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="tbody">

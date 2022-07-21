@@ -175,7 +175,7 @@
 				<xsl:attribute name="section"><xsl:value-of select="$section"/></xsl:attribute>
 				
 				<xsl:variable name="section_prefix">
-					<xsl:if test="($name = 'clause' or $name = 'terms') and $section != '' and not(contains($section, '.'))">Clause </xsl:if> <!-- first level clause -->
+					<xsl:if test="($name = 'clause' or $name = 'terms' or ($name = 'references' and @normative='true')) and $section != '' and not(contains($section, '.'))">Clause </xsl:if> <!-- first level clause -->
 					<xsl:if test="$name = 'section-title' or ($name = 'p' and @type = 'section-title')">Section </xsl:if>
 					<xsl:if test="$name = 'formula' and $organization = 'IEC'">Equation </xsl:if>
 				</xsl:variable>
@@ -3506,7 +3506,14 @@
 	
 	<xsl:template match="ol" name="ol">
 		<list>
-			<xsl:apply-templates select="@*"/>
+			<xsl:choose>
+				<xsl:when test="$organization = 'IEEE'">
+					<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates select="@*"/>
+				</xsl:otherwise>
+			</xsl:choose>
 			
 			<!-- Example: <?list-type loweralpha?> -->
 			<xsl:variable name="processing_instruction_type" select="normalize-space(preceding-sibling::*[1]/processing-instruction('list-type'))"/>
@@ -3521,6 +3528,7 @@
 			<xsl:variable name="list-type">
 				<xsl:choose>
 					<!-- <xsl:when test="@type = 'arabic'">alpha-lower</xsl:when> -->
+					<xsl:when test="$type = 'arabic' and $organization = 'IEEE'">ordered</xsl:when>
 					<xsl:when test="$type = 'arabic' and not($organization = 'IEC')">order</xsl:when>
 					<xsl:otherwise>
 						<xsl:choose>
@@ -4517,7 +4525,12 @@
 					</xsl:choose>
 				</xsl:if>
 				<xsl:if test="not(ancestor::preface and starts-with(preceding-sibling::*[self::title]/text(), 'Amendments'))">
-					<xsl:attribute name="position">float</xsl:attribute>
+					<xsl:attribute name="position">
+						<xsl:choose>
+							<xsl:when test="$organization = 'IEEE'">anchor</xsl:when>
+							<xsl:otherwise>float</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
 				</xsl:if>
 				<!-- https://github.com/metanorma/mn-samples-bsi/issues/39 -->
 				<!-- <xsl:if test="starts-with(title/text(), 'Relationship between') or starts-with(title/text(), 'Correspondence between')">
@@ -4557,6 +4570,11 @@
 			</xsl:if>
 			<table>
 				<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix')]"/>
+				<xsl:if test="$organization = 'IEEE'">
+				 <xsl:attribute name="cellpadding">5</xsl:attribute>
+				 <xsl:attribute name="frame">box</xsl:attribute>
+				 <xsl:attribute name="rules">all</xsl:attribute>
+				</xsl:if>
 				<xsl:apply-templates select="@width"/>
 				
 				<xsl:apply-templates select="colgroup" mode="table"/>
@@ -4659,6 +4677,17 @@
 					<xsl:copy-of select="@*"/>
 					<xsl:apply-templates />
 				</xsl:element>	
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template match="colgroup/col">
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEEE'">
+				<xsl:copy></xsl:copy>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy-of select="."/>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -5315,7 +5344,7 @@
 				<xsl:otherwise>
 					<xsl:value-of select="$label"/>
 					<xsl:if test="$organization = 'IEEE'">
-						<xsl:if test="not(contains($label,'.'))"> <!-- add dot for 1st level label only -->
+						<xsl:if test="not(contains($label,'.') or contains($label,')') )"> <!-- add dot for 1st level label only -->
 							<xsl:text>.</xsl:text>
 						</xsl:if>
 					</xsl:if>
