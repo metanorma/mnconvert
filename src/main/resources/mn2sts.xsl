@@ -2951,11 +2951,11 @@
 		</xsl:variable>
 		<xsl:variable name="xref_fn">
 			<xref ref-type="fn" rid="fn_{$number_id}"> <!-- {$sfx} rid="fn_{$number}" -->
-				<sup><xsl:value-of select="$number"/>)</sup>
+				<sup><xsl:value-of select="$number"/><xsl:if test="$organization != 'IEEE'">)</xsl:if></sup>
 			</xref>
 			<fn id="fn_{$number_id}"> <!-- {$sfx} -->
 				<label>
-					<sup><xsl:value-of select="$number"/>)</sup>
+					<sup><xsl:value-of select="$number"/><xsl:if test="$organization != 'IEEE'">)</xsl:if></sup>
 				</label>
 				<xsl:apply-templates/>
 			</fn>
@@ -3090,34 +3090,77 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-
-		<term-sec id="sec_{$section}"><!-- id="{$current_id}" -->
+		
+		
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEEE'">
+				<xsl:if test="not(preceding-sibling::term)">	<!-- for 1st only -->
+					<std-def-list>
+						<xsl:for-each select=". | following-sibling::term">
+							<!-- Example:
+							<std-def-list-item>
+								<term>term name (alt name)</term>
+								<x>: </x>
+								<def>
+									<p>description</p>
+								</def>
+							</std-def-list-item>
+						-->
+						<std-def-list-item>
+							<term>
+								<xsl:apply-templates select="preferred[1]/node()"/>
+								<xsl:for-each select="preferred[position() &gt;= 2]">
+									<xsl:if test="position() = 1">
+										<xsl:text> (</xsl:text>
+									</xsl:if>
+									<xsl:apply-templates />
+									<xsl:if test="position() != last()">
+										<xsl:text>, </xsl:text>
+									</xsl:if>
+									<xsl:if test="position() = last()">
+										<xsl:text>)</xsl:text>
+									</xsl:if>
+								</xsl:for-each>
+							</term>
+							<x><xsl:text>: </xsl:text></x>
+							<def><xsl:apply-templates select="definition/node()"/></def>
+						</std-def-list-item>
+						</xsl:for-each>
+					</std-def-list>
+				</xsl:if>
+			</xsl:when>
 			
-			<xsl:call-template name="insert_label">
-				<xsl:with-param name="label" select="$section"/>
-				<xsl:with-param name="isAddition" select="count(title/node()[normalize-space() != ''][1][self::add]) = 1"/>
-			</xsl:call-template>
-			
-			<tbx:termEntry id="{$current_id}">
-				<tbx:langSet xml:lang="en">
-					<xsl:apply-templates select="node()[not(self::termexample or self::termnote or self::termsource or 
-																										self::preferred or self::admitted or self::deprecates or self::domain or 
-																										self::term)]"/>
+			<xsl:otherwise>
+		
+				<term-sec id="sec_{$section}"><!-- id="{$current_id}" -->
 					
-					<xsl:apply-templates select="termexample"/>
+					<xsl:call-template name="insert_label">
+						<xsl:with-param name="label" select="$section"/>
+						<xsl:with-param name="isAddition" select="count(title/node()[normalize-space() != ''][1][self::add]) = 1"/>
+					</xsl:call-template>
 					
-					<xsl:apply-templates select="termnote"/>
+					<tbx:termEntry id="{$current_id}">
+						<tbx:langSet xml:lang="en">
+							<xsl:apply-templates select="node()[not(self::termexample or self::termnote or self::termsource or 
+																												self::preferred or self::admitted or self::deprecates or self::domain or 
+																												self::term)]"/>
+							
+							<xsl:apply-templates select="termexample"/>
+							
+							<xsl:apply-templates select="termnote"/>
+							
+							<xsl:apply-templates select="termsource"/>
+							
+							<xsl:apply-templates select="preferred | admitted | deprecates | domain"/>
+							
+						</tbx:langSet>
+					</tbx:termEntry>
 					
-					<xsl:apply-templates select="termsource"/>
+					<xsl:apply-templates select="term"/>
 					
-					<xsl:apply-templates select="preferred | admitted | deprecates | domain"/>
-					
-				</tbx:langSet>
-			</tbx:termEntry>
-			
-			<xsl:apply-templates select="term"/>
-			
-		</term-sec>
+				</term-sec>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>	
 
 	<xsl:template match="term/text()">
@@ -3335,8 +3378,17 @@
 														$parent_name = 'termnote' or 
 														$parent_name = 'modification' or
 														$parent_name = 'dd'">
-				<xsl:if test="preceding-sibling::*[1][self::p]"><break /></xsl:if>
-				<xsl:apply-templates />
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEEE' and ($parent_name = 'definition'  or $parent_name = 'verbaldefinition' or $parent_name = 'verbal-definition')">
+						<p>
+							<xsl:apply-templates />
+						</p>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:if test="preceding-sibling::*[1][self::p]"><break /></xsl:if>
+						<xsl:apply-templates />
+					</xsl:otherwise>
+				</xsl:choose>
 			</xsl:when>
 			<xsl:when test="@type = 'floating-title'">
 				<!-- create parent element with floating title, for nested clauses (sec) -->
