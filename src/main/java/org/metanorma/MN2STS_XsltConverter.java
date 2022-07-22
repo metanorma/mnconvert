@@ -38,7 +38,7 @@ public class MN2STS_XsltConverter extends XsltConverter {
     private String checkType = "xsd_niso";
     private CheckAgainstEnum checkTypeEnumValue = CheckAgainstEnum.XSD_NISO_INTERCHANGE_MATHML3; 
     private String tagset = "interchange"; // default
-    private String mathmlVersion = "mathml3"; // default
+    private String mathmlVersion = "3"; // default
     
     private OutputFormatEnum outputFormatEnumValue = OutputFormatEnum.NISO;
 
@@ -59,9 +59,13 @@ public class MN2STS_XsltConverter extends XsltConverter {
         }
     }
     
+    public String getMathmlVersion() {
+        return "mathml" + mathmlVersion;
+    }
+    
     public void setMathmlVersion(String mathmlVersion) {
         if (mathmlVersion != null) {
-            this.mathmlVersion = "mathml" + mathmlVersion;
+            this.mathmlVersion = mathmlVersion;
         }
     }
     
@@ -92,7 +96,7 @@ public class MN2STS_XsltConverter extends XsltConverter {
             }
             
             
-            String ctype = (checkType.replace("-", "_") + "_" + tagset + "_" + mathmlVersion).toUpperCase();
+            String ctype = (checkType.replace("-", "_") + "_" + tagset + "_" + getMathmlVersion()).toUpperCase();
             
             if (CheckAgainstEnum.valueOf(ctype) != null) {
                 checkTypeEnumValue = CheckAgainstEnum.valueOf(ctype);
@@ -121,7 +125,8 @@ public class MN2STS_XsltConverter extends XsltConverter {
             
             // check agains XSD NISO, DTD NISO or DTD ISO
             STSValidator validator = new STSValidator(outputFilePath, checkType);
-            validator.setCheckAgainst(checkTypeEnumValue);
+            validator.setTagset(tagset);
+            validator.setMathmlVersion(mathmlVersion);
             validator.setIdRefChecking(isIdRefChecking);
             if (!validator.check()) {
                 return false;
