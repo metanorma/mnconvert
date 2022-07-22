@@ -78,6 +78,14 @@ public class MN2STS_XsltConverter extends XsltConverter {
         }
     }
     
+    private String getCtype(){
+        String ctype = checkType.replace("-", "_");
+        if (!checkType.equals("dtd-iso")) {
+            ctype = ctype + "_" + tagset + "_" + getMathmlVersion();
+        }
+        return ctype.toUpperCase();
+    }
+    
     @Override
     public boolean process() {
         try {
@@ -96,7 +104,7 @@ public class MN2STS_XsltConverter extends XsltConverter {
             }
             
             
-            String ctype = (checkType.replace("-", "_") + "_" + tagset + "_" + getMathmlVersion()).toUpperCase();
+            String ctype = getCtype();
             
             if (CheckAgainstEnum.valueOf(ctype) != null) {
                 checkTypeEnumValue = CheckAgainstEnum.valueOf(ctype);

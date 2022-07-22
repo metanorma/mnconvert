@@ -66,6 +66,14 @@ public class STSValidator {
         this.isDebugMode = isDebugMode;
     }
     
+    private String getCtype(){
+        String ctype = checkType.replace("-", "_");
+        if (!checkType.equals("dtd-iso")) {
+            ctype = ctype + "_" + tagset + "_" + getMathmlVersion();
+        }
+        return ctype.toUpperCase();
+    }
+    
     public boolean check() {
         try {
             
@@ -75,7 +83,7 @@ public class STSValidator {
                 return false;
             }
             
-            String ctype = (checkType.replace("-", "_") + "_" + tagset + "_" + getMathmlVersion()).toUpperCase();
+            String ctype = getCtype();
             if (CheckAgainstEnum.valueOf(ctype) != null) {
                 checkAgainst = CheckAgainstEnum.valueOf(ctype);
             } else {
