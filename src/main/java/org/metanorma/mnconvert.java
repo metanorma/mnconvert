@@ -60,14 +60,14 @@ public class mnconvert {
                     .build());
             addOption(Option.builder("ts")
                     .longOpt("tagset")
-                    .desc("use Interchange (value 'interchange', default) or Extended (value 'extended') NISO STS Tag Set in DTD/XSD validation")
+                    .desc("use Interchange (value 'interchange', default) or Extended (value 'extended') NISO STS Tag Set in NISO DTD/XSD validation")
                     .hasArg()
                     .argName("interchange|extended")
                     .required(false)
                     .build());
             addOption(Option.builder("m")
                     .longOpt("mathml")
-                    .desc("use MathML version 2 (value '2') or 3 (value '3', default) in DTD/XSD validation")
+                    .desc("use MathML version 2 (value '2') or 3 (value '3', default) in NISO DTD/XSD validation")
                     .hasArg()
                     .argName("2|3")
                     .required(false)
