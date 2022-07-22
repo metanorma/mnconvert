@@ -269,7 +269,7 @@ public class Util {
                 }
             } catch (FileNotFoundException ex) {
                 if (ex.toString().toLowerCase().contains(".dtd") && isIgnoreDTD.length == 0) {
-                    logger.log(Level.WARNING, "Can''t load DTD: {0}", ex.toString());
+                    //logger.log(Level.WARNING, "Can''t load external DTD: {0}, internal DTD will be used.", ex.toString());
                     return getInputFormat(inputXmlFile, true);
                 } else {
                     logger.warning(ex.toString());
