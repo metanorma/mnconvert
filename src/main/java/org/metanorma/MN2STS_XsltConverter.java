@@ -36,7 +36,9 @@ public class MN2STS_XsltConverter extends XsltConverter {
 
     
     private String checkType = "xsd_niso";
-    private CheckAgainstEnum checkTypeEnumValue = CheckAgainstEnum.XSD_NISO; 
+    private CheckAgainstEnum checkTypeEnumValue = CheckAgainstEnum.XSD_NISO_INTERCHANGE_MATHML3; 
+    private String tagset = "interchange"; // default
+    private String mathmlVersion = "mathml3"; // default
     
     private OutputFormatEnum outputFormatEnumValue = OutputFormatEnum.NISO;
 
@@ -51,6 +53,17 @@ public class MN2STS_XsltConverter extends XsltConverter {
         }
     }
 
+    public void setTagset(String tagset) {
+        if (tagset != null) {
+            this.tagset = tagset;
+        }
+    }
+    
+    public void setMathmlVersion(String mathmlVersion) {
+        if (mathmlVersion != null) {
+            this.mathmlVersion = "mathml" + mathmlVersion;
+        }
+    }
     
     private void setDefaultOutputFilePath() {
         if (outputFilePath.isEmpty()) {
@@ -79,7 +92,8 @@ public class MN2STS_XsltConverter extends XsltConverter {
             }
             
             
-            String ctype = checkType.replace("-", "_").toUpperCase();
+            String ctype = (checkType.replace("-", "_") + "_" + tagset + "_" + mathmlVersion).toUpperCase();
+            
             if (CheckAgainstEnum.valueOf(ctype) != null) {
                 checkTypeEnumValue = CheckAgainstEnum.valueOf(ctype);
             } else {
@@ -107,6 +121,7 @@ public class MN2STS_XsltConverter extends XsltConverter {
             
             // check agains XSD NISO, DTD NISO or DTD ISO
             STSValidator validator = new STSValidator(outputFilePath, checkType);
+            validator.setCheckAgainst(checkTypeEnumValue);
             validator.setIdRefChecking(isIdRefChecking);
             if (!validator.check()) {
                 return false;

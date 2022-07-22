@@ -58,6 +58,20 @@ public class mnconvert {
                     .argName("xsd-niso|dtd-iso|dtd-niso")
                     .required(true)
                     .build());
+            addOption(Option.builder("ts")
+                    .longOpt("tagset")
+                    .desc("use Interchange (value 'interchange', default) or Extended (value 'extended') NISO STS Tag Set in DTD/XSD validation")
+                    .hasArg()
+                    .argName("interchange|extended")
+                    .required(false)
+                    .build());
+            addOption(Option.builder("m")
+                    .longOpt("mathml")
+                    .desc("use MathML version 2 (value '2') or 3 (value '3', default) in DTD/XSD validation")
+                    .hasArg()
+                    .argName("2|3")
+                    .required(false)
+                    .build());
             addOption(Option.builder("idref")
                     .longOpt("idrefchecking")
                     .desc("Enable checking of ID/IDREF constraints (for XSD NISO only)")
@@ -123,6 +137,20 @@ public class mnconvert {
                     .desc("For STS output only: check against XSD NISO (value 'xsd-niso', default), DTD ISO (value 'dtd-iso'), DTD NISO (value 'dtd-niso')")
                     .hasArg()
                     .argName("xsd-niso|dtd-iso|dtd-niso")
+                    .required(false)
+                    .build());
+            addOption(Option.builder("ts")
+                    .longOpt("tagset")
+                    .desc("For STS NISO output only: use Interchange (value 'interchange', default) or Extended (value 'extended') NISO STS Tag Set in DTD/XSD validation")
+                    .hasArg()
+                    .argName("interchange|extended")
+                    .required(false)
+                    .build());
+            addOption(Option.builder("m")
+                    .longOpt("mathml")
+                    .desc("For STS NISO output only: use MathML version 2 (value '2') or 3 (value '3', default) in DTD/XSD validation")
+                    .hasArg()
+                    .argName("2|3")
                     .required(false)
                     .build());
             addOption(Option.builder("idref")
@@ -203,6 +231,8 @@ public class mnconvert {
                 String argXmlIn = arglist.get(0);
                 
                 STSValidator validator = new STSValidator(argXmlIn, cmdSTSCheckOnly.getOptionValue("check-type"));
+                validator.setTagset(cmdSTSCheckOnly.getOptionValue("tagset"));
+                validator.setMathmlVersion(cmdSTSCheckOnly.getOptionValue("mathml"));
                 validator.setDebugMode(cmdSTSCheckOnly.hasOption("debug"));
                 validator.setIdRefChecking(cmdSTSCheckOnly.hasOption("idrefchecking"));
                 
@@ -272,6 +302,8 @@ public class mnconvert {
                         {
                             MN2STS_XsltConverter mn2sts = new MN2STS_XsltConverter();
                             mn2sts.setCheckType(cmdMain.getOptionValue("check-type"));
+                            mn2sts.setTagset(cmdMain.getOptionValue("tagset"));
+                            mn2sts.setMathmlVersion(cmdMain.getOptionValue("mathml"));
                             defaultOutputFormat = "niso";
                             converter = mn2sts;
                             break;

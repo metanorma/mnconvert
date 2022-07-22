@@ -19,6 +19,8 @@ java -jar mnconvert-1.19.0.jar xml_file --check-type xsd-niso
 
 - `--check-type`, `-ct` - Check against XSD NISO (value xsd-niso), DTD ISO (dtd-iso), DTD NISO (dtd-niso)
 - `--idrefchecking`, `-idref` - Enable checking of ID/IDREF constraints (for XSD NISO only)
+- `--tagset`, `-ts` - use Interchange (value 'interchange', default) or Extended (value 'extended') NISO STS Tag Set in NISO DTD/XSD validation
+- `--mathml`, `-m` - use MathML version 2 (value '2') or 3 (value '3', default) in NISO DTD/XSD validation
 
 === 2. Convert ISO/NISO STS xml to Metanorma xml or adoc.
 
@@ -46,6 +48,8 @@ java -jar mnconvert-1.19.0.jar xml_file [options]
 - `--output-format`, -of - iso|niso(default), optional
 - `--check-type`, `-ct` - check against XSD NISO (value 'xsd-niso', default), DTD ISO (value 'dtd-iso'), DTD NISO (value 'dtd-niso')
 - `--idrefchecking`, `-idref` - Enable checking of ID/IDREF constraints (for XSD NISO only)
+- `--tagset`, `-ts` - use Interchange (value 'interchange', default) or Extended (value 'extended') NISO STS Tag Set in NISO DTD/XSD validation
+- `--mathml`, `-m` - use MathML version 2 (value '2') or 3 (value '3', default) in NISO DTD/XSD validation
 
 === 4. Converting from RFC XML version 2 (and v3 later...) to Metanorma AsciiDoc.
 

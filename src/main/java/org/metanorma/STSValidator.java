@@ -27,7 +27,9 @@ public class STSValidator {
     private String xmlFilePath = "document.xml"; // default input file name
     
     private String checkType = "xsd_niso";
-    private CheckAgainstEnum checkAgainst = CheckAgainstEnum.XSD_NISO; 
+    private CheckAgainstEnum checkAgainst = CheckAgainstEnum.XSD_NISO_INTERCHANGE_MATHML3; // default
+    private String tagset = "interchange"; // default
+    private String mathmlVersion = "mathml3"; // default
     
     private boolean isDebugMode = false; // default no debug
     
@@ -40,6 +42,22 @@ public class STSValidator {
         }
     }
 
+    public void setTagset(String tagset) {
+        if (tagset != null) {
+            this.tagset = tagset;
+        }
+    }
+    
+    public void setMathmlVersion(String mathmlVersion) {
+        if (mathmlVersion != null) {
+            this.mathmlVersion = "mathml" + mathmlVersion;
+        }
+    }
+
+    public void setCheckAgainst (CheckAgainstEnum checkAgainst) {
+        this.checkAgainst = checkAgainst;
+    }
+    
     public void setIdRefChecking(boolean isIdRefChecking) {
         this.isIdRefChecking = isIdRefChecking;
     }
@@ -57,7 +75,7 @@ public class STSValidator {
                 return false;
             }
             
-            String ctype = checkType.replace("-", "_").toUpperCase();
+            String ctype = (checkType.replace("-", "_") + "_" + tagset + "_" + mathmlVersion).toUpperCase();
             if (CheckAgainstEnum.valueOf(ctype) != null) {
                 checkAgainst = CheckAgainstEnum.valueOf(ctype);
             } else {
