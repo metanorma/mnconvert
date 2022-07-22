@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +34,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.w3c.dom.Element;
 
 /**
  *
@@ -238,19 +240,24 @@ public class Util {
         return outFilename;
     }
     
-    public static String getInputFormat(String inputXmlFile) {
+    public static String getInputFormat(String inputXmlFile, boolean... isIgnoreDTD) {
         if (inputXmlFile.toLowerCase().endsWith(".docx")) {
             return "docx";
         } else {
             DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
             try {
+                if (isIgnoreDTD.length > 0 && isIgnoreDTD[0]) {
+                    fact.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+                }
                 DocumentBuilder builder = fact.newDocumentBuilder();
                 Document doc;
+                
                 if (inputXmlFile.toLowerCase().startsWith("http") || inputXmlFile.toLowerCase().startsWith("www.")) {
                     doc = builder.parse(inputXmlFile);
                 } else {
                     doc = builder.parse(new FileInputStream(inputXmlFile));
                 }
+                
                 Node node = doc.getDocumentElement();
                 String root = node.getNodeName();
                 if (root.endsWith("-standard") || root.equals("metanorma-collection")) {
@@ -260,7 +267,15 @@ public class Util {
                 } else {
                     return "sts";
                 }
-            } catch (ParserConfigurationException | SAXException | IOException ex) {
+            } catch (FileNotFoundException ex) {
+                if (ex.toString().toLowerCase().contains(".dtd") && isIgnoreDTD.length == 0) {
+                    logger.log(Level.WARNING, "Can''t load DTD: {0}", ex.toString());
+                    return getInputFormat(inputXmlFile, true);
+                } else {
+                    logger.warning(ex.toString());
+                }
+            }
+            catch (ParserConfigurationException | SAXException | IOException ex) {
                 logger.severe(ex.toString());
             }
         }
