@@ -32,7 +32,7 @@ java -jar mnconvert-1.19.0.jar xml_file [options]
 - `--output-format`, `-of` - xml|adoc(default), optional
 - `--imagesdir`, `-img` - folder with images (default 'images'), optional
 - `--split-bibdata`, `-sb` - create Metanorma Adoc and Relaton XML, optional
-- `--type`, `-t` - type of standard to generate (iso, bsi, etc.), optional
+- `--type`, `-st` - type of standard to generate (iso, bsi, etc.), optional
 
 === 3. Convert Metanorma xml to ISO/NISO STS xml.
 

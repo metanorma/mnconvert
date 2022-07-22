@@ -53,7 +53,7 @@ public class mnconvert {
                     .build());
             addOption(Option.builder("ct")
                     .longOpt("check-type")
-                    .desc("Check against XSD NISO (value xsd-niso), DTD ISO (dtd-iso), DTD NISO (dtd-niso) (Default: xsd-niso)")
+                    .desc("Check against XSD NISO (value 'xsd-niso', default), DTD ISO (value 'dtd-iso'), DTD NISO (value 'dtd-niso')")
                     .hasArg()
                     .argName("xsd-niso|dtd-iso|dtd-niso")
                     .required(true)
@@ -96,13 +96,6 @@ public class mnconvert {
                     .argName("xml|adoc|iso|niso")
                     .required(false)
                     .build());
-            addOption(Option.builder("t")
-                    .longOpt("check-type")
-                    .desc("For STS output only: check against XSD NISO (value 'xsd-niso', default), DTD ISO (value 'dtd-iso'), DTD NISO (value 'dtd-niso')")
-                    .hasArg()
-                    .argName("xsd-niso|dtd-iso|dtd-niso")
-                    .required(false)
-                    .build());
             addOption(Option.builder("sb")
                     .longOpt("split-bibdata")
                     .desc("For STS input only: create MN Adoc and Relaton XML")
@@ -127,7 +120,7 @@ public class mnconvert {
                     .build());
             addOption(Option.builder("ct")
                     .longOpt("check-type")
-                    .desc("Check against XSD NISO (value xsd-niso), DTD ISO (dtd-iso), DTD NISO (dtd-niso) (Default: xsd-niso)")
+                    .desc("For STS output only: check against XSD NISO (value 'xsd-niso', default), DTD ISO (value 'dtd-iso'), DTD NISO (value 'dtd-niso')")
                     .hasArg()
                     .argName("xsd-niso|dtd-iso|dtd-niso")
                     .required(false)
