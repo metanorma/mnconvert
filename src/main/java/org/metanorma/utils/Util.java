@@ -11,6 +11,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -34,7 +36,14 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Element;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 
 /**
  *
@@ -357,5 +366,32 @@ public class Util {
         }
         return strResult;
     }
-    
+
+    public static String serializeXML(File fXMLin) throws ParserConfigurationException, TransformerException, SAXException, IOException {
+        DocumentBuilderFactory dbfactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbfactory.newDocumentBuilder();
+        
+        EntityResolver entityResolver = new EntityResolver() {
+            @Override
+            public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+                if (systemId.endsWith(".dtd")) {
+                        logger.log(Level.WARNING, "(Ignored external DTD: {0}, .jar''s internal XSD/DTD will be used.)", systemId);
+                        StringReader stringInput = new StringReader(" ");
+                        return new InputSource(stringInput);
+                }
+                else {
+                        return null;
+                }
+            }
+        };
+        dBuilder.setEntityResolver(entityResolver);
+        
+        Document doc = dBuilder.parse(fXMLin);
+        doc.getDocumentElement().normalize();
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        StreamResult result = new StreamResult(new StringWriter());
+        DOMSource source = new DOMSource(doc);
+        transformer.transform(source, result);
+        return result.getWriter().toString();
+      }
 }

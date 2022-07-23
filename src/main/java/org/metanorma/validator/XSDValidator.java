@@ -4,6 +4,7 @@ import org.metanorma.utils.ResourceResolver;
 import org.metanorma.utils.Util;
 import org.metanorma.utils.LoggerHelper;
 import java.io.File;
+import java.io.StringReader;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,7 +48,11 @@ public class XSDValidator extends Validator {
             // Disable checking of ID/IDREF constraints. Validation will not fail if there are non-unique ID values or dangling IDREF values in the document. 
             validator.setFeature("http://apache.org/xml/features/validation/id-idref-checking", isIdRefChecking);
             validator.setErrorHandler(errorHandler);
-            validator.validate(new StreamSource(xml));            
+            
+            String xmlString = Util.serializeXML(xml);
+            //validator.validate(new StreamSource(xml));   
+            validator.validate(new StreamSource(new StringReader(xmlString)));
+            
         } catch (Exception e) { 
             exceptions.add(e.toString());            
         }        
