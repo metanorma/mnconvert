@@ -47,6 +47,8 @@ public class DTDValidator extends Validator {
         
         try {        
             DocumentBuilderFactory dbfactory = DocumentBuilderFactory.newInstance();
+            dbfactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            
             DocumentBuilder builder = dbfactory.newDocumentBuilder();
             
             // copy dtd folder and xml file into the temp folder
