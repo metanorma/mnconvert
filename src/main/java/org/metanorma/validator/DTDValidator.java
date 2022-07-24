@@ -37,10 +37,17 @@ public class DTDValidator extends Validator {
     }
 
     @Override
-    public List<String> validate(CheckAgainstEnum checkAgainst) {
-        this.checkAgainst = checkAgainst;
-                
-        String checkSrc = CheckAgainstMap.getMap().get(checkAgainst);
+    public List<String> validate(Object checkAgainst) {
+        
+        String checkSrc;
+        if (checkAgainst instanceof CheckAgainstEnum) {
+            this.checkAgainst = (CheckAgainstEnum) checkAgainst;
+            checkSrc = CheckAgainstMap.getMap().get(checkAgainst);
+        } else {
+            filepathDTDorXSD = (String) checkAgainst;
+            checkSrc = filepathDTDorXSD;
+        }
+        
         String checkSrcPath = "/" + new File(checkSrc).getParentFile();
         
         logger.log(Level.INFO, "Validate XML against DTD {0}...", checkSrc);
@@ -53,10 +60,8 @@ public class DTDValidator extends Validator {
             
             // copy dtd folder and xml file into the temp folder
             final Path tmpfilepath = Paths.get(Util.getJavaTempDir(), UUID.randomUUID().toString());
-
             Files.createDirectories(tmpfilepath);
-
-            ResourcesUtils.copyResources(getClass().getResource(checkSrcPath), checkSrcPath, tmpfilepath.toFile());
+            
             // to debug jar
             //jar:file:/C:/Metanorma/mn2sts/target/mn2sts-1.1.jar!/NISO-STS-extended-1-MathML3-DTD
             //java.net.URL url = new java.net.URL("jar:file:/C:\\Metanorma\\mn2sts\\mn2sts-1.1.jar!/NISO-STS-extended-1-MathML3-DTD");
@@ -71,9 +76,18 @@ public class DTDValidator extends Validator {
 
             Document document = builder.parse(xml);
             DOMImplementation domImpl = document.getImplementation();
-            DocumentType doctype = domImpl.createDocumentType("doctype",
+            DocumentType doctype;
+            if (checkAgainst instanceof CheckAgainstEnum) {
+                ResourcesUtils.copyResources(getClass().getResource(checkSrcPath), checkSrcPath, tmpfilepath.toFile());
+                doctype = domImpl.createDocumentType("doctype",
                 "",
                 tmpfilepath + File.separator + checkSrc);
+            } else {
+                doctype = domImpl.createDocumentType("doctype",
+                "",
+                checkSrc);
+            }
+            
             //transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, doctype.getPublicId());
             transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, doctype.getSystemId());
             DOMSource source = new DOMSource(document);

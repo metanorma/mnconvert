@@ -3,6 +3,9 @@ package org.metanorma.utils;
 // https://stackoverflow.com/questions/2342808/how-to-validate-an-xml-file-using-java-with-an-xsd-having-an-include
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,8 +78,17 @@ public class ResourceResolver implements LSResourceResolver {
             // Read the resource as input stream
             String normalizedPath = getNormalizedPath(baseResourcePath, systemId);
             InputStream resourceAsStream = this.getClass().getClassLoader()
-                    .getResourceAsStream(normalizedPath);
-
+                    .getResourceAsStream(normalizedPath); // file from jar
+            if (resourceAsStream == null) {
+                // file from disk
+                try {
+                    resourceAsStream = new FileInputStream(new File(normalizedPath));
+                } catch(FileNotFoundException ex) {
+                    System.out.println(ex.toString());
+                    return null;
+                }
+            }
+            
             String newPath = "";
             // if the current resource is not in the same path with base
             // resource, add current resource's path to pathMap

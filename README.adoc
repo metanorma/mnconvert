@@ -22,6 +22,17 @@ java -jar mnconvert-1.19.0.jar xml_file --check-type xsd-niso
 - `--tagset`, `-ts` - use Interchange (value 'interchange', default) or Extended (value 'extended') NISO STS Tag Set in NISO DTD/XSD validation
 - `--mathml`, `-m` - use MathML version 2 (value '2') or 3 (value '3', default) in NISO DTD/XSD validation
 
+or check any xml against XSD, DTD.
+
+[source,sh]
+----
+java -jar mnconvert-1.19.0.jar xml_file --validation-against <path DTD or XSD>
+----
+
+- `--validation-against`, `-va` - Check against specified DTD ot XSD
+- `--idrefchecking`, `-idref` - Enable checking of ID/IDREF constraints (for XSD only)
+
+
 === 2. Convert ISO/NISO STS xml to Metanorma xml or adoc.
 
 [source,sh]

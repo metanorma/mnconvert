@@ -28,6 +28,7 @@ public class STSValidator {
     
     private String checkType = "xsd_niso";
     private CheckAgainstEnum checkAgainst = CheckAgainstEnum.XSD_NISO_INTERCHANGE_MATHML3; // default
+    private String filepathDTDorXSD = "";
     private String tagset = "interchange"; // default
     private String mathmlVersion = "3"; // default
     
@@ -42,6 +43,14 @@ public class STSValidator {
         }
     }
 
+    public STSValidator(String xmlFilePath) {
+        this.xmlFilePath = xmlFilePath;
+    }
+    
+    public void setFilepathDTDorXSD(String DTDXSDPath) {
+        this.filepathDTDorXSD = DTDXSDPath;
+    }
+    
     public void setTagset(String tagset) {
         if (tagset != null) {
             this.tagset = tagset;
@@ -83,29 +92,42 @@ public class STSValidator {
                 return false;
             }
             
-            String ctype = getCtype();
-            if (CheckAgainstEnum.valueOf(ctype) != null) {
-                checkAgainst = CheckAgainstEnum.valueOf(ctype);
-            } else {
-                logger.log(Level.SEVERE, "Unknown option value:  {0}", checkType);
-                return false;
-            }
-            
-            
             List<String> exceptions; 
+            
+            if (!filepathDTDorXSD.isEmpty()) {
+                boolean isXSDcheck = filepathDTDorXSD.toLowerCase().endsWith(".xsd");
+                if (isXSDcheck) {
+                    XSDValidator xsdValidator = new XSDValidator(fXMLin);
+                    xsdValidator.setIdRefChecking(isIdRefChecking);
+                    exceptions = xsdValidator.validate(filepathDTDorXSD);                
+                } else {                
+                    DTDValidator dtdValidator = new DTDValidator(fXMLin);
+                    dtdValidator.setDebug(isDebugMode);
+                    exceptions = dtdValidator.validate(filepathDTDorXSD);                
+                }
+            } else {
+            
+                String ctype = getCtype();
+                if (CheckAgainstEnum.valueOf(ctype) != null) {
+                    checkAgainst = CheckAgainstEnum.valueOf(ctype);
+                } else {
+                    logger.log(Level.SEVERE, "Unknown option value:  {0}", checkType);
+                    return false;
+                }
 
-            String checkSrc = CheckAgainstMap.getMap().get(checkAgainst);
+                String checkSrc = CheckAgainstMap.getMap().get(checkAgainst);
 
-            boolean isXSDcheck = checkSrc.toLowerCase().endsWith(".xsd");
+                boolean isXSDcheck = checkSrc.toLowerCase().endsWith(".xsd");
 
-            if (isXSDcheck) {
-                XSDValidator xsdValidator = new XSDValidator(fXMLin);
-                xsdValidator.setIdRefChecking(isIdRefChecking);
-                exceptions = xsdValidator.validate(checkAgainst);                
-            } else {                
-                DTDValidator dtdValidator = new DTDValidator(fXMLin);
-                dtdValidator.setDebug(isDebugMode);
-                exceptions = dtdValidator.validate(checkAgainst);                
+                if (isXSDcheck) {
+                    XSDValidator xsdValidator = new XSDValidator(fXMLin);
+                    xsdValidator.setIdRefChecking(isIdRefChecking);
+                    exceptions = xsdValidator.validate(checkAgainst);
+                } else {                
+                    DTDValidator dtdValidator = new DTDValidator(fXMLin);
+                    dtdValidator.setDebug(isDebugMode);
+                    exceptions = dtdValidator.validate(checkAgainst);
+                }
             }
             
             StringBuilder sbErrors = new StringBuilder();

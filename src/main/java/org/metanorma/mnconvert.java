@@ -27,6 +27,8 @@ public class mnconvert {
     
     static final String CMD_STSCheckOnly = "java -jar " + APP_NAME + ".jar <input_xml_file> [--check-type type...]";
     
+    static final String CMD_STSCheckOnlyExternal = "java -jar " + APP_NAME + ".jar <input_xml_file> [--validation-against <path to DTD/XSD>]";
+    
     static final String CMD_STSorRFCtoMN = "java -jar " + APP_NAME + ".jar <input_xml_file> [options]";
     
     static final String CMD_DOCXtoMN = "java -jar " + APP_NAME + ".jar <input_docx_file> [options]";
@@ -75,6 +77,29 @@ public class mnconvert {
             addOption(Option.builder("idref")
                     .longOpt("idrefchecking")
                     .desc("Enable checking of ID/IDREF constraints (for XSD NISO only)")
+                    .required(false)
+                    .build());
+        }
+    };
+    
+    // Mode 1.1 (External)
+    static final Options optionsSTSCheckOnlyExternal = new Options() {
+        {
+            addOption(Option.builder("v")
+                    .longOpt("version")
+                    .desc("display application version")
+                    .required(false)
+                    .build());
+            addOption(Option.builder("va")
+                    .longOpt("validation-against")
+                    .desc("Path to DTD/XSD")
+                    .hasArg()
+                    .argName("xsd-niso|dtd-iso|dtd-niso")
+                    .required(true)
+                    .build());
+            addOption(Option.builder("idref")
+                    .longOpt("idrefchecking")
+                    .desc("Enable checking of ID/IDREF constraints (for XSD only)")
                     .required(false)
                     .build());
         }
@@ -246,6 +271,36 @@ public class mnconvert {
             }
         }
         
+         if(cmdFail) {
+            try {
+                CommandLine cmdSTSCheckOnlyExternal = parser.parse(optionsSTSCheckOnlyExternal, args);
+                System.out.print(APP_NAME + " ");
+                printVersion(cmdSTSCheckOnlyExternal.hasOption("version"));
+                System.out.println("\n");
+                
+                List<String> arglist = cmdSTSCheckOnlyExternal.getArgList();
+                if (arglist.isEmpty() || arglist.get(0).trim().length() == 0) {
+                    throw new ParseException("");
+                }
+
+                String argXmlIn = arglist.get(0);
+                
+                STSValidator validator = new STSValidator(argXmlIn);
+                validator.setFilepathDTDorXSD(cmdSTSCheckOnlyExternal.getOptionValue("validation-against"));
+                
+                validator.setDebugMode(cmdSTSCheckOnlyExternal.hasOption("debug"));
+                validator.setIdRefChecking(cmdSTSCheckOnlyExternal.hasOption("idrefchecking"));
+                
+                if (!validator.check()) {
+                    System.exit(ERROR_EXIT_CODE);
+                }
+                
+                cmdFail = false;
+            } catch (ParseException exp) {
+                cmdFail = true;
+            }
+        }
+        
         if(cmdFail) {            
             try {
                 CommandLine cmdMain = parser.parse(optionsMain, args);
@@ -356,6 +411,8 @@ public class mnconvert {
         PrintWriter pw = new PrintWriter(stringWriter);
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp(pw, 80, CMD_STSCheckOnly, "", optionsSTSCheckOnly, 0, 0, "");
+        pw.write("\nOR\n\n");
+        formatter.printHelp(pw, 80, CMD_STSCheckOnlyExternal, "", optionsSTSCheckOnlyExternal, 0, 0, "");
         pw.write("\nOR\n\n");
         formatter.printHelp(pw, 80, CMD_STSorRFCtoMN, "", optionsMain, 0, 0, "");
         pw.write("\nOR\n\n");

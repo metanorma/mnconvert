@@ -375,7 +375,7 @@ public class Util {
             @Override
             public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
                 if (systemId.endsWith(".dtd")) {
-                        logger.log(Level.WARNING, "(Ignored external DTD: {0}, .jar''s internal XSD/DTD will be used.)", systemId);
+                        logger.log(Level.WARNING, "(Ignored external DTD from DOCTYPE: {0}, .jar''s internal or specified XSD/DTD will be used.)", systemId);
                         StringReader stringInput = new StringReader(" ");
                         return new InputSource(stringInput);
                 }

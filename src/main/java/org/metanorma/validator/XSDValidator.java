@@ -4,6 +4,7 @@ import org.metanorma.utils.ResourceResolver;
 import org.metanorma.utils.Util;
 import org.metanorma.utils.LoggerHelper;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.StringReader;
 import java.util.List;
 import java.util.logging.Level;
@@ -28,10 +29,16 @@ public class XSDValidator extends Validator {
         super(xml);
     }
 
-    public List<String> validate(CheckAgainstEnum checkAgainst) {
-        this.checkAgainst = checkAgainst;
+    public List<String> validate(Object checkAgainst) {
         
-        String checkSrc = CheckAgainstMap.getMap().get(checkAgainst);
+        String checkSrc;
+        if (checkAgainst instanceof CheckAgainstEnum) {
+            this.checkAgainst = (CheckAgainstEnum) checkAgainst;
+            checkSrc = CheckAgainstMap.getMap().get(this.checkAgainst);
+        } else {
+            filepathDTDorXSD = (String) checkAgainst;
+            checkSrc = filepathDTDorXSD;
+        }
                 
         logger.log(Level.INFO, "Validate XML against XSD {0}...", checkSrc);
         
@@ -42,7 +49,13 @@ public class XSDValidator extends Validator {
         //schemaFactory.setResourceResolver(new ResourceResolver(""));
               
         try {
-            Source schemaFile = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), checkSrc.replaceAll("\\\\", "/")));
+            Source schemaFile;
+            if (checkAgainst instanceof CheckAgainstEnum) {
+                schemaFile = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), checkSrc.replaceAll("\\\\", "/")));
+            } else {
+                schemaFile = new StreamSource(new File(filepathDTDorXSD));
+            }
+            
             Schema schema = schemaFactory.newSchema(schemaFile);
             javax.xml.validation.Validator validator = schema.newValidator();
             // Disable checking of ID/IDREF constraints. Validation will not fail if there are non-unique ID values or dangling IDREF values in the document. 
