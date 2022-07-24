@@ -94,7 +94,6 @@ public class mnconvert {
                     .longOpt("validation-against")
                     .desc("Path to DTD/XSD")
                     .hasArg()
-                    .argName("xsd-niso|dtd-iso|dtd-niso")
                     .required(true)
                     .build());
             addOption(Option.builder("idref")
@@ -130,9 +129,9 @@ public class mnconvert {
                     .build());
             addOption(Option.builder("of")
                     .longOpt("output-format")
-                    .desc("output format: xml|adoc(default) for Metanorma output, iso|niso(default) for STS output")
+                    .desc("output format: xml|adoc(default) for Metanorma output, iso|niso(default) for STS output, or ieee for IEEE format output")
                     .hasArg()
-                    .argName("xml|adoc|iso|niso")
+                    .argName("xml|adoc|iso|niso|ieee")
                     .required(false)
                     .build());
             addOption(Option.builder("sb")
@@ -176,6 +175,12 @@ public class mnconvert {
                     .desc("For STS NISO output only: use MathML version 2 (value '2') or 3 (value '3', default) in DTD/XSD validation")
                     .hasArg()
                     .argName("2|3")
+                    .required(false)
+                    .build());
+            addOption(Option.builder("va")
+                    .longOpt("validation-against")
+                    .desc("Path to DTD/XSD")
+                    .hasArg()
                     .required(false)
                     .build());
             addOption(Option.builder("idref")
@@ -359,6 +364,7 @@ public class mnconvert {
                             mn2sts.setCheckType(cmdMain.getOptionValue("check-type"));
                             mn2sts.setTagset(cmdMain.getOptionValue("tagset"));
                             mn2sts.setMathmlVersion(cmdMain.getOptionValue("mathml"));
+                            mn2sts.setFilepathDTDorXSD(cmdMain.getOptionValue("validation-against"));
                             defaultOutputFormat = "niso";
                             converter = mn2sts;
                             break;
