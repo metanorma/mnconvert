@@ -850,7 +850,7 @@
 	
 	
 	<!-- Add @stdid (and @id3) to ref for reference mechanism between <std std-id="..."></std> and <ref></ref> -->
-	<xsl:template match="ref" mode="ref_fix">
+	<xsl:template match="ref | list[@list-content = 'normative-references']/list-item/p" mode="ref_fix">
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="ref_fix"/>
 			

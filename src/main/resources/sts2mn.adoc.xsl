@@ -1736,7 +1736,7 @@
 	<!-- ======================== -->
 	<!-- Normative references -->
 	<!-- ======================== -->
-	<xsl:template match="body/sec[@sec-type = 'norm-refs'] | front/sec[@sec-type = 'norm-refs'] | body/sec[title = 'Normative references']" priority="2">
+	<xsl:template match="body/sec[@sec-type = 'norm-refs'] | front/sec[@sec-type = 'norm-refs'] | body/sec[title = 'Normative references' or list/@list-content = 'normative-references']" priority="2">
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$sectionsFolder}/02-normrefs.adoc">
 			<xsl:text>&#xa;</xsl:text>
@@ -1753,7 +1753,7 @@
 	</xsl:template>
 	
 	<!-- Text before references -->
-	<xsl:template match="sec[@sec-type = 'norm-refs']/p" priority="2">
+	<xsl:template match="sec[@sec-type = 'norm-refs' or list/@list-content = 'normative-references']/p" priority="2">
 		<xsl:if test="not(preceding-sibling::*[1][self::p])"> <!-- first p in norm-refs -->
 			<xsl:text>[NOTE,type=boilerplate]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
@@ -3912,7 +3912,7 @@
 		<xsl:apply-templates/>
 	</xsl:template>
 	
-	<xsl:template match="ref">
+	<xsl:template match="ref | list[@list-content = 'normative-references']/list-item/p">
 		<xsl:param name="skip_standard_other">true</xsl:param>
 		<xsl:variable name="unique"><!-- skip repeating references -->
 			<xsl:choose>
@@ -4090,7 +4090,7 @@
 	
 	<xsl:template match="ref/std/std-ref"/>
 	
-	<xsl:template match="ref/mixed-citation/std">
+	<xsl:template match="ref/mixed-citation/std | list[@list-content = 'normative-references']/list-item//mixed-citation/std">
 		<xsl:choose>
 			<xsl:when test="$organization = 'IEEE'">
 				<xsl:apply-templates />
@@ -4177,6 +4177,17 @@
 		<!-- remove [N2] ... from start of mixed-citation -->
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regexNormRefsNumber,'$3')"/>
 	</xsl:template>
+	
+	
+	<xsl:template match="list[@list-content = 'normative-references']">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="list[@list-content = 'normative-references']/list-item">
+		<xsl:apply-templates />
+		<xsl:text>&#xa;&#xa;</xsl:text>
+	</xsl:template>
+	
 	<!-- ============================ -->
 	<!-- References -->
 	<!-- ============================ -->
