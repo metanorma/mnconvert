@@ -477,6 +477,28 @@
 	<!-- ================= -->
 
 	<!-- ================= -->
+	<!-- IEEE sts model processing -->
+	<!-- ================= -->
+	<xsl:template name="build_ieee_model_std">
+		<xsl:variable name="id_prefix">
+			<xsl:if test="parent::mixed-citation and not(parent::mixed-citation/following-sibling::*[1][self::xref[@ref-type = 'bibr']])">hidden_</xsl:if>
+		</xsl:variable>
+		<xsl:variable name="id" select="translate(pub-id,' ','_')"/>
+		<reference><xsl:value-of select="$id_prefix"/><xsl:value-of select="$id"/></reference>
+		<xsl:if test="$id_prefix != ''">
+			<xsl:variable name="referenceText">
+				<xsl:apply-templates select="std-organization"/>
+				<xsl:text> </xsl:text>
+				<xsl:apply-templates select="pub-id"/>
+			</xsl:variable>
+			<referenceText><xsl:value-of select="$referenceText"/></referenceText>
+		</xsl:if>
+	</xsl:template>
+	<!-- ================= -->
+	<!-- END IEEE sts model processing -->
+	<!-- ================= -->
+
+	<!-- ================= -->
 	<!-- tbx:source model processing -->
 	<!-- ================= -->
 	

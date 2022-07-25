@@ -2331,7 +2331,14 @@
 		<xsl:if test="bold2[std-ref]">**</xsl:if>
 		
 		<xsl:variable name="model_std_">
-			<xsl:call-template name="build_sts_model_std"/>
+			<xsl:choose>
+				<xsl:when test="$organization = 'IEEE'">
+					<xsl:call-template name="build_ieee_model_std"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:call-template name="build_sts_model_std"/>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:variable>
 		<xsl:variable name="model_std" select="xalan:nodeset($model_std_)"/>
 		
@@ -3111,7 +3118,7 @@
 	</xsl:template>
 	
 	<xsl:template match="mixed-citation">
-		<xsl:if test="$organization = 'IEEE'"><xsl:text>, </xsl:text></xsl:if>
+		<xsl:if test="$organization = 'IEEE' and (ancestor::ref-list or ancestor::list[@list-content = 'normative-references'])"><xsl:text>, </xsl:text></xsl:if>
 		<xsl:if test="preceding-sibling::node()">
 			<xsl:text> </xsl:text>
 		</xsl:if>
@@ -3901,6 +3908,35 @@
 		</xsl:if>
 		
 		<xsl:apply-templates/>
+		
+		
+		<xsl:if test="$organization = 'IEEE' and ancestor::app">
+			<!-- put hidden items -->
+			<xsl:variable name="hidden_bibitems">
+				<xsl:for-each select="//mixed-citation[not(ancestor::list-item[@list-content='normative-references']) and not(ancestor::ref-list)][not(following-sibling::*[1][self::xref/@ref-type = 'bibr'])]/std">
+					<xsl:variable name="std_model_">
+						<xsl:call-template name="build_ieee_model_std"/>
+					</xsl:variable>
+					<xsl:variable name="std_model" select="xalan:nodeset($std_model_)"/>
+					<xsl:if test="normalize-space($std_model/referenceText) != ''">
+						<item>
+							<xsl:attribute name="id"><xsl:value-of select="$std_model/reference"/></xsl:attribute>
+							<xsl:text>* [[[</xsl:text>
+							<xsl:value-of select="$std_model/reference"/>
+							<xsl:text>,hidden(</xsl:text>
+							<xsl:value-of select="$std_model/referenceText"/>
+							<xsl:text>)]]]</xsl:text>
+						</item>
+					</xsl:if>
+				</xsl:for-each>
+			</xsl:variable>
+			<xsl:for-each select="xalan:nodeset($hidden_bibitems)//item">
+				<xsl:if test="not(preceding-sibling::item[@id = current()/@id])"> <!-- unique only -->
+					<xsl:value-of select="."/>
+					<xsl:text>&#xa;&#xa;</xsl:text>
+				</xsl:if>
+			</xsl:for-each>
+		</xsl:if>
 		
 		<!-- output [%bibitem] at the end of bibliography -->
 		<xsl:apply-templates select="node()[@content-type = 'standard_other']">
