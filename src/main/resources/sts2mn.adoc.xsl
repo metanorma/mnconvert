@@ -3117,6 +3117,20 @@
 		<xsl:apply-templates/>
 	</xsl:template>
 		
+	<xsl:template match="mixed-citation" mode="IEEE">
+		<xsl:if test="@publication-type = 'standard'">
+			<xsl:for-each select="std/std-organization | std/pub-id">
+				<xsl:apply-templates />
+				<xsl:if test="position() != last()"><xsl:text> </xsl:text></xsl:if>
+			</xsl:for-each>
+		</xsl:if>
+	</xsl:template>
+		
+	<xsl:template match="mixed-citation"> <!-- [not(@publication-type='standard')] -->
+		<xsl:if test="$organization = 'IEEE'"><xsl:text>, </xsl:text></xsl:if>
+		<xsl:apply-templates/>
+	</xsl:template>
+		
 	<!-- =============== -->
 	<!-- Definitions list (dl) -->
 	<!-- =============== -->
@@ -3867,6 +3881,15 @@
 			<xsl:text>&#xa;</xsl:text> -->
 		</xsl:if>
 		
+		<xsl:if test="$organization = 'IEEE' and ancestor::app">
+			<!-- special case with additional [bibliography] in annex --> 
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:text>[bibliography]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:text>=</xsl:text>
+			<xsl:apply-templates select="ancestor::app/title"/>
+		</xsl:if>
+		
 		<xsl:apply-templates/>
 		
 		<!-- output [%bibitem] at the end of bibliography -->
@@ -3889,11 +3912,13 @@
 			</xsl:choose>
 		</xsl:variable>
 		
+		<!-- DEBUG:<xsl:apply-templates select="." mode="print_as_xml"/> -->
+		
 		<!-- <xsl:variable name="isAsciiBibFormat" select="normalize-space(@referenceText != '' and
 				java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, @referenceText) = 'false')"/> -->
 		
 		<xsl:variable name="reference">
-			
+				
 			<xsl:variable name="ids">
 				<item><xsl:value-of select="@id"/></item>
 				<item><xsl:value-of select="@id2"/></item>
@@ -3964,13 +3989,15 @@
 						
 						<xsl:variable name="referenceText">
 							
-							<!-- note: @referenceText and @label_number added at ref_fix step -->
-							<xsl:if test="@label_number != '' and @referenceText != ''">
-								<xsl:text>(</xsl:text>
-							</xsl:if>
-							<xsl:value-of select="@label_number"/>
-							<xsl:if test="@label_number != '' and @referenceText != ''">
-								<xsl:text>)</xsl:text>
+							<xsl:if test="not($organization = 'IEEE' and mixed-citation/@publication-type = 'standard')">
+								<!-- note: @referenceText and @label_number added at ref_fix step -->
+								<xsl:if test="@label_number != '' and @referenceText != ''">
+									<xsl:text>(</xsl:text>
+								</xsl:if>
+								<xsl:value-of select="@label_number"/>
+								<xsl:if test="@label_number != '' and @referenceText != ''">
+									<xsl:text>)</xsl:text>
+								</xsl:if>
 							</xsl:if>
 							<!-- <xsl:value-of select="@referenceText"/> -->
 							<!-- add BSI prefix for PAS -->
@@ -4002,7 +4029,7 @@
 				
 				</xsl:otherwise>
 			</xsl:choose>
-			
+		
 		</xsl:variable>
 		
 		<xsl:if test="normalize-space($reference) != ''">
@@ -4054,7 +4081,14 @@
 	<xsl:template match="ref/std/std-ref"/>
 	
 	<xsl:template match="ref/mixed-citation/std">
-		<xsl:call-template name="std"/>
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEEE'">
+				<xsl:apply-templates />
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:call-template name="std"/>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	<xsl:template match="ref/mixed-citation/std" mode="references">
 		<!-- <xsl:text>,</xsl:text> -->

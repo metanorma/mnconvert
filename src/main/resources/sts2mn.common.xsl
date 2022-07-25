@@ -926,26 +926,32 @@
 				</xsl:variable>
 				<xsl:value-of select="$std-ref_text"/>
 				<xsl:if test="normalize-space($std-ref_text) = ''">
-					
-					<xsl:variable name="mixed-citation_first_text_" select="normalize-space(translate((mixed-citation//text()[normalize-space()!=''])[1], '&#xA0;&#x2011;', ' -'))"/>
-					<xsl:variable name="mixed-citation_first_text">
-						<xsl:choose>
-							<xsl:when test="contains($mixed-citation_first_text_, ',')"><xsl:value-of select="normalize-space(substring-before($mixed-citation_first_text_,','))"/></xsl:when>
-							<xsl:otherwise><xsl:value-of select="$mixed-citation_first_text_"/></xsl:otherwise>
-						</xsl:choose>
-					</xsl:variable>
-					
-					<!-- check if mixed-citatiot contains standard like reference,
-					Example: GHTF/SG1/N055:2009 -->
-					
-					<!-- if first text in mixed-citation ends ends with :year OR
-					starts with ISO|IEC... and count of digits more 2 -->
-					<xsl:if test="java:org.metanorma.utils.RegExHelper.matches('.*\d+:\d{4}$', $mixed-citation_first_text) = 'true' or 
-						(java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, $mixed-citation_first_text) = 'true' and 
-							java:org.metanorma.utils.RegExHelper.matches('.*\d{2,}.*', $mixed-citation_first_text) = 'true'
-						)">
-						<xsl:value-of select="$mixed-citation_first_text"/>
-					</xsl:if>
+					<xsl:choose>
+						<xsl:when test="$organization != 'IEEE'">
+							<xsl:variable name="mixed-citation_first_text_" select="normalize-space(translate((mixed-citation//text()[normalize-space()!=''])[1], '&#xA0;&#x2011;', ' -'))"/>
+							<xsl:variable name="mixed-citation_first_text">
+								<xsl:choose>
+									<xsl:when test="contains($mixed-citation_first_text_, ',')"><xsl:value-of select="normalize-space(substring-before($mixed-citation_first_text_,','))"/></xsl:when>
+									<xsl:otherwise><xsl:value-of select="$mixed-citation_first_text_"/></xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
+							
+							<!-- check if mixed-citatiot contains standard like reference,
+							Example: GHTF/SG1/N055:2009 -->
+							
+							<!-- if first text in mixed-citation ends ends with :year OR
+							starts with ISO|IEC... and count of digits more 2 -->
+							<xsl:if test="java:org.metanorma.utils.RegExHelper.matches('.*\d+:\d{4}$', $mixed-citation_first_text) = 'true' or 
+								(java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, $mixed-citation_first_text) = 'true' and 
+									java:org.metanorma.utils.RegExHelper.matches('.*\d{2,}.*', $mixed-citation_first_text) = 'true'
+								)">
+								<xsl:value-of select="$mixed-citation_first_text"/>
+							</xsl:if>
+						</xsl:when>
+						<xsl:otherwise> <!-- IEEE -->
+							<xsl:apply-templates select="mixed-citation" mode="IEEE"/>
+						</xsl:otherwise>
+					</xsl:choose>
 				</xsl:if>
 			</xsl:variable>
 			<xsl:variable name="referenceText" select="normalize-space($referenceText_)"/>
@@ -957,7 +963,7 @@
 			<xsl:variable name="content-type">
 				<xsl:choose>
 					<xsl:when test="(not(@content-type) or @content-type = 'standard') and
-							$referenceText != '' and java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, $referenceText) = 'false'">standard_other</xsl:when>
+							$referenceText != '' and java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, $referenceText) = 'false' and $organization != 'IEEE'">standard_other</xsl:when>
 					<xsl:when test="@content-type"><xsl:value-of select="@content-type"/></xsl:when>
 					<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, $referenceText) = 'true'">standard</xsl:when>
 				</xsl:choose>
