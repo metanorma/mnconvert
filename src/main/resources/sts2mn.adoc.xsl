@@ -3111,6 +3111,7 @@
 	</xsl:template>
 	
 	<xsl:template match="mixed-citation">
+		<xsl:if test="$organization = 'IEEE'"><xsl:text>, </xsl:text></xsl:if>
 		<xsl:if test="preceding-sibling::node()">
 			<xsl:text> </xsl:text>
 		</xsl:if>
@@ -3125,12 +3126,21 @@
 			</xsl:for-each>
 		</xsl:if>
 	</xsl:template>
-		
-	<xsl:template match="mixed-citation"> <!-- [not(@publication-type='standard')] -->
-		<xsl:if test="$organization = 'IEEE'"><xsl:text>, </xsl:text></xsl:if>
-		<xsl:apply-templates/>
+	
+	<xsl:template match="mixed-citation[std and not(ancestor::ref) and not(ancestor::list[@list-content = 'normative-references'])][following-sibling::*[1][self::xref[@ref-type = 'bibr']]]">
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEEE'">
+				<!-- link will be added in the following xref -->
+				<!-- <xsl:text>&lt;&lt;</xsl:text>
+				<xsl:value-of select="following-sibling::*[1][self::xref[@ref-type = 'bibr']]/@rid"/>
+				<xsl:text>&gt;&gt;</xsl:text> -->
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:apply-templates/>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
-		
+	
 	<!-- =============== -->
 	<!-- Definitions list (dl) -->
 	<!-- =============== -->
