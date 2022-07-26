@@ -122,7 +122,7 @@ public class sts2mnTests {
         assertTrue(Files.exists(fileout));
     }
 
-    /*@Test
+    @Test
     public void successConvertToRelativeAdocOutputSpecified() throws ParseException {
         assumeNotNull(XMLFILE_MN);
         String user_dir = System.getProperty("user.dir");
@@ -138,7 +138,7 @@ public class sts2mnTests {
         mnconvert.main(args);
         System.setProperty("user.dir", user_dir); // we should restore value for another tests
         assertTrue(Files.exists(fileout));
-    } */
+    }
     
     @Test
     public void successConvertToXML() throws ParseException {
