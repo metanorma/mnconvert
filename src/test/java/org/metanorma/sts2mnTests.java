@@ -5,6 +5,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import org.apache.commons.cli.ParseException;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -132,6 +133,7 @@ public class sts2mnTests {
 
         String[] args = new String[]{"--output-format", "adoc", "--output", filename,
                 Paths.get(System.getProperty("buildDirectory"), "..", XMLFILE_MN).normalize().toString()};
+        System.out.println("Args:" + Arrays.toString(args));
         mnconvert.main(args);
         System.setProperty("user.dir", user_dir); // we should restore value for another tests
         
