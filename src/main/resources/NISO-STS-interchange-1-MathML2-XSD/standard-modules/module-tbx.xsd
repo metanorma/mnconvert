@@ -1,0 +1,494 @@
+<?xml-stylesheet href="xsd.xsl" type="text/xsl"?>
+<xsd:schema xmlns:mtl="http://www.mulberrytech.com/taglib"
+            xmlns:c="http://www.w3.org/ns/xproc-step"
+            xmlns:tbx="urn:iso:std:iso:30042:ed-1"
+            xmlns:mml="http://www.w3.org/1998/Math/MathML"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="urn:iso:std:iso:30042:ed-1"><!--* Allow references to unqualified names *-->
+   <xsd:import/>
+   <xsd:import namespace="http://www.w3.org/1998/Math/MathML"/>
+   <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+   <!--* Some imports may need to be added manually *-->
+   <xsd:element name="crossReference">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Cross Reference</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType mixed="true">
+         <xsd:group ref="simpleText-model" minOccurs="0" maxOccurs="unbounded"/>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute name="script" use="optional" type="xsd:string"/>
+         <xsd:attribute name="target" use="optional" type="xsd:IDREF"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+         <xsd:attribute ref="xml:lang" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="definition">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Definition</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType mixed="true">
+         <xsd:group ref="basicText-model" minOccurs="0" maxOccurs="unbounded"/>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute name="script" use="optional" type="xsd:string"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="entailedTerm">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Entailed Term</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType mixed="true">
+         <xsd:group ref="simpleText-model" minOccurs="0" maxOccurs="unbounded"/>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute name="script" use="optional" type="xsd:string"/>
+         <xsd:attribute name="target" use="optional" type="xsd:IDREF"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+         <xsd:attribute ref="xml:lang" use="optional"/>
+         <xsd:attribute name="xtarget" use="optional" type="xsd:string"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="example">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Example</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType mixed="true">
+         <xsd:group ref="basicText-model" minOccurs="0" maxOccurs="unbounded"/>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute name="script" use="optional" type="xsd:string"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="externalCrossReference">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>External Cross Reference</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType mixed="true">
+         <xsd:group ref="simpleText-model" minOccurs="0" maxOccurs="unbounded"/>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute name="script" use="optional" type="xsd:string"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+         <xsd:attribute ref="xml:lang" use="optional"/>
+         <xsd:attribute name="xtarget" use="required" type="xsd:string"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="geographicalUsage">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Geographical Usage</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType mixed="true">
+         <xsd:choice minOccurs="0" maxOccurs="unbounded"/>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute name="script" use="optional" type="xsd:string"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+         <xsd:attribute ref="xml:lang" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="grammaticalGender">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Grammatical Gender</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute name="value" use="required">
+            <xsd:simpleType>
+               <xsd:annotation>
+                  <xsd:documentation/>
+               </xsd:annotation>
+               <xsd:restriction base="xsd:NMTOKEN">
+                  <xsd:enumeration value="feminine"/>
+                  <xsd:enumeration value="masculine"/>
+                  <xsd:enumeration value="neuter"/>
+               </xsd:restriction>
+            </xsd:simpleType>
+         </xsd:attribute>
+         <xsd:attribute ref="xml:base" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="grammaticalNumber">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Grammatical Number</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute name="value" use="required">
+            <xsd:simpleType>
+               <xsd:annotation>
+                  <xsd:documentation/>
+               </xsd:annotation>
+               <xsd:restriction base="xsd:NMTOKEN">
+                  <xsd:enumeration value="plural"/>
+                  <xsd:enumeration value="singular"/>
+               </xsd:restriction>
+            </xsd:simpleType>
+         </xsd:attribute>
+         <xsd:attribute ref="xml:base" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="langSet">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Language Set</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType>
+         <xsd:sequence>
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+               <xsd:group ref="TBX.crossReference"/>
+               <xsd:group ref="TBX.definition"/>
+               <xsd:group ref="TBX.example"/>
+               <xsd:group ref="TBX.externalCrossReference"/>
+               <xsd:group ref="TBX.note"/>
+               <xsd:group ref="TBX.see"/>
+               <xsd:group ref="TBX.source"/>
+               <xsd:group ref="TBX.subjectField"/>
+               <xsd:group ref="TBX.xGraphic"/>
+               <xsd:group ref="TBX.xMathML"/>
+               <xsd:group ref="TBX.xSource"/>
+            </xsd:choice>
+            <xsd:choice maxOccurs="unbounded">
+               <xsd:group ref="TBX.tig"/>
+            </xsd:choice>
+         </xsd:sequence>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute name="script" use="optional" type="xsd:string"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+         <xsd:attribute ref="xml:lang" use="required"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="normativeAuthorization">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Normative Authorization</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute name="value" use="required">
+            <xsd:simpleType>
+               <xsd:annotation>
+                  <xsd:documentation/>
+               </xsd:annotation>
+               <xsd:restriction base="xsd:NMTOKEN">
+                  <xsd:enumeration value="admittedTerm"/>
+                  <xsd:enumeration value="deprecatedTerm"/>
+                  <xsd:enumeration value="preferredTerm"/>
+               </xsd:restriction>
+            </xsd:simpleType>
+         </xsd:attribute>
+         <xsd:attribute ref="xml:base" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="note">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Note</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType mixed="true">
+         <xsd:group ref="basicText-model" minOccurs="0" maxOccurs="unbounded"/>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute name="script" use="optional" type="xsd:string"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+         <xsd:attribute ref="xml:lang" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="partOfSpeech">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Part of Speech</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute name="value" use="required">
+            <xsd:simpleType>
+               <xsd:annotation>
+                  <xsd:documentation/>
+               </xsd:annotation>
+               <xsd:restriction base="xsd:NMTOKEN">
+                  <xsd:enumeration value="adj"/>
+                  <xsd:enumeration value="adv"/>
+                  <xsd:enumeration value="noun"/>
+                  <xsd:enumeration value="verb"/>
+               </xsd:restriction>
+            </xsd:simpleType>
+         </xsd:attribute>
+         <xsd:attribute ref="xml:base" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="pronunciation">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Pronunciation</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType mixed="true">
+         <xsd:group ref="simpleText-model" minOccurs="0" maxOccurs="unbounded"/>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="see">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>See</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType mixed="true">
+         <xsd:group ref="simpleText-model" minOccurs="0" maxOccurs="unbounded"/>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute name="script" use="optional" type="xsd:string"/>
+         <xsd:attribute name="target" use="optional" type="xsd:IDREF"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+         <xsd:attribute ref="xml:lang" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="source">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Source</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType mixed="true">
+         <xsd:group ref="simpleText-model" minOccurs="0" maxOccurs="unbounded"/>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute name="script" use="optional" type="xsd:string"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+         <xsd:attribute ref="xml:lang" use="optional"/>
+         <xsd:attribute name="xtarget" use="optional" type="xsd:string"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="subjectField">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Subject Field</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType mixed="true">
+         <xsd:choice minOccurs="0" maxOccurs="unbounded"/>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute name="script" use="optional" type="xsd:string"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+         <xsd:attribute ref="xml:lang" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="term">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Term</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType mixed="true">
+         <xsd:group ref="simpleText-model" minOccurs="0" maxOccurs="unbounded"/>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute name="script" use="optional" type="xsd:string"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="termEntry">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Term Entry (Concept Entry)</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType>
+         <xsd:sequence>
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+               <xsd:group ref="TBX.externalCrossReference"/>
+               <xsd:group ref="TBX.xGraphic"/>
+               <xsd:group ref="TBX.xMathML"/>
+               <xsd:group ref="TBX.xSource"/>
+               <xsd:group ref="niso-sts-termEntry-additions.class"/>
+            </xsd:choice>
+            <xsd:choice maxOccurs="unbounded">
+               <xsd:group ref="TBX.langSet"/>
+            </xsd:choice>
+         </xsd:sequence>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="termType">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Term Type</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute name="value" use="required">
+            <xsd:simpleType>
+               <xsd:annotation>
+                  <xsd:documentation/>
+               </xsd:annotation>
+               <xsd:restriction base="xsd:NMTOKEN">
+                  <xsd:enumeration value="abbreviation"/>
+                  <xsd:enumeration value="acronym"/>
+                  <xsd:enumeration value="equation"/>
+                  <xsd:enumeration value="formula"/>
+                  <xsd:enumeration value="fullForm"/>
+                  <xsd:enumeration value="symbol"/>
+                  <xsd:enumeration value="variant"/>
+               </xsd:restriction>
+            </xsd:simpleType>
+         </xsd:attribute>
+         <xsd:attribute ref="xml:base" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="tig">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Tig (Term Information Group)</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType>
+         <xsd:sequence>
+            <xsd:group ref="TBX.term"/>
+            <xsd:choice minOccurs="0">
+               <xsd:group ref="TBX.partOfSpeech"/>
+            </xsd:choice>
+            <xsd:choice minOccurs="0">
+               <xsd:group ref="TBX.geographicalUsage"/>
+            </xsd:choice>
+            <xsd:choice minOccurs="0">
+               <xsd:group ref="TBX.grammaticalGender"/>
+            </xsd:choice>
+            <xsd:choice minOccurs="0">
+               <xsd:group ref="TBX.grammaticalNumber"/>
+            </xsd:choice>
+            <xsd:choice minOccurs="0">
+               <xsd:group ref="TBX.normativeAuthorization"/>
+            </xsd:choice>
+            <xsd:choice minOccurs="0">
+               <xsd:group ref="TBX.pronunciation"/>
+            </xsd:choice>
+            <xsd:choice minOccurs="0">
+               <xsd:group ref="TBX.termType"/>
+            </xsd:choice>
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+               <xsd:group ref="TBX.usageNote"/>
+            </xsd:choice>
+         </xsd:sequence>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="usageNote">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>Usage Note</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType mixed="true">
+         <xsd:group ref="basicText-model" minOccurs="0" maxOccurs="unbounded"/>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute name="script" use="optional" type="xsd:string"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="xGraphic">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>External Graphic</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType mixed="true">
+         <xsd:choice minOccurs="0" maxOccurs="unbounded"/>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+         <xsd:attribute name="xtarget" use="required" type="xsd:string"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="xMathML">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>External Mathml</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType mixed="true">
+         <xsd:choice minOccurs="0" maxOccurs="unbounded"/>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+         <xsd:attribute name="xtarget" use="required" type="xsd:string"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="xSource">
+      <xsd:annotation>
+         <xsd:documentation>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <h3>External Source</h3>
+            </div>
+         </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexType mixed="true">
+         <xsd:choice minOccurs="0" maxOccurs="unbounded"/>
+         <xsd:attribute name="id" use="optional" type="xsd:ID"/>
+         <xsd:attribute ref="xml:base" use="optional"/>
+         <xsd:attribute name="xtarget" use="required" type="xsd:string"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:annotation/>
+</xsd:schema>
+

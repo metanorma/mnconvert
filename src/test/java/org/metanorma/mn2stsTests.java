@@ -169,6 +169,52 @@ public class mn2stsTests {
     }
     
     @Test
+    public void successConvertAndCheckXSDMathML2() throws ParseException, Exception {
+        assumeNotNull(XMLFILE_MN);
+        System.out.println(name.getMethodName());
+        Path xmlout = Paths.get(System.getProperty("buildDirectory"), "out.xml");
+
+        String[] args = new String[]{XMLFILE_MN, "--output", xmlout.toAbsolutePath().toString(),"--mathml","2"};
+        mnconvert.main(args);
+
+        assertTrue(Files.exists(xmlout));
+        String capturedLog = getTestCapturedLog();
+        //assertTrue(systemOutRule.getLog().contains("is valid"));
+        assertTrue(capturedLog.contains("is valid") && capturedLog.contains("NISO-STS-interchange-1-mathml2.xsd"));
+    }
+    
+    @Test
+    public void successConvertAndCheckXSDExtendedMathML2() throws ParseException, Exception {
+        assumeNotNull(XMLFILE_MN);
+        System.out.println(name.getMethodName());
+        Path xmlout = Paths.get(System.getProperty("buildDirectory"), "out.xml");
+
+        String[] args = new String[]{XMLFILE_MN, "--output", xmlout.toAbsolutePath().toString(),"--tagset", "extended", "--mathml", "2"};
+        mnconvert.main(args);
+
+        assertTrue(Files.exists(xmlout));
+        String capturedLog = getTestCapturedLog();
+        //assertTrue(systemOutRule.getLog().contains("is valid"));
+        assertTrue(capturedLog.contains("is valid") && capturedLog.contains("NISO-STS-extended-1-mathml2.xsd"));
+    }
+    
+    @Test
+    public void successConvertAndCheckDTDExtendedMathML2() throws ParseException, Exception {
+        assumeNotNull(XMLFILE_MN);
+        System.out.println(name.getMethodName());
+        Path xmlout = Paths.get(System.getProperty("buildDirectory"), "out.xml");
+
+        String[] args = new String[]{XMLFILE_MN, "--output", xmlout.toAbsolutePath().toString(),"--check-type", "dtd-niso", "--tagset", "extended", "--mathml", "2"};
+        mnconvert.main(args);
+
+        assertTrue(Files.exists(xmlout));
+        String capturedLog = getTestCapturedLog();
+        //assertTrue(systemOutRule.getLog().contains("is valid"));
+        assertTrue(capturedLog.contains("is valid") && capturedLog.contains("NISO-STS-extended-1-mathml2.dtd"));
+    }
+    
+    
+    @Test
     public void regexHelperText() {
         System.out.println(name.getMethodName());
         String res = RegExHelper.matches("^.*:\\d{4}\\D.*$", "PD 6079-4:2006 (Book)");

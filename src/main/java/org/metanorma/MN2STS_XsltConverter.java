@@ -36,8 +36,11 @@ public class MN2STS_XsltConverter extends XsltConverter {
 
     
     private String checkType = "xsd_niso";
-    private CheckAgainstEnum checkTypeEnumValue = CheckAgainstEnum.XSD_NISO; 
-    
+    private CheckAgainstEnum checkTypeEnumValue = CheckAgainstEnum.XSD_NISO_INTERCHANGE_MATHML3; 
+    private String tagset = "interchange"; // default
+    private String mathmlVersion = "3"; // default
+    private String filepathDTDorXSD ="";
+            
     private OutputFormatEnum outputFormatEnumValue = OutputFormatEnum.NISO;
 
     
@@ -51,6 +54,27 @@ public class MN2STS_XsltConverter extends XsltConverter {
         }
     }
 
+    public void setTagset(String tagset) {
+        if (tagset != null) {
+            this.tagset = tagset;
+        }
+    }
+    
+    public String getMathmlVersion() {
+        return "mathml" + mathmlVersion;
+    }
+    
+    public void setMathmlVersion(String mathmlVersion) {
+        if (mathmlVersion != null) {
+            this.mathmlVersion = mathmlVersion;
+        }
+    }
+    
+    public void setFilepathDTDorXSD(String filepathDTDorXSD) {
+        if (filepathDTDorXSD != null) {
+            this.filepathDTDorXSD = filepathDTDorXSD;
+        }
+    }
     
     private void setDefaultOutputFilePath() {
         if (outputFilePath.isEmpty()) {
@@ -59,6 +83,14 @@ public class MN2STS_XsltConverter extends XsltConverter {
             
             outputFilePath = outputFilePathWithoutExtension + "sts." + outputFormat + ".xml";
         }
+    }
+    
+    private String getCtype(){
+        String ctype = checkType.replace("-", "_");
+        if (!checkType.equals("dtd-iso")) {
+            ctype = ctype + "_" + tagset + "_" + getMathmlVersion();
+        }
+        return ctype.toUpperCase();
     }
     
     @Override
@@ -79,7 +111,8 @@ public class MN2STS_XsltConverter extends XsltConverter {
             }
             
             
-            String ctype = checkType.replace("-", "_").toUpperCase();
+            String ctype = getCtype();
+            
             if (CheckAgainstEnum.valueOf(ctype) != null) {
                 checkTypeEnumValue = CheckAgainstEnum.valueOf(ctype);
             } else {
@@ -100,13 +133,19 @@ public class MN2STS_XsltConverter extends XsltConverter {
             if (fileXSL != null) {
                 logger.info(String.format(INPUT_LOG, XSL_INPUT, fileXSL));
             }
-            logger.info(String.format(OUTPUT_LOG_MN2STS, XML_OUTPUT, outputFilePath, outputFormat.toUpperCase()));
+            logger.info(String.format(OUTPUT_LOG_MN2STS_IEEE, XML_OUTPUT, outputFilePath, outputFormat.toUpperCase(), (!outputFormat.toUpperCase().equals("IEEE") ? "STS" : "" )));
             logger.info("");
             
             convertmn2sts();
             
             // check agains XSD NISO, DTD NISO or DTD ISO
             STSValidator validator = new STSValidator(outputFilePath, checkType);
+            if (!filepathDTDorXSD.isEmpty()) {
+                validator.setFilepathDTDorXSD(filepathDTDorXSD);
+            } else {
+                validator.setTagset(tagset);
+                validator.setMathmlVersion(mathmlVersion);
+            }
             validator.setIdRefChecking(isIdRefChecking);
             if (!validator.check()) {
                 return false;

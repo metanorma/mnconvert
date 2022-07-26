@@ -2,5 +2,5 @@ package org.metanorma;
 
 
 public enum OutputFormatEnum {
-   NISO, ISO
+   NISO, ISO, IEEE
 }

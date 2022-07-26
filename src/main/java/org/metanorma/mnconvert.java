@@ -27,6 +27,8 @@ public class mnconvert {
     
     static final String CMD_STSCheckOnly = "java -jar " + APP_NAME + ".jar <input_xml_file> [--check-type type...]";
     
+    static final String CMD_STSCheckOnlyExternal = "java -jar " + APP_NAME + ".jar <input_xml_file> [--validation-against <path to DTD/XSD>]";
+    
     static final String CMD_STSorRFCtoMN = "java -jar " + APP_NAME + ".jar <input_xml_file> [options]";
     
     static final String CMD_DOCXtoMN = "java -jar " + APP_NAME + ".jar <input_docx_file> [options]";
@@ -53,14 +55,50 @@ public class mnconvert {
                     .build());
             addOption(Option.builder("ct")
                     .longOpt("check-type")
-                    .desc("Check against XSD NISO (value xsd-niso), DTD ISO (dtd-iso), DTD NISO (dtd-niso) (Default: xsd-niso)")
+                    .desc("Check against XSD NISO (value 'xsd-niso', default), DTD ISO (value 'dtd-iso'), DTD NISO (value 'dtd-niso')")
                     .hasArg()
                     .argName("xsd-niso|dtd-iso|dtd-niso")
                     .required(true)
                     .build());
+            addOption(Option.builder("ts")
+                    .longOpt("tagset")
+                    .desc("use Interchange (value 'interchange', default) or Extended (value 'extended') NISO STS Tag Set in NISO DTD/XSD validation")
+                    .hasArg()
+                    .argName("interchange|extended")
+                    .required(false)
+                    .build());
+            addOption(Option.builder("m")
+                    .longOpt("mathml")
+                    .desc("use MathML version 2 (value '2') or 3 (value '3', default) in NISO DTD/XSD validation")
+                    .hasArg()
+                    .argName("2|3")
+                    .required(false)
+                    .build());
             addOption(Option.builder("idref")
                     .longOpt("idrefchecking")
                     .desc("Enable checking of ID/IDREF constraints (for XSD NISO only)")
+                    .required(false)
+                    .build());
+        }
+    };
+    
+    // Mode 1.1 (External)
+    static final Options optionsSTSCheckOnlyExternal = new Options() {
+        {
+            addOption(Option.builder("v")
+                    .longOpt("version")
+                    .desc("display application version")
+                    .required(false)
+                    .build());
+            addOption(Option.builder("va")
+                    .longOpt("validation-against")
+                    .desc("Path to DTD/XSD")
+                    .hasArg()
+                    .required(true)
+                    .build());
+            addOption(Option.builder("idref")
+                    .longOpt("idrefchecking")
+                    .desc("Enable checking of ID/IDREF constraints (for XSD only)")
                     .required(false)
                     .build());
         }
@@ -91,16 +129,9 @@ public class mnconvert {
                     .build());
             addOption(Option.builder("of")
                     .longOpt("output-format")
-                    .desc("output format: xml|adoc(default) for Metanorma output, iso|niso(default) for STS output")
+                    .desc("output format: xml|adoc(default) for Metanorma output, iso|niso(default) for STS output, or ieee for IEEE format output")
                     .hasArg()
-                    .argName("xml|adoc|iso|niso")
-                    .required(false)
-                    .build());
-            addOption(Option.builder("t")
-                    .longOpt("check-type")
-                    .desc("For STS output only: check against XSD NISO (value 'xsd-niso', default), DTD ISO (value 'dtd-iso'), DTD NISO (value 'dtd-niso')")
-                    .hasArg()
-                    .argName("xsd-niso|dtd-iso|dtd-niso")
+                    .argName("xml|adoc|iso|niso|ieee")
                     .required(false)
                     .build());
             addOption(Option.builder("sb")
@@ -127,9 +158,29 @@ public class mnconvert {
                     .build());
             addOption(Option.builder("ct")
                     .longOpt("check-type")
-                    .desc("Check against XSD NISO (value xsd-niso), DTD ISO (dtd-iso), DTD NISO (dtd-niso) (Default: xsd-niso)")
+                    .desc("For STS output only: check against XSD NISO (value 'xsd-niso', default), DTD ISO (value 'dtd-iso'), DTD NISO (value 'dtd-niso')")
                     .hasArg()
                     .argName("xsd-niso|dtd-iso|dtd-niso")
+                    .required(false)
+                    .build());
+            addOption(Option.builder("ts")
+                    .longOpt("tagset")
+                    .desc("For STS NISO output only: use Interchange (value 'interchange', default) or Extended (value 'extended') NISO STS Tag Set in DTD/XSD validation")
+                    .hasArg()
+                    .argName("interchange|extended")
+                    .required(false)
+                    .build());
+            addOption(Option.builder("m")
+                    .longOpt("mathml")
+                    .desc("For STS NISO output only: use MathML version 2 (value '2') or 3 (value '3', default) in DTD/XSD validation")
+                    .hasArg()
+                    .argName("2|3")
+                    .required(false)
+                    .build());
+            addOption(Option.builder("va")
+                    .longOpt("validation-against")
+                    .desc("Path to DTD/XSD")
+                    .hasArg()
                     .required(false)
                     .build());
             addOption(Option.builder("idref")
@@ -210,8 +261,40 @@ public class mnconvert {
                 String argXmlIn = arglist.get(0);
                 
                 STSValidator validator = new STSValidator(argXmlIn, cmdSTSCheckOnly.getOptionValue("check-type"));
+                validator.setTagset(cmdSTSCheckOnly.getOptionValue("tagset"));
+                validator.setMathmlVersion(cmdSTSCheckOnly.getOptionValue("mathml"));
                 validator.setDebugMode(cmdSTSCheckOnly.hasOption("debug"));
                 validator.setIdRefChecking(cmdSTSCheckOnly.hasOption("idrefchecking"));
+                
+                if (!validator.check()) {
+                    System.exit(ERROR_EXIT_CODE);
+                }
+                
+                cmdFail = false;
+            } catch (ParseException exp) {
+                cmdFail = true;
+            }
+        }
+        
+         if(cmdFail) {
+            try {
+                CommandLine cmdSTSCheckOnlyExternal = parser.parse(optionsSTSCheckOnlyExternal, args);
+                System.out.print(APP_NAME + " ");
+                printVersion(cmdSTSCheckOnlyExternal.hasOption("version"));
+                System.out.println("\n");
+                
+                List<String> arglist = cmdSTSCheckOnlyExternal.getArgList();
+                if (arglist.isEmpty() || arglist.get(0).trim().length() == 0) {
+                    throw new ParseException("");
+                }
+
+                String argXmlIn = arglist.get(0);
+                
+                STSValidator validator = new STSValidator(argXmlIn);
+                validator.setFilepathDTDorXSD(cmdSTSCheckOnlyExternal.getOptionValue("validation-against"));
+                
+                validator.setDebugMode(cmdSTSCheckOnlyExternal.hasOption("debug"));
+                validator.setIdRefChecking(cmdSTSCheckOnlyExternal.hasOption("idrefchecking"));
                 
                 if (!validator.check()) {
                     System.exit(ERROR_EXIT_CODE);
@@ -279,6 +362,9 @@ public class mnconvert {
                         {
                             MN2STS_XsltConverter mn2sts = new MN2STS_XsltConverter();
                             mn2sts.setCheckType(cmdMain.getOptionValue("check-type"));
+                            mn2sts.setTagset(cmdMain.getOptionValue("tagset"));
+                            mn2sts.setMathmlVersion(cmdMain.getOptionValue("mathml"));
+                            mn2sts.setFilepathDTDorXSD(cmdMain.getOptionValue("validation-against"));
                             defaultOutputFormat = "niso";
                             converter = mn2sts;
                             break;
@@ -331,6 +417,8 @@ public class mnconvert {
         PrintWriter pw = new PrintWriter(stringWriter);
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp(pw, 80, CMD_STSCheckOnly, "", optionsSTSCheckOnly, 0, 0, "");
+        pw.write("\nOR\n\n");
+        formatter.printHelp(pw, 80, CMD_STSCheckOnlyExternal, "", optionsSTSCheckOnlyExternal, 0, 0, "");
         pw.write("\nOR\n\n");
         formatter.printHelp(pw, 80, CMD_STSorRFCtoMN, "", optionsMain, 0, 0, "");
         pw.write("\nOR\n\n");
