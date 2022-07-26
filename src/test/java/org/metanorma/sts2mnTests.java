@@ -1,19 +1,16 @@
 package org.metanorma;
 
-import org.metanorma.mnconvert;
 import org.metanorma.utils.LoggerHelper;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.cli.ParseException;
-
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNotNull;
-
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemOutRule;
@@ -137,7 +134,21 @@ public class sts2mnTests {
                 Paths.get(System.getProperty("buildDirectory"), "..", XMLFILE_MN).normalize().toString()};
         mnconvert.main(args);
         System.setProperty("user.dir", user_dir); // we should restore value for another tests
+        
+        final File folder = new File(System.getProperty("buildDirectory"));
+        listFilesForFolder(folder);
+        
         assertTrue(Files.exists(fileout));
+    }
+    
+    private void listFilesForFolder(final File folder) {
+        for (final File fileEntry : folder.listFiles()) {
+            if (fileEntry.isDirectory()) {
+                listFilesForFolder(fileEntry);
+            } else {
+                System.out.println(fileEntry.getName());
+            }
+        }
     }
     
     @Test
