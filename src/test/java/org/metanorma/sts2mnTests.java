@@ -128,31 +128,16 @@ public class sts2mnTests {
 
         String filename = "custom_relative.adoc";
         System.out.println(name.getMethodName());
-        Path fileout = Paths.get(System.getProperty("buildDirectory"), "custom_relative.adoc");
-        System.out.println("fileout=" + fileout.toAbsolutePath().toString());
-        System.out.println("buildDirectory=" + System.getProperty("buildDirectory"));
+        //Path fileout = Paths.get(System.getProperty("buildDirectory"), "custom_relative.adoc");
+        Path fileout = Paths.get(new File(filename).getAbsolutePath());
         fileout.toFile().delete();
 
         String[] args = new String[]{"--output-format", "adoc", "--output", filename,
                 Paths.get(System.getProperty("buildDirectory"), "..", XMLFILE_MN).normalize().toString()};
-        System.out.println("Args:" + Arrays.toString(args));
         mnconvert.main(args);
         System.setProperty("user.dir", user_dir); // we should restore value for another tests
         
-        final File folder = new File(System.getProperty("buildDirectory"));
-        listFilesForFolder(folder);
-        
         assertTrue(Files.exists(fileout));
-    }
-    
-    private void listFilesForFolder(final File folder) {
-        for (final File fileEntry : folder.listFiles()) {
-            if (fileEntry.isDirectory()) {
-                listFilesForFolder(fileEntry);
-            } else {
-                System.out.println(fileEntry.getName());
-            }
-        }
     }
     
     @Test

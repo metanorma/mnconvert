@@ -390,7 +390,6 @@ public class mnconvert {
                 converter.setOutputFormat(cmdMain.getOptionValue("output-format", defaultOutputFormat));
                 converter.setInputXslPath(cmdMain.getOptionValue("xsl-file"));
                 converter.setOutputFilePath(cmdMain.getOptionValue("output"));
-                System.out.println("Outpath:" + new File(cmdMain.getOptionValue("output")).getAbsolutePath());
                 converter.setDebugMode(cmdMain.hasOption("debug"));
                 converter.setIdRefChecking(cmdMain.hasOption("idrefchecking"));
                 
