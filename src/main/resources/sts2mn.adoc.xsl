@@ -1886,7 +1886,8 @@
 		<xsl:apply-templates />
 	</xsl:template>
 	
-	<xsl:template match="std-def-list-item/term">
+	<!-- term -->
+	<xsl:template match="std-def-list-item[x]/term">
 		<xsl:variable name="level">
 			<xsl:for-each select="ancestor::std-def-list-item[1]">
 				<xsl:call-template name="getLevel"/>
@@ -1908,10 +1909,24 @@
 	
 	<xsl:template match="std-def-list-item/x[normalize-space() = ':']"/>
 	
-	<xsl:template match="std-def-list-item/def">
+	<xsl:template match="std-def-list-item[x]/def">
 		<xsl:apply-templates />	
 	</xsl:template>
 	
+	<!-- definition list item -->
+	<xsl:template match="std-def-list-item[not(x)]/term">
+		<xsl:apply-templates />
+		<xsl:text>:: </xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="std-def-list-item[not(x)]/def">
+		<xsl:apply-templates />
+		<xsl:text>&#xa;&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="std-def-list-item[not(x)]/def/p" priority="2">
+		<xsl:apply-templates />
+	</xsl:template>
 	
 	<!-- ======================== -->
 	<!-- END Terms and definitions -->
