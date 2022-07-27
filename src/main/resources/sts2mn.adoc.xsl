@@ -1755,6 +1755,16 @@
 	
 	<xsl:template match="front/sec[participants-sec]"/> <!-- skip -->
 	
+	<xsl:template match="front/sec[title = 'Notice to users']" priority="2">
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEEE'"><!-- skip --></xsl:when>
+			<xsl:otherwise>
+				<xsl:apply-templates />
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+		
+	
 	<xsl:template match="front/ack">
 		<xsl:call-template name="setId"/>
 		<xsl:text>[.preface,heading=acknowledgements]</xsl:text>
@@ -1884,7 +1894,7 @@
 		</xsl:variable>
 		<xsl:value-of select="$level"/><xsl:text> </xsl:text>
 		<xsl:variable name="term"><xsl:apply-templates /></xsl:variable>
-		<xsl:variable name="regex_term_preferred">^(.*)\((.+)\)$</xsl:variable>
+		<xsl:variable name="regex_term_preferred">^([^\(]*)\((.+)\)$</xsl:variable>
 		<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($term),$regex_term_preferred,'$1'))"/>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
@@ -2373,6 +2383,11 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<xsl:template match="editing-instruction">
+		<xsl:text>EDITOR: </xsl:text>
+		<xsl:apply-templates/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
 	
 	<!-- empty 
 		<std>
