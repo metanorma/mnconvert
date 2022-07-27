@@ -833,6 +833,13 @@
 		<!-- :semantic-metadata-collab: -->
 		<!-- :semantic-metadata-collab-type-accredited-by: -->
 		<xsl:apply-templates select="contrib-group[.//collab-alternatives]"/>
+		
+		<!-- :semantic-metadata-funding-source-institution:
+			:semantic-metadata-funding-source-institution-id:
+			:semantic-metadata-award-group-id:
+			:semantic-metadata-funding-statement
+		-->
+		<xsl:apply-templates select="funding-group"/>
 
 		<!-- :working-group: -->
 		<xsl:apply-templates select="(../sec/participants-sec/p[contains(text(), ' Working Group ')])[1]"/>
@@ -1679,6 +1686,31 @@
 	<xsl:template match="contrib-group/contrib/@emeritus[. = 'yes']">
 		<xsl:text>*</xsl:text>
 	</xsl:template>
+	
+	<xsl:template match="funding-group/award-group/funding-source/institution-wrap/institution">
+		<xsl:text>:semantic-metadata-funding-source-institution: </xsl:text>
+		<xsl:apply-templates/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="funding-group/award-group/funding-source/institution-wrap/institution-id">
+		<xsl:text>:semantic-metadata-funding-source-institution-id: </xsl:text>
+		<xsl:apply-templates/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="funding-group/award-group/award-id">
+		<xsl:text>:semantic-metadata-award-group-id: </xsl:text>
+		<xsl:apply-templates/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="funding-group/funding-statement">
+		<xsl:text>:semantic-metadata-funding-statement: </xsl:text>
+		<xsl:apply-templates/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
 	<!-- =========== -->
 	<!-- end bibdata (standard/front) -->
 	<!-- =========== -->
