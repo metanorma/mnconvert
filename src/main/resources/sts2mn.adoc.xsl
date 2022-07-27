@@ -698,6 +698,9 @@
 		<!-- :keywords: -->
 		<xsl:apply-templates select="kwd-group"/>
 		
+		<!-- :semantic-metadata-std-id-doi: -->
+		<xsl:apply-templates select="std-id"/>
+		
 		<!-- ==================== -->
 		<!-- std-xref processing  -->
 		<!-- ==================== -->
@@ -981,8 +984,20 @@
 			</xsl:choose>
 		</xsl:variable>
 		<xsl:if test="normalize-space($date) != ''">
-			<xsl:text>:published-date: </xsl:text><xsl:value-of select="$date"/>
-			<xsl:text>&#xa;</xsl:text>
+			<xsl:choose>
+				<xsl:when test="$organization = 'IEEE'">
+					<xsl:choose>
+						<xsl:when test="@date-type = 'published'"><xsl:text>:published-date: </xsl:text></xsl:when>
+						<xsl:otherwise><xsl:text>:date: </xsl:text><xsl:value-of select="@date-type"/><xsl:text> </xsl:text></xsl:otherwise>
+					</xsl:choose>
+					<xsl:value-of select="$date"/>
+					<xsl:text>&#xa;</xsl:text>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:text>:published-date: </xsl:text><xsl:value-of select="$date"/>
+					<xsl:text>&#xa;</xsl:text>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:if>
 	</xsl:template>
 	
@@ -1374,7 +1389,8 @@
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>	
 	
-	<xsl:variable name="regex_ieee_number">^.*?(\d+)-(\d+)$</xsl:variable>
+	<!-- <xsl:variable name="regex_ieee_number">^.*?(\d+)-(\d+)$</xsl:variable> -->
+	<xsl:variable name="regex_ieee_number">^IEEE Std (.*)-(\d+)$</xsl:variable>
 	<xsl:template match="std-designation[@content-type = 'full']" mode="docnumber">
 		<xsl:text>:docnumber: </xsl:text><xsl:value-of select="java:replaceAll(java:java.lang.String.new(.), $regex_ieee_number, '$1')"/>
 		<xsl:text>&#xa;</xsl:text>
@@ -1457,7 +1473,15 @@
 	<xsl:template match="approval/approval-date">
 		<xsl:variable name="date" select="normalize-space(@iso-8601-date)"/>
 		<xsl:if test="$date != ''">
-			<xsl:text>:issued-date: </xsl:text><xsl:value-of select="$date"/>
+			<xsl:choose>
+				<xsl:when test="@date-type = 'approved'">
+					<xsl:text>:issued-date: </xsl:text>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:text>:date: </xsl:text><xsl:value-of select="@date-type"/><xsl:text> </xsl:text>
+				</xsl:otherwise>
+			</xsl:choose>
+			<xsl:value-of select="$date"/>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 	</xsl:template>
@@ -1490,7 +1514,15 @@
 	</xsl:template>
 	
 	<xsl:template match="kwd-group">
-		<xsl:text>:keywords: </xsl:text><xsl:apply-templates/>
+		<xsl:choose>
+			<xsl:when test="$organization != 'IEEE' or @kwd-group-type = 'AuthorFree'">
+				<xsl:text>:keywords: </xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text>:semantic-metadata-keywords-</xsl:text><xsl:value-of select="@kwd-group-type"/><xsl:text>: </xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
+		<xsl:apply-templates/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
@@ -1499,6 +1531,11 @@
 		<xsl:if test="following-sibling::*"><xsl:text>, </xsl:text></xsl:if>
 	</xsl:template>
 	
+	<xsl:template match="std-meta/std-id[@std-id-type]">
+		<xsl:text>:semantic-metadata-std-id-</xsl:text><xsl:value-of select="@std-id-type"/><xsl:text>: </xsl:text>
+		<xsl:apply-templates/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
 	
 	<xsl:template match="contrib-group[.//collab-alternatives]" priority="2">
 		<xsl:apply-templates mode="collab-alternatives"/>
