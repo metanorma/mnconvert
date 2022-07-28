@@ -493,6 +493,19 @@
 		</reference>
 		<xsl:if test="$isHidden = 'true'">
 			<xsl:variable name="referenceText">
+				<!-- <xsl:choose>
+					<xsl:when test="source"> -->
+						<!-- get elements before source -->
+						<!-- <xsl:for-each select="source/preceding-sibling::node()">
+							<xsl:if test="not(position() = last() and normalize-space() = ',')">
+								<xsl:value-of select="."/>
+							</xsl:if>
+						</xsl:for-each>
+					</xsl:when>
+					<xsl:otherwise>
+						
+					</xsl:otherwise>
+				</xsl:choose> -->
 				<!-- <xsl:apply-templates select="std-organization"/>
 				<xsl:text> </xsl:text>
 				<xsl:apply-templates select="pub-id"/> -->

@@ -3226,12 +3226,12 @@
 	</xsl:template>
 		
 	<xsl:template match="mixed-citation" mode="IEEE">
-		<xsl:if test="@publication-type = 'standard'">
+		<!-- <xsl:if test="@publication-type = 'standard'"> -->
 			<xsl:for-each select="std/std-organization | std/pub-id">
 				<xsl:apply-templates />
 				<xsl:if test="position() != last()"><xsl:text> </xsl:text></xsl:if>
 			</xsl:for-each>
-		</xsl:if>
+		<!-- </xsl:if> -->
 	</xsl:template>
 	
 	<xsl:template match="mixed-citation[std and not(ancestor::ref) and not(ancestor::list[@list-content = 'normative-references'])][following-sibling::*[1][self::xref[@ref-type = 'bibr']]]">
