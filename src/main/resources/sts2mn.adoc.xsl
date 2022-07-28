@@ -3155,6 +3155,9 @@
 		<xsl:apply-templates />
 	</xsl:template>
 	
+	<!-- command in 'sup' after/before xref <sup><xref ref-type="fn" rid="fn3">3</xref>, <xref ref-type="fn" rid="fn4">4</xref>, <xref ref-type="fn" rid="fn5">5</xref></sup> -->
+	<xsl:template match="sup[xref[@ref-type='fn' or @ref-type='table-fn']]/text()[normalize-space() = ',']"/>
+	
 	<xsl:template match="fn-group"/><!-- fn from fn-group  moved to after the text -->
 	
 	<!-- Multi-paragraph footnote -->
@@ -3165,6 +3168,9 @@
 	</xsl:template>
 	
 	<xsl:template match="fn" name="fn">
+		<xsl:if test="preceding-sibling::node()[normalize-space() != ''][1][self::fn]">
+			<xsl:text>,</xsl:text>
+		</xsl:if>
 		<xsl:text> footnote:[</xsl:text>
 			<xsl:apply-templates />
 		<xsl:text>]</xsl:text>
