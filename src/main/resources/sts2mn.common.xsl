@@ -480,16 +480,23 @@
 	<!-- IEEE sts model processing -->
 	<!-- ================= -->
 	<xsl:template name="build_ieee_model_std">
-		<xsl:variable name="id_prefix">
-			<xsl:if test="parent::mixed-citation and not(parent::mixed-citation/following-sibling::*[1][self::xref[@ref-type = 'bibr']])">hidden_</xsl:if>
+		<xsl:variable name="isHidden">
+			<xsl:if test="parent::mixed-citation and not(parent::mixed-citation/following-sibling::*[1][self::xref[@ref-type = 'bibr']])">true</xsl:if>
 		</xsl:variable>
 		<xsl:variable name="id" select="translate(pub-id,' ','_')"/>
-		<reference><xsl:value-of select="$id_prefix"/><xsl:value-of select="$id"/></reference>
-		<xsl:if test="$id_prefix != ''">
+		<reference>
+			<xsl:if test="$isHidden = 'true'">	
+				<xsl:attribute name="isHidden">true</xsl:attribute>
+				<xsl:text>hidden_</xsl:text>
+			</xsl:if>
+			<xsl:value-of select="$id"/>
+		</reference>
+		<xsl:if test="$isHidden = 'true'">
 			<xsl:variable name="referenceText">
-				<xsl:apply-templates select="std-organization"/>
+				<!-- <xsl:apply-templates select="std-organization"/>
 				<xsl:text> </xsl:text>
-				<xsl:apply-templates select="pub-id"/>
+				<xsl:apply-templates select="pub-id"/> -->
+				<xsl:apply-templates />
 			</xsl:variable>
 			<referenceText><xsl:value-of select="$referenceText"/></referenceText>
 		</xsl:if>
@@ -1011,7 +1018,13 @@
 					<xsl:when test="normalize-space($preceding_title) != ''">
 						<xsl:value-of select="java:replaceAll(java:java.lang.String.new($preceding_title),'_{2,}','_')"/>_<xsl:number/>
 					</xsl:when>
-					<xsl:otherwise>bibliography_<xsl:number/></xsl:otherwise>
+					<xsl:otherwise>
+						<xsl:text>bibliography_</xsl:text>
+						<xsl:choose>
+							<xsl:when test="parent::list-item"><xsl:number count="list-item"/></xsl:when>
+							<xsl:otherwise><xsl:number/></xsl:otherwise> <!-- ref -->
+						</xsl:choose>
+					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:attribute>
 			

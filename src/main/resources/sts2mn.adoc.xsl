@@ -2541,7 +2541,8 @@
 							($refs_referenceText != '' and not($refs_referenceText = $referenceText)) or
 							java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText)) = 'false' or
 							((contains($referenceText, 'series') or contains($referenceText, 'parts')) and not($model_std/locality)) or
-							$ref_by_id/@label_number">
+							$ref_by_id/@label_number or 
+							$model_std/reference/@isHidden = 'true'">
 							 
 							 <!-- java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($referenceText)) = 'false' or -->
 							 
@@ -4625,7 +4626,7 @@
 	<xsl:template match="disp-quote/related-object"/>
 		
 	<xsl:template match="code | preformat">
-		<xsl:if test="preceding-sibling::node()[1][self::text()]">
+		<xsl:if test="preceding-sibling::node()[1][self::text()] or not(preceding-sibling::p)">
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</xsl:if>
 		<xsl:text>[source</xsl:text>
