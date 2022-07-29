@@ -1690,11 +1690,40 @@
 			
 			<xsl:apply-templates select="abstract" mode="front_ieee"/>
 			
-			
 			<xsl:apply-templates select="../misc-container/semantic-metadata/*[starts-with(local-name(), 'keywords-')]"/>
 			<xsl:apply-templates select="keyword[1]">
 				<xsl:with-param name="process">true</xsl:with-param>
 			</xsl:apply-templates>
+			
+			<!-- funding-group -->
+			<xsl:variable name="funding-group_">
+				<xsl:apply-templates select="../misc-container/semantic-metadata/funding-source-institution |
+									../misc-container/semantic-metadata/funding-source-institution-id |
+									../misc-container/semantic-metadata/award-group-id |
+									../misc-container/semantic-metadata/funding-statement"/>
+			</xsl:variable>
+			<xsl:variable name="funding-group" select="xalan:nodeset($funding-group_)"/>
+			<xsl:if test="$funding-group/*">
+				<funding-group>
+					<xsl:if test="$funding-group/institution or
+									$funding-group/institution-id or
+									$funding-group/award-id">
+						<award-group>
+							<xsl:if test="$funding-group/institution or
+									$funding-group/institution-id">
+								<funding-source>
+									<institution-wrap>
+										<xsl:copy-of select="$funding-group/institution"/>
+										<xsl:copy-of select="$funding-group/institution-id"/>
+									</institution-wrap>
+								</funding-source>
+							</xsl:if>
+							<xsl:copy-of select="$funding-group/award-id"/>
+						</award-group>
+					</xsl:if>
+					<xsl:copy-of select="$funding-group/funding-statement"/>
+				</funding-group>
+			</xsl:if>
 			
 			<counts>
 				<fig-count count="{count(//figure)}"/>
@@ -1764,6 +1793,23 @@
 	</xsl:template>
 	<xsl:template match="semantic-metadata/collab-type-accredited-by">
 		<collab collab-type="accredited-by"><xsl:value-of select="."/></collab>
+	</xsl:template>
+	
+	<xsl:template match="semantic-metadata/funding-source-institution">
+		<institution><xsl:value-of select="."/></institution>
+	</xsl:template>
+	<xsl:template match="semantic-metadata/funding-source-institution-id">
+		<institution-id institution-id-type="fundref">
+			<xsl:value-of select="."/>
+		</institution-id>
+	</xsl:template>
+	<xsl:template match="semantic-metadata/award-group-id">
+		<award-id>
+			<xsl:value-of select="."/>
+		</award-id>
+	</xsl:template>
+	<xsl:template match="semantic-metadata/funding-statement">
+		<xsl:copy-of select="."/>
 	</xsl:template>
 	
 	<xsl:template match="feedback-statement/clause/p" mode="front_ieee_publisher">
