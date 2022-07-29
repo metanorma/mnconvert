@@ -574,21 +574,37 @@
 		
 		<xsl:apply-templates select="permissions/copyright-holder/@copyright-owner[. != 'IEEE']"/>
 		
-		<!-- :published-date: -->
-		<xsl:apply-templates select="pub-date"/>
 		
-		<!-- :issued-date: -->
-		<xsl:apply-templates select="approval/approval-date"/>
+		<xsl:variable name="dates_model_">
+			<!-- :published-date: -->
+			<xsl:apply-templates select="pub-date"/>
+			<!-- :issued-date: -->
+			<xsl:apply-templates select="approval/approval-date"/>
+			<!-- :date: reaffirm -->
+			<xsl:apply-templates select="reaffirm-date"/>
+			<!-- :date: release 2020-01-01 -->
+			<xsl:apply-templates select="release-date"/>
+		</xsl:variable>
+		<xsl:variable name="dates_model" select="xalan:nodeset($dates_model_)"/>
+		<xsl:for-each select="$dates_model/*[not(self::date)]">
+			<xsl:text>:</xsl:text><xsl:value-of select="local-name()"/><xsl:text>: </xsl:text><xsl:value-of select="."/>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:for-each>
+		<!--  arbitrary date(s) -->
+		<xsl:for-each select="$dates_model/date">
+			<xsl:text>:date</xsl:text>
+			<xsl:if test="position() &gt; 1">_<xsl:value-of select="position()"/></xsl:if>
+			<xsl:text>: </xsl:text>
+			<xsl:value-of select="@type"/>
+			<xsl:text> </xsl:text>
+			<xsl:value-of select="."/>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:for-each>
 		
-		<!-- :date: reaffirm -->
-		<xsl:apply-templates select="reaffirm-date"/>
 		
 		<!-- :updates: -->
 		<!-- :semantic-metadata-related-article-edition: -->
 		<xsl:apply-templates select="std-title-group/alt-title/related-article"/>
-		
-		<!-- :date: release 2020-01-01 -->
-		<xsl:apply-templates select="release-date"/>
 		
 		<!-- :uri: www.... -->
 		<xsl:apply-templates select="self-uri"/>
@@ -994,15 +1010,22 @@
 			<xsl:choose>
 				<xsl:when test="$organization = 'IEEE'">
 					<xsl:choose>
-						<xsl:when test="@date-type = 'published'"><xsl:text>:published-date: </xsl:text></xsl:when>
-						<xsl:otherwise><xsl:text>:date: </xsl:text><xsl:value-of select="@date-type"/><xsl:text> </xsl:text></xsl:otherwise>
+						<xsl:when test="@date-type = 'published'">
+							<!-- <xsl:text>:published-date: </xsl:text> -->
+							<published-date><xsl:value-of select="$date"/></published-date>
+						</xsl:when>
+						<xsl:otherwise>
+							<!-- <xsl:text>:date: </xsl:text><xsl:value-of select="@date-type"/><xsl:text> </xsl:text> -->
+							<date type="{@date-type}"><xsl:value-of select="$date"/></date>
+						</xsl:otherwise>
 					</xsl:choose>
-					<xsl:value-of select="$date"/>
-					<xsl:text>&#xa;</xsl:text>
+					<!-- <xsl:value-of select="$date"/>
+					<xsl:text>&#xa;</xsl:text> -->
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:text>:published-date: </xsl:text><xsl:value-of select="$date"/>
-					<xsl:text>&#xa;</xsl:text>
+					<!-- <xsl:text>:published-date: </xsl:text><xsl:value-of select="$date"/>
+					<xsl:text>&#xa;</xsl:text> -->
+					<published-date><xsl:value-of select="$date"/></published-date>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:if>
@@ -1010,8 +1033,9 @@
 	
 	<xsl:template match="release-date[ancestor::front or ancestor::adoption-front]">
 		<xsl:if test="normalize-space() != ''">
-			<xsl:text>:date: release </xsl:text><xsl:value-of select="."/>
-			<xsl:text>&#xa;</xsl:text>
+			<!-- <xsl:text>:date: release </xsl:text><xsl:value-of select="."/>
+			<xsl:text>&#xa;</xsl:text> -->
+			<date type="release"><xsl:value-of select="."/></date>
 		</xsl:if>
 	</xsl:template>
 	
@@ -1482,22 +1506,25 @@
 		<xsl:if test="$date != ''">
 			<xsl:choose>
 				<xsl:when test="@date-type = 'approved'">
-					<xsl:text>:issued-date: </xsl:text>
+					<!-- <xsl:text>:issued-date: </xsl:text> -->
+					<issued-date><xsl:value-of select="$date"/></issued-date>
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:text>:date: </xsl:text><xsl:value-of select="@date-type"/><xsl:text> </xsl:text>
+					<!-- <xsl:text>:date: </xsl:text><xsl:value-of select="@date-type"/><xsl:text> </xsl:text> -->
+					<date type="{@date-type}"><xsl:value-of select="$date"/></date>
 				</xsl:otherwise>
 			</xsl:choose>
-			<xsl:value-of select="$date"/>
-			<xsl:text>&#xa;</xsl:text>
+			<!-- <xsl:value-of select="$date"/>
+			<xsl:text>&#xa;</xsl:text> -->
 		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="reaffirm-date">
 		<xsl:variable name="date" select="normalize-space(@iso-8601-date)"/>
 		<xsl:if test="$date != ''">
-			<xsl:text>:date: reaffirm </xsl:text><xsl:value-of select="$date"/>
-			<xsl:text>&#xa;</xsl:text>
+			<!-- <xsl:text>:date: reaffirm </xsl:text><xsl:value-of select="$date"/>
+			<xsl:text>&#xa;</xsl:text> -->
+			<date type="reaffirm"><xsl:value-of select="$date"/></date>
 		</xsl:if>
 	</xsl:template>
 	
