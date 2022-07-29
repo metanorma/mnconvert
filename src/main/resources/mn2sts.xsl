@@ -1581,6 +1581,8 @@
 			<xsl:variable name="number" select="docidentifier[@type = 'IEEE'][not(@scope)]"/>
 			<xsl:variable name="year" select="substring(normalize-space(date[@type = 'issued']),1,4)"/> <!-- approval date -->
 			
+			<std-id std-id-type="doi"><xsl:value-of select="../misc-container/semantic-metadata/std-id-doi"/></std-id>
+			
 			<std-designation content-type="full"><xsl:value-of select="concat($std_prefix,$number,'-',$year)"/></std-designation> <!-- Example: IEEE Std 1127-2013 -->
 			<std-designation content-type="full-tm"><xsl:value-of select="concat($std_prefix,$number,$trademark,'-',$year)"/></std-designation> <!-- Example: IEEE Std 1127&#x2122;-2013 -->
 			<std-designation content-type="std-num"><xsl:value-of select="concat($number,'-',$year)"/></std-designation> <!-- Example: 1127-2013 -->
@@ -1659,7 +1661,7 @@
 						<xsl:apply-templates select="ext/editorialgroup/society" mode="front_ieee"/>
 					</xsl:variable>
 					<xsl:variable name="items" select="xalan:nodeset($items_)"/>
-					<xsl:for-each select="$items/*">
+					<xsl:for-each select="$items/*[normalize-space() != '']">
 						<xsl:copy-of select="."/>
 						<xsl:if test="position() != last()">
 							<xsl:text> of the </xsl:text>
@@ -1688,6 +1690,8 @@
 			
 			<xsl:apply-templates select="abstract" mode="front_ieee"/>
 			
+			
+			<xsl:apply-templates select="../misc-container/semantic-metadata/*[starts-with(local-name(), 'keywords-')]"/>
 			<xsl:apply-templates select="keyword[1]">
 				<xsl:with-param name="process">true</xsl:with-param>
 			</xsl:apply-templates>
@@ -1831,7 +1835,7 @@
 			</xsl:choose>
 		</xsl:variable>
 		<xsl:variable name="year" select="substring($date,1,4)"/>
-		<day><xsl:value-of select="$day"/></day>
+		<day><xsl:value-of select="number($day)"/></day> <!-- remove 0 at start -->
 		<month><xsl:value-of select="$monthStr"/></month>
 		<year><xsl:value-of select="$year"/></year>
 	</xsl:template>
@@ -1888,6 +1892,18 @@
 			<xsl:attribute name="complex-abstract">no</xsl:attribute>
 			<xsl:apply-templates/>
 		</abstract>
+	</xsl:template>
+	
+	<xsl:template match="semantic-metadata/*[starts-with(local-name(), 'keywords-')]">
+		<xsl:variable name="current_name" select="local-name()"/>
+		<xsl:variable name="kwd_group" select="substring-after(local-name(), 'keywords-')"/>
+		<xsl:if test="not(../preceding-sibling::semantic-metadata[*[local-name() = $current_name]])"> <!-- for first in group -->
+			<kwd-group kwd-group-type="{java:toUpperCase(java:java.lang.String.new($kwd_group))}">
+				<xsl:for-each select=". | ../following-sibling::semantic-metadata[*[local-name() = $current_name]]">
+					<kwd><xsl:value-of select="."/></kwd>
+				</xsl:for-each>
+			</kwd-group>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="keyword">
