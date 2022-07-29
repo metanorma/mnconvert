@@ -3232,12 +3232,26 @@
 	</xsl:template>
 		
 	<xsl:template match="mixed-citation" mode="IEEE">
-		<!-- <xsl:if test="@publication-type = 'standard'"> -->
+		<!-- <xsl:if test="@publication-type = 'standard'">
 			<xsl:for-each select="std/std-organization | std/pub-id">
 				<xsl:apply-templates />
 				<xsl:if test="position() != last()"><xsl:text> </xsl:text></xsl:if>
 			</xsl:for-each>
-		<!-- </xsl:if> -->
+		</xsl:if> -->
+		<xsl:choose>
+			<xsl:when test="std/source">
+				<!-- get elements before source -->
+				<xsl:for-each select="std/source/preceding-sibling::node()">
+					<xsl:if test="not(position() = last() and normalize-space(translate(.,'&#x2122;',' ')) = ',')">
+						<xsl:value-of select="."/>
+						<!-- <xsl:apply-templates /> -->
+					</xsl:if>
+				</xsl:for-each>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="std"/>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="mixed-citation[std and not(ancestor::ref) and not(ancestor::list[@list-content = 'normative-references'])][following-sibling::*[1][self::xref[@ref-type = 'bibr']]]">
