@@ -427,6 +427,37 @@
 			
 			
 			<xsl:if test="$organization = 'IEEE'">
+				
+				<xsl:variable name="contrib-groups_">
+					<xsl:for-each select="std-meta/contrib-group">
+						<xsl:copy-of select="."/>
+					</xsl:for-each>
+				</xsl:variable>
+				<xsl:variable name="contrib-groups" select="xalan:nodeset($contrib-groups_)"/>
+				
+				<xsl:for-each select="sec[.//participants-sec]">
+					<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
+					<!-- Participants lists -->
+					<xsl:variable name="filename">
+						<!-- 00-participants.adoc  -->
+						<xsl:value-of select="$sectionsFolder"/><xsl:text>/00-participants</xsl:text><xsl:text>.</xsl:text><xsl:value-of select="$docfile_ext"/>
+					</xsl:variable>
+				
+					<redirect:write file="{$outpath}/{$filename}">
+						<!-- https://www.metanorma.org/author/ieee/topics/markup/#participants -->
+						<xsl:apply-templates select="." mode="participants">
+							<xsl:with-param name="contrib-groups" select="$contrib-groups"/>
+						</xsl:apply-templates>
+					</redirect:write>
+				
+					<redirect:write file="{$outpath}/{$docfile}">
+						<xsl:text>include::</xsl:text><xsl:value-of select="$filename"/><xsl:text>[]</xsl:text>
+						<xsl:text>&#xa;&#xa;</xsl:text>
+					</redirect:write>
+				
+				</xsl:for-each>
+				
+				
 				<xsl:for-each select="std-meta/abstract">
 					<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 					<xsl:variable name="section_name" select="local-name()"/>
@@ -857,14 +888,12 @@
 		-->
 		<xsl:apply-templates select="funding-group"/>
 
-		<!-- :working-group: -->
-		<xsl:apply-templates select="(../sec/participants-sec/p[contains(text(), ' Working Group ')])[1]"/>
-		<!-- :balloting-group: -->
-		<xsl:apply-templates select="(../sec/participants-sec/p[contains(text(), ' balloting group ')])[1]"/>
-		<!-- :wg-chair: :wg-vicechair:  :wg-members: etc. -->
-		<xsl:apply-templates select="contrib-group[not(.//collab-alternatives)]"/>
-		
 
+		<!-- :working-group: -->
+		<xsl:apply-templates select="(../sec/participants-sec/p[contains(text(), ' Working Group ') or contains(text(), ' subcommittee ')])[1]" mode="front_ieee"/>
+		<!-- :balloting-group: -->
+		<xsl:apply-templates select="(../sec/participants-sec/p[contains(text(), ' balloting group ') or contains(text(), ' individual balloting ')])[1]" mode="front_ieee"/>
+		
 	</xsl:template>
 	
 	<xsl:template match="std-title-group/std-main-title" mode="doctype">
@@ -1594,125 +1623,130 @@
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="sec/participants-sec/p[contains(., ' Working Group ')]">
+	<!-- https://www.metanorma.org/author/ieee/topics/markup/#participants -->
+	<xsl:template match="sec[.//participants-sec]" mode="participants">
+		<xsl:param name="contrib-groups"/>
+		<xsl:text>== Participants</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:apply-templates>
+			<xsl:with-param name="contrib-groups" select="$contrib-groups"/>
+		</xsl:apply-templates>
+	</xsl:template>
+	
+	<xsl:template match="sec[.//participants-sec]//*" priority="2">
+		<xsl:param name="contrib-groups"/>
+		<xsl:apply-templates>
+			<xsl:with-param name="contrib-groups" select="$contrib-groups"/>
+		</xsl:apply-templates>
+	</xsl:template>
+	
+	<xsl:template match="sec[.//participants-sec]/title" priority="3"/>
+	
+	<xsl:template match="sec/participants-sec[p[contains(., ' Working Group ')]]" priority="3">
+		<xsl:param name="contrib-groups"/>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>=== Working group</xsl:text>
+		<xsl:text>&#xa;&#xa;</xsl:text>
+		<xsl:apply-templates>
+			<xsl:with-param name="contrib-groups" select="$contrib-groups"/>
+		</xsl:apply-templates>
+	</xsl:template>
+	
+	<xsl:template match="sec/participants-sec[p[contains(., ' balloting group ') or contains(., ' balloting committee ')]]" priority="3">
+		<xsl:param name="contrib-groups"/>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>=== Balloting group</xsl:text>
+		<xsl:text>&#xa;&#xa;</xsl:text>
+		<xsl:apply-templates>
+			<xsl:with-param name="contrib-groups" select="$contrib-groups"/>
+		</xsl:apply-templates>
+	</xsl:template>
+	
+	<xsl:template match="sec/participants-sec[p[contains(., ' Standards Board ')]]" priority="3">
+		<xsl:param name="contrib-groups"/>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>=== Standards board</xsl:text>
+		<xsl:text>&#xa;&#xa;</xsl:text>
+		<xsl:apply-templates>
+			<xsl:with-param name="contrib-groups" select="$contrib-groups"/>
+		</xsl:apply-templates>
+	</xsl:template>
+	
+	
+	<xsl:template match="sec[.//participants-sec]//xref[@ref-type = 'contrib']" priority="3">
+		<xsl:param name="contrib-groups"/>
+		
+		<xsl:variable name="contrib-group" select="$contrib-groups//contrib[@id = current()/@rid]"/>
+		
+		<xsl:variable name="isMemberOnly" select="normalize-space(count($contrib-groups//contrib[@id = current()/@rid]/preceding-sibling::contrib[@contrib-type!='member']) = 0)"/>
+		
+		<!-- <xsl:text>&#xa;DEBUG:&#xa;</xsl:text><xsl:apply-templates select="$contrib-group" mode="print_as_xml"/><xsl:text>&#xa;</xsl:text> -->
+	
+		<xsl:choose>
+			<xsl:when test="$contrib-group/role and not($contrib-group/@emeritus='yes')">
+				<xsl:text>item::</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>name::: </xsl:text>
+				<xsl:for-each select="$contrib-group/name-alternatives/string-name/*">
+					<xsl:apply-templates/>
+					<xsl:if test="position() != last()"><xsl:text> </xsl:text></xsl:if>
+				</xsl:for-each>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>role::: </xsl:text>
+				<xsl:apply-templates select="$contrib-group/role"/>
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:when>
+			
+			<xsl:otherwise>
+				<xsl:choose>
+					<xsl:when test="$isMemberOnly = 'true'">
+						<xsl:text>* </xsl:text>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:text>item:: </xsl:text>
+					</xsl:otherwise>
+				</xsl:choose>
+			
+				<xsl:for-each select="$contrib-group/name-alternatives/string-name/*">
+					<xsl:apply-templates/>
+					<xsl:if test="position() != last()"><xsl:text> </xsl:text></xsl:if>
+				</xsl:for-each>
+				<xsl:if test="$contrib-group/@emeritus='yes'">*</xsl:if>
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
+		<xsl:if test="ancestor::list-item and not(ancestor::list-item/following-sibling::list-item)">
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="sec/participants-sec/p" priority="3"/>
+	
+	<xsl:template match="sec/participants-sec/p[contains(., ' Working Group ')]" mode="front_ieee">
 		<xsl:text>:working-group: </xsl:text>
 		<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(.),'^.* the (.+) Working Group .*$','$1'))"/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="sec/participants-sec/p[contains(., ' balloting group ')]">
+	<xsl:template match="sec/participants-sec/p[contains(., ' subcommittee ')]" mode="front_ieee">
+		<xsl:text>:working-group: </xsl:text>
+		<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(.),'^.* the (.+) subcommittee .*$','$1'))"/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="sec/participants-sec/p[contains(., ' balloting group ')]" mode="front_ieee">
 		<xsl:text>:balloting-group: </xsl:text>
 		<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(.),'^.* entity (.+) balloting group .*$','$1'))"/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="contrib-group[contains(@content-type, 'Working Group')]">
-		<xsl:apply-templates mode="working_group"/>
-	</xsl:template>
-	
-	<xsl:template match="contrib-group/contrib[@contrib-type = 'chair']" mode="working_group">
-		<xsl:text>:wg-chair: </xsl:text><xsl:apply-templates/>
+	<xsl:template match="sec/participants-sec/p[contains(., ' individual balloting ')]" mode="front_ieee">
+		<xsl:text>:balloting-group: </xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>:balloting-group-type: individual</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="contrib-group/contrib[@contrib-type = 'vice-chair']" mode="working_group">
-		<xsl:text>:wg-vicechair: </xsl:text><xsl:apply-templates/>
-		<xsl:text>&#xa;</xsl:text>
-	</xsl:template>
-	
-	
-	<xsl:template match="contrib-group[@content-type = '']">
-		<xsl:apply-templates mode="other_group"/>
-	</xsl:template>
-	
-	<!-- organizations -->
-	<xsl:template match="contrib-group/contrib[@contrib-type = 'member'][preceding-sibling::contrib[@contrib-type = 'chair' or @contrib-type = 'vice-chair']]" mode="working_group">
-		<!-- for first only -->
-		<xsl:if test="not(preceding-sibling::contrib[@contrib-type = 'member'])">
-			<xsl:text>:wg-members: </xsl:text>
-			<xsl:apply-templates />
-			<!-- process next -->
-			<xsl:for-each select="following-sibling::contrib">
-				<xsl:text>; </xsl:text>
-				<xsl:apply-templates />
-			</xsl:for-each>
-			<xsl:text>&#xa;</xsl:text>
-		</xsl:if>
-	</xsl:template>
-	
-	<!-- persons -->
-	<xsl:template match="contrib-group/contrib[@contrib-type = 'member'][not(preceding-sibling::contrib[@contrib-type = 'chair' or @contrib-type = 'vice-chair'])]" mode="working_group">
-		<!-- for first only -->
-		<xsl:if test="not(preceding-sibling::contrib[@contrib-type = 'member'])">
-			<xsl:text>:wg-members-persons: </xsl:text>
-			<xsl:apply-templates />
-			<!-- process next -->
-			<xsl:for-each select="following-sibling::contrib">
-				<xsl:text>; </xsl:text>
-				<xsl:apply-templates />
-			</xsl:for-each>
-			<xsl:text>&#xa;</xsl:text>
-		</xsl:if>
-	</xsl:template>
-	
-	<xsl:template match="contrib-group[not(contrib[@contrib-type = 'chair' or @contrib-type = 'vice-chair'])]/contrib" mode="other_group">
-		<xsl:if test="not(preceding-sibling::contrib[@contrib-type = 'member'])">
-			<xsl:text>:balloting-group-members: </xsl:text>
-			<xsl:apply-templates/>
-			<!-- process next -->
-			<xsl:for-each select="following-sibling::contrib">
-				<xsl:text>; </xsl:text>
-				<xsl:apply-templates />
-			</xsl:for-each>
-			<xsl:text>&#xa;</xsl:text>
-		</xsl:if>
-	</xsl:template>
-	
-	<xsl:template match="contrib-group[contrib[@contrib-type = 'chair' or @contrib-type = 'vice-chair']]/contrib[@contrib-type = 'chair']" mode="other_group" priority="2">
-		<xsl:text>:std-board-chair: </xsl:text><xsl:apply-templates/>
-		<xsl:text>&#xa;</xsl:text>
-	</xsl:template>
-	
-	<xsl:template match="contrib-group[contrib[@contrib-type = 'chair' or @contrib-type = 'vice-chair']]/contrib[@contrib-type = 'vice-chair']" mode="other_group" priority="2">
-		<xsl:text>:std-board-vicechair: </xsl:text><xsl:apply-templates/>
-		<xsl:text>&#xa;</xsl:text>
-	</xsl:template>
-	
-	<xsl:template match="contrib-group[contrib[@contrib-type = 'chair' or @contrib-type = 'vice-chair']]/contrib[@contrib-type = 'past-chair']" mode="other_group" priority="2">
-		<xsl:text>:std-board-pastchair: </xsl:text><xsl:apply-templates/>
-		<xsl:text>&#xa;</xsl:text>
-	</xsl:template>
-	
-	<xsl:template match="contrib-group[contrib[@contrib-type = 'chair' or @contrib-type = 'vice-chair']]/contrib[@contrib-type = 'secretary']" mode="other_group" priority="2">
-		<xsl:text>:std-board-secretary: </xsl:text><xsl:apply-templates/>
-		<xsl:text>&#xa;</xsl:text>
-	</xsl:template>
-	
-	<xsl:template match="contrib-group[contrib[@contrib-type = 'chair' or @contrib-type = 'vice-chair']]/contrib" mode="other_group">
-		<xsl:if test="not(preceding-sibling::contrib[@contrib-type = 'member'])">
-			<xsl:text>:std-board-members: </xsl:text><xsl:apply-templates/>
-			<!-- process next -->
-			<xsl:for-each select="following-sibling::contrib">
-				<xsl:text>; </xsl:text>
-				<xsl:apply-templates />
-			</xsl:for-each>
-			<xsl:text>&#xa;</xsl:text>
-		</xsl:if>
-	</xsl:template>
-	
-	<xsl:template match="contrib-group/contrib//given-names">
-		<xsl:apply-templates/><xsl:text> </xsl:text>
-	</xsl:template>
-	<xsl:template match="contrib-group/contrib/role"/>
-	
-	<xsl:template match="contrib-group/contrib/name-alternatives">
-		<xsl:apply-templates/>
-		<xsl:apply-templates select="ancestor::contrib[1]/@emeritus"/>
-	</xsl:template>
-	
-	<xsl:template match="contrib-group/contrib/@emeritus[. = 'yes']">
-		<xsl:text>*</xsl:text>
-	</xsl:template>
 	
 	<xsl:template match="funding-group/award-group/funding-source/institution-wrap/institution">
 		<xsl:text>:semantic-metadata-funding-source-institution: </xsl:text>
