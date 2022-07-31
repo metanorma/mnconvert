@@ -1641,9 +1641,11 @@
 				</contrib-group>
 			</xsl:if>
 			
-			<contrib-group>
-				<!-- To do -->
-			</contrib-group>
+			<!-- contrib-group -->
+			<xsl:apply-templates select="../boilerplate/legal-statement//clause[@id = 'boilerplate-participants' or title = 'Participants']/clause[
+					@id = 'boilerplate-participants-wg' or title = 'Working group' or
+					@id = 'boilerplate-participants-bg' or title = 'Balloting group' or
+					@id = 'boilerplate-participants-sb' or title = 'Standards board']" mode="contrib-group"/>
 			
 			<!-- <isbn publication-format="online" specific-use="ISBN-13"> -->
 			<xsl:apply-templates select="docidentifier[@type = 'ISBN' and @scope = 'PDF']" mode="front_ieee"/>
@@ -1984,6 +1986,69 @@
 			<xsl:apply-templates/>
 		</xsl:copy>
 	</xsl:template>
+	
+	<xsl:template match="legal-statement//clause" mode="contrib-group">
+		<!-- Source (metanorma xml) example: 
+			<ul id="_">
+				<li>
+					<dl id="_">
+						<dt>name</dt>
+						<dd>Firstname Lastname</dd>
+						<dt>role</dt>
+						<dd>Chair</dd>
+					</dl>
+				</li>
+				...
+		-->
+		<contrib-group content-type="">
+			<xsl:apply-templates select=".//dl" mode="contrib"/>
+		</contrib-group>
+	</xsl:template>
+	
+	<xsl:template match="dl" mode="contrib">
+		<!-- Destination IEEE xml example:
+			<contrib contrib-type="chair" id="contrib1">
+				<name-alternatives>
+					<string-name specific-use="display">
+						<given-names>Firstname</given-names>
+						<surname>Lastname</surname>
+					</string-name>
+				</name-alternatives>
+				<role>Chair</role>
+			</contrib>
+		-->
+		<xsl:variable name="contrib-type" select="dt[. = 'role']/following-sibling::dd[1]"/>
+		<xsl:variable name="num"><xsl:number count="dl[ancestor::clause[@id = 'boilerplate-participants' or title = 'Participants']]" level="any"/></xsl:variable>
+		<xsl:variable name="name_" select="normalize-space(dt[. = 'name']/following-sibling::dd[1])"/>
+		<xsl:variable name="name" select="translate($name_,'*','')"/>
+		<xsl:variable name="isEmeritus" select="normalize-space(java:endsWith(java:java.lang.String.new($name_),'*'))"/>
+		<contrib>
+			<xsl:attribute name="contrib-type">
+				<xsl:value-of select="java:toLowerCase(java:java.lang.String.new(normalize-space(translate($contrib-type,' ','-'))))"/>
+				<xsl:if test="$isEmeritus = 'true'">-emeritus</xsl:if>
+			</xsl:attribute>
+			<xsl:if test="$isEmeritus = 'true'">
+				<xsl:attribute name="emeritus">yes</xsl:attribute>
+			</xsl:if>
+			<xsl:attribute name="id">contrib<xsl:value-of select="$num"/></xsl:attribute>
+			
+			<name-alternatives>
+				<string-name specific-use="display">
+					
+					<xsl:variable name="name_regex">^(.*)(\s|\h)(.*)</xsl:variable>
+					<given-names><xsl:value-of select="java:replaceAll(java:java.lang.String.new($name),$name_regex,'$1')"/></given-names>
+					<surname><xsl:value-of select="java:replaceAll(java:java.lang.String.new($name),$name_regex,'$3')"/></surname>
+				</string-name>
+			</name-alternatives>
+			<xsl:if test="$contrib-type != 'member'">
+				<role><xsl:value-of select="$contrib-type"/></role>
+			</xsl:if>
+			<xsl:if test="$isEmeritus = 'true'">
+				<role>Member Emeritus</role>
+			</xsl:if>
+		</contrib>
+	</xsl:template>
+	
 	
 	<!-- [@id = 'boilerplate-participants'] -->
 	<xsl:template match="legal-statement/clause" mode="front_ieee_participants">
