@@ -1613,7 +1613,7 @@
 				<xsl:text>IEEE </xsl:text>
 				<xsl:value-of select="$doctype_str"/>
 				<xsl:text> for </xsl:text>
-				<xsl:apply-templates select="title/node()"/>
+				<xsl:apply-templates select="title[not(@type='provenance')]/node()"/>
 			</xsl:variable>
 			
 			<std-title-group>
