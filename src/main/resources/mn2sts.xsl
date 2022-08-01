@@ -2077,50 +2077,68 @@
 			<xsl:apply-templates mode="front_ieee_participants"/>
 		</sec>
 	</xsl:template>
-	<xsl:template match="legal-statement/clause/title" mode="front_ieee_participants">
+	<xsl:template match="legal-statement/clause/title" mode="front_ieee_participants" priority="2">
 		<xsl:copy>
 			<xsl:apply-templates/>
 		</xsl:copy>
 	</xsl:template>
 	<xsl:template match="legal-statement/clause/clause" mode="front_ieee_participants">
+		<xsl:apply-templates mode="front_ieee_participants"/>
+	</xsl:template>
+	<xsl:template match="legal-statement//clause/title" mode="front_ieee_participants"/>
+	
+	<xsl:template match="legal-statement/clause//p[not(@type)]" mode="front_ieee_participants" priority="2">
 		<participants-sec>
-			<xsl:apply-templates mode="front_ieee_participants"/>
+			<p>
+				<xsl:apply-templates mode="front_ieee_participants"/>
+			</p>
+			<xsl:apply-templates select="following::ul[preceding-sibling::p[1][@id = current()/@id]]" mode="front_ieee_participants">
+				<xsl:with-param name="process">true</xsl:with-param>
+			</xsl:apply-templates>
 		</participants-sec>
 	</xsl:template>
-	<xsl:template match="legal-statement//clause/p[not(@type)]" mode="front_ieee_participants">
+	
+	<!-- <xsl:template match="legal-statement//clause/p[not(@type)]" mode="front_ieee_participants">
 		<xsl:copy>
 			<xsl:apply-templates/>
 		</xsl:copy>
+	</xsl:template> -->
+	
+	<xsl:template match="legal-statement//clause/ul" mode="front_ieee_participants">
+		<xsl:param name="process">false</xsl:param>
+		<xsl:if test="$process = 'true'">
+			<xsl:if test="li[dl/dt[.='role']/following-sibling::dd[1][. != 'member' and not(contains(., 'Manager'))]]">
+				<officers>
+					<list list-type="simple">
+						<xsl:apply-templates select="li[dl/dt[.='role']/following-sibling::dd[1][. != 'member' and not(contains(., 'Manager'))]]" mode="front_ieee_participants"/>
+					</list>
+				</officers>
+			</xsl:if>
+			<xsl:if test="li[dl/dt[.='role']/following-sibling::dd[1][. = 'member' or contains(., 'Manager')]]">
+				<list list-type="simple">
+					<xsl:apply-templates select="li[dl/dt[.='role']/following-sibling::dd[1][. = 'member' or contains(., 'Manager')]]" mode="front_ieee_participants"/>
+				</list>
+			</xsl:if>
+		</xsl:if>
 	</xsl:template>
-	<xsl:template match="legal-statement//clause/p[@type]" mode="front_ieee_participants">
-		<!-- To do -->
-		<officers>
-			<list list-type="simple">
-				<list-item>
-					<p>
-						<xref ref-type="contrib" rid="contrib1"/>
-					</p>
-				</list-item>
-				<list-item>
-					<p>
-						<xref ref-type="contrib" rid="contrib2"/>
-					</p>
-				</list-item>
-			</list>
-		</officers>
-		<list list-type="simple">
-			<list-item>
-				<p>
-					<xref ref-type="contrib" rid="contrib3"/>
-				</p>
-			</list-item>
-			<list-item>
-				<p>
-					<xref ref-type="contrib" rid="contrib4"/>
-				</p>
-			</list-item>
-		</list>
+	
+	<xsl:template match="li" mode="front_ieee_participants">
+		<xsl:apply-templates mode="front_ieee_participants"/>
 	</xsl:template>
+	<xsl:template match="dl" mode="front_ieee_participants">
+		<xsl:variable name="num"><xsl:number count="dl[ancestor::clause[@id = 'boilerplate-participants' or title = 'Participants']]" level="any"/></xsl:variable>
+		<list-item>
+			<p>
+				<xref>
+					<xsl:attribute name="ref-type">contrib</xsl:attribute>
+					<xsl:attribute name="rid">contrib<xsl:value-of select="$num"/></xsl:attribute>
+				</xref>
+			</p>
+		</list-item>
+	</xsl:template>
+	
+	<xsl:template match="legal-statement//clause/p[@type]" mode="front_ieee_participants"/>
+	
 	<!-- ============= -->
 	<!-- End IEEE bibdata -->
 	<!-- ============= -->
