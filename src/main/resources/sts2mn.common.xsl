@@ -511,7 +511,7 @@
 				<xsl:apply-templates select="pub-id"/> -->
 				<xsl:apply-templates />
 			</xsl:variable>
-			<referenceText><xsl:value-of select="$referenceText"/></referenceText>
+			<referenceText><xsl:value-of select="normalize-space($referenceText)"/></referenceText>
 		</xsl:if>
 	</xsl:template>
 	<!-- ================= -->

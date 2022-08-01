@@ -70,11 +70,11 @@
 				<xsl:when test="parent::sections and self::clause and @type='intro'">0</xsl:when>
 				
 				<!-- Scope -->
-				<xsl:when test="parent::sections and self::clause and (@type='scope' or @type='overview')">1</xsl:when>
+				<xsl:when test="parent::sections and self::clause and (@type='scope' or @type='overview' or title = 'Overview')">1</xsl:when>
 				
 				<!-- Normative References -->
 				<xsl:when test="ancestor:: bibliography and self::references and @normative='true'">
-					<xsl:value-of select="count(ancestor::*[contains(local-name(), '-standard')]/sections/clause[@type='scope' or @type='overview']) + 1"/>
+					<xsl:value-of select="count(ancestor::*[contains(local-name(), '-standard')]/sections/clause[@type='scope' or @type='overview' or title = 'Overview']) + 1"/>
 				</xsl:when>
 				
 				<!-- Terms and definitions -->
@@ -857,7 +857,7 @@
 				<xsl:apply-templates select="sections/clause[@type='intro']"/> <!-- [0] -->
 			
 				<!-- Scope -->
-				<xsl:apply-templates select="sections/clause[@type='scope' or @type = 'overview']"/> <!-- [1] -->
+				<xsl:apply-templates select="sections/clause[@type='scope' or @type = 'overview' or title = 'Overview']"/> <!-- [1] -->
 				
 				<!-- Normative References -->
 				<xsl:apply-templates select="bibliography/references[@normative='true'] | bibliography/clause[references[@normative='true']]"/>
@@ -873,6 +873,7 @@
 																																																not(@type='intro') and
 																																																not(@type='scope') and
 																																																not(@type='overview') and
+																																																not(title = 'Overview') and
 																																																not(self::clause and .//terms) and
 																																																not(self::clause and .//definitions)]" />
 			</body>	
@@ -2892,11 +2893,24 @@
 	<xsl:template match="bibitem[starts-with(@id, 'hidden_bibitem_')] | bibitem[@hidden = 'true']" priority="3"/>
 	
 	<xsl:template match="bibitem[1][ancestor::references[@normative='true']]" priority="2">
-		<ref-list content-type="norm-refs">
-			<xsl:for-each select="../bibitem">
-				<xsl:call-template name="bibitem"/>
-			</xsl:for-each>
-		</ref-list>
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEEE'">
+				<list>
+					<xsl:attribute name="list-content">normative-references</xsl:attribute>
+					<xsl:attribute name="list-type">simple</xsl:attribute>
+					<xsl:for-each select="../bibitem">
+						<xsl:call-template name="bibitem_norm_ref_IEEE"/>
+					</xsl:for-each>
+				</list>
+			</xsl:when>
+			<xsl:otherwise>
+				<ref-list content-type="norm-refs">
+					<xsl:for-each select="../bibitem">
+						<xsl:call-template name="bibitem"/>
+					</xsl:for-each>
+				</ref-list>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	<xsl:template match="bibitem[position() &gt; 1][ancestor::references[@normative='true']]" priority="2"/>
 	
@@ -3016,7 +3030,33 @@
 			</xsl:choose>
 			
 		</ref>
-		
+
+	</xsl:template>
+	
+	<xsl:template name="bibitem_norm_ref_IEEE">
+		<list-item>
+			<p>
+				<xsl:choose>
+					<xsl:when test="@type = 'standard'">
+						<xsl:apply-templates/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:apply-templates select="formattedref" mode="IEEE"/>
+						<xsl:apply-templates select="formattedref/node()[self::fn or self::xref]"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</p>
+		</list-item>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/formattedref" mode="IEEE">
+		<mixed-citation publication-format="print">
+			<std>
+				<source>
+					<xsl:apply-templates select="node()[not(self::xref or self::fn or self::text()[preceding-sibling::*[1][self::fn]])]"/>
+				</source>
+			</std>
+		</mixed-citation>
 	</xsl:template>
 	
 	<xsl:template match="references/bibitem/*[self::docidentifier or self::docnumber or self::date or self::contributor or self::edition or self::language or self::script or self::copyright]" priority="2">
