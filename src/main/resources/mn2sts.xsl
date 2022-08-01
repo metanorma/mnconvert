@@ -1988,6 +1988,10 @@
 	</xsl:template>
 	
 	<xsl:template match="legal-statement//clause" mode="contrib-group">
+		<xsl:apply-templates select="p" mode="contrib-group"/>
+	</xsl:template>
+	
+	<xsl:template match="legal-statement//clause/p" mode="contrib-group">
 		<!-- Source (metanorma xml) example: 
 			<ul id="_">
 				<li>
@@ -2000,11 +2004,21 @@
 				</li>
 				...
 		-->
-		<xsl:variable name="content-type" select="normalize-space(java:replaceAll(java:java.lang.String.new(p[1]),'^.* the ((.+)( Working Group | subcommittee | balloting group | Standards Board )).*$','$1'))"/>
+		<xsl:variable name="content-type">
+			<xsl:choose>
+				<xsl:when test="contains(., ' liaisons') or contains(., ' Liaisons')">
+					<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(.),'^.* (IEEE(\s|\h|\-)SA Standards Board [l|L]iaisons).*$','$1'))"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(.),'^.* the ((.+)( Working Group | subcommittee | balloting group | Standards Board )).*$','$1'))"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
 		<contrib-group content-type="{$content-type}">
-			<xsl:apply-templates select=".//dl" mode="contrib"/>
+			<xsl:apply-templates select="following::ul[preceding-sibling::p[1][@id = current()/@id]]//dl" mode="contrib"/>
 		</contrib-group>
 	</xsl:template>
+	<xsl:template match="legal-statement//clause/p[@type='emeritus_sign']" mode="contrib-group"/>
 	
 	<xsl:template match="dl" mode="contrib">
 		<!-- Destination IEEE xml example:
@@ -2025,7 +2039,11 @@
 		<xsl:variable name="isEmeritus" select="normalize-space(java:endsWith(java:java.lang.String.new($name_),'*'))"/>
 		<contrib>
 			<xsl:attribute name="contrib-type">
-				<xsl:value-of select="java:toLowerCase(java:java.lang.String.new(normalize-space(translate($contrib-type,' ','-'))))"/>
+				<xsl:variable name="value" select="java:toLowerCase(java:java.lang.String.new(normalize-space(translate($contrib-type,' ','-'))))"/>
+				<xsl:choose>
+					<xsl:when test="contains($value,',')"><xsl:value-of select="substring-before($value,',')"/></xsl:when>
+					<xsl:otherwise><xsl:value-of select="$value"/></xsl:otherwise>
+				</xsl:choose>
 				<xsl:if test="$isEmeritus = 'true'">-emeritus</xsl:if>
 			</xsl:attribute>
 			<xsl:if test="$isEmeritus = 'true'">

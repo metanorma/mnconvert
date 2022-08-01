@@ -1642,36 +1642,45 @@
 	
 	<xsl:template match="sec[.//participants-sec]/title" priority="3"/>
 	
-	<xsl:template match="sec/participants-sec[p[contains(., ' Working Group ')]]" priority="3">
+	<xsl:template match="sec/participants-sec" priority="3">
+		<xsl:param name="contrib-groups"/>
+		<xsl:apply-templates>
+			<xsl:with-param name="contrib-groups" select="$contrib-groups"/>
+		</xsl:apply-templates>
+	</xsl:template>
+	
+	<xsl:template match="sec/participants-sec/p[contains(., ' Working Group ')]" priority="3">
 		<xsl:param name="contrib-groups"/>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>=== Working group</xsl:text>
 		<xsl:text>&#xa;&#xa;</xsl:text>
-		<xsl:apply-templates>
-			<xsl:with-param name="contrib-groups" select="$contrib-groups"/>
-		</xsl:apply-templates>
 	</xsl:template>
 	
-	<xsl:template match="sec/participants-sec[p[contains(., ' balloting group ') or contains(., ' balloting committee ')]]" priority="3">
+	<xsl:template match="sec/participants-sec/p[contains(., ' balloting group ') or contains(., ' balloting committee ')]" priority="3">
 		<xsl:param name="contrib-groups"/>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>=== Balloting group</xsl:text>
 		<xsl:text>&#xa;&#xa;</xsl:text>
-		<xsl:apply-templates>
-			<xsl:with-param name="contrib-groups" select="$contrib-groups"/>
-		</xsl:apply-templates>
 	</xsl:template>
 	
-	<xsl:template match="sec/participants-sec[p[contains(., ' Standards Board ')]]" priority="3">
+	<xsl:template match="sec/participants-sec/p[contains(., ' Standards Board ')]" priority="3">
 		<xsl:param name="contrib-groups"/>
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>=== Standards board</xsl:text>
-		<xsl:text>&#xa;&#xa;</xsl:text>
-		<xsl:apply-templates>
-			<xsl:with-param name="contrib-groups" select="$contrib-groups"/>
-		</xsl:apply-templates>
+		<xsl:choose>
+			<xsl:when test="not(../preceding-sibling::participants-sec/p[contains(normalize-space(.), ' Standards Board ')])">
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>=== Standards board</xsl:text>
+				<xsl:text>&#xa;&#xa;</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:apply-templates />
+				<xsl:text>&#xa;&#xa;</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
+	<!-- <xsl:template match="sec/participants-sec/p" priority="3">
+		<xsl:apply-templates/>
+	</xsl:template> -->
 	
 	<xsl:template match="sec[.//participants-sec]//xref[@ref-type = 'contrib']" priority="3">
 		<xsl:param name="contrib-groups"/>
@@ -1719,8 +1728,6 @@
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 	</xsl:template>
-	
-	<xsl:template match="sec/participants-sec/p" priority="3"/>
 	
 	<xsl:template match="sec/participants-sec/p[contains(., ' Working Group ')]" mode="front_ieee">
 		<xsl:text>:working-group: </xsl:text>
