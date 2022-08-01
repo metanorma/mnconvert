@@ -2000,7 +2000,8 @@
 				</li>
 				...
 		-->
-		<contrib-group content-type="">
+		<xsl:variable name="content-type" select="normalize-space(java:replaceAll(java:java.lang.String.new(p[1]),'^.* the ((.+)( Working Group | subcommittee | balloting group | Standards Board )).*$','$1'))"/>
+		<contrib-group content-type="{$content-type}">
 			<xsl:apply-templates select=".//dl" mode="contrib"/>
 		</contrib-group>
 	</xsl:template>
