@@ -4416,64 +4416,79 @@
 		<xsl:if test="not($element_xref)">
 			<xsl:message>WARNING: There is no ID/IDREF binding for IDREF '<xsl:value-of select="@target"/>'.</xsl:message>
 		</xsl:if>
-		<xref> <!-- ref-type="{$ref_type}" rid="{$id}" --> <!-- replaced by xsl:attribute name=... for save ordering -->
-			<xsl:attribute name="ref-type">
-				<xsl:value-of select="$ref_type"/>
-			</xsl:attribute>
-			<xsl:attribute name="rid">
-				<xsl:choose>
-					<xsl:when test="$parent_id != ''"><xsl:value-of select="$parent_id"/></xsl:when>
-					<xsl:when test="@bibitemid != ''"><xsl:value-of select="@bibitemid"/></xsl:when> <!-- from origin -->
-					<xsl:otherwise><xsl:value-of select="@target"/></xsl:otherwise>
-				</xsl:choose>
-			</xsl:attribute>
-				<!-- <xsl:choose>
-					<xsl:when test="normalize-space($id) = ''"><xsl:value-of select="@target"/></xsl:when>
-					<xsl:otherwise><xsl:value-of select="$id"/></xsl:otherwise>
-				</xsl:choose>
-      </xsl:attribute> -->
-			<xsl:choose>
-				<xsl:when test="$isSemanticXML = 'true'"> <!-- semantic xml -->
-					<xsl:variable name="text_">
-						<xsl:value-of select="$section_prefix"/>
+		
+		<xsl:choose>
+			<xsl:when test="starts-with(@target,'hidden_') and $organization = 'IEEE'">
+				<mixed-citation>
+					<std>
+						<xsl:variable name="pub-id"><xsl:apply-templates /></xsl:variable>
+						<xsl:variable name="regex_pub-id">^(\w*)(\s|\h)(.*)</xsl:variable>
+						<std-organization><xsl:value-of select="java:replaceAll(java:java.lang.String.new($pub-id),$regex_pub-id,'$1')"/></std-organization>
+						<pub-id pub-id-type="std-designation"><xsl:value-of select="java:replaceAll(java:java.lang.String.new($pub-id),$regex_pub-id,'$3')"/></pub-id>
+					</std>
+				</mixed-citation>
+			</xsl:when>
+			<xsl:otherwise>
+				<xref> <!-- ref-type="{$ref_type}" rid="{$id}" --> <!-- replaced by xsl:attribute name=... for save ordering -->
+					<xsl:attribute name="ref-type">
+						<xsl:value-of select="$ref_type"/>
+					</xsl:attribute>
+					<xsl:attribute name="rid">
 						<xsl:choose>
-							<xsl:when test="$section_bolded = 'true' and not(ancestor::td or ancestor::th)">
-								<bold><xsl:value-of select="translate($section, '&#xA0;', ' ')"/></bold>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:value-of select="translate($section, '&#xA0;', ' ')"/>
-							</xsl:otherwise>
+							<xsl:when test="$parent_id != ''"><xsl:value-of select="$parent_id"/></xsl:when>
+							<xsl:when test="@bibitemid != ''"><xsl:value-of select="@bibitemid"/></xsl:when> <!-- from origin -->
+							<xsl:otherwise><xsl:value-of select="@target"/></xsl:otherwise>
 						</xsl:choose>
-					</xsl:variable>
-					<xsl:variable name="text">
-						<xsl:copy-of select="$text_"/>
-						<xsl:if test="normalize-space($text_) = ''"><!-- in case of term -->
-							<xsl:value-of select="$elements//element[@id = current()/@target]/@section"/>
-						</xsl:if>
-					</xsl:variable>
+					</xsl:attribute>
+						<!-- <xsl:choose>
+							<xsl:when test="normalize-space($id) = ''"><xsl:value-of select="@target"/></xsl:when>
+							<xsl:otherwise><xsl:value-of select="$id"/></xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute> -->
 					<xsl:choose>
-						<xsl:when test="self::origin">
-							<xsl:value-of select="@citeas"/>
-							<xsl:apply-templates/>
+						<xsl:when test="$isSemanticXML = 'true'"> <!-- semantic xml -->
+							<xsl:variable name="text_">
+								<xsl:value-of select="$section_prefix"/>
+								<xsl:choose>
+									<xsl:when test="$section_bolded = 'true' and not(ancestor::td or ancestor::th)">
+										<bold><xsl:value-of select="translate($section, '&#xA0;', ' ')"/></bold>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="translate($section, '&#xA0;', ' ')"/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
+							<xsl:variable name="text">
+								<xsl:copy-of select="$text_"/>
+								<xsl:if test="normalize-space($text_) = ''"><!-- in case of term -->
+									<xsl:value-of select="$elements//element[@id = current()/@target]/@section"/>
+								</xsl:if>
+							</xsl:variable>
+							<xsl:choose>
+								<xsl:when test="self::origin">
+									<xsl:value-of select="@citeas"/>
+									<xsl:apply-templates/>
+								</xsl:when>
+								<xsl:when test="./*">
+									<xsl:apply-templates mode="internalFormat">
+										<xsl:with-param name="text" select="$text"/>
+									</xsl:apply-templates>
+								</xsl:when>
+								<xsl:when test="normalize-space($text) != ''">
+									<xsl:copy-of select="$text"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:apply-templates select="node()[not(local-name() = 'stem')]"/>
+								</xsl:otherwise>
+							</xsl:choose>
 						</xsl:when>
-						<xsl:when test="./*">
-							<xsl:apply-templates mode="internalFormat">
-								<xsl:with-param name="text" select="$text"/>
-							</xsl:apply-templates>
-						</xsl:when>
-						<xsl:when test="normalize-space($text) != ''">
-							<xsl:copy-of select="$text"/>
-						</xsl:when>
-						<xsl:otherwise>
+						<xsl:otherwise> <!-- presentation xml -->
 							<xsl:apply-templates select="node()[not(local-name() = 'stem')]"/>
 						</xsl:otherwise>
 					</xsl:choose>
-				</xsl:when>
-				<xsl:otherwise> <!-- presentation xml -->
-					<xsl:apply-templates select="node()[not(local-name() = 'stem')]"/>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xref>
+				</xref>
+			</xsl:otherwise>
+		</xsl:choose>
 		<xsl:apply-templates select="stem"/> <!-- put inline-formula outside xref -->
 	</xsl:template>
 	

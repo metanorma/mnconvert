@@ -2666,6 +2666,11 @@
 		</xsl:choose>
 	</xsl:template> -->
 	
+	<xsl:template match="std/std-organization">
+		<xsl:apply-templates/>
+		<xsl:if test="not(starts-with(following-sibling::node()[1],' '))"/><xsl:text> </xsl:text>
+	</xsl:template>
+	
 	<xsl:template match="ref//std-ref"> <!-- sec[@sec-type = 'norm-refs'] -->
 		<xsl:apply-templates />
 	</xsl:template>
