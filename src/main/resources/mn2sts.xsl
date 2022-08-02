@@ -3631,6 +3631,13 @@
 							</xsl:if>
 							<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
 							<xsl:apply-templates />
+							
+							
+							<xsl:if test="$organization = 'IEEE'"> <!-- move 'ul' and 'ol' inside 'p' -->
+								<xsl:apply-templates select="following-sibling::*[1][self::ul or self::ol]">
+									<xsl:with-param name="skip">false</xsl:with-param>
+								</xsl:apply-templates>
+							</xsl:if>
 						</p>
 					</xsl:otherwise>
 				</xsl:choose>
@@ -3685,79 +3692,101 @@
 	
 	
 	<xsl:template match="ul" name="ul">
-		<list> 
-			<xsl:apply-templates select="@*"/>
-			<xsl:variable name="processing_instruction_type" select="normalize-space(preceding-sibling::*[1]/processing-instruction('list-type'))"/>
-			<xsl:variable name="list-type">
-				<xsl:choose>
-						<xsl:when test="normalize-space($processing_instruction_type) = 'simple'">simple</xsl:when>
-						<xsl:when test="normalize-space(@type) = ''">bullet</xsl:when> <!-- even when <label>—</label> ! -->
-						<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
-					</xsl:choose>
-			</xsl:variable>
-			<xsl:attribute name="list-type">
-				<xsl:value-of select="$list-type"/>
-			</xsl:attribute>
-			<xsl:apply-templates>
-				<xsl:with-param name="list-type" select="$list-type"/>
-			</xsl:apply-templates>
-		</list>
-		<xsl:for-each select="note">
-			<xsl:call-template name="note"/>
-		</xsl:for-each>
+		<xsl:param name="skip">true</xsl:param>
+		
+		<xsl:variable name="process">
+			<xsl:choose>
+				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and preceding-sibling::*[1][self::p]">false</xsl:when>
+				<xsl:otherwise>true</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:if test="$process = 'true'">
+			<list> 
+				<xsl:apply-templates select="@*"/>
+				<xsl:variable name="processing_instruction_type" select="normalize-space(preceding-sibling::*[1]/processing-instruction('list-type'))"/>
+				<xsl:variable name="list-type">
+					<xsl:choose>
+							<xsl:when test="normalize-space($processing_instruction_type) = 'simple'">simple</xsl:when>
+							<xsl:when test="normalize-space(@type) = ''">bullet</xsl:when> <!-- even when <label>—</label> ! -->
+							<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
+						</xsl:choose>
+				</xsl:variable>
+				<xsl:attribute name="list-type">
+					<xsl:value-of select="$list-type"/>
+				</xsl:attribute>
+				<xsl:apply-templates>
+					<xsl:with-param name="list-type" select="$list-type"/>
+				</xsl:apply-templates>
+			</list>
+			<xsl:for-each select="note">
+				<xsl:call-template name="note"/>
+			</xsl:for-each>
+		</xsl:if>
 	</xsl:template>
 	<xsl:template match="ul/@type"/>
 	
 	<xsl:template match="ol" name="ol">
-		<list>
+		<xsl:param name="skip">true</xsl:param>
+		
+		<xsl:variable name="process">
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE'">
-					<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:apply-templates select="@*"/>
-				</xsl:otherwise>
+				<xsl:when test="$organization = 'IEEE' and $skip = 'true'">false</xsl:when>
+				<xsl:otherwise>true</xsl:otherwise>
 			</xsl:choose>
-			
-			<!-- Example: <?list-type loweralpha?> -->
-			<xsl:variable name="processing_instruction_type" select="normalize-space(preceding-sibling::*[1]/processing-instruction('list-type'))"/>
-			
-			<xsl:variable name="type">
+		</xsl:variable>
+		
+		<xsl:if test="$process = 'true'">
+			<list>
 				<xsl:choose>
-					<xsl:when test="normalize-space($processing_instruction_type) != ''"><xsl:value-of select="$processing_instruction_type"/></xsl:when>
-					<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
-				</xsl:choose>
-			</xsl:variable>
-			
-			<xsl:variable name="list-type">
-				<xsl:choose>
-					<!-- <xsl:when test="@type = 'arabic'">alpha-lower</xsl:when> -->
-					<xsl:when test="$type = 'arabic' and $organization = 'IEEE'">ordered</xsl:when>
-					<xsl:when test="$type = 'arabic' and not($organization = 'IEC')">order</xsl:when>
+					<xsl:when test="$organization = 'IEEE'">
+						<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
+					</xsl:when>
 					<xsl:otherwise>
-						<xsl:choose>
-							<xsl:when test="$organization = 'IEC' and normalize-space($type) = ''">arabic</xsl:when>
-							<xsl:when test="normalize-space($type) = ''">alpha-lower</xsl:when>
-							<xsl:when test="$type = 'alphabet'">alpha-lower</xsl:when>
-							<xsl:when test="$type = 'alphabet_upper'">alpha-upper</xsl:when>
-							<xsl:when test="$type = 'roman'">roman-lower</xsl:when>
-							<xsl:when test="$type = 'roman_upper'">roman-upper</xsl:when>
-							<xsl:when test="$type = 'arabic'">arabic</xsl:when>
-							<xsl:otherwise><xsl:value-of select="$type"/></xsl:otherwise>
-						</xsl:choose>
+						<xsl:apply-templates select="@*"/>
 					</xsl:otherwise>
 				</xsl:choose>
-			</xsl:variable>
-			<xsl:attribute name="list-type">
-				<xsl:value-of select="$list-type"/>
-			</xsl:attribute>
-			<xsl:apply-templates>
-				<xsl:with-param name="list-type" select="$list-type"/>
-			</xsl:apply-templates>
-		</list>
-		<xsl:for-each select="note">
-			<xsl:call-template name="note"/>
-		</xsl:for-each>
+				
+				<!-- Example: <?list-type loweralpha?> -->
+				<xsl:variable name="processing_instruction_type" select="normalize-space(preceding-sibling::*[1]/processing-instruction('list-type'))"/>
+				
+				<xsl:variable name="type">
+					<xsl:choose>
+						<xsl:when test="normalize-space($processing_instruction_type) != ''"><xsl:value-of select="$processing_instruction_type"/></xsl:when>
+						<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				
+				<xsl:variable name="list-type">
+					<xsl:choose>
+						<!-- <xsl:when test="@type = 'arabic'">alpha-lower</xsl:when> -->
+						<xsl:when test="$type = 'arabic' and $organization = 'IEEE'">ordered</xsl:when>
+						<xsl:when test="$type = 'arabic' and not($organization = 'IEC')">order</xsl:when>
+						<xsl:otherwise>
+							<xsl:choose>
+								<xsl:when test="$organization = 'IEC' and normalize-space($type) = ''">arabic</xsl:when>
+								<xsl:when test="normalize-space($type) = ''">alpha-lower</xsl:when>
+								<xsl:when test="$type = 'alphabet'">alpha-lower</xsl:when>
+								<xsl:when test="$type = 'alphabet_upper'">alpha-upper</xsl:when>
+								<xsl:when test="$type = 'roman'">roman-lower</xsl:when>
+								<xsl:when test="$type = 'roman_upper'">roman-upper</xsl:when>
+								<xsl:when test="$type = 'arabic'">arabic</xsl:when>
+								<xsl:otherwise><xsl:value-of select="$type"/></xsl:otherwise>
+							</xsl:choose>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:attribute name="list-type">
+					<xsl:value-of select="$list-type"/>
+				</xsl:attribute>
+				<xsl:apply-templates>
+					<xsl:with-param name="list-type" select="$list-type"/>
+				</xsl:apply-templates>
+			</list>
+			<xsl:for-each select="note">
+				<xsl:call-template name="note"/>
+			</xsl:for-each>
+		</xsl:if>
 	</xsl:template>
 	<xsl:template match="ol/@type"/>
 	<xsl:template match="ol/@start"/>
