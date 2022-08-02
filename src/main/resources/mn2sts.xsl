@@ -3637,6 +3637,13 @@
 								<xsl:apply-templates select="following-sibling::*[1][self::ul or self::ol]">
 									<xsl:with-param name="skip">false</xsl:with-param>
 								</xsl:apply-templates>
+								<!-- if paragraph ends with ':' and next element if formula, then put formula inside current p -->
+								<xsl:if test="normalize-space(java:endsWith(java:java.lang.String.new(normalize-space()),':')) = 'true'">
+									<!-- <normalize-space>DEBUG:<xsl:value-of select="normalize-space()"/></normalize-space> -->
+									<xsl:apply-templates select="following-sibling::*[1][self::formula]">
+										<xsl:with-param name="skip">false</xsl:with-param>
+									</xsl:apply-templates>
+								</xsl:if>
 							</xsl:if>
 						</p>
 					</xsl:otherwise>
@@ -5248,32 +5255,46 @@
 	
 	
 	<xsl:template match="formula">
-		<xsl:if test="parent::th[strong]">
-			<xsl:text disable-output-escaping="yes">&lt;/bold&gt;</xsl:text>
-		</xsl:if>
-	
-		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE'">
-				<p>
+		<xsl:param name="skip">true</xsl:param>
+		
+		<xsl:variable name="process">
+			<xsl:choose>
+				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),':')) = 'true'">false</xsl:when>
+				<xsl:otherwise>true</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:if test="$process = 'true'">
+		
+			<xsl:if test="parent::th[strong]">
+				<xsl:text disable-output-escaping="yes">&lt;/bold&gt;</xsl:text>
+			</xsl:if>
+		
+			<xsl:choose>
+				<xsl:when test="$organization = 'IEEE' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),':')) = 'false'"> <!-- and not(parent::p) -->
+					<p>
+						<disp-formula>
+							<xsl:apply-templates />
+						</disp-formula>
+					</p>
+				</xsl:when>
+				<xsl:otherwise>
 					<disp-formula>
 						<xsl:apply-templates />
 					</disp-formula>
-				</p>
-			</xsl:when>
-			<xsl:otherwise>
-				<disp-formula>
-					<xsl:apply-templates />
-				</disp-formula>
-			</xsl:otherwise>
-		</xsl:choose>
-		
-		<xsl:if test="parent::th[strong]">
-			<xsl:text disable-output-escaping="yes">&lt;bold&gt;</xsl:text>
+				</xsl:otherwise>
+			</xsl:choose>
+			
+			<xsl:if test="parent::th[strong]">
+				<xsl:text disable-output-escaping="yes">&lt;bold&gt;</xsl:text>
+			</xsl:if>
 		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="formula/stem" priority="2">
-		<xsl:copy-of select="../@id"/>
+		<xsl:if test="not(starts-with(../@id,'_'))">
+			<xsl:copy-of select="../@id"/>
+		</xsl:if>
 			
 		<xsl:if test="$isSemanticXML = 'true' and not(name)">
 			<xsl:variable name="formula_id" select="../@id"/>
