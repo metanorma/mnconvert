@@ -4977,6 +4977,9 @@
 		</xsl:variable>
 		<xsl:variable name="id" select="$elements//element[@source_id = $current_id]/@id"/> -->
 		<xsl:choose>
+			<xsl:when test="$organization = 'IEEE' and parent::formula">
+				<xsl:call-template name="create_variable-list"/>
+			</xsl:when>
 			<xsl:when test="preceding-sibling::*[1][self::figure] or preceding-sibling::*[1][self::stem]">
 				<xsl:call-template name="create_array"/>
 			</xsl:when>
@@ -5023,6 +5026,32 @@
 			<xsl:call-template name="note"/>
 		</xsl:for-each>
 	</xsl:template>
+	
+	
+	<xsl:template name="create_variable-list">
+		<variable-list>
+			<xsl:if test="preceding-sibling::*[1][self::stem]">
+				<p>where</p>
+				<xsl:apply-templates select="dt" mode="variable-list"/>
+			</xsl:if>
+		</variable-list>
+	</xsl:template>
+	<xsl:template match="dt" mode="variable-list">
+		<var-item>
+			<term>
+				<xsl:apply-templates/>
+			</term>
+			<xsl:apply-templates select="following-sibling::dd[1]" mode="variable-list"/>
+		</var-item>
+	</xsl:template>
+	<xsl:template match="dd" mode="variable-list">
+		<def>
+			<p>
+				<xsl:apply-templates/>
+			</p>
+		</def>
+	</xsl:template>
+	
 	
 	<xsl:template match="dl/note" priority="2"/>
 	
@@ -5219,22 +5248,22 @@
 	
 	
 	<xsl:template match="formula">
-		<xsl:apply-templates />
-	</xsl:template>
-	
-	<xsl:template match="formula/stem" priority="2">
 		<xsl:if test="parent::th[strong]">
 			<xsl:text disable-output-escaping="yes">&lt;/bold&gt;</xsl:text>
 		</xsl:if>
-		
+	
 		<xsl:choose>
 			<xsl:when test="$organization = 'IEEE'">
 				<p>
-					<xsl:call-template name="insert_disp-formula"/>
+					<disp-formula>
+						<xsl:apply-templates />
+					</disp-formula>
 				</p>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:call-template name="insert_disp-formula"/>
+				<disp-formula>
+					<xsl:apply-templates />
+				</disp-formula>
 			</xsl:otherwise>
 		</xsl:choose>
 		
@@ -5243,27 +5272,20 @@
 		</xsl:if>
 	</xsl:template>
 	
-	<xsl:template name="insert_disp-formula">
-		<disp-formula>
-			<!-- <xsl:variable name="current_id" select="../@id"/>		 -->
-			<!-- <xsl:variable name="id" select="$elements//element[@source_id = $current_id]/@id"/> -->
-			<!-- <xsl:variable name="id"><xsl:value-of select="$current_id"/></xsl:variable> --> <!-- <xsl:call-template name="getId"/> -->
-			<!-- <xsl:attribute name="id">
-				<xsl:value-of select="$id"/>
-			</xsl:attribute> -->
-			<xsl:copy-of select="../@id"/>
+	<xsl:template match="formula/stem" priority="2">
+		<xsl:copy-of select="../@id"/>
 			
-			<xsl:if test="$isSemanticXML = 'true' and not(name)">
-				<xsl:variable name="formula_id" select="../@id"/>
-				<xsl:variable name="section" select="normalize-space(@section)"/>
-				<xsl:if test="$section != '' and not(unnumbered=  'true') and not($organization = 'IEEE')">
-					<label><xsl:value-of select="$section"/></label>
-				</xsl:if>
+		<xsl:if test="$isSemanticXML = 'true' and not(name)">
+			<xsl:variable name="formula_id" select="../@id"/>
+			<xsl:variable name="section" select="normalize-space(@section)"/>
+			<xsl:if test="$section != '' and not(unnumbered=  'true') and not($organization = 'IEEE')">
+				<label><xsl:value-of select="$section"/></label>
 			</xsl:if>
-			
-			<xsl:apply-templates />
-		</disp-formula>
+		</xsl:if>
+		
+		<xsl:apply-templates />
 	</xsl:template>
+	
 	
 	<!-- special case: <stem type="MathML"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>R</mi></math>< ! - - R - - > </stem><sub>1</sub> -->
 	<xsl:template match="stem[count(mml:math/*) = 1 and mml:math/mml:mi and following-sibling::node()[normalize-space() != ''][1][self::sub or self::sup]]">
