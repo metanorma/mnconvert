@@ -4947,14 +4947,24 @@
 		</xsl:element>	
 	</xsl:template>
 	
-	
-	<xsl:template match="th">
-		<th>
-			<xsl:apply-templates select="@*"/>
+	<xsl:template match="td | th">
+		<xsl:element name="{local-name()}"> <!-- <th> <td> -->
+			<xsl:choose>
+				<xsl:when test="$organization = 'IEEE' and @align='left' and @valign='top'">
+					<xsl:apply-templates select="@*[local-name() != 'align' and local-name() != 'valign']"/>
+					<xsl:if test="@colspan">
+						<xsl:apply-templates select="@align"/>
+					</xsl:if>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates select="@*"/>
+				</xsl:otherwise>
+			</xsl:choose>
+			
 			<!-- <bold> -->
 				<xsl:apply-templates />
 			<!-- </bold> -->
-		</th>
+		</xsl:element>
 	</xsl:template>
 	
 	
