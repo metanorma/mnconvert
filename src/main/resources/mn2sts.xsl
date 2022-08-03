@@ -3633,18 +3633,18 @@
 							<xsl:apply-templates />
 							
 							
-							<xsl:if test="$organization = 'IEEE'"> <!-- move 'ul' and 'ol' inside 'p' -->
+							<xsl:if test="$organization = 'IEEE' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space()),':')) = 'true'"> <!-- if paragraph ends with ':', then move next 'formula' inside 'p' -->
+								<xsl:apply-templates select="following-sibling::*[1][self::formula]">
+									<xsl:with-param name="skip">false</xsl:with-param>
+								</xsl:apply-templates>
+							</xsl:if>
+							
+							<xsl:if test="$organization = 'IEEE' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space()),'.')) = 'false' and not(ancestor::li)"> <!-- if paragraph ends with '.' and next element is 'ol' or 'ul', then move next 'ul' and 'ol' inside 'p' inside current p  -->
 								<xsl:apply-templates select="following-sibling::*[1][self::ul or self::ol]">
 									<xsl:with-param name="skip">false</xsl:with-param>
 								</xsl:apply-templates>
-								<!-- if paragraph ends with ':' and next element if formula, then put formula inside current p -->
-								<xsl:if test="normalize-space(java:endsWith(java:java.lang.String.new(normalize-space()),':')) = 'true'">
-									<!-- <normalize-space>DEBUG:<xsl:value-of select="normalize-space()"/></normalize-space> -->
-									<xsl:apply-templates select="following-sibling::*[1][self::formula]">
-										<xsl:with-param name="skip">false</xsl:with-param>
-									</xsl:apply-templates>
-								</xsl:if>
 							</xsl:if>
+							
 						</p>
 					</xsl:otherwise>
 				</xsl:choose>
@@ -3703,7 +3703,7 @@
 		
 		<xsl:variable name="process">
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and preceding-sibling::*[1][self::p]">false</xsl:when>
+				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false' and not(ancestor::li)">false</xsl:when> <!-- preceding-sibling::*[1][self::p] -->
 				<xsl:otherwise>true</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -3738,7 +3738,7 @@
 		
 		<xsl:variable name="process">
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE' and $skip = 'true'">false</xsl:when>
+				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false' and not(ancestor::li)">false</xsl:when>
 				<xsl:otherwise>true</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -3785,7 +3785,7 @@
 				</xsl:variable>
 				<xsl:attribute name="list-type">
 					<xsl:choose>
-						<xsl:when test="$type = 'arabic' and $organization = 'IEEE'">ordered</xsl:when>
+						<xsl:when test="$organization = 'IEEE'">ordered</xsl:when>
 						<xsl:otherwise><xsl:value-of select="$list-type"/></xsl:otherwise>
 					</xsl:choose>
 				</xsl:attribute>
