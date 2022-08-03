@@ -4775,6 +4775,10 @@
 		
 		<xsl:call-template name="setId"/>
 		
+		<xsl:if test="$organization = 'IEEE' and tex-math and not(contains(tex-math,'\tag{'))">
+			<xsl:text>[%unnumbered]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 		<xsl:choose>
 			<xsl:when test="tex-math">
 				<xsl:text>[latexmath]</xsl:text>

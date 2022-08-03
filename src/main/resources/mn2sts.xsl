@@ -177,7 +177,7 @@
 				<xsl:variable name="section_prefix">
 					<xsl:if test="($name = 'clause' or $name = 'terms' or ($name = 'references' and @normative='true')) and $section != '' and not(contains($section, '.'))">Clause </xsl:if> <!-- first level clause -->
 					<xsl:if test="$name = 'section-title' or ($name = 'p' and @type = 'section-title')">Section </xsl:if>
-					<xsl:if test="$name = 'formula' and $organization = 'IEC'">Equation </xsl:if>
+					<xsl:if test="$name = 'formula' and ($organization = 'IEC' or $organization = 'IEEE')">Equation </xsl:if>
 				</xsl:variable>
 				
 				<xsl:attribute name="section_prefix"><xsl:value-of select="$section_prefix"/></xsl:attribute>
@@ -388,8 +388,8 @@
 		<xsl:variable name="section">
 			<xsl:choose>
 				<xsl:when test="self::dl"><xsl:number format="a" level="any"/></xsl:when>
-				<xsl:when test="self::formula and ancestor::sections"><xsl:number format="(1)" level="any"/></xsl:when>
-				<xsl:when test="self::formula and ancestor::annex">
+				<xsl:when test="self::formula[not(unnumbered='true')] and ancestor::sections"><xsl:number format="(1)" level="any" count="formula[not(@unnumbered = 'true')]"/></xsl:when>
+				<xsl:when test="self::formula[not(unnumbered='true')] and ancestor::annex">
 					<xsl:variable name="root_element_id" select="generate-id(ancestor::annex)"/>
 					<xsl:number format="A" level="any" count="annex"/>
 					<xsl:text>.</xsl:text>
