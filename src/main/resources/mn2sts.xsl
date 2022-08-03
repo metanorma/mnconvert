@@ -3767,7 +3767,7 @@
 				<xsl:variable name="list-type">
 					<xsl:choose>
 						<!-- <xsl:when test="@type = 'arabic'">alpha-lower</xsl:when> -->
-						<xsl:when test="$type = 'arabic' and $organization = 'IEEE'">ordered</xsl:when>
+						<!-- <xsl:when test="$type = 'arabic' and $organization = 'IEEE'">ordered</xsl:when> -->
 						<xsl:when test="$type = 'arabic' and not($organization = 'IEC')">order</xsl:when>
 						<xsl:otherwise>
 							<xsl:choose>
@@ -3784,7 +3784,10 @@
 					</xsl:choose>
 				</xsl:variable>
 				<xsl:attribute name="list-type">
-					<xsl:value-of select="$list-type"/>
+					<xsl:choose>
+						<xsl:when test="$type = 'arabic' and $organization = 'IEEE'">ordered</xsl:when>
+						<xsl:otherwise><xsl:value-of select="$list-type"/></xsl:otherwise>
+					</xsl:choose>
 				</xsl:attribute>
 				<xsl:apply-templates>
 					<xsl:with-param name="list-type" select="$list-type"/>
