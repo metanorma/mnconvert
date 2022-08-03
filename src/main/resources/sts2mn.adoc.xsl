@@ -4768,11 +4768,19 @@
 	</xsl:template>
 	
 	<xsl:template match="disp-formula">
-		<!-- <xsl:text>stem:[</xsl:text> -->
-		<xsl:if test="local-name(preceding-sibling::node()[normalize-space() != ''][1]) != 'p'">
-			<xsl:text>&#xa;&#xa;</xsl:text>
-		</xsl:if>
-		
+	
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEEE' and ancestor::def"> <!-- process as inline-formula -->
+				<xsl:text>&#xa;+&#xa;</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<!-- <xsl:text>stem:[</xsl:text> -->
+				<xsl:if test="local-name(preceding-sibling::node()[normalize-space() != ''][1]) != 'p'">
+					<xsl:text>&#xa;&#xa;</xsl:text>
+				</xsl:if>
+			</xsl:otherwise>
+		</xsl:choose>	
+			
 		<xsl:call-template name="setId"/>
 		
 		<xsl:if test="$organization = 'IEEE' and tex-math and not(contains(tex-math,'\tag{'))">
@@ -4802,6 +4810,7 @@
 		<xsl:apply-templates select="variable-list">
 			<xsl:with-param name="process">true</xsl:with-param>
 		</xsl:apply-templates>
+		
 	</xsl:template>
 	<xsl:template match="disp-formula/text()[normalize-space()='']"/>
 	
@@ -4853,6 +4862,12 @@
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="def-head">
+		<xsl:apply-templates />
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="variable-list">

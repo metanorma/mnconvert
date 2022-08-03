@@ -3639,7 +3639,7 @@
 								</xsl:apply-templates>
 							</xsl:if>
 							
-							<xsl:if test="$organization = 'IEEE' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space()),'.')) = 'false' and not(ancestor::li)"> <!-- if paragraph ends with '.' and next element is 'ol' or 'ul', then move next 'ul' and 'ol' inside 'p' inside current p  -->
+							<xsl:if test="$organization = 'IEEE' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space()),'.')) = 'false' and not(ancestor::li)"> <!-- if paragraph doesn't end with '.' and next element is 'ol' or 'ul', then move next 'ul' and 'ol' inside 'p' inside current p  -->
 								<xsl:apply-templates select="following-sibling::*[1][self::ul or self::ol or self::sourcecode or self::dl or self::table]">
 									<xsl:with-param name="skip">false</xsl:with-param>
 								</xsl:apply-templates>
@@ -3703,7 +3703,7 @@
 		
 		<xsl:variable name="process">
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false' and not(ancestor::li)">false</xsl:when> <!-- preceding-sibling::*[1][self::p] -->
+				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and preceding-sibling::*[1][self::p] and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false' and not(ancestor::li)">false</xsl:when> <!-- preceding-sibling::*[1][self::p] -->
 				<xsl:otherwise>true</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -3738,7 +3738,7 @@
 		
 		<xsl:variable name="process">
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false' and not(ancestor::li)">false</xsl:when>
+				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and preceding-sibling::*[1][self::p] and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false' and not(ancestor::li)">false</xsl:when>
 				<xsl:otherwise>true</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -4751,7 +4751,7 @@
 		
 		<xsl:variable name="process">
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false'">false</xsl:when>
+				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and preceding-sibling::*[1][self::p] and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false'">false</xsl:when>
 				<xsl:otherwise>true</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -5000,7 +5000,7 @@
 		
 		<xsl:variable name="process">
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false'">false</xsl:when>
+				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and preceding-sibling::*[1][self::p] and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false'">false</xsl:when>
 				<xsl:otherwise>true</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -5379,7 +5379,7 @@
 		
 		<xsl:variable name="process">
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false'">false</xsl:when>
+				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and preceding-sibling::*[1][self::p] and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false'">false</xsl:when>
 				<xsl:otherwise>true</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
