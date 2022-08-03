@@ -3640,7 +3640,7 @@
 							</xsl:if>
 							
 							<xsl:if test="$organization = 'IEEE' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space()),'.')) = 'false' and not(ancestor::li)"> <!-- if paragraph ends with '.' and next element is 'ol' or 'ul', then move next 'ul' and 'ol' inside 'p' inside current p  -->
-								<xsl:apply-templates select="following-sibling::*[1][self::ul or self::ol]">
+								<xsl:apply-templates select="following-sibling::*[1][self::ul or self::ol or self::sourcecode or self::dl or self::table]">
 									<xsl:with-param name="skip">false</xsl:with-param>
 								</xsl:apply-templates>
 							</xsl:if>
@@ -4747,118 +4747,132 @@
 	</xsl:template>
 	
 	<xsl:template match="table" name="table"> <!-- [*[local-name() = 'name']] -->
-		<xsl:variable name="number"><xsl:number level="any"/></xsl:variable>
+		<xsl:param name="skip">true</xsl:param>
 		
-    <xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
-    <xsl:variable name="wrap-element">
-      <xsl:choose>
-        <xsl:when test="ancestor::figure">array</xsl:when>
-        <xsl:otherwise>table-wrap</xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    
-    <xsl:element name="{$wrap-element}">
-		<!-- <table-wrap id="{$id}"> --> <!-- position="float" -->
-      <xsl:attribute name="id">
-        <xsl:value-of select="$id"/>
-      </xsl:attribute>
-			<xsl:variable name="orientation" select="normalize-space(preceding-sibling::*[1][self::pagebreak]/@orientation)"/>
-			<xsl:if test="$orientation = 'landscape'">
-				<xsl:attribute name="orientation"><xsl:value-of select="$orientation"/></xsl:attribute>
-			</xsl:if>
+		<xsl:variable name="process">
+			<xsl:choose>
+				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false'">false</xsl:when>
+				<xsl:otherwise>true</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:if test="$process = 'true'">
+	
+			<xsl:variable name="number"><xsl:number level="any"/></xsl:variable>
 			
-			<xsl:variable name="isKeyTable" select="normalize-space(preceding-sibling::*[1][self::figure] and (name/text() = 'Key' or name/text() = 'Table &#160;&#8212; Key'))"/>
-			
-			<xsl:variable name="isWhereTable" select="normalize-space(preceding-sibling::*[1][self::stem] or (preceding-sibling::*[1][self::p][text() = 'where:'] and preceding-sibling::*[2][self::stem]))"/>
-			
-			<xsl:if test="$wrap-element = 'table-wrap'">
-				<xsl:if test="ancestor::preface">
-					<xsl:choose>
-						<xsl:when test="starts-with(preceding-sibling::*[self::title]/text(), 'Amendments')">
-							<xsl:attribute name="content-type">ace-table</xsl:attribute>
-						</xsl:when>
-						<xsl:when test="not(label) and not(caption)">
-							<xsl:attribute name="content-type">informal-table</xsl:attribute>
-						</xsl:when>
-					</xsl:choose>
-				</xsl:if>
-				<xsl:if test="not(ancestor::preface and starts-with(preceding-sibling::*[self::title]/text(), 'Amendments'))">
-					<xsl:attribute name="position">
-						<xsl:choose>
-							<xsl:when test="$organization = 'IEEE'">anchor</xsl:when>
-							<xsl:otherwise>float</xsl:otherwise>
-						</xsl:choose>
-					</xsl:attribute>
-				</xsl:if>
-				<!-- https://github.com/metanorma/mn-samples-bsi/issues/39 -->
-				<!-- <xsl:if test="starts-with(title/text(), 'Relationship between') or starts-with(title/text(), 'Correspondence between')">
-					norm-refs
-				</xsl:if> -->
-				<xsl:if test="$isWhereTable = 'true'">
-					<xsl:attribute name="content-type">formula-index</xsl:attribute>
-				</xsl:if>
-				<xsl:if test="$isKeyTable = 'true'">
-					<xsl:attribute name="content-type">fig-index</xsl:attribute>
-				</xsl:if>
-				<xsl:variable name="processing_instruction_content_type" select="normalize-space(preceding-sibling::*[1]/processing-instruction('content-type'))"/>
-				<xsl:if test="$processing_instruction_content_type != ''">
-					<xsl:attribute name="content-type"><xsl:value-of select="$processing_instruction_content_type"/></xsl:attribute>
-				</xsl:if>
-				
-			</xsl:if>
-			<xsl:variable name="label">
+			<xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
+			<xsl:variable name="wrap-element">
 				<xsl:choose>
-					<xsl:when test="ancestor::amend/autonumber[@type = 'table']">
-						<xsl:value-of select="ancestor::amend/autonumber[@type = 'table']/text()"/>
-					</xsl:when>
-          <xsl:when test="ancestor::figure"></xsl:when>
-					<xsl:when test="$isKeyTable = 'true'">Key</xsl:when>
-					<xsl:otherwise>
-						<xsl:value-of select="@section"/>
-					</xsl:otherwise>
+					<xsl:when test="ancestor::figure">array</xsl:when>
+					<xsl:otherwise>table-wrap</xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
-			<xsl:if test="normalize-space($label) != ''">
-				<label>
-					<xsl:value-of select="$label"/>
-				</label>
-			</xsl:if>
-			<xsl:if test="$isKeyTable = 'false' and $isWhereTable = 'false'">
-				<xsl:apply-templates select="name" mode="table"/>
-			</xsl:if>
-			<table>
-				<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix')]"/>
-				<xsl:if test="$organization = 'IEEE'">
-				 <xsl:attribute name="cellpadding">5</xsl:attribute>
-				 <xsl:attribute name="frame">box</xsl:attribute>
-				 <xsl:attribute name="rules">all</xsl:attribute>
+			
+			<xsl:element name="{$wrap-element}">
+			<!-- <table-wrap id="{$id}"> --> <!-- position="float" -->
+				<xsl:if test="not($organization = 'IEEE' and starts-with(@id,'_'))">
+					<xsl:attribute name="id">
+						<xsl:value-of select="$id"/>
+					</xsl:attribute>
 				</xsl:if>
-				<xsl:apply-templates select="@width"/>
+				<xsl:variable name="orientation" select="normalize-space(preceding-sibling::*[1][self::pagebreak]/@orientation)"/>
+				<xsl:if test="$orientation = 'landscape'">
+					<xsl:attribute name="orientation"><xsl:value-of select="$orientation"/></xsl:attribute>
+				</xsl:if>
 				
-				<xsl:apply-templates select="colgroup" mode="table"/>
-				<xsl:apply-templates select="thead" mode="table"/>
-				<xsl:apply-templates select="tfoot" mode="table"/>
-				<xsl:apply-templates select="tbody" mode="table"/>
-				<xsl:apply-templates />
-			</table>
-			
-			<!-- <table-wrap>
-			<table></table>
-			<table></table>
-			</table-wrap> -->
-			<xsl:apply-templates select="following-sibling::*[1][self::table]" mode="table_wrap_multiple"/>
-			
-			<!-- move notes outside table -->
-			<xsl:if test="note">
-				<table-wrap-foot>
-					<xsl:for-each select="note">
-						<xsl:call-template name="note"/>
-					</xsl:for-each>
-				</table-wrap-foot>
-			</xsl:if>
-		<!-- </table-wrap> -->
-    </xsl:element>
-		
+				<xsl:variable name="isKeyTable" select="normalize-space(preceding-sibling::*[1][self::figure] and (name/text() = 'Key' or name/text() = 'Table &#160;&#8212; Key'))"/>
+				
+				<xsl:variable name="isWhereTable" select="normalize-space(preceding-sibling::*[1][self::stem] or (preceding-sibling::*[1][self::p][text() = 'where:'] and preceding-sibling::*[2][self::stem]))"/>
+				
+				<xsl:if test="$wrap-element = 'table-wrap'">
+					<xsl:if test="ancestor::preface">
+						<xsl:choose>
+							<xsl:when test="starts-with(preceding-sibling::*[self::title]/text(), 'Amendments')">
+								<xsl:attribute name="content-type">ace-table</xsl:attribute>
+							</xsl:when>
+							<xsl:when test="not(label) and not(caption)">
+								<xsl:attribute name="content-type">informal-table</xsl:attribute>
+							</xsl:when>
+						</xsl:choose>
+					</xsl:if>
+					<xsl:if test="not(ancestor::preface and starts-with(preceding-sibling::*[self::title]/text(), 'Amendments'))">
+						<xsl:attribute name="position">
+							<xsl:choose>
+								<xsl:when test="$organization = 'IEEE'">anchor</xsl:when>
+								<xsl:otherwise>float</xsl:otherwise>
+							</xsl:choose>
+						</xsl:attribute>
+					</xsl:if>
+					<!-- https://github.com/metanorma/mn-samples-bsi/issues/39 -->
+					<!-- <xsl:if test="starts-with(title/text(), 'Relationship between') or starts-with(title/text(), 'Correspondence between')">
+						norm-refs
+					</xsl:if> -->
+					<xsl:if test="$isWhereTable = 'true'">
+						<xsl:attribute name="content-type">formula-index</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="$isKeyTable = 'true'">
+						<xsl:attribute name="content-type">fig-index</xsl:attribute>
+					</xsl:if>
+					<xsl:variable name="processing_instruction_content_type" select="normalize-space(preceding-sibling::*[1]/processing-instruction('content-type'))"/>
+					<xsl:if test="$processing_instruction_content_type != ''">
+						<xsl:attribute name="content-type"><xsl:value-of select="$processing_instruction_content_type"/></xsl:attribute>
+					</xsl:if>
+					
+				</xsl:if>
+				<xsl:variable name="label">
+					<xsl:choose>
+						<xsl:when test="ancestor::amend/autonumber[@type = 'table']">
+							<xsl:value-of select="ancestor::amend/autonumber[@type = 'table']/text()"/>
+						</xsl:when>
+						<xsl:when test="ancestor::figure"></xsl:when>
+						<xsl:when test="$isKeyTable = 'true'">Key</xsl:when>
+						<xsl:when test="@unnumbered = 'true'"></xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="@section"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:if test="normalize-space($label) != ''">
+					<label>
+						<xsl:value-of select="$label"/>
+					</label>
+				</xsl:if>
+				<xsl:if test="$isKeyTable = 'false' and $isWhereTable = 'false'">
+					<xsl:apply-templates select="name" mode="table"/>
+				</xsl:if>
+				<table>
+					<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix')]"/>
+					<xsl:if test="$organization = 'IEEE'">
+					 <xsl:attribute name="cellpadding">5</xsl:attribute>
+					 <xsl:attribute name="frame">box</xsl:attribute>
+					 <xsl:attribute name="rules">all</xsl:attribute>
+					</xsl:if>
+					<xsl:apply-templates select="@width"/>
+					
+					<xsl:apply-templates select="colgroup" mode="table"/>
+					<xsl:apply-templates select="thead" mode="table"/>
+					<xsl:apply-templates select="tfoot" mode="table"/>
+					<xsl:apply-templates select="tbody" mode="table"/>
+					<xsl:apply-templates />
+				</table>
+				
+				<!-- <table-wrap>
+				<table></table>
+				<table></table>
+				</table-wrap> -->
+				<xsl:apply-templates select="following-sibling::*[1][self::table]" mode="table_wrap_multiple"/>
+				
+				<!-- move notes outside table -->
+				<xsl:if test="note">
+					<table-wrap-foot>
+						<xsl:for-each select="note">
+							<xsl:call-template name="note"/>
+						</xsl:for-each>
+					</table-wrap-foot>
+				</xsl:if>
+			<!-- </table-wrap> -->
+			</xsl:element>
+		</xsl:if>
 	</xsl:template>
 
 
@@ -4982,31 +4996,43 @@
 	<!-- Definitions list processing -->
 	<!-- =============================== -->
 	<xsl:template match="dl">
-		<!-- <xsl:variable name="current_id">
-			<xsl:call-template name="getId"/>
-		</xsl:variable>
-		<xsl:variable name="id" select="$elements//element[@source_id = $current_id]/@id"/> -->
-		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE' and parent::formula">
-				<xsl:call-template name="create_variable-list"/>
-			</xsl:when>
-			<xsl:when test="preceding-sibling::*[1][self::figure] or preceding-sibling::*[1][self::stem]">
-				<xsl:call-template name="create_array"/>
-			</xsl:when>
-			<xsl:otherwise>
-				<!-- <p>
-					<xsl:call-template name="create_array"/>
-				</p> -->
-				<def-list>
-					<xsl:copy-of select="@id"/>
-					<xsl:if test="preceding-sibling::*[1][self::title][contains(normalize-space(), 'Abbrev')]">
-						<xsl:attribute name="list-type">abbreviations</xsl:attribute>
-					</xsl:if>
-					<xsl:apply-templates mode="dl"/>
-				</def-list>
-			</xsl:otherwise>
-		</xsl:choose>
+		<xsl:param name="skip">true</xsl:param>
 		
+		<xsl:variable name="process">
+			<xsl:choose>
+				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false'">false</xsl:when>
+				<xsl:otherwise>true</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:if test="$process = 'true'">
+			<!-- <xsl:variable name="current_id">
+				<xsl:call-template name="getId"/>
+			</xsl:variable>
+			<xsl:variable name="id" select="$elements//element[@source_id = $current_id]/@id"/> -->
+			<xsl:choose>
+				<xsl:when test="$organization = 'IEEE' and parent::formula">
+					<xsl:call-template name="create_variable-list"/>
+				</xsl:when>
+				<xsl:when test="preceding-sibling::*[1][self::figure] or preceding-sibling::*[1][self::stem]">
+					<xsl:call-template name="create_array"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<!-- <p>
+						<xsl:call-template name="create_array"/>
+					</p> -->
+					<def-list>
+						<xsl:if test="not($organization = 'IEEE' and starts-with(@id,'_'))">
+							<xsl:copy-of select="@id"/>
+						</xsl:if>
+						<xsl:if test="preceding-sibling::*[1][self::title][contains(normalize-space(), 'Abbrev')]">
+							<xsl:attribute name="list-type">abbreviations</xsl:attribute>
+						</xsl:if>
+						<xsl:apply-templates mode="dl"/>
+					</def-list>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:if>
 	</xsl:template>
 
 	<xsl:template name="create_array">
@@ -5084,13 +5110,16 @@
 			<term>
 				<xsl:apply-templates />
 			</term>
-			<def><xsl:apply-templates select="following-sibling::dd[1]" mode="dd"/></def>
+			<def>
+				<xsl:if test="$organization = 'IEEE'"><x></x></xsl:if>
+				<xsl:apply-templates select="following-sibling::dd[1]" mode="dd"/>
+			</def>
 		</def-item>
 	</xsl:template>
 	
 	<xsl:template match="dd" mode="dl"/>
 	<xsl:template match="dd" mode="dd">
-		<p><xsl:copy-of select="p[1]/@id"/><xsl:apply-templates /></p>
+		<p><xsl:if test="not($organization = 'IEEE' and starts-with(p[1]/@id,'_'))"><xsl:copy-of select="p[1]/@id"/></xsl:if><xsl:apply-templates /></p>
 	</xsl:template>
 	
 	<!-- =============================== -->
@@ -5346,25 +5375,37 @@
 	<xsl:template match="review"/>
 
 	<xsl:template match="sourcecode">
-		<xsl:choose>
-			<xsl:when test="$format = 'NISO' and $organization != 'IEEE'">
-				<code>
-					<xsl:apply-templates select="@*"/>
-					<xsl:apply-templates/>
-				</code>
-			</xsl:when>
-			<!-- ISO -->
-			<xsl:otherwise>
-				<preformat>
-					<xsl:if test="@lang">
-						<xsl:attribute name="preformat-type">
-							<xsl:value-of select="@lang"/>
-						</xsl:attribute>
-					</xsl:if>
-					<xsl:apply-templates/>
-				</preformat>
-			</xsl:otherwise>
-		</xsl:choose>
+		<xsl:param name="skip">true</xsl:param>
+		
+		<xsl:variable name="process">
+			<xsl:choose>
+				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false'">false</xsl:when>
+				<xsl:otherwise>true</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:if test="$process = 'true'">
+	
+			<xsl:choose>
+				<xsl:when test="$format = 'NISO' and $organization != 'IEEE'">
+					<code>
+						<xsl:apply-templates select="@*"/>
+						<xsl:apply-templates/>
+					</code>
+				</xsl:when>
+				<!-- ISO -->
+				<xsl:otherwise>
+					<preformat>
+						<xsl:if test="@lang">
+							<xsl:attribute name="preformat-type">
+								<xsl:value-of select="@lang"/>
+							</xsl:attribute>
+						</xsl:if>
+						<xsl:apply-templates/>
+					</preformat>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="sourcecode/@lang">
