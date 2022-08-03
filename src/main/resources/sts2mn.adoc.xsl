@@ -2298,31 +2298,35 @@
 					<xsl:text>[align=center]</xsl:text>
 						<xsl:text>&#xa;</xsl:text>
 				</xsl:if> -->
-				<xsl:value-of select="$p_text"/>
-				<xsl:text>&#xa;</xsl:text>
-				<xsl:variable name="isLastPinCommentary" select="preceding-sibling::p[starts-with(normalize-space(), $commentary_on) and 
-							(starts-with(normalize-space(.//italic/text()), $commentary_on) or starts-with(normalize-space(.//italic2/text()), $commentary_on))] and
-							*[1][self::italic or self::italic2] and normalize-space(translate(./text(),'&#xa0;.','  ')) = '' and
-							not(following-sibling::p[*[1][self::italic or self::italic2] and normalize-space(translate(./text(),'&#xa0;.','  ')) = ''])"/>
-				<xsl:if test="$isLastPinCommentary = 'true'">
-					<xsl:text>====</xsl:text>
-					<xsl:text>&#xa;&#xa;</xsl:text>
+				
+				<xsl:if test="not($organization = 'IEEE' and contains($p_text,'Bibliographical references are') and parent::app and following-sibling::ref-list)">
+					<xsl:value-of select="$p_text"/>
+					<xsl:text>&#xa;</xsl:text>
+					<xsl:variable name="isLastPinCommentary" select="preceding-sibling::p[starts-with(normalize-space(), $commentary_on) and 
+								(starts-with(normalize-space(.//italic/text()), $commentary_on) or starts-with(normalize-space(.//italic2/text()), $commentary_on))] and
+								*[1][self::italic or self::italic2] and normalize-space(translate(./text(),'&#xa0;.','  ')) = '' and
+								not(following-sibling::p[*[1][self::italic or self::italic2] and normalize-space(translate(./text(),'&#xa0;.','  ')) = ''])"/>
+					<xsl:if test="$isLastPinCommentary = 'true'">
+						<xsl:text>====</xsl:text>
+						<xsl:text>&#xa;&#xa;</xsl:text>
+					</xsl:if>
+					<xsl:choose>
+						<!-- if p in list-item and this p is first element (except label), next element is not another nested list, and there are another elements, or last p -->
+						<xsl:when test="parent::list-item and 
+						count(parent::list-item/*[not(self::label)]) &gt; 1 and
+						((count(preceding-sibling::*[not(self::label)]) = 0 and following-sibling::*[1][not(self::list)]) 
+						or not(following-sibling::*[not(self::list)]))"></xsl:when>
+						<xsl:when test="parent::list-item and not(../following-sibling::*) and count(ancestor::list-item) &gt; 1"></xsl:when>
+						<xsl:when test="parent::list-item and following-sibling::*[1][self::non-normative-note]"><xsl:text>&#xa;</xsl:text></xsl:when>
+						<xsl:when test="ancestor::list-item and not(following-sibling::p) and following-sibling::non-normative-note"></xsl:when>
+						<xsl:when test="ancestor::non-normative-note and not(following-sibling::p)"></xsl:when>
+						<xsl:when test="ancestor::non-normative-example and not(following-sibling::p)"></xsl:when>
+						<xsl:when test="not(following-sibling::p) and ancestor::list/following-sibling::non-normative-note"></xsl:when>
+						<xsl:when test="ancestor::sec[@sec-type = 'norm-refs'] and not(following-sibling::*[1][self::p])"></xsl:when>
+						<xsl:otherwise><xsl:text>&#xa;</xsl:text></xsl:otherwise>
+					</xsl:choose>
 				</xsl:if>
-				<xsl:choose>
-					<!-- if p in list-item and this p is first element (except label), next element is not another nested list, and there are another elements, or last p -->
-					<xsl:when test="parent::list-item and 
-					count(parent::list-item/*[not(self::label)]) &gt; 1 and
-					((count(preceding-sibling::*[not(self::label)]) = 0 and following-sibling::*[1][not(self::list)]) 
-					or not(following-sibling::*[not(self::list)]))"></xsl:when>
-					<xsl:when test="parent::list-item and not(../following-sibling::*) and count(ancestor::list-item) &gt; 1"></xsl:when>
-					<xsl:when test="parent::list-item and following-sibling::*[1][self::non-normative-note]"><xsl:text>&#xa;</xsl:text></xsl:when>
-					<xsl:when test="ancestor::list-item and not(following-sibling::p) and following-sibling::non-normative-note"></xsl:when>
-					<xsl:when test="ancestor::non-normative-note and not(following-sibling::p)"></xsl:when>
-					<xsl:when test="ancestor::non-normative-example and not(following-sibling::p)"></xsl:when>
-					<xsl:when test="not(following-sibling::p) and ancestor::list/following-sibling::non-normative-note"></xsl:when>
-					<xsl:when test="ancestor::sec[@sec-type = 'norm-refs'] and not(following-sibling::*[1][self::p])"></xsl:when>
-					<xsl:otherwise><xsl:text>&#xa;</xsl:text></xsl:otherwise>
-				</xsl:choose>
+				
 			</xsl:otherwise>
 		</xsl:choose>
 		
@@ -3871,7 +3875,9 @@
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$sectionsFolder}/{$annex_label}.adoc">
 			<xsl:text>&#xa;</xsl:text>
-			<xsl:call-template name="setId"/>
+			<xsl:if test="not($organization = 'IEEE' and ref-list)"><!-- special case for IEEE, ref-list inside app -->
+				<xsl:call-template name="setId"/>
+			</xsl:if>
 			<xsl:text>[appendix</xsl:text>
 			<xsl:apply-templates select="annex-type" mode="annex"/>		
 			<xsl:text>]</xsl:text>
@@ -4093,6 +4099,9 @@
 		
 		<xsl:if test="$organization = 'IEEE' and ancestor::app">
 			<!-- special case with additional [bibliography] in annex --> 
+			<xsl:text>[[</xsl:text>
+			<xsl:value-of select="ancestor::app/@id"/>
+			<xsl:text>]]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:text>[bibliography]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
@@ -4252,7 +4261,16 @@
 								<xsl:text>path:(hyperlink,</xsl:text>
 							</xsl:if>
 							
-							<xsl:value-of select="$referenceText"/>
+							<xsl:choose>
+								<xsl:when test="$organization = 'IEEE'">
+									<xsl:variable name="text" select="java:replaceAll(java:java.lang.String.new($referenceText), '(\s|\h)Std(\s|\h)', ' ')"/> <!-- remove ' Std ' -->
+									<xsl:value-of select="translate($text,'™','')"/> <!-- remove trademark sign -->
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="$referenceText"/>
+								</xsl:otherwise>
+							</xsl:choose>
+							
 							
 							<xsl:if test=".//named-content[@content-type='ace-tag']">
 								<xsl:text>)</xsl:text>
@@ -4263,8 +4281,10 @@
 					
 					</xsl:if>
 				
-				
-					<xsl:apply-templates/>
+					<xsl:variable name="reference_desc">
+						<xsl:apply-templates/>
+					</xsl:variable>
+					<xsl:value-of select="normalize-space($reference_desc)"/>
 				
 				</xsl:otherwise>
 			</xsl:choose>

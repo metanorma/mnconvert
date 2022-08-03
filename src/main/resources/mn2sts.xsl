@@ -2809,18 +2809,36 @@
 		
 		<xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
 		
-		<app id="{$id}" content-type="inform-annex">
-			<xsl:if test="normalize-space(@obligation) != ''">
-				<xsl:attribute name="content-type">
-					<xsl:choose>
-						<xsl:when test="@obligation  = 'informative'">inform-annex</xsl:when>
-						<xsl:otherwise><xsl:value-of select="@obligation"/></xsl:otherwise>
-					</xsl:choose>
-				</xsl:attribute>
-			</xsl:if>
-			<xsl:if test="$organization = 'BSI' and normalize-space(@obligation) = ''">
-				<xsl:attribute name="content-type">norm-annex</xsl:attribute>
-			</xsl:if>
+		<app id="{$id}">
+		
+			<xsl:choose>
+				<xsl:when test="$organization = 'IEEE'">
+					<xsl:attribute name="normative">no</xsl:attribute>
+					<xsl:if test="normalize-space(@obligation) != ''">
+						<xsl:attribute name="normative">
+							<xsl:choose>
+								<xsl:when test="@obligation  = 'informative'">no</xsl:when>
+								<xsl:otherwise>yes</xsl:otherwise>
+							</xsl:choose>
+						</xsl:attribute>
+					</xsl:if>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:attribute name="content-type">inform-annex</xsl:attribute>
+					<xsl:if test="normalize-space(@obligation) != ''">
+						<xsl:attribute name="content-type">
+							<xsl:choose>
+								<xsl:when test="@obligation  = 'informative'">inform-annex</xsl:when>
+								<xsl:otherwise><xsl:value-of select="@obligation"/></xsl:otherwise>
+							</xsl:choose>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="$organization = 'BSI' and normalize-space(@obligation) = ''">
+						<xsl:attribute name="content-type">norm-annex</xsl:attribute>
+					</xsl:if>
+				</xsl:otherwise>
+			</xsl:choose>
+			
 			<label>
 				<xsl:choose>
 					<xsl:when test="ancestor::amend/autonumber[@type = 'annex']">
