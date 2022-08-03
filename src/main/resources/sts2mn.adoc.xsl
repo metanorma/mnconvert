@@ -4768,11 +4768,13 @@
 	</xsl:template>
 	
 	<xsl:template match="disp-formula">
-		<xsl:call-template name="setId"/>
 		<!-- <xsl:text>stem:[</xsl:text> -->
 		<xsl:if test="local-name(preceding-sibling::node()[normalize-space() != ''][1]) != 'p'">
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</xsl:if>
+		
+		<xsl:call-template name="setId"/>
+		
 		<xsl:choose>
 			<xsl:when test="tex-math">
 				<xsl:text>[latexmath]</xsl:text>
@@ -4798,6 +4800,21 @@
 		</xsl:apply-templates>
 	</xsl:template>
 	<xsl:template match="disp-formula/text()[normalize-space()='']"/>
+	
+	<!-- Special case: the word 'Equation' outside of xref
+		Example: Equation <xref ref-type="disp-formula" rid="deqn1">(1)</xref>
+	-->
+	<xsl:variable name="regexEquationXref">(.*)Equation $</xsl:variable>
+	<xsl:template match="text()[following-sibling::node()[1][self::xref and @ref-type='disp-formula']]" priority="2">
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEEE' and java:org.metanorma.utils.RegExHelper.matches($regexEquationXref, .) = 'true'">
+				<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regexEquationXref,'$1')"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="."/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 	
 	<!-- MathML -->
 	<!-- https://www.metanorma.com/blog/2019-05-29-latex-math-stem/ -->
