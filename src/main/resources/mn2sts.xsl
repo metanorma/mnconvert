@@ -5759,8 +5759,9 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:value-of select="$label"/>
+					<xsl:copy-of select="@*"/>
 					<xsl:if test="$organization = 'IEEE'">
-						<xsl:if test="not(contains($label,'.') or contains($label,')') )"> <!-- add dot for 1st level label only -->
+						<xsl:if test="not(contains($label,'.') or contains($label,')') ) and not(parent::ul)"> <!-- add dot for 1st level label only -->
 							<xsl:text>.</xsl:text>
 						</xsl:if>
 					</xsl:if>
