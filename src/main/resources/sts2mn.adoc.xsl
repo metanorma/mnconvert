@@ -876,6 +876,11 @@
 		<!-- :isbn-print: -->
 		<xsl:apply-templates select="isbn[@publication-format = 'print']"/>
 
+		<!-- :semantic-metadata-open-access: -->
+		<xsl:apply-templates select="ancestor::standards-document/@open-access"/>
+		<!-- :semantic-metadata-revision: -->
+		<!-- <xsl:apply-templates select="ancestor::standards-document/@revision"/> -->
+		
 		<!-- :semantic-metadata-collab-type-logo: -->
 		<!-- :semantic-metadata-collab: -->
 		<!-- :semantic-metadata-collab-type-accredited-by: -->
@@ -1649,7 +1654,7 @@
 		</xsl:apply-templates>
 	</xsl:template>
 	
-	<xsl:template match="sec/participants-sec/p[contains(., ' Working Group ')]" priority="3">
+	<xsl:template match="sec/participants-sec[1]/p" priority="3"> <!-- [contains(., ' Working Group ')] -->
 		<xsl:param name="contrib-groups"/>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>=== Working group</xsl:text>
@@ -1663,10 +1668,10 @@
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="sec/participants-sec/p[contains(., ' Standards Board ')]" priority="3">
+	<xsl:template match="sec/participants-sec[position() &gt; 2]/p[contains(., ' Standards Board ')]" priority="3">
 		<xsl:param name="contrib-groups"/>
 		<xsl:choose>
-			<xsl:when test="not(../preceding-sibling::participants-sec/p[contains(normalize-space(.), ' Standards Board ')])">
+			<xsl:when test="not(../preceding-sibling::participants-sec[count(preceding-sibling::participants-sec) &gt;= 2]/p[contains(normalize-space(.), ' Standards Board ')])">
 				<xsl:text>&#xa;</xsl:text>
 				<xsl:text>=== Standards board</xsl:text>
 				<xsl:text>&#xa;&#xa;</xsl:text>
@@ -1754,6 +1759,17 @@
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
+	<xsl:template match="standards-document/@open-access">
+		<xsl:text>:semantic-metadata-open-access: </xsl:text>
+		<xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<!-- <xsl:template match="standards-document/@revision">
+		<xsl:text>:semantic-metadata-revision: </xsl:text>
+		<xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template> -->
 	
 	<xsl:template match="funding-group/award-group/funding-source/institution-wrap/institution">
 		<xsl:text>:semantic-metadata-funding-source-institution: </xsl:text>

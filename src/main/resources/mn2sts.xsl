@@ -571,6 +571,11 @@
 					
 					<xsl:attribute name="dtd-version">1.7</xsl:attribute>
 					
+					<xsl:variable name="open-access" select="normalize-space(misc-container/semantic-metadata/open-access)"/>
+					<xsl:if test="$open-access != ''">
+						<xsl:attribute name="open-access"><xsl:value-of select="$open-access"/></xsl:attribute>
+					</xsl:if>
+					
 					<xsl:attribute name="revision">
 						<xsl:choose>
 							<xsl:when test="bibdata/relation[@type='updates']">yes</xsl:when>
@@ -1658,7 +1663,7 @@
 			
 			<xsl:if test="ext/editorialgroup/committee or ext/editorialgroup/society">
 				<std-sponsor>
-					<xsl:text>Sponsor </xsl:text>
+					<!-- <xsl:text>Sponsor </xsl:text> -->
 					<xsl:variable name="items_">
 						<xsl:apply-templates select="ext/editorialgroup/committee" mode="front_ieee"/>
 						<xsl:apply-templates select="ext/editorialgroup/society" mode="front_ieee"/>
@@ -2108,16 +2113,16 @@
 	<xsl:template match="legal-statement//clause/ul" mode="front_ieee_participants">
 		<xsl:param name="process">false</xsl:param>
 		<xsl:if test="$process = 'true'">
-			<xsl:if test="li[dl/dt[.='role']/following-sibling::dd[1][. != 'member' and not(contains(., 'Manager'))]]">
+			<xsl:if test="li[dl/dt[.='role']/following-sibling::dd[1][. != 'member']]"> <!--  and not(contains(., 'Manager')) -->
 				<officers>
 					<list list-type="simple">
-						<xsl:apply-templates select="li[dl/dt[.='role']/following-sibling::dd[1][. != 'member' and not(contains(., 'Manager'))]]" mode="front_ieee_participants"/>
+						<xsl:apply-templates select="li[dl/dt[.='role']/following-sibling::dd[1][. != 'member']]" mode="front_ieee_participants"/> <!--  and not(contains(., 'Manager')) -->
 					</list>
 				</officers>
 			</xsl:if>
-			<xsl:if test="li[dl/dt[.='role']/following-sibling::dd[1][. = 'member' or contains(., 'Manager')]]">
+			<xsl:if test="li[dl/dt[.='role']/following-sibling::dd[1][. = 'member']]"> <!--  or contains(., 'Manager') -->
 				<list list-type="simple">
-					<xsl:apply-templates select="li[dl/dt[.='role']/following-sibling::dd[1][. = 'member' or contains(., 'Manager')]]" mode="front_ieee_participants"/>
+					<xsl:apply-templates select="li[dl/dt[.='role']/following-sibling::dd[1][. = 'member']]" mode="front_ieee_participants"/> <!--  or contains(., 'Manager') -->
 				</list>
 			</xsl:if>
 		</xsl:if>
