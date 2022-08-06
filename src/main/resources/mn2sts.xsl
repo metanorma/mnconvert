@@ -4662,7 +4662,7 @@
 	<xsl:template match="admonition">
 		<xsl:param name="inside_term">false</xsl:param>
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE' and (parent::introduction or following-sibling::*[1][self::term])">
+			<xsl:when test="$organization = 'IEEE' and (parent::introduction or following-sibling::*[1][self::term] or (following-sibling::*[1][self::dl] and parent::definitions) or (parent::dd and ancestor::definitions))">
 				<xsl:choose>
 					<xsl:when test="parent::introduction">
 						<boxed-text position="anchor">
@@ -4671,7 +4671,7 @@
 							</p>
 						</boxed-text>
 					</xsl:when>
-					<xsl:when test="following-sibling::*[1][self::term] and $inside_term = 'true'">
+					<xsl:when test="$inside_term = 'true'">
 						<editing-instruction>
 							<xsl:apply-templates />
 						</editing-instruction>
@@ -5058,6 +5058,14 @@
 				<xsl:when test="$organization = 'IEEE' and parent::formula">
 					<xsl:call-template name="create_variable-list"/>
 				</xsl:when>
+				<xsl:when test="$organization = 'IEEE' and parent::definitions">
+					<std-def-list>
+						<xsl:apply-templates select="preceding-sibling::*[1][self::admonition][@type='editorial']">
+							<xsl:with-param name="inside_term">true</xsl:with-param>
+						</xsl:apply-templates>
+						<xsl:apply-templates mode="std-def-list"/>
+					</std-def-list>
+				</xsl:when>
 				<xsl:when test="preceding-sibling::*[1][self::figure] or preceding-sibling::*[1][self::stem]">
 					<xsl:call-template name="create_array"/>
 				</xsl:when>
@@ -5164,6 +5172,28 @@
 	<xsl:template match="dd" mode="dl"/>
 	<xsl:template match="dd" mode="dd">
 		<p><xsl:if test="not($organization = 'IEEE' and starts-with(p[1]/@id,'_'))"><xsl:copy-of select="p[1]/@id"/></xsl:if><xsl:apply-templates /></p>
+	</xsl:template>
+	
+	<!-- IEEE -->
+	<xsl:template match="dt" mode="std-def-list">
+		<std-def-list-item>
+			<xsl:if test="ancestor::definitions">
+				<xsl:apply-templates select="following-sibling::dd[1]/admonition[@type='editorial']">
+					<xsl:with-param name="inside_term">true</xsl:with-param>
+				</xsl:apply-templates>
+			</xsl:if>
+			<term>
+				<xsl:apply-templates />
+			</term>
+			<def>
+				<xsl:apply-templates select="following-sibling::dd[1]" mode="dd_std-def-list"/>
+			</def>
+		</std-def-list-item>
+	</xsl:template>
+	<xsl:template match="dd" mode="std-def-list"/>
+	
+	<xsl:template match="dd" mode="dd_std-def-list">
+		<p><xsl:apply-templates select="node()[not(self::admonition[@type='editorial'])]"/></p>
 	</xsl:template>
 	
 	<!-- =============================== -->
