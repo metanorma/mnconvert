@@ -1940,7 +1940,24 @@
 	<!-- first element in Terms and definitions section -->
 	<xsl:template match="sec[@sec-type = 'terms']/title | sec[@sec-type = 'terms']//sec/title | sec[.//std-def-list]/title" priority="2">
 	
-		<xsl:call-template name="title"/>
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEEE' and ../../self::body and . != 'Definitions'">
+				<xsl:variable name="level">
+					<xsl:call-template name="getLevel"/>
+				</xsl:variable>				
+				<xsl:value-of select="$level"/>
+				<xsl:text> </xsl:text>
+				<!-- From:https://www.metanorma.org/author/topics/document-format/section-terms/#clause-title
+					It is recommended to use the "Terms and definitions" title for the clause heading regardless of the content contained — Metanorma will automatically render the correct clause title. -->
+				<xsl:text>Terms and definitions</xsl:text> 
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:call-template name="title"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	
+		
 		
 		<xsl:if test="ancestor::sec[java:toLowerCase(java:java.lang.String.new(title)) = 'terms and definitions'] or ancestor::sec[java:toLowerCase(java:java.lang.String.new(title)) = 'definitions'][.//std-def-list]">
 			<xsl:text>[.boilerplate]</xsl:text>
@@ -2005,7 +2022,21 @@
 	
 	<xsl:template match="std-def-list-item[not(x)]/def">
 		<xsl:apply-templates />
+		<xsl:apply-templates select="../editing-instruction">
+			<xsl:with-param name="process">true</xsl:with-param>
+		</xsl:apply-templates>
 		<xsl:text>&#xa;&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="std-def-list-item[not(x)]/editing-instruction" priority="2">
+		<xsl:param name="process">false</xsl:param>
+		<xsl:if test="$process = 'true'">
+			<xsl:text>&#xa;+&#xa;</xsl:text>
+			<xsl:call-template name="editing-instruction"/>
+		</xsl:if>
+	</xsl:template>
+	<xsl:template match="std-def-list-item[not(x)]/editing-instruction/p" priority="2">
+		<xsl:apply-templates/>
 	</xsl:template>
 	
 	<xsl:template match="std-def-list-item[not(x)]/def/p" priority="2">
@@ -2486,7 +2517,7 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	<xsl:template match="editing-instruction">
+	<xsl:template match="editing-instruction" name="editing-instruction">
 		<xsl:text>EDITOR: </xsl:text>
 		<xsl:apply-templates/>
 		<xsl:text>&#xa;</xsl:text>
