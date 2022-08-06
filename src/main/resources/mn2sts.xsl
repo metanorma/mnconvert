@@ -3323,6 +3323,9 @@
 			<xsl:when test="$organization = 'IEEE'">
 				<xsl:if test="not(preceding-sibling::term)">	<!-- for 1st only -->
 					<std-def-list>
+						<xsl:apply-templates select="preceding-sibling::*[1][self::admonition][@type='editorial']">
+							<xsl:with-param name="inside_term">true</xsl:with-param>
+						</xsl:apply-templates>
 						<xsl:for-each select=". | following-sibling::term">
 							<!-- Example:
 							<std-def-list-item>
@@ -3351,6 +3354,7 @@
 							</term>
 							<x><xsl:text>: </xsl:text></x>
 							<def><xsl:apply-templates select="definition/node()"/></def>
+							<xsl:apply-templates select="*[not(self::definition or self::preferred)]"/>
 						</std-def-list-item>
 						</xsl:for-each>
 					</std-def-list>
@@ -3434,9 +3438,16 @@
 	</xsl:template>
 	
 	<xsl:template match="termnote"> <!--  mode="termEntry" -->
-		<tbx:note>
-			<xsl:apply-templates />
-		</tbx:note>
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEEE'">
+				 <xsl:call-template name="note"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<tbx:note>
+					<xsl:apply-templates />
+				</tbx:note>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="termsource"> <!--  mode="termEntry" -->
@@ -3606,7 +3617,7 @@
 														$parent_name = 'modification' or
 														$parent_name = 'dd'">
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEEE' and ($parent_name = 'definition'  or $parent_name = 'verbaldefinition' or $parent_name = 'verbal-definition')">
+					<xsl:when test="$organization = 'IEEE' and ($parent_name = 'definition' or $parent_name = 'termnote' or $parent_name = 'verbaldefinition' or $parent_name = 'verbal-definition')">
 						<p>
 							<xsl:apply-templates />
 						</p>
@@ -4649,13 +4660,23 @@
 	
 	<!-- https://github.com/metanorma/mn2sts/issues/8 -->
 	<xsl:template match="admonition">
+		<xsl:param name="inside_term">false</xsl:param>
 		<xsl:choose>
-			<xsl:when test="parent::introduction and $organization = 'IEEE'">
-				<boxed-text position="anchor">
-					<p>
-						<xsl:apply-templates />
-					</p>
-				</boxed-text>
+			<xsl:when test="$organization = 'IEEE' and (parent::introduction or following-sibling::*[1][self::term])">
+				<xsl:choose>
+					<xsl:when test="parent::introduction">
+						<boxed-text position="anchor">
+							<p>
+								<xsl:apply-templates />
+							</p>
+						</boxed-text>
+					</xsl:when>
+					<xsl:when test="following-sibling::*[1][self::term] and $inside_term = 'true'">
+						<editing-instruction>
+							<xsl:apply-templates />
+						</editing-instruction>
+					</xsl:when>
+				</xsl:choose>
 			</xsl:when>
 			<xsl:otherwise>
 				<non-normative-note>
