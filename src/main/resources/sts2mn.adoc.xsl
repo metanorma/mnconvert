@@ -4791,7 +4791,12 @@
 		</xsl:if>
 		<xsl:text>[source</xsl:text>
 		<xsl:text>%unnumbered</xsl:text> <!-- otherwise source block gets numbered as a figure -->
-		<xsl:if test="@language">,<xsl:value-of select="@language"/></xsl:if>
+		<xsl:apply-templates select="@language"/>
+		<xsl:apply-templates select="@code-type"/>
+		<xsl:apply-templates select="@preformat-type"/>
+		<xsl:if test="$organization = 'IEEE' and contains(preceding-sibling::*[1],'EXPRESS')">
+			<xsl:text>,EXPRESS</xsl:text>
+		</xsl:if>
 		<xsl:text>]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>--</xsl:text>
@@ -4801,6 +4806,10 @@
 		<xsl:text>--</xsl:text>
 		<xsl:text>&#xa;</xsl:text>		
 		<xsl:if test="not(following-sibling::*)"><xsl:text>&#xa;</xsl:text></xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="code/@language | code/@code-type | preformat/@preformat-type">
+		<xsl:text>,</xsl:text><xsl:value-of select="."/>
 	</xsl:template>
 	
 	<xsl:template match="element-citation">

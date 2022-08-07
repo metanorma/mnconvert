@@ -5469,14 +5469,28 @@
 				</xsl:when>
 				<!-- ISO -->
 				<xsl:otherwise>
-					<preformat>
-						<xsl:if test="@lang">
-							<xsl:attribute name="preformat-type">
-								<xsl:value-of select="@lang"/>
-							</xsl:attribute>
-						</xsl:if>
-						<xsl:apply-templates/>
-					</preformat>
+					<xsl:choose>
+						<xsl:when test="$organization = 'IEEE' and normalize-space(@lang) != ''">
+							<code>
+								<xsl:if test="@lang != 'EXPRESS'">
+									<xsl:attribute name="code-type"><xsl:value-of select="@lang"/></xsl:attribute>
+								</xsl:if>
+								<xsl:attribute name="position">anchor</xsl:attribute>
+								<xsl:attribute name="xml:space">preserve</xsl:attribute>
+								<xsl:apply-templates/>
+							</code>
+						</xsl:when>
+						<xsl:otherwise>
+							<preformat>
+								<xsl:if test="@lang">
+									<xsl:attribute name="preformat-type">
+										<xsl:value-of select="@lang"/>
+									</xsl:attribute>
+								</xsl:if>
+								<xsl:apply-templates/>
+							</preformat>
+						</xsl:otherwise>
+					</xsl:choose>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:if>
