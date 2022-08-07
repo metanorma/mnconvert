@@ -5144,6 +5144,13 @@
 		<xsl:text>stem:[</xsl:text><xsl:apply-templates /><xsl:text>]</xsl:text>
 	</xsl:template>
 	
+	<xsl:template match="styled-content[@style='color']">
+		<xsl:text>[css color:</xsl:text>
+		<xsl:value-of select="@style-type"/>
+		<xsl:text>]#</xsl:text>
+		<xsl:apply-templates />
+		<xsl:text>#</xsl:text>
+	</xsl:template>
 	
 	<xsl:template name="getLevel">
 		<xsl:param name="addon">0</xsl:param>

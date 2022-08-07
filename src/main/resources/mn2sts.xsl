@@ -4418,7 +4418,65 @@
 	</xsl:template>
 
 	<xsl:template match="span">
-		<xsl:apply-templates />
+		<xsl:variable name="styles__">
+			<xsl:call-template name="split">
+				<xsl:with-param name="pText" select="concat(@style,';')"/>
+				<xsl:with-param name="sep" select="';'"/>
+			</xsl:call-template>
+		</xsl:variable>
+		
+		<xsl:variable name="quot">"</xsl:variable>
+		<xsl:variable name="styles_">
+			<xsl:for-each select="xalan:nodeset($styles__)/item">
+				<xsl:variable name="key" select="normalize-space(substring-before(., ':'))"/>
+				<xsl:variable name="value" select="normalize-space(substring-after(translate(.,$quot,''), ':'))"/>
+				<xsl:if test="$key = 'font-family' or $key = 'color'">
+					<style name="{$key}"><xsl:value-of select="$value"/></style>
+				</xsl:if>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:variable name="styles" select="xalan:nodeset($styles_)"/>
+		<xsl:choose>
+			<xsl:when test="$styles/style">
+				<!-- Example: <styled-content style="color" style-type="red">color text</styled-content> -->
+				<xsl:call-template name="insertStyledContent">
+					<xsl:with-param name="node">
+						<xsl:apply-templates />
+					</xsl:with-param>
+					<xsl:with-param name="styles" select="$styles"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:apply-templates />
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<!-- insert nested <styled-content ...><styled-content ...> node </styled-content></styled-content> -->
+	<xsl:template name="insertStyledContent">
+		<xsl:param name="node"/>
+		<xsl:param name="styles"/>
+		<xsl:param name="pos" select="1"/>
+		<xsl:for-each select="$styles/style[$pos]">
+			<styled-content>
+				<!-- Example: <styled-content style="color" style-type="red">color text</styled-content> -->
+				<xsl:attribute name="style"><xsl:value-of select="@name"/></xsl:attribute>
+				<xsl:attribute name="style-type"><xsl:value-of select="."/></xsl:attribute>
+				<xsl:choose>
+					<xsl:when test="($pos + 1) &gt; count(xalan:nodeset($styles)/style)"> <!-- last style -->
+						<xsl:copy-of select="$node"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:call-template name="insertStyledContent">
+							<xsl:with-param name="node" select="$node"/>
+							<xsl:with-param name="styles" select="$styles"/>
+							<xsl:with-param name="pos" select="$pos + 1"/>
+						</xsl:call-template>
+					</xsl:otherwise>
+				</xsl:choose>
+			</styled-content>
+		</xsl:for-each>
+		
 	</xsl:template>
 
 	<!-- <xsl:template match="*[local-name() = 'definition']//*[local-name() = 'em']" priority="2"> -->
@@ -5925,5 +5983,32 @@
 			<xsl:otherwise>undated</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
+	
+	<!-- split string by separator -->
+	<xsl:template name="split">
+		<xsl:param name="pText" select="."/>
+		<xsl:param name="sep" select="','"/>
+		<xsl:param name="normalize-space" select="'true'"/>
+		<xsl:param name="keep_sep" select="'false'"/>
+		<xsl:if test="string-length($pText) >0">
+			<item>
+				<xsl:choose>
+					<xsl:when test="$normalize-space = 'true'">
+						<xsl:value-of select="normalize-space(substring-before(concat($pText, $sep), $sep))"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="substring-before(concat($pText, $sep), $sep)"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</item>
+			<xsl:if test="$keep_sep = 'true' and contains($pText, $sep)"><item><xsl:value-of select="$sep"/></item></xsl:if>
+			<xsl:call-template name="split">
+				<xsl:with-param name="pText" select="substring-after($pText, $sep)"/>
+				<xsl:with-param name="sep" select="$sep"/>
+				<xsl:with-param name="normalize-space" select="$normalize-space"/>
+				<xsl:with-param name="keep_sep" select="$keep_sep"/>
+			</xsl:call-template>
+		</xsl:if>
+	</xsl:template> <!-- split -->
 	
 </xsl:stylesheet>
