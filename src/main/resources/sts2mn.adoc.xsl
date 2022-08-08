@@ -3655,17 +3655,19 @@
 		</xsl:variable>
 		<xsl:choose>
 			<xsl:when test="$cols-count = 1">1</xsl:when> <!-- cols="1" -->
-			<xsl:when test="colgroup/col[@width] or col[@width]">
+			<xsl:when test="colgroup/col[@width or @align] or col[@width or @align]">
 				<xsl:for-each select="colgroup/col | col">
+					<xsl:call-template name="alignmentProcessing"/>
 					<xsl:variable name="width" select="translate(@width, '%cm', '')"/>
 					<xsl:variable name="width_number" select="number($width)"/>
 					<xsl:choose>
 						<xsl:when test="normalize-space($width_number) != 'NaN'">
 							<xsl:value-of select="round($width_number * 100)"/>
 						</xsl:when>
-						<xsl:otherwise>
+						<xsl:when test="$width != ''">
 							<xsl:value-of select="$width"/>
-						</xsl:otherwise>
+						</xsl:when>
+						<xsl:otherwise>1</xsl:otherwise>
 					</xsl:choose>
 					<xsl:if test="position() != last()">,</xsl:if>
 				</xsl:for-each>
@@ -3751,6 +3753,7 @@
 		<xsl:call-template name="alignmentProcessing"/>
 		<xsl:call-template name="complexFormatProcessing"/>
 		<xsl:call-template name="insertCellSeparator"/>
+		<xsl:call-template name="alignmentProcessingP"/>
 		<xsl:apply-templates />
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
@@ -3760,6 +3763,7 @@
 		<xsl:call-template name="alignmentProcessing"/>
 		<xsl:call-template name="complexFormatProcessing"/>
 		<xsl:call-template name="insertCellSeparator"/>
+		<xsl:call-template name="alignmentProcessingP"/>
 		<xsl:choose>
 			<xsl:when test="position() = last() and normalize-space() = '' and not(*)"></xsl:when>
 			<xsl:otherwise>
@@ -3777,7 +3781,6 @@
 				<xsl:text> </xsl:text>
 			</xsl:otherwise>
 		</xsl:choose>
-		
 	</xsl:template>
 	
 	<xsl:template name="spanProcessing">		
@@ -3799,7 +3802,11 @@
 	</xsl:template>
 	
 	<xsl:template name="alignmentProcessing">
-		<xsl:if test="(@align and @align != 'left') or (@valign and @valign != 'top')">
+		
+		<xsl:variable name="defaultAlignment"><xsl:if test="not($organization = 'IEEE')">left</xsl:if></xsl:variable>
+		<xsl:variable name="defaultVAlignment"><xsl:if test="not($organization = 'IEEE')">top</xsl:if></xsl:variable>
+
+		<xsl:if test="(@align and @align != $defaultAlignment) or (@valign and @valign != $defaultVAlignment)">
 			
 			<xsl:variable name="align">
 				<xsl:call-template name="getAlignFormat"/>
@@ -3815,25 +3822,36 @@
 		</xsl:if>
 	</xsl:template>
 	
+	<!-- special case: set justified alignment for child 'p' -->
+	<xsl:template name="alignmentProcessingP">
+		<xsl:if test="@align = 'justify'">
+			<xsl:text>[align=justified]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
 	<xsl:template name="complexFormatProcessing">
 		<xsl:if test=".//graphic or .//inline-graphic or .//list or .//def-list or
 			.//named-content[@content-type = 'ace-tag'][contains(@specific-use, '_start') or contains(@specific-use, '_end')] or
 			.//styled-content[@style = 'addition' or @style-type = 'addition'] or
-			.//styled-content[@style = 'text-alignment: center']">a</xsl:if> <!-- AsciiDoc prefix before table cell -->
+			.//styled-content[@style = 'text-alignment: center'] or
+			@align = 'justify'">a</xsl:if> <!-- AsciiDoc prefix before table cell -->
 	</xsl:template>
 	
 	<xsl:template name="getAlignFormat">
 		<xsl:choose>
 			<xsl:when test="@align = 'center'">^</xsl:when>
 			<xsl:when test="@align = 'right'">&gt;</xsl:when>
-			<!-- <xsl:otherwise>&lt;</xsl:otherwise> --><!-- left -->
+			<xsl:when test="@align = 'left' and $organization = 'IEEE'">&lt;</xsl:when>
+			<!-- <xsl:otherwise>&lt;</xsl:otherwise> --> <!-- left -->
 		</xsl:choose>
 	</xsl:template>
 	<xsl:template name="getVAlignFormat">
 		<xsl:choose>
 			<xsl:when test="@valign = 'middle'">.^</xsl:when>
 			<xsl:when test="@valign = 'bottom'">.&gt;</xsl:when>
-			<!-- <xsl:otherwise>&lt;</xsl:otherwise> --> <!-- top -->
+			<xsl:when test="@valign = 'top' and $organization = 'IEEE'">.&lt;</xsl:when>
+			<!-- <xsl:otherwise>.&lt;</xsl:otherwise> --> <!-- top -->
 		</xsl:choose>
 	</xsl:template>
 	

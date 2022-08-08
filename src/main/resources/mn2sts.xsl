@@ -3658,6 +3658,9 @@
 							</styled-content>
 						</p>
 					</xsl:when>
+					<xsl:when test="$organization = 'IEEE' and ($parent_name = 'td' or $parent_name = 'th')">
+						<xsl:apply-templates />
+					</xsl:when>
 					<xsl:otherwise>
 						<p>
 							<xsl:if test="$organization != 'BSI' and $organization != 'IEEE'">
@@ -5076,6 +5079,9 @@
 	<xsl:template match="td | th">
 		<xsl:element name="{local-name()}"> <!-- <th> <td> -->
 			<xsl:choose>
+				<xsl:when test="$organization = 'IEEE' and p/@align[. = 'justified']">
+					<xsl:attribute name="align">justify</xsl:attribute>
+				</xsl:when>
 				<xsl:when test="$organization = 'IEEE' and @align='left' and @valign='top'">
 					<xsl:apply-templates select="@*[local-name() != 'align' and local-name() != 'valign']"/>
 					<xsl:if test="@colspan">
