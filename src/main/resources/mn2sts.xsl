@@ -4037,6 +4037,7 @@
 					<xsl:variable name="start_standard_regex">^((CN|IEC|(IEC/[A-Z]{2,3})|IETF|BCP|ISO|(ISO/[A-Z]{2,3})|ITU|NIST|OGC|CC|OMG|UN|W3C|IEEE|IHO|BIPM|ECMA|CIE|BS|BSI|BS(\s|\h)OHSAS|PAS|CEN|(CEN/[A-Z]{2,3})|CEN/CENELEC|EN|IANA|3GPP|OASIS|IEV)(\s|\h))+((Guide|TR|TC)(\s|\h))?\d.*</xsl:variable>
 					<xsl:if test="java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($docidentifier)) = 'true'">
 						<xsl:attribute name="type">standard</xsl:attribute>
+						<xsl:attribute name="organization"><xsl:value-of select="java:replaceAll(java:java.lang.String.new(normalize-space($docidentifier)),$start_standard_regex,'$2')"/></xsl:attribute>
 					</xsl:if>
 				</xsl:if>
 				
@@ -4044,6 +4045,10 @@
 				<docidentifier>
 					<xsl:value-of select="$docidentifier"/>
 				</docidentifier>
+				
+				<xsl:if test="$organization = 'IEEE'">
+					<xsl:copy-of select="formattedref"/>
+				</xsl:if>
 			</bibitem>
 		</xsl:for-each>
 	</xsl:variable>
@@ -4059,9 +4064,12 @@
 		</xsl:variable>
 		<xsl:variable name="model_eref" select="xalan:nodeset($model_eref_)"/>
 	
-		<xsl:variable name="docidentifier_URN" select="normalize-space($bibitems_URN/bibitem[@id = current()/@bibitemid]/urn)"/>
+		<xsl:variable name="bibitem_URN_" select="$bibitems_URN/bibitem[@id = current()/@bibitemid]"/>
+		<xsl:variable name="bibitem_URN" select="xalan:nodeset($bibitem_URN_)"/>
+	
+		<xsl:variable name="docidentifier_URN" select="normalize-space($bibitem_URN/urn)"/>
 		
-		<xsl:variable name="docidentifier" select="normalize-space($bibitems_URN/bibitem[@id = current()/@bibitemid]/docidentifier)"/>
+		<xsl:variable name="docidentifier" select="normalize-space($bibitem_URN/docidentifier)"/>
 		<!-- bibitems_URN=<xsl:copy-of select="$bibitems_URN"/> -->
 		<xsl:variable name="value">
 			<xsl:choose>
@@ -4133,7 +4141,7 @@
 					
 				</std-ref>
 			</std>
-		</xsl:if>
+		</xsl:if> <!-- eref for $organization = 'IEC' -->
 	
 		<xsl:if test="$organization = 'BSI'">
 			<!-- <xsl:copy-of select="$model_eref"/> -->
@@ -4232,9 +4240,30 @@
 				</xsl:choose>
 			</xsl:variable>
 			
+		</xsl:if> <!-- eref for $organization = 'BSI' -->
+		
+		<xsl:if test="$organization = 'IEEE'">
+			<mixed-citation>
+				<!-- <debug><xsl:copy-of select="$bibitem_URN"/></debug> -->
+				<xsl:choose>
+					<xsl:when test="$bibitem_URN/@type = 'standard'">
+						<std>
+							<std-organization><xsl:value-of select="$bibitem_URN/@organization"/></std-organization>
+							<pub-id pub-id-type="std-designation">Std <xsl:value-of select="normalize-space(substring-after($bibitem_URN/docidentifier, $bibitem_URN/@organization))"/></pub-id>&#x2122;
+						</std>
+					</xsl:when>
+					<xsl:otherwise> <!-- non-standard -->
+					</xsl:otherwise>
+				</xsl:choose>
+			</mixed-citation>
+			<xref>
+				<xsl:attribute name="ref-type">bibr</xsl:attribute>
+				<xsl:attribute name="rid"><xsl:value-of select="@bibitemid"/></xsl:attribute>
+				<xsl:value-of select="@citeas"/>
+			</xref>
 		</xsl:if>
 		
-		<xsl:if test="$organization != 'IEC' and $organization != 'BSI'">
+		<xsl:if test="$organization != 'IEC' and $organization != 'BSI' and $organization != 'IEEE'">
 	
 			<xsl:variable name="citeas_" select="java:replaceAll(java:java.lang.String.new(@citeas),'--','—')"/>
 			<xsl:variable name="citeas">
