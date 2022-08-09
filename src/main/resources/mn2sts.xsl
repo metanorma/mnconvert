@@ -1571,6 +1571,8 @@
 		</xsl:element>
 	</xsl:template> <!-- bibdata mode="front" -->
 	
+	
+	<xsl:variable name="trademark">&#x2122;</xsl:variable>
 	<!-- ============= -->
 	<!-- IEEE bibdata -->
 	<!-- ============= -->
@@ -1583,7 +1585,6 @@
 			<xsl:variable name="bibdata"><xsl:copy-of select="."/></xsl:variable> <!-- for using bibdata in another context in 'for-each' iterations -->
 			
 			<xsl:variable name="std_prefix">IEEE Std </xsl:variable>
-			<xsl:variable name="trademark">&#x2122;</xsl:variable>
 			<xsl:variable name="number" select="docidentifier[@type = 'IEEE'][not(@scope)]"/>
 			<xsl:variable name="year" select="substring(normalize-space(date[@type = 'issued']),1,4)"/> <!-- approval date -->
 			
@@ -3057,10 +3058,12 @@
 	</xsl:template>
 	
 	<xsl:template name="bibitem_norm_ref_IEEE">
+		<xsl:variable name="bibitem_URN_" select="$bibitems_URN/bibitem[@id = current()/../@bibitemid]"/>
+		<xsl:variable name="bibitem_URN" select="xalan:nodeset($bibitem_URN_)"/>
 		<list-item>
 			<p>
 				<xsl:choose>
-					<xsl:when test="@type = 'standard'">
+					<xsl:when test="$bibitem_URN/@type = 'standard'">
 						<xsl:apply-templates/>
 					</xsl:when>
 					<xsl:otherwise>
@@ -3073,7 +3076,12 @@
 	</xsl:template>
 	
 	<xsl:template match="bibitem/formattedref" mode="IEEE">
+		<xsl:variable name="bibitem_URN_" select="$bibitems_URN/bibitem[@id = current()/../@bibitemid]"/>
+		<xsl:variable name="bibitem_URN" select="xalan:nodeset($bibitem_URN_)"/>
 		<mixed-citation publication-format="print">
+			<xsl:if test="$bibitem_URN/@type = 'standard'">
+				<xsl:attribute name="publication-type">standard</xsl:attribute>
+			</xsl:if>
 			<std>
 				<source>
 					<xsl:apply-templates select="node()[not(self::xref or self::fn or self::text()[preceding-sibling::*[1][self::fn]])]"/>
@@ -4015,6 +4023,7 @@
 			<bibitem>
 				<xsl:copy-of select="@id"/>
 				<xsl:copy-of select="@type"/>
+				<xsl:copy-of select="@hidden"/>
 				<xsl:variable name="urn_" select="docidentifier[@type = 'URN']"/>
 				<!-- remove URN urn: at start -->
 				<xsl:variable name="urn__" select="java:replaceAll(java:java.lang.String.new($urn_),'^(URN )?(urn:)?','')"/>
@@ -4032,13 +4041,24 @@
 					</xsl:if>
 				</xsl:variable>
 				
-				<xsl:if test="not(@type)">
-					<!-- Examples: ISO number, BS EN number, EN ISO number -->
-					<xsl:variable name="start_standard_regex">^((CN|IEC|(IEC/[A-Z]{2,3})|IETF|BCP|ISO|(ISO/[A-Z]{2,3})|ITU|NIST|OGC|CC|OMG|UN|W3C|IEEE|IHO|BIPM|ECMA|CIE|BS|BSI|BS(\s|\h)OHSAS|PAS|CEN|(CEN/[A-Z]{2,3})|CEN/CENELEC|EN|IANA|3GPP|OASIS|IEV)(\s|\h))+((Guide|TR|TC)(\s|\h))?\d.*</xsl:variable>
-					<xsl:if test="java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($docidentifier)) = 'true'">
+				<!-- Examples: ISO number, BS EN number, EN ISO number -->
+				<xsl:variable name="start_standard_regex">^((CN|IEC|(IEC/[A-Z]{2,3})|IETF|BCP|ISO|(ISO/[A-Z]{2,3})|ITU|NIST|OGC|CC|OMG|UN|W3C|IEEE|IEEE Std|IHO|BIPM|ECMA|CIE|BS|BSI|BS(\s|\h)OHSAS|PAS|CEN|(CEN/[A-Z]{2,3})|CEN/CENELEC|EN|IANA|3GPP|OASIS|IEV)(\s|\h))+((Guide|TR|TC)(\s|\h))?\d.*</xsl:variable>
+				<xsl:variable name="start_standard_regex_IEEE">^(IEEE)(\s|\h)(Std(\s|\h))?(.*)</xsl:variable>
+				<xsl:if test="java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, normalize-space($docidentifier)) = 'true' or java:org.metanorma.utils.RegExHelper.matches($start_standard_regex_IEEE, normalize-space($docidentifier)) = 'true'">
+					<xsl:if test="not(@type)">
 						<xsl:attribute name="type">standard</xsl:attribute>
-						<xsl:attribute name="organization"><xsl:value-of select="java:replaceAll(java:java.lang.String.new(normalize-space($docidentifier)),$start_standard_regex,'$2')"/></xsl:attribute>
 					</xsl:if>
+					
+					<xsl:attribute name="organization">
+						<xsl:choose>
+							<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($start_standard_regex_IEEE, normalize-space($docidentifier)) = 'true'">
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new(normalize-space($docidentifier)),$start_standard_regex_IEEE,'$1')"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="java:replaceAll(java:java.lang.String.new(normalize-space($docidentifier)),$start_standard_regex,'$2')"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
 				</xsl:if>
 				
 				<urn><xsl:value-of select="$urn"/></urn>
@@ -4248,19 +4268,26 @@
 				<xsl:choose>
 					<xsl:when test="$bibitem_URN/@type = 'standard'">
 						<std>
-							<std-organization><xsl:value-of select="$bibitem_URN/@organization"/></std-organization>
-							<pub-id pub-id-type="std-designation">Std <xsl:value-of select="normalize-space(substring-after($bibitem_URN/docidentifier, $bibitem_URN/@organization))"/></pub-id>&#x2122;
+							<xsl:variable name="organization" select="java:replaceAll(java:java.lang.String.new($bibitem_URN/@organization),' Std','')" />
+							<std-organization><xsl:value-of select="$organization"/></std-organization>
+							<pub-id pub-id-type="std-designation">
+								<xsl:text>Std </xsl:text>
+								<!-- <xsl:value-of select="normalize-space(substring-after($bibitem_URN/docidentifier, $bibitem_URN/@organization))"/> -->
+								<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($bibitem_URN/docidentifier),concat($bibitem_URN/@organization,'([\s|\h]Std[\s|\h])?([^,]*).*'),'$2'))"/> <!-- 'IEEE Std 1234, ...' => 1234 -->
+							</pub-id><xsl:value-of select="$trademark"/>
 						</std>
 					</xsl:when>
 					<xsl:otherwise> <!-- non-standard -->
 					</xsl:otherwise>
 				</xsl:choose>
 			</mixed-citation>
-			<xref>
-				<xsl:attribute name="ref-type">bibr</xsl:attribute>
-				<xsl:attribute name="rid"><xsl:value-of select="@bibitemid"/></xsl:attribute>
-				<xsl:value-of select="@citeas"/>
-			</xref>
+			<xsl:if test="not($bibitem_URN/@hidden = 'true')">
+				<xref>
+					<xsl:attribute name="ref-type">bibr</xsl:attribute>
+					<xsl:attribute name="rid"><xsl:value-of select="@bibitemid"/></xsl:attribute>
+					<xsl:value-of select="@citeas"/>
+				</xref>
+			</xsl:if>
 		</xsl:if>
 		
 		<xsl:if test="$organization != 'IEC' and $organization != 'BSI' and $organization != 'IEEE'">
