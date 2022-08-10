@@ -4072,7 +4072,7 @@
 				<xsl:variable name="docidentifier">
 					<xsl:value-of select="docidentifier[not(@type = 'metanorma' or @type = 'metanorma-ordinal')][1]"/>
 					<!-- <xsl:if test="starts-with(@id, 'hidden_bibitem_')"> -->
-					<xsl:if test="@hidden = 'true'">
+					<xsl:if test="@hidden = 'true' and not($organization = 'IEEE')">
 						<xsl:text> </xsl:text>
 						<xsl:value-of select="translate(docnumber, '&#xa0;&#8209;', ' -')"/>
 					</xsl:if>
@@ -4304,22 +4304,14 @@
 		</xsl:if> <!-- eref for $organization = 'BSI' -->
 		
 		<xsl:if test="$organization = 'IEEE'">
-			<mixed-citation>
-				<!-- <debug><xsl:copy-of select="$bibitem_URN"/></debug> -->
-				<xsl:choose>
-					<xsl:when test="$bibitem_URN/@type = 'standard'">
-						<xsl:call-template name="insert_std_IEEE">
-							<xsl:with-param name="bibitem_URN" select="$bibitem_URN"/>
-						</xsl:call-template>
-						
-					</xsl:when>
-					<xsl:otherwise> <!-- non-standard -->
-						<source>
-							<xsl:value-of select="."/>
-						</source>
-					</xsl:otherwise>
-				</xsl:choose>
-			</mixed-citation>
+			<xsl:if test="$bibitem_URN/@type = 'standard'">
+				<mixed-citation>
+					<!-- <debug><xsl:copy-of select="$bibitem_URN"/></debug> -->
+					<xsl:call-template name="insert_std_IEEE">
+						<xsl:with-param name="bibitem_URN" select="$bibitem_URN"/>
+					</xsl:call-template>
+				</mixed-citation>
+			</xsl:if>
 			<xsl:if test="not($bibitem_URN/@hidden = 'true')">
 				<xref>
 					<xsl:attribute name="ref-type">bibr</xsl:attribute>
@@ -4385,21 +4377,37 @@
 	<xsl:template name="insert_std_IEEE">
 		<xsl:param name="bibitem_URN"/>
 		<xsl:param name="is_bibitem">false</xsl:param>
+		
+		<!-- From xref:
+		<mixed-citation>
+			<std>
+				<xsl:variable name="pub-id"><xsl:apply-templates /></xsl:variable>
+				<xsl:variable name="regex_pub-id">^(\w*)(\s|\h)(.*)</xsl:variable>
+				<std-organization><xsl:value-of select="java:replaceAll(java:java.lang.String.new($pub-id),$regex_pub-id,'$1')"/></std-organization>
+				<pub-id pub-id-type="std-designation"><xsl:value-of select="java:replaceAll(java:java.lang.String.new($pub-id),$regex_pub-id,'$3')"/></pub-id>
+			</std>
+		</mixed-citation> -->
+		
 		<std>
 			<xsl:variable name="organization" select="java:replaceAll(java:java.lang.String.new($bibitem_URN/@organization),' Std','')" />
 			<std-organization><xsl:value-of select="$organization"/></std-organization>
-			<xsl:if test="$is_bibitem = 'true'">
-				<xsl:text> Std </xsl:text>
-			</xsl:if>
+			<!-- <xsl:if test="$is_bibitem = 'true'"> -->
+			<xsl:text> Std </xsl:text>
+			<!-- </xsl:if> -->
 			<pub-id pub-id-type="std-designation">
-				<xsl:if test="$is_bibitem = 'false'">
+				<!-- <xsl:if test="$is_bibitem = 'false'">
 					<xsl:text>Std </xsl:text>
-				</xsl:if>
+				</xsl:if> -->
 				<!-- <xsl:value-of select="normalize-space(substring-after($bibitem_URN/docidentifier, $bibitem_URN/@organization))"/> -->
-				<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($bibitem_URN/docidentifier),concat($bibitem_URN/@organization,'([\s|\h]Std[\s|\h])?([^,]*).*'),'$2'))"/> <!-- 'IEEE Std 1234, ...' => 1234 -->
+			 <!--  <bibitem_URN_docidentifier><xsl:value-of select="$bibitem_URN/docidentifier"/></bibitem_URN_docidentifier>
+				<regex><xsl:value-of select="concat($bibitem_URN/@organization,'([\s|\h]Std[\s|\h])?([^,]*)™?.*'),'$2')"/></regex> -->
+				<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($bibitem_URN/docidentifier),concat($bibitem_URN/@organization,'([\s|\h]Std[\s|\h])?([^,™]*).*'),'$2'))"/> <!-- 'IEEE Std 1234, ...' => 1234 -->
 			</pub-id><xsl:value-of select="$trademark"/>
 			<xsl:if test="$is_bibitem = 'true'">
-				<source specific-use="IEEE">
+				<source>
+					<xsl:if test="$bibitem_URN/@type = 'standard'">
+						<xsl:attribute name="specific-use">IEEE</xsl:attribute>
+					</xsl:if>
 					<xsl:variable name="nodes">
 						<xsl:apply-templates select="node()[not(self::xref or self::fn or self::text()[preceding-sibling::*[1][self::fn]])]"/>
 					</xsl:variable>
