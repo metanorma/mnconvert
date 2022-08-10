@@ -3100,7 +3100,7 @@
 						<xsl:with-param name="is_bibitem" select="'true'"/>
 					</xsl:call-template>
 				</xsl:when>
-				<xsl:otherwise>
+				<xsl:otherwise> <!-- non-standard -->
 					<source>
 						<xsl:apply-templates select="node()[not(self::xref or self::fn or self::text()[preceding-sibling::*[1][self::fn]])]"/>
 					</source>
@@ -3118,10 +3118,17 @@
 						<xsl:with-param name="docidentifier" select="$docidentifier"/>
 					</xsl:call-template>
 				</xsl:variable>
+				
+				<xsl:variable name="regex_pub-id-year">^(.*)[\s|\h]?-[\s|\h]?(\d{4})$</xsl:variable>
+				<xsl:variable name="pub-id_full" select="normalize-space(substring-after(docidentifier[@type = 'IEEE' and @scope=  'trademark'], $organization))"/>
+				<xsl:variable name="pub-id" select="java:replaceAll(java:java.lang.String.new($pub-id_full),$regex_pub-id-year,'$1')"/> <!-- number without year -->
+				<xsl:variable name="year" select="java:replaceAll(java:java.lang.String.new($pub-id_full),$regex_pub-id-year,'$2')"/>
+				
 				<std-organization><xsl:value-of select="$organization"/></std-organization> Std	
-				<pub-id><xsl:value-of select="normalize-space(substring-after(docidentifier[@type = 'IEEE' and @scope=  'trademark'], $organization))"/></pub-id>
+				<pub-id><xsl:value-of select="$pub-id"/></pub-id>
+				<xsl:if test="$year != '' and $year != $pub-id">-<year><xsl:value-of select="$year"/></year></xsl:if>
+				<source specific-use="IEEE"><xsl:apply-templates select="title/node()"/></source>
 			</std>.
-			<source specific-use="IEEE"><xsl:apply-templates select="title/node()"/></source>
 		</mixed-citation>
 	</xsl:template>
 	
@@ -4394,6 +4401,12 @@
 			<!-- <xsl:if test="$is_bibitem = 'true'"> -->
 			<xsl:text> Std </xsl:text>
 			<!-- </xsl:if> -->
+			
+			<xsl:variable name="regex_pub-id-year">^(.*)[\s|\h]?-[\s|\h]?(\d{4})$</xsl:variable>
+			<xsl:variable name="pub-id_full" select="normalize-space(java:replaceAll(java:java.lang.String.new($bibitem_URN/docidentifier),concat($bibitem_URN/@organization,'([\s|\h]Std[\s|\h])?([^,™]*).*'),'$2'))"/>
+			<xsl:variable name="pub-id" select="java:replaceAll(java:java.lang.String.new($pub-id_full),$regex_pub-id-year,'$1')"/> <!-- number without year -->
+			<xsl:variable name="year" select="java:replaceAll(java:java.lang.String.new($pub-id_full),$regex_pub-id-year,'$2')"/>
+			
 			<pub-id pub-id-type="std-designation">
 				<!-- <xsl:if test="$is_bibitem = 'false'">
 					<xsl:text>Std </xsl:text>
@@ -4401,13 +4414,14 @@
 				<!-- <xsl:value-of select="normalize-space(substring-after($bibitem_URN/docidentifier, $bibitem_URN/@organization))"/> -->
 			 <!--  <bibitem_URN_docidentifier><xsl:value-of select="$bibitem_URN/docidentifier"/></bibitem_URN_docidentifier>
 				<regex><xsl:value-of select="concat($bibitem_URN/@organization,'([\s|\h]Std[\s|\h])?([^,]*)™?.*'),'$2')"/></regex> -->
-				<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($bibitem_URN/docidentifier),concat($bibitem_URN/@organization,'([\s|\h]Std[\s|\h])?([^,™]*).*'),'$2'))"/> <!-- 'IEEE Std 1234, ...' => 1234 -->
+				<xsl:value-of select="$pub-id"/>
 			</pub-id><xsl:value-of select="$trademark"/>
+			<xsl:if test="$year != '' and $year != $pub-id">-<year><xsl:value-of select="$year"/></year></xsl:if>
 			<xsl:if test="$is_bibitem = 'true'">
-				<source>
-					<xsl:if test="$bibitem_URN/@type = 'standard'">
+				<source specific-use="IEEE">
+					<!-- <xsl:if test="$bibitem_URN/@type = 'standard'">
 						<xsl:attribute name="specific-use">IEEE</xsl:attribute>
-					</xsl:if>
+					</xsl:if> -->
 					<xsl:variable name="nodes">
 						<xsl:apply-templates select="node()[not(self::xref or self::fn or self::text()[preceding-sibling::*[1][self::fn]])]"/>
 					</xsl:variable>
@@ -4731,7 +4745,7 @@
 		</xsl:if>
 		
 		<xsl:choose>
-			<xsl:when test="starts-with(@target,'hidden_') and $organization = 'IEEE'">
+			<!-- <xsl:when test="starts-with(@target,'hidden_') and $organization = 'IEEE'">
 				<mixed-citation>
 					<std>
 						<xsl:variable name="pub-id"><xsl:apply-templates /></xsl:variable>
@@ -4740,7 +4754,7 @@
 						<pub-id pub-id-type="std-designation"><xsl:value-of select="java:replaceAll(java:java.lang.String.new($pub-id),$regex_pub-id,'$3')"/></pub-id>
 					</std>
 				</mixed-citation>
-			</xsl:when>
+			</xsl:when> -->
 			<xsl:otherwise>
 				<xref> <!-- ref-type="{$ref_type}" rid="{$id}" --> <!-- replaced by xsl:attribute name=... for save ordering -->
 					<xsl:attribute name="ref-type">
