@@ -780,6 +780,12 @@
 	<xsl:template name="insertBack">
 		<xsl:if test="annex or bibliography/references or indexsect or .//index">
 			<back>
+				<xsl:if test="$organization = 'IEEE'">
+					<xsl:apply-templates select="preface/acknowledgements" mode="front_preface">
+						<xsl:with-param name="process">true</xsl:with-param>
+					</xsl:apply-templates>
+				</xsl:if>
+			
 				<xsl:if test="annex">
 					<app-group>
 						<xsl:apply-templates select="annex" mode="back"/>
@@ -2069,18 +2075,7 @@
 	</xsl:template>
 	
 	<xsl:template match="preface/acknowledgements" mode="front_preface" priority="2">
-		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE'">
-				<ack>
-					<xsl:copy-of select="@id"/>
-					<xsl:apply-templates select="title"/>
-					<xsl:apply-templates select="node()[not(self::title)]"/>
-				</ack>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:call-template name="preface_node"/> <!-- see below -->
-			</xsl:otherwise>
-		</xsl:choose>
+		<xsl:call-template name="preface_node"/> <!-- see below -->
 	</xsl:template>
 	
 	<xsl:template match="preface/*[not(self::abstract or @type = 'section-title' or self::section-title)]" mode="front_preface" name="preface_node">

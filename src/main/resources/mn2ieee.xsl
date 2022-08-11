@@ -635,6 +635,25 @@
 	<!-- End IEEE bibdata -->
 	<!-- ============= -->
 	
+	<xsl:template match="preface/clause[starts-with(@id,'front-ack')]" mode="front_preface">
+		<ack>
+			<xsl:copy-of select="@id"/>
+			<xsl:apply-templates />
+		</ack>
+	</xsl:template>
+	
+	<xsl:template match="preface/acknowledgements" mode="front_preface" priority="3">
+		<xsl:param name="process">false</xsl:param>
+		<xsl:if test="$process = 'true'">
+			<ack content-type="back-ack1">
+				<xsl:copy-of select="@id"/>
+				<!-- <xsl:apply-templates select="title"/>
+				<xsl:apply-templates select="node()[not(self::title)]"/> -->
+				<xsl:apply-templates />
+			</ack>
+		</xsl:if>
+	</xsl:template>
+	
 	<xsl:template match="p">
 		<xsl:variable name="parent_name" select="local-name(..)"/>
 		

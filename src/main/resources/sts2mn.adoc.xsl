@@ -483,7 +483,7 @@
 			</xsl:if>
 			
 			<!-- if in front there are another elements, except xxx-meta -->
-			<xsl:for-each select="*[local-name() != 'iso-meta' and local-name() != 'nat-meta' and local-name() != 'reg-meta' and local-name() != 'std-meta']">
+			<xsl:for-each select="*[local-name() != 'iso-meta' and local-name() != 'nat-meta' and local-name() != 'reg-meta' and local-name() != 'std-meta'] | ancestor::standards-document/back/ack[title = 'Acknowledgements']">
 				<xsl:variable name="number_"><xsl:number /></xsl:variable>
 				<xsl:variable name="number" select="format-number($number_, '00')"/>
 				<xsl:variable name="section_name">
@@ -534,7 +534,7 @@
 			<xsl:apply-templates select="/standard/back"/> -->
 		</xsl:if>
 		
-	</xsl:template>
+	</xsl:template> <!--END: front -->
 	
 	<xsl:template name="insertCommonAttributes">
 		<xsl:text>:mn-document-class: </xsl:text><xsl:value-of select="$sdo"/>
@@ -1849,9 +1849,13 @@
 	</xsl:template>
 		
 	
-	<xsl:template match="front/ack">
+	<xsl:template match="front/ack | back/ack[title = 'Acknowledgements']">
 		<xsl:call-template name="setId"/>
-		<xsl:text>[.preface,heading=acknowledgements]</xsl:text>
+		<xsl:text>[.preface</xsl:text>
+		<xsl:if test="not($organization = 'IEEE') or ancestor::back">
+			<xsl:text>,heading=acknowledgements</xsl:text>
+		</xsl:if>
+		<xsl:text>]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:apply-templates />
 	</xsl:template>
