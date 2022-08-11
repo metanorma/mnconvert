@@ -4763,7 +4763,7 @@
 			</xsl:if>
 		
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),':')) = 'false'"> <!-- and not(parent::p) -->
+				<xsl:when test="$organization = 'IEEE' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),':')) = 'false' and not(parent::dd)"> <!-- and not(parent::p) -->
 					<p>
 						<disp-formula>
 							<xsl:apply-templates />
