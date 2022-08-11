@@ -3213,6 +3213,13 @@
 						<xsl:value-of select="@rid"/>
 						<xsl:text>}</xsl:text> -->
 					</xsl:when>
+					<xsl:when test="@ref-type = 'fn' and ancestor::code"> <!-- xref in 'code' -->
+						<xsl:text>{{{</xsl:text>
+						<xsl:for-each select="ancestor::code/following-sibling::fn[@id = current()/@rid]">
+							<xsl:call-template name="fn"/>
+						</xsl:for-each>
+						<xsl:text>}}}</xsl:text>
+					</xsl:when>
 					<xsl:otherwise>
 						<!-- fn will be processed after xref -->
 						<!-- no need to process right now -->
@@ -3294,6 +3301,9 @@
 		<xsl:value-of select="@id"/>
 		<xsl:text>]</xsl:text>
 	</xsl:template>
+	
+	<!-- special case: fn after 'code' with 'xref' -->
+	<xsl:template match="fn[preceding-sibling::*[1][self::code][xref[@ref-type = 'fn']]]" priority="2"/>
 	
 	<xsl:template match="fn" name="fn">
 		<xsl:if test="preceding-sibling::node()[normalize-space() != ''][1][self::fn]">
