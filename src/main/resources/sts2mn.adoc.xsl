@@ -4997,8 +4997,21 @@
 	<xsl:template match="def-item/term | var-item/term">
 		<xsl:apply-templates/>
 		<xsl:if test="count(node()) = 0"><xsl:text> </xsl:text></xsl:if>
+		<xsl:apply-templates select="following-sibling::*[self::x] | following-sibling::*[self::def]/x">
+			<xsl:with-param name="process">true</xsl:with-param>
+		</xsl:apply-templates>
 		<xsl:text>:: </xsl:text>
 		<!-- <xsl:text>&#xa;</xsl:text> -->
+	</xsl:template>
+	
+	<xsl:template match="def-item/x | def-item/def/x | var-item/x">
+		<xsl:param name="process">false</xsl:param>
+		<xsl:if test="$process = 'true'">
+			<xsl:choose>
+				<xsl:when test=". = ':'">&amp;#58;</xsl:when> <!-- otherwise we get ::: -->
+				<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="def-item/def | var-item/def">

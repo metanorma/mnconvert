@@ -4545,11 +4545,33 @@
 	<xsl:template match="dt" mode="dl">
 		<def-item>
 			<xsl:copy-of select="@id"/>
-			<term>
+			<xsl:variable name="term_nodes">
 				<xsl:apply-templates />
+			</xsl:variable>
+			<xsl:variable name="term_nodes_last" select="xalan:nodeset($term_nodes)/node()[last()]"/>
+			<xsl:variable name="x" select="substring($term_nodes_last, string-length($term_nodes_last))"/>
+			<!-- <debug_x><xsl:value-of select="$x"/></debug_x> -->
+			<term>
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEEE' and ($x = '&#xd;' or $x = '&#xa;' or $x = '&#xd;&#xa;' or $x = '=' or $x = ':')">
+						<xsl:for-each select="xalan:nodeset($term_nodes)/node()">
+							<xsl:choose>
+								<xsl:when test="position() = last()"><xsl:value-of select="substring(., 1, string-length(.) - 1)"/></xsl:when>
+								<xsl:otherwise><xsl:copy-of select="."/></xsl:otherwise>
+							</xsl:choose>
+						</xsl:for-each>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:copy-of select="$term_nodes"/>
+					</xsl:otherwise>
+				</xsl:choose>
 			</term>
 			<def>
-				<xsl:if test="$organization = 'IEEE'"><x></x></xsl:if>
+				<xsl:if test="$organization = 'IEEE'">
+					<x>
+						<xsl:if test="$x = '&#xd;' or $x = '&#xa;' or $x = '&#xd;&#xa;' or $x = '=' or $x = ':'"><xsl:value-of select="$x"/></xsl:if>
+					</x>
+				</xsl:if>
 				<xsl:apply-templates select="following-sibling::dd[1]" mode="dd"/>
 			</def>
 		</def-item>
