@@ -19,6 +19,19 @@ java -jar mnconvert-1.19.0.jar xml_file --check-type xsd-niso
 
 - `--check-type`, `-ct` - Check against XSD NISO (value xsd-niso), DTD ISO (dtd-iso), DTD NISO (dtd-niso)
 - `--idrefchecking`, `-idref` - Enable checking of ID/IDREF constraints (for XSD NISO only)
+- `--tagset`, `-ts` - use Interchange (value 'interchange', default) or Extended (value 'extended') NISO STS Tag Set in NISO DTD/XSD validation
+- `--mathml`, `-m` - use MathML version 2 (value '2') or 3 (value '3', default) in NISO DTD/XSD validation
+
+or check any xml against XSD, DTD.
+
+[source,sh]
+----
+java -jar mnconvert-1.19.0.jar xml_file --validation-against <path DTD or XSD>
+----
+
+- `--validation-against`, `-va` - Check against specified DTD ot XSD
+- `--idrefchecking`, `-idref` - Enable checking of ID/IDREF constraints (for XSD only)
+
 
 === 2. Convert ISO/NISO STS xml to Metanorma xml or adoc.
 
@@ -32,7 +45,7 @@ java -jar mnconvert-1.19.0.jar xml_file [options]
 - `--output-format`, `-of` - xml|adoc(default), optional
 - `--imagesdir`, `-img` - folder with images (default 'images'), optional
 - `--split-bibdata`, `-sb` - create Metanorma Adoc and Relaton XML, optional
-- `--type`, `-t` - type of standard to generate (iso, bsi, etc.), optional
+- `--type`, `-st` - type of standard to generate (iso, bsi, etc.), optional
 
 === 3. Convert Metanorma xml to ISO/NISO STS xml.
 
@@ -46,12 +59,25 @@ java -jar mnconvert-1.19.0.jar xml_file [options]
 - `--output-format`, -of - iso|niso(default), optional
 - `--check-type`, `-ct` - check against XSD NISO (value 'xsd-niso', default), DTD ISO (value 'dtd-iso'), DTD NISO (value 'dtd-niso')
 - `--idrefchecking`, `-idref` - Enable checking of ID/IDREF constraints (for XSD NISO only)
+- `--tagset`, `-ts` - use Interchange (value 'interchange', default) or Extended (value 'extended') NISO STS Tag Set in NISO DTD/XSD validation
+- `--mathml`, `-m` - use MathML version 2 (value '2') or 3 (value '3', default) in NISO DTD/XSD validation
 
 === 4. Converting from RFC XML version 2 (and v3 later...) to Metanorma AsciiDoc.
 
 [source,sh]
 ----
 java -jar mnconvert-1.19.0.jar xml_file [options]
+----
+
+- `--xsl-file`, `-s` - path to XSL file, optional
+- `--output`, `-o` - path to output file, optional
+
+
+=== 5. Converting from DOCX (ISO Simple Template and ISO Edited DIS Template) to Metanorma AsciiDoc.
+
+[source,sh]
+----
+java -jar mnconvert-1.19.0.jar docx_file [options]
 ----
 
 - `--xsl-file`, `-s` - path to XSL file, optional

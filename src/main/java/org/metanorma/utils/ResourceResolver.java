@@ -3,8 +3,13 @@ package org.metanorma.utils;
 // https://stackoverflow.com/questions/2342808/how-to-validate-an-xml-file-using-java-with-an-xsd-having-an-include
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -21,7 +26,10 @@ public class ResourceResolver implements LSResourceResolver {
 
     /** The path map. */
     private Map<String, String> pathMap = new HashMap<String, String>();
-
+    
+    /** The path array. */
+    private List<String> pathArray = new ArrayList<>();
+    
     /**
      * Instantiates a new resource resolver.
      *
@@ -47,7 +55,7 @@ public class ResourceResolver implements LSResourceResolver {
         String currentResourceName = systemId.substring(systemId.lastIndexOf("/") + 1);
 
         // If this resource hasn't been added yet
-        if (!pathMap.containsKey(currentResourceName)) {
+        //if (!pathMap.containsKey(currentResourceName)) {
             if (baseURI != null) {
                 baseResourceName = baseURI
                         .substring(baseURI.lastIndexOf("/") + 1);
@@ -70,25 +78,42 @@ public class ResourceResolver implements LSResourceResolver {
             // Read the resource as input stream
             String normalizedPath = getNormalizedPath(baseResourcePath, systemId);
             InputStream resourceAsStream = this.getClass().getClassLoader()
-                    .getResourceAsStream(normalizedPath);
-
+                    .getResourceAsStream(normalizedPath); // file from jar
+            if (resourceAsStream == null) {
+                // file from disk
+                try {
+                    resourceAsStream = new FileInputStream(new File(normalizedPath));
+                } catch(FileNotFoundException ex) {
+                    System.out.println(ex.toString());
+                    return null;
+                }
+            }
+            
+            String newPath = "";
             // if the current resource is not in the same path with base
             // resource, add current resource's path to pathMap
             if (systemId.contains("/")) {
                 pathMap.put(currentResourceName, normalizedPath.substring(0,normalizedPath.lastIndexOf("/")+1));
+                newPath = normalizedPath.substring(0,normalizedPath.lastIndexOf("/")+1) + currentResourceName;
             } else {
                 // The current resource should be at the same path as the base
                 // resource
                 pathMap.put(systemId, baseResourcePath);
+                newPath = baseResourcePath + systemId;
             }
-            Scanner s = new Scanner(resourceAsStream).useDelimiter("\\A");
-            String s1 = s.next().replaceAll("\\n", " ") // the parser cannot understand elements broken down multiple lines e.g. (<xs:element \n name="buxing">)
-                    .replace("\\t", " ") // these two about whitespaces is only for decoration
-                    .replaceAll("\\s+", " ").replaceAll("[^\\x20-\\x7e]", ""); // some files has a special character as a first character indicating utf-8 file
-            InputStream is = new ByteArrayInputStream(s1.getBytes());
+            
+            if (!pathArray.contains(newPath)) {
+                pathArray.add(newPath);
+                
+                Scanner s = new Scanner(resourceAsStream).useDelimiter("\\A");
+                String s1 = s.next().replaceAll("\\n", " ") // the parser cannot understand elements broken down multiple lines e.g. (<xs:element \n name="buxing">)
+                        .replace("\\t", " ") // these two about whitespaces is only for decoration
+                        .replaceAll("\\s+", " ").replaceAll("[^\\x20-\\x7e]", ""); // some files has a special character as a first character indicating utf-8 file
+                InputStream is = new ByteArrayInputStream(s1.getBytes());
 
-            return new LSInputImpl(publicId, systemId, is); // same as Input class
-        }
+                return new LSInputImpl(publicId, systemId, is); // same as Input class
+            }
+        //}
 
         // If this resource has already been added, do not add the same resource again. It throws
         // "org.xml.sax.SAXParseException: sch-props-correct.2: A schema cannot contain two global components with the same name; this schema contains two occurrences of ..."

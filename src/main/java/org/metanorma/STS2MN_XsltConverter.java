@@ -220,7 +220,7 @@ public class STS2MN_XsltConverter extends XsltConverter {
                 xmlFileOut = new File(relatonXML);
             }
 
-            Files.createDirectories(Paths.get(xmlFileOut.getParent()));
+            Files.createDirectories(Paths.get(xmlFileOut.getAbsoluteFile().getParent()));
             try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(xmlFileOut.getAbsolutePath()))) {
                 writer.write(xmlMetanorma);
             }
