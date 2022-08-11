@@ -2140,8 +2140,15 @@
 		
 		<xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
 		
-		<app id="{$id}">
-		
+		<app>
+			<xsl:if test="not($organization = 'IEEE' and starts-with(@id,'_'))">
+				<xsl:attribute name="id">
+					<xsl:value-of select="$id"/>
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:if test="$organization = 'IEEE' and references">
+				<xsl:copy-of select="references/@id"/>
+			</xsl:if>
 			<xsl:choose>
 				<xsl:when test="$organization = 'IEEE'">
 					<xsl:attribute name="normative">no</xsl:attribute>
@@ -2180,10 +2187,26 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			</label>
-			<xsl:if test="normalize-space(@obligation) != ''">
-				<annex-type>(<xsl:value-of select="@obligation"/>)</annex-type>
-			</xsl:if>
+			<xsl:choose>
+				<xsl:when test="$organization = 'IEEE'">
+					<annex-type>
+						<xsl:text>(</xsl:text>
+						<xsl:value-of select="@obligation"/>
+						<xsl:if test="normalize-space(@obligation) = ''">
+							<xsl:text>informative</xsl:text>
+						</xsl:if>
+						<xsl:text>)</xsl:text>
+					</annex-type>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:if test="normalize-space(@obligation) != ''">
+						<annex-type>(<xsl:value-of select="@obligation"/>)</annex-type>
+					</xsl:if>
+				</xsl:otherwise>
+			</xsl:choose>
+			
 			<xsl:apply-templates />
+			
 		</app>
 	</xsl:template>
 	
@@ -2212,6 +2235,13 @@
 					<xsl:apply-templates/>
 				</xsl:otherwise>
 			</xsl:choose> -->
+		</ref-list>
+	</xsl:template>
+	
+	<xsl:template match="annex/references[not(@normative='true')]">
+		<xsl:apply-templates select="p"/> <!-- put p before ref-list in app/ref-list structure -->
+		<ref-list>
+			<xsl:apply-templates select="*[not(self::p or self::title)]"/>
 		</ref-list>
 	</xsl:template>
 	
