@@ -638,48 +638,79 @@
 	<xsl:template match="p">
 		<xsl:variable name="parent_name" select="local-name(..)"/>
 		
-		<xsl:choose>
-			<xsl:when test="$parent_name = 'termexample' or 
-														$parent_name = 'definition'  or 
-														$parent_name = 'verbaldefinition'  or 
-														$parent_name = 'verbal-definition'  or 
-														$parent_name = 'termnote' or 
-														$parent_name = 'modification' or
-														$parent_name = 'dd'">
-				<xsl:choose>
-					<xsl:when test="$parent_name = 'definition' or $parent_name = 'termnote' or $parent_name = 'verbaldefinition' or $parent_name = 'verbal-definition'">
-						<p>
+		<xsl:variable name="paragraph_">
+			<xsl:choose>
+				<xsl:when test="$parent_name = 'termexample' or 
+															$parent_name = 'definition'  or 
+															$parent_name = 'verbaldefinition'  or 
+															$parent_name = 'verbal-definition'  or 
+															$parent_name = 'termnote' or 
+															$parent_name = 'modification' or
+															$parent_name = 'dd'">
+					<xsl:choose>
+						<xsl:when test="$parent_name = 'definition' or $parent_name = 'termnote' or $parent_name = 'verbaldefinition' or $parent_name = 'verbal-definition'">
+							<p>
+								<xsl:apply-templates />
+							</p>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:if test="preceding-sibling::*[1][self::p]"><break /></xsl:if>
 							<xsl:apply-templates />
-						</p>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:if test="preceding-sibling::*[1][self::p]"><break /></xsl:if>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
+				<xsl:when test="$parent_name = 'td' or $parent_name = 'th'">
+					<xsl:apply-templates />
+				</xsl:when>
+				<xsl:otherwise>
+					<p>
+						<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
 						<xsl:apply-templates />
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:when>
-			<xsl:when test="$parent_name = 'td' or $parent_name = 'th'">
-				<xsl:apply-templates />
+						
+						<!-- if paragraph ends with ':', then move next 'formula' inside 'p' -->
+						<xsl:if test="normalize-space(java:endsWith(java:java.lang.String.new(normalize-space()),':')) = 'true'">
+							<xsl:apply-templates select="following-sibling::*[1][self::formula]">
+								<xsl:with-param name="skip">false</xsl:with-param>
+							</xsl:apply-templates>
+						</xsl:if>
+						
+						<!-- if paragraph doesn't end with '.' and next element is 'ol' or 'ul', then move next 'ul' and 'ol' inside 'p' inside current p  -->
+						<xsl:if test="normalize-space(java:endsWith(java:java.lang.String.new(normalize-space()),'.')) = 'false' and not(ancestor::li)">
+							<xsl:apply-templates select="following-sibling::*[1][self::ul or self::ol or self::sourcecode or self::dl or self::table]">
+								<xsl:with-param name="skip">false</xsl:with-param>
+							</xsl:apply-templates>
+						</xsl:if>
+					</p>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="paragraph" select="xalan:nodeset($paragraph_)"/>
+		<xsl:choose>
+			<xsl:when test="$paragraph/p/break">	<!-- IEEE doesn't support break in the paragraph -->
+				<xsl:for-each select="$paragraph/p/break">
+				
+					<xsl:if test="not(preceding-sibling::break)"> <!-- first break -->
+						<p> <!-- first p -->
+							<xsl:copy-of select="preceding-sibling::node()"/>
+						</p>
+					</xsl:if>
+					
+					<xsl:if test="preceding-sibling::break">
+						<p>
+							<xsl:copy-of select="preceding-sibling::break[1]/following-sibling::node()[following-sibling::break[1][generate-id() = generate-id(current())]]"/>
+						</p>
+					</xsl:if>
+					
+					<xsl:if test="not(following-sibling::break)"> <!-- last break -->
+						<p> <!-- last p -->
+							<xsl:copy-of select="following-sibling::node()"/>
+						</p>
+					</xsl:if>
+					
+				</xsl:for-each>
 			</xsl:when>
 			<xsl:otherwise>
-				<p>
-					<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
-					<xsl:apply-templates />
-					
-					<!-- if paragraph ends with ':', then move next 'formula' inside 'p' -->
-					<xsl:if test="normalize-space(java:endsWith(java:java.lang.String.new(normalize-space()),':')) = 'true'">
-						<xsl:apply-templates select="following-sibling::*[1][self::formula]">
-							<xsl:with-param name="skip">false</xsl:with-param>
-						</xsl:apply-templates>
-					</xsl:if>
-					
-					<!-- if paragraph doesn't end with '.' and next element is 'ol' or 'ul', then move next 'ul' and 'ol' inside 'p' inside current p  -->
-					<xsl:if test="normalize-space(java:endsWith(java:java.lang.String.new(normalize-space()),'.')) = 'false' and not(ancestor::li)">
-						<xsl:apply-templates select="following-sibling::*[1][self::ul or self::ol or self::sourcecode or self::dl or self::table]">
-							<xsl:with-param name="skip">false</xsl:with-param>
-						</xsl:apply-templates>
-					</xsl:if>
-				</p>
+				<xsl:copy-of select="$paragraph"/>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
