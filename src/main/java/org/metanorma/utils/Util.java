@@ -6,10 +6,13 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -33,6 +36,14 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Element;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 
 /**
  *
@@ -238,19 +249,24 @@ public class Util {
         return outFilename;
     }
     
-    public static String getInputFormat(String inputXmlFile) {
+    public static String getInputFormat(String inputXmlFile, boolean... isIgnoreDTD) {
         if (inputXmlFile.toLowerCase().endsWith(".docx")) {
             return "docx";
         } else {
             DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
             try {
+                if (isIgnoreDTD.length > 0 && isIgnoreDTD[0]) {
+                    fact.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+                }
                 DocumentBuilder builder = fact.newDocumentBuilder();
                 Document doc;
+                
                 if (inputXmlFile.toLowerCase().startsWith("http") || inputXmlFile.toLowerCase().startsWith("www.")) {
                     doc = builder.parse(inputXmlFile);
                 } else {
                     doc = builder.parse(new FileInputStream(inputXmlFile));
                 }
+                
                 Node node = doc.getDocumentElement();
                 String root = node.getNodeName();
                 if (root.endsWith("-standard") || root.equals("metanorma-collection")) {
@@ -260,7 +276,15 @@ public class Util {
                 } else {
                     return "sts";
                 }
-            } catch (ParserConfigurationException | SAXException | IOException ex) {
+            } catch (FileNotFoundException ex) {
+                if (ex.toString().toLowerCase().contains(".dtd") && isIgnoreDTD.length == 0) {
+                    //logger.log(Level.WARNING, "Can''t load external DTD: {0}, internal DTD will be used.", ex.toString());
+                    return getInputFormat(inputXmlFile, true);
+                } else {
+                    logger.warning(ex.toString());
+                }
+            }
+            catch (ParserConfigurationException | SAXException | IOException ex) {
                 logger.severe(ex.toString());
             }
         }
@@ -342,5 +366,32 @@ public class Util {
         }
         return strResult;
     }
-    
+
+    public static String serializeXML(File fXMLin) throws ParserConfigurationException, TransformerException, SAXException, IOException {
+        DocumentBuilderFactory dbfactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbfactory.newDocumentBuilder();
+        
+        EntityResolver entityResolver = new EntityResolver() {
+            @Override
+            public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+                if (systemId.endsWith(".dtd")) {
+                        logger.log(Level.WARNING, "(Ignored external DTD from DOCTYPE: {0}, .jar''s internal or specified XSD/DTD will be used.)", systemId);
+                        StringReader stringInput = new StringReader(" ");
+                        return new InputSource(stringInput);
+                }
+                else {
+                        return null;
+                }
+            }
+        };
+        dBuilder.setEntityResolver(entityResolver);
+        
+        Document doc = dBuilder.parse(fXMLin);
+        doc.getDocumentElement().normalize();
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        StreamResult result = new StreamResult(new StringWriter());
+        DOMSource source = new DOMSource(doc);
+        transformer.transform(source, result);
+        return result.getWriter().toString();
+      }
 }

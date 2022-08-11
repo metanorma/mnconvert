@@ -1,6 +1,5 @@
 package org.metanorma;
 
-import org.metanorma.mnconvert;
 import org.metanorma.utils.LoggerHelper;
 import java.io.File;
 import java.nio.file.Files;
@@ -130,7 +129,8 @@ public class sts2mnTests {
 
         String filename = "custom_relative.adoc";
         System.out.println(name.getMethodName());
-        Path fileout = Paths.get(System.getProperty("buildDirectory"), "custom_relative.adoc");
+        //Path fileout = Paths.get(System.getProperty("buildDirectory"), "custom_relative.adoc");
+        Path fileout = Paths.get(new File(filename).getAbsolutePath());
         fileout.toFile().delete();
 
         String[] args = new String[]{"--output-format", "adoc", "--output", filename,
