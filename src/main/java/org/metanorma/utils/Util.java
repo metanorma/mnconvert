@@ -7,17 +7,22 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Optional;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -29,6 +34,16 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Element;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 
 /**
  *
@@ -263,7 +278,7 @@ public class Util {
                 }
             } catch (FileNotFoundException ex) {
                 if (ex.toString().toLowerCase().contains(".dtd") && isIgnoreDTD.length == 0) {
-                    logger.log(Level.WARNING, "Can''t load DTD: {0}", ex.toString());
+                    //logger.log(Level.WARNING, "Can''t load external DTD: {0}, internal DTD will be used.", ex.toString());
                     return getInputFormat(inputXmlFile, true);
                 } else {
                     logger.warning(ex.toString());
@@ -282,4 +297,101 @@ public class Util {
         }
         sbBuffer.setLength(0);
     }
+    
+
+    public static void unzipFile(Path zipPath, String destPath, List<String> fileList) {
+        try {
+            File destDir = new File(destPath);
+            byte[] buffer = new byte[1024];
+            ZipInputStream zis = new ZipInputStream(new FileInputStream(zipPath.toString()));
+            ZipEntry zipEntry = zis.getNextEntry();
+            while (zipEntry != null) {
+                if(!zipEntry.isDirectory()) {
+                    String zipEntryName = new File(zipEntry.getName()).getName();
+                    if (fileList.contains(zipEntryName)) {
+                        File newFile = new File(destDir, zipEntryName);
+                        logger.log(Level.INFO, "Extracting file {0}...", newFile.getAbsolutePath());
+                        FileOutputStream fos = new FileOutputStream(newFile);
+                        int len;
+                        while ((len = zis.read(buffer)) > 0) {
+                            fos.write(buffer, 0, len);
+                        }
+                        fos.close();
+                    }
+                }
+                zipEntry = zis.getNextEntry();
+            }
+            zis.closeEntry();
+            zis.close();
+        } catch (Exception ex) {
+            logger.log(Level.INFO, "Can''t unzip a file: {0}", ex.getMessage());
+        }
+    }
+
+    // 
+    public static String unzipFileToString(Path zipPath, String fileName) {
+        String strResult = "";
+        try {
+            ZipInputStream zis = new ZipInputStream(new FileInputStream(zipPath.toString()));
+            ZipEntry zipEntry = zis.getNextEntry();
+            while (zipEntry != null) {
+                if(!zipEntry.isDirectory()) {
+                    String zipEntryName = new File(zipEntry.getName()).getName();
+                    if (fileName.equals(zipEntryName)) {
+                        
+                        // read file into byte array
+                        int total = (int) zipEntry.getSize();
+                        byte[] bytes = new byte[total];
+                        int pos = 0;
+                        while (total > 0) {
+                            int read = zis.read(bytes, pos, total);
+                            if (read == -1) {
+                                // end of stream
+                                throw new IOException("Unexpected end of stream after " + pos + " bytes for entry " + fileName);
+                            }
+                            pos += read;
+                            total -= read;
+                        }
+                        
+                        strResult = new String(bytes, StandardCharsets.UTF_8);
+                        break;
+                    }
+                }
+                zipEntry = zis.getNextEntry();
+            }
+            zis.closeEntry();
+            zis.close();
+        } catch (Exception ex) {
+            logger.log(Level.INFO, "Can''t unzip a file: {0}", ex.getMessage());
+        }
+        return strResult;
+    }
+
+    public static String serializeXML(File fXMLin) throws ParserConfigurationException, TransformerException, SAXException, IOException {
+        DocumentBuilderFactory dbfactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbfactory.newDocumentBuilder();
+        
+        EntityResolver entityResolver = new EntityResolver() {
+            @Override
+            public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+                if (systemId.endsWith(".dtd")) {
+                        logger.log(Level.WARNING, "(Ignored external DTD from DOCTYPE: {0}, .jar''s internal or specified XSD/DTD will be used.)", systemId);
+                        StringReader stringInput = new StringReader(" ");
+                        return new InputSource(stringInput);
+                }
+                else {
+                        return null;
+                }
+            }
+        };
+        dBuilder.setEntityResolver(entityResolver);
+        
+        Document doc = dBuilder.parse(fXMLin);
+        doc.getDocumentElement().normalize();
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        StreamResult result = new StreamResult(new StringWriter());
+        DOMSource source = new DOMSource(doc);
+        transformer.transform(source, result);
+        return result.getWriter().toString();
+      }
 }

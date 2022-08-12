@@ -11,6 +11,7 @@ abstract class Validator {
 
     final List<String> exceptions = new LinkedList<>();
     CheckAgainstEnum checkAgainst;
+    String filepathDTDorXSD;
     File xml;
     
     ErrorHandler errorHandler = new ErrorHandler() {
@@ -37,6 +38,6 @@ abstract class Validator {
         this.xml = xml;
     }
     
-    abstract public List<String> validate(CheckAgainstEnum checkAgainst);
-        
+    abstract public List<String> validate(Object checkAgainst); //CheckAgainstEnum or String
+    
 }
