@@ -477,6 +477,32 @@
 	<!-- ================= -->
 
 	<!-- ================= -->
+	<!-- IEEE sts model processing -->
+	<!-- ================= -->
+	<xsl:template name="build_ieee_model_std">
+		<xsl:variable name="isHidden">
+			<xsl:if test="parent::mixed-citation and not(parent::mixed-citation/following-sibling::*[1][self::xref[@ref-type = 'bibr']])">true</xsl:if>
+		</xsl:variable>
+		<xsl:variable name="id" select="translate(pub-id,' ','_')"/>
+		<reference>
+			<xsl:if test="$isHidden = 'true'">	
+				<xsl:attribute name="isHidden">true</xsl:attribute>
+				<xsl:text>hidden_</xsl:text>
+			</xsl:if>
+			<xsl:value-of select="$id"/>
+		</reference>
+		<xsl:if test="$isHidden = 'true'">
+			<xsl:variable name="referenceText">
+				<xsl:apply-templates />
+			</xsl:variable>
+			<referenceText><xsl:value-of select="normalize-space($referenceText)"/></referenceText>
+		</xsl:if>
+	</xsl:template>
+	<!-- ================= -->
+	<!-- END IEEE sts model processing -->
+	<!-- ================= -->
+
+	<!-- ================= -->
 	<!-- tbx:source model processing -->
 	<!-- ================= -->
 	
@@ -850,7 +876,7 @@
 	
 	
 	<!-- Add @stdid (and @id3) to ref for reference mechanism between <std std-id="..."></std> and <ref></ref> -->
-	<xsl:template match="ref" mode="ref_fix">
+	<xsl:template match="ref | list[@list-content = 'normative-references']/list-item/p" mode="ref_fix">
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="ref_fix"/>
 			
@@ -926,26 +952,32 @@
 				</xsl:variable>
 				<xsl:value-of select="$std-ref_text"/>
 				<xsl:if test="normalize-space($std-ref_text) = ''">
-					
-					<xsl:variable name="mixed-citation_first_text_" select="normalize-space(translate((mixed-citation//text()[normalize-space()!=''])[1], '&#xA0;&#x2011;', ' -'))"/>
-					<xsl:variable name="mixed-citation_first_text">
-						<xsl:choose>
-							<xsl:when test="contains($mixed-citation_first_text_, ',')"><xsl:value-of select="normalize-space(substring-before($mixed-citation_first_text_,','))"/></xsl:when>
-							<xsl:otherwise><xsl:value-of select="$mixed-citation_first_text_"/></xsl:otherwise>
-						</xsl:choose>
-					</xsl:variable>
-					
-					<!-- check if mixed-citatiot contains standard like reference,
-					Example: GHTF/SG1/N055:2009 -->
-					
-					<!-- if first text in mixed-citation ends ends with :year OR
-					starts with ISO|IEC... and count of digits more 2 -->
-					<xsl:if test="java:org.metanorma.utils.RegExHelper.matches('.*\d+:\d{4}$', $mixed-citation_first_text) = 'true' or 
-						(java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, $mixed-citation_first_text) = 'true' and 
-							java:org.metanorma.utils.RegExHelper.matches('.*\d{2,}.*', $mixed-citation_first_text) = 'true'
-						)">
-						<xsl:value-of select="$mixed-citation_first_text"/>
-					</xsl:if>
+					<xsl:choose>
+						<xsl:when test="$organization != 'IEEE'">
+							<xsl:variable name="mixed-citation_first_text_" select="normalize-space(translate((mixed-citation//text()[normalize-space()!=''])[1], '&#xA0;&#x2011;', ' -'))"/>
+							<xsl:variable name="mixed-citation_first_text">
+								<xsl:choose>
+									<xsl:when test="contains($mixed-citation_first_text_, ',')"><xsl:value-of select="normalize-space(substring-before($mixed-citation_first_text_,','))"/></xsl:when>
+									<xsl:otherwise><xsl:value-of select="$mixed-citation_first_text_"/></xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
+							
+							<!-- check if mixed-citatiot contains standard like reference,
+							Example: GHTF/SG1/N055:2009 -->
+							
+							<!-- if first text in mixed-citation ends ends with :year OR
+							starts with ISO|IEC... and count of digits more 2 -->
+							<xsl:if test="java:org.metanorma.utils.RegExHelper.matches('.*\d+:\d{4}$', $mixed-citation_first_text) = 'true' or 
+								(java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, $mixed-citation_first_text) = 'true' and 
+									java:org.metanorma.utils.RegExHelper.matches('.*\d{2,}.*', $mixed-citation_first_text) = 'true'
+								)">
+								<xsl:value-of select="$mixed-citation_first_text"/>
+							</xsl:if>
+						</xsl:when>
+						<xsl:otherwise> <!-- IEEE -->
+							<xsl:apply-templates select="mixed-citation" mode="IEEE"/>
+						</xsl:otherwise>
+					</xsl:choose>
 				</xsl:if>
 			</xsl:variable>
 			<xsl:variable name="referenceText" select="normalize-space($referenceText_)"/>
@@ -957,7 +989,7 @@
 			<xsl:variable name="content-type">
 				<xsl:choose>
 					<xsl:when test="(not(@content-type) or @content-type = 'standard') and
-							$referenceText != '' and java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, $referenceText) = 'false'">standard_other</xsl:when>
+							$referenceText != '' and java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, $referenceText) = 'false' and $organization != 'IEEE'">standard_other</xsl:when>
 					<xsl:when test="@content-type"><xsl:value-of select="@content-type"/></xsl:when>
 					<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, $referenceText) = 'true'">standard</xsl:when>
 				</xsl:choose>
@@ -983,7 +1015,13 @@
 					<xsl:when test="normalize-space($preceding_title) != ''">
 						<xsl:value-of select="java:replaceAll(java:java.lang.String.new($preceding_title),'_{2,}','_')"/>_<xsl:number/>
 					</xsl:when>
-					<xsl:otherwise>bibliography_<xsl:number/></xsl:otherwise>
+					<xsl:otherwise>
+						<xsl:text>bibliography_</xsl:text>
+						<xsl:choose>
+							<xsl:when test="parent::list-item"><xsl:number count="list-item"/></xsl:when>
+							<xsl:otherwise><xsl:number/></xsl:otherwise> <!-- ref -->
+						</xsl:choose>
+					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:attribute>
 			
@@ -1166,7 +1204,17 @@
 	</xsl:template>
 	
 	<xsl:template match="fig/caption/p" mode="model_fig">
-		<non-normative-note><xsl:apply-templates mode="model_fig"/></non-normative-note>
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEEE'">
+				<title_main>
+					<xsl:apply-templates mode="model_fig"/>
+				</title_main>
+			</xsl:when>
+			<xsl:otherwise>
+				<non-normative-note><xsl:apply-templates mode="model_fig"/></non-normative-note>
+			</xsl:otherwise>
+		</xsl:choose>
+		
 	</xsl:template>
 	
 	<xsl:template match="fig/*[self::table-wrap or self::array][count(table/col) + count(table/colgroup/col) = 1 and .//graphic]" mode="model_fig">
@@ -1378,7 +1426,7 @@
 						<xsl:otherwise>
 							<xsl:if test="$copymode = 'false' and $OUTPUT_FORMAT = 'xml'"><xsl:value-of select="$imagesdir"/><xsl:text>/</xsl:text></xsl:if>
 							<xsl:value-of select="$image_link"/>
-							<xsl:if test="not(contains($image_link, '.png')) and not(contains($image_link, '.jpg')) and not(contains($image_link, '.bmp'))">
+							<xsl:if test="not(contains($image_link, '.png')) and not(contains($image_link, '.jpg')) and not(contains($image_link, '.bmp')) and not(contains($image_link, '.tif'))">
 								<xsl:text>.png</xsl:text>
 							</xsl:if>
 						</xsl:otherwise>
