@@ -1703,18 +1703,33 @@
 		<!-- <xsl:text>&#xa;DEBUG:&#xa;</xsl:text><xsl:apply-templates select="$contrib-group" mode="print_as_xml"/><xsl:text>&#xa;</xsl:text> -->
 	
 		<xsl:choose>
-			<xsl:when test="$contrib-group/role and not($contrib-group/@emeritus='yes')">
+			<xsl:when test="($contrib-group/role or $contrib-group/collab-alternatives) and not($contrib-group/@emeritus='yes')">
 				<xsl:text>item::</xsl:text>
 				<xsl:text>&#xa;</xsl:text>
-				<xsl:text>name::: </xsl:text>
-				<xsl:for-each select="$contrib-group/name-alternatives/string-name/*">
-					<xsl:apply-templates/>
-					<xsl:if test="position() != last()"><xsl:text> </xsl:text></xsl:if>
-				</xsl:for-each>
-				<xsl:text>&#xa;</xsl:text>
-				<xsl:text>role::: </xsl:text>
-				<xsl:apply-templates select="$contrib-group/role"/>
-				<xsl:text>&#xa;</xsl:text>
+				
+				<xsl:if test="$contrib-group/name-alternatives">
+					<xsl:text>name::: </xsl:text>
+					<xsl:for-each select="$contrib-group/name-alternatives/string-name/*">
+						<xsl:apply-templates/>
+						<xsl:if test="position() != last()"><xsl:text> </xsl:text></xsl:if>
+					</xsl:for-each>
+					<xsl:text>&#xa;</xsl:text>
+				</xsl:if>
+				
+				<xsl:if test="$contrib-group/collab-alternatives">
+					<xsl:text>company::: </xsl:text>
+					<xsl:for-each select="$contrib-group/collab-alternatives/collab">
+						<xsl:apply-templates/>
+						<xsl:if test="position() != last()"><xsl:text> </xsl:text></xsl:if>
+					</xsl:for-each>
+					<xsl:text>&#xa;</xsl:text>
+				</xsl:if>
+				
+				<xsl:if test="$contrib-group/role">
+					<xsl:text>role::: </xsl:text>
+					<xsl:apply-templates select="$contrib-group/role"/>
+					<xsl:text>&#xa;</xsl:text>
+				</xsl:if>
 			</xsl:when>
 			
 			<xsl:otherwise>

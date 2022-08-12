@@ -528,6 +528,9 @@
 		<xsl:variable name="num"><xsl:number count="dl[ancestor::clause[@id = 'boilerplate-participants' or title = 'Participants']]" level="any"/></xsl:variable>
 		<xsl:variable name="name_" select="normalize-space(dt[. = 'name']/following-sibling::dd[1])"/>
 		<xsl:variable name="name" select="translate($name_,'*','')"/>
+		<xsl:variable name="company_" select="normalize-space(dt[. = 'company']/following-sibling::dd[1])"/>
+		<xsl:variable name="company" select="translate($company_,'*','')"/>
+		
 		<xsl:variable name="isEmeritus" select="normalize-space(java:endsWith(java:java.lang.String.new($name_),'*'))"/>
 		<contrib>
 			<xsl:attribute name="contrib-type">
@@ -543,14 +546,21 @@
 			</xsl:if>
 			<xsl:attribute name="id">contrib<xsl:value-of select="$num"/></xsl:attribute>
 			
-			<name-alternatives>
-				<string-name specific-use="display">
-					
-					<xsl:variable name="name_regex">^(.*)(\s|\h)(.*)</xsl:variable>
-					<given-names><xsl:value-of select="java:replaceAll(java:java.lang.String.new($name),$name_regex,'$1')"/></given-names>
-					<surname><xsl:value-of select="java:replaceAll(java:java.lang.String.new($name),$name_regex,'$3')"/></surname>
-				</string-name>
-			</name-alternatives>
+			<xsl:if test="$name != ''">
+				<name-alternatives>
+					<string-name specific-use="display">
+						<xsl:variable name="name_regex">^(.*)(\s|\h)(.*)</xsl:variable>
+						<given-names><xsl:value-of select="java:replaceAll(java:java.lang.String.new($name),$name_regex,'$1')"/></given-names>
+						<surname><xsl:value-of select="java:replaceAll(java:java.lang.String.new($name),$name_regex,'$3')"/></surname>
+					</string-name>
+				</name-alternatives>
+			</xsl:if>
+			<xsl:if test="$company != ''">
+				<collab-alternatives>
+					<collab><xsl:value-of select="$company"/></collab>
+				</collab-alternatives>
+			</xsl:if>
+			
 			<xsl:if test="$contrib-type != 'member'">
 				<role><xsl:value-of select="$contrib-type"/></role>
 			</xsl:if>
