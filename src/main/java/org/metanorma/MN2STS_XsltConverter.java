@@ -136,14 +136,17 @@ public class MN2STS_XsltConverter extends XsltConverter {
        
         OutputJaxpImplementationInfo();
 
+        TransformerFactory factory = TransformerFactory.newInstance();
+        
         Source srcXSL;
         if (fileXSL != null) { //external xsl
             srcXSL = new StreamSource(fileXSL);
         } else { // internal xsl
             srcXSL = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), "mn2sts.xsl"));
+            // for xsl:include processing (load xsl from jar)
+            factory.setURIResolver(new XSLT_ResourceResolver());
         }
 
-        TransformerFactory factory = TransformerFactory.newInstance();
         Transformer transformer = factory.newTransformer(srcXSL);
         transformer.setParameter("debug", isDebugMode);
         transformer.setParameter("outputformat", outputFormat.toUpperCase());
