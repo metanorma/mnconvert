@@ -4784,18 +4784,25 @@
 				<xsl:text disable-output-escaping="yes">&lt;/bold&gt;</xsl:text>
 			</xsl:if>
 		
+			<xsl:variable name="id"><xsl:if test="stem and not(starts-with(@id,'_'))"><xsl:value-of select="@id"/></xsl:if></xsl:variable>
+			
+			<xsl:variable name="disp-formula">
+				<disp-formula>
+					<xsl:if test="$id != ''">
+						<xsl:attribute name="id"><xsl:value-of select="$id"/></xsl:attribute>
+					</xsl:if>
+					<xsl:apply-templates />
+				</disp-formula>
+			</xsl:variable>
+			
 			<xsl:choose>
 				<xsl:when test="$organization = 'IEEE' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),':')) = 'false' and not(parent::dd)"> <!-- and not(parent::p) -->
 					<p>
-						<disp-formula>
-							<xsl:apply-templates />
-						</disp-formula>
+						<xsl:copy-of select="$disp-formula"/>
 					</p>
 				</xsl:when>
 				<xsl:otherwise>
-					<disp-formula>
-						<xsl:apply-templates />
-					</disp-formula>
+					<xsl:copy-of select="$disp-formula"/>
 				</xsl:otherwise>
 			</xsl:choose>
 			
@@ -4806,10 +4813,7 @@
 	</xsl:template>
 	
 	<xsl:template match="formula/stem" priority="2">
-		<xsl:if test="not(starts-with(../@id,'_'))">
-			<xsl:copy-of select="../@id"/>
-		</xsl:if>
-			
+		
 		<xsl:if test="$isSemanticXML = 'true' and not(name)">
 			<xsl:variable name="formula_id" select="../@id"/>
 			<xsl:variable name="section" select="normalize-space(../@section)"/>
