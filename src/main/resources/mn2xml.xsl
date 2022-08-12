@@ -455,14 +455,15 @@
 				</xsl:when>				
 				<xsl:when test="ancestor::annex">
 					<xsl:variable name="annexid" select="normalize-space(/*/bibdata/ext/structuredidentifier/annexid)"/>
+					<xsl:variable name="curr_annexid" select="ancestor::annex/@id"/>							
 					<xsl:choose>
 						<xsl:when test="self::table">
-							<xsl:variable name="curr_annexid" select="ancestor::annex/@id"/>							
 							<xsl:number format="A" count="annex"/>
 							<xsl:number format=".1" level="any" count="table[ancestor::annex/@id = $curr_annexid]"/>
 						</xsl:when>						
 						<xsl:when test="self::figure">
-							<xsl:number format="A.1-1" level="multiple" count="annex | figure"/>
+							<xsl:number format="A" count="annex"/>
+							<xsl:number format=".1-1" level="any" count="figure[ancestor::annex/@id = $curr_annexid]"/>
 						</xsl:when>
 						<xsl:when test="$level = 1">							
 							<xsl:choose>
@@ -3017,7 +3018,14 @@
 		
 		<xsl:if test="$process = 'true'">
 			<list> 
-				<xsl:apply-templates select="@*"/>
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEEE'">
+						<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:apply-templates select="@*"/>
+					</xsl:otherwise>
+				</xsl:choose>
 				<xsl:variable name="processing_instruction_type" select="normalize-space(preceding-sibling::*[1]/processing-instruction('list-type'))"/>
 				<xsl:variable name="list-type">
 					<xsl:choose>
