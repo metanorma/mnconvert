@@ -1654,6 +1654,12 @@
 		</xsl:apply-templates>
 	</xsl:template>
 	
+	<xsl:template match="sec/participants-sec[position() &gt; 1]/p" priority="3">
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:apply-templates/>
+		<xsl:text>&#xa;&#xa;</xsl:text>
+	</xsl:template>
+	
 	<xsl:template match="sec/participants-sec[1]/p" priority="3"> <!-- [contains(., ' Working Group ')] -->
 		<xsl:param name="contrib-groups"/>
 		<xsl:text>&#xa;</xsl:text>
