@@ -884,7 +884,7 @@
 		<!-- :semantic-metadata-collab-type-logo: -->
 		<!-- :semantic-metadata-collab: -->
 		<!-- :semantic-metadata-collab-type-accredited-by: -->
-		<xsl:apply-templates select="contrib-group[.//collab-alternatives]"/>
+		<xsl:apply-templates select="contrib-group[.//collab-alternatives and not(contrib/@contrib-type='member')]"/>
 		
 		<!-- :semantic-metadata-funding-source-institution:
 			:semantic-metadata-funding-source-institution-id:
@@ -1599,13 +1599,13 @@
 		<xsl:if test="following-sibling::*"><xsl:text>, </xsl:text></xsl:if>
 	</xsl:template>
 	
-	<xsl:template match="std-meta/std-id[@std-id-type]">
+	<xsl:template match="std-meta/std-id[@std-id-type][normalize-space() != '']">
 		<xsl:text>:semantic-metadata-std-id-</xsl:text><xsl:value-of select="@std-id-type"/><xsl:text>: </xsl:text>
 		<xsl:apply-templates/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="contrib-group[.//collab-alternatives]" priority="2">
+	<xsl:template match="contrib-group[.//collab-alternatives and not(contrib/@contrib-type='member')]" priority="2">
 		<xsl:apply-templates mode="collab-alternatives"/>
 	</xsl:template>
 	
@@ -1721,7 +1721,7 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			
-				<xsl:for-each select="$contrib-group/name-alternatives/string-name/*">
+				<xsl:for-each select="$contrib-group/name-alternatives/string-name/* | $contrib-group/collab-alternatives/collab">
 					<xsl:apply-templates/>
 					<xsl:if test="position() != last()"><xsl:text> </xsl:text></xsl:if>
 				</xsl:for-each>
@@ -1920,7 +1920,7 @@
 	</xsl:template>
 	
 	<!-- Text before references -->
-	<xsl:template match="sec[@sec-type = 'norm-refs' or list/@list-content = 'normative-references']/p" priority="2">
+	<xsl:template match="sec[@sec-type = 'norm-refs' or title = 'Normative references' or list/@list-content = 'normative-references']/p" priority="2">
 		<xsl:if test="not(preceding-sibling::*[1][self::p])"> <!-- first p in norm-refs -->
 			<xsl:text>[NOTE,type=boilerplate]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
