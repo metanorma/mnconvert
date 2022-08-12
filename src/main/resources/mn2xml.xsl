@@ -4475,7 +4475,7 @@
 
 	<xsl:template name="create_array">
 		<!-- <xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable> -->
-		<xsl:if test="preceding-sibling::*[1][self::stem]">
+		<xsl:if test="preceding-sibling::*[1][self::stem] and not(ancestor::formula)">
 			<p>where:</p>
 		</xsl:if>
 		<array> <!-- id="{$id}" -->
@@ -4812,8 +4812,8 @@
 			
 		<xsl:if test="$isSemanticXML = 'true' and not(name)">
 			<xsl:variable name="formula_id" select="../@id"/>
-			<xsl:variable name="section" select="normalize-space(@section)"/>
-			<xsl:if test="$section != '' and not(unnumbered=  'true') and not($organization = 'IEEE')">
+			<xsl:variable name="section" select="normalize-space(../@section)"/>
+			<xsl:if test="$section != '' and not(../@unnumbered=  'true') and not($organization = 'IEEE')">
 				<label><xsl:value-of select="$section"/></label>
 			</xsl:if>
 		</xsl:if>
