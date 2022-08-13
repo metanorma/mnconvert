@@ -81,7 +81,9 @@ public class MN2STS_XsltConverter extends XsltConverter {
             
             String outputFilePathWithoutExtension = super.getDefaultOutputFilePath();
             
-            outputFilePath = outputFilePathWithoutExtension + "sts." + outputFormat + ".xml";
+            String sfx = (outputFormat.toUpperCase().equals("IEEE") ? "" : "sts.");
+            
+            outputFilePath = outputFilePathWithoutExtension + sfx + outputFormat + ".xml";
         }
     }
     
@@ -181,7 +183,8 @@ public class MN2STS_XsltConverter extends XsltConverter {
         if (fileXSL != null) { //external xsl
             srcXSL = new StreamSource(fileXSL);
         } else { // internal xsl
-            srcXSL = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), "mn2sts.xsl"));
+            String xslname = (outputFormat.toUpperCase().equals("IEEE") ? "mn2ieee.xsl" : "mn2sts.xsl");
+            srcXSL = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), xslname));
             // for xsl:include processing (load xsl from jar)
             factory.setURIResolver(new XSLT_ResourceResolver());
         }
