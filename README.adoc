@@ -120,9 +120,10 @@ e.g.
 java -jar target/mnconvert-1.20.0.jar tests/iso-tc154-8601-1-en.xml --output tests/iso-tc154-8601-1-en.out.xml
 ----
 
-NOTE: Input XML format (Metanorma, STS ISO/NISO or XML2RFC) determines programmatically by root element of input file: +
+NOTE: Input XML format (Metanorma, STS ISO/NISO, IEEE or XML2RFC) determines programmatically by root element of input file: +
 - Metanorma XML - *-standard or metanorma-collection +
 - XML2RFC - rfc +
+- IEEE - standards-document +
 - ISO/STS in another cases +
 but you can specify it obviously by parameter --input-format, -if (values: metanorma|sts|rfc)
 
