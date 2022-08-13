@@ -170,7 +170,7 @@
 				<xsl:variable name="section_prefix">
 					<xsl:if test="($name = 'clause' or $name = 'terms' or ($name = 'references' and @normative='true')) and $section != '' and not(contains($section, '.'))">Clause </xsl:if> <!-- first level clause -->
 					<xsl:if test="$name = 'section-title' or ($name = 'p' and @type = 'section-title')">Section </xsl:if>
-					<xsl:if test="$name = 'formula' and ($organization = 'IEC' or $organization = 'IEEE')">Equation </xsl:if>
+					<xsl:if test="$name = 'formula' and ($organization = 'IEC' or $outputformat = 'IEEE')">Equation </xsl:if>
 				</xsl:variable>
 				
 				<xsl:attribute name="section_prefix"><xsl:value-of select="$section_prefix"/></xsl:attribute>
@@ -328,7 +328,7 @@
 			</xsl:variable>
 			
 			<xsl:variable name="section_bolded" select="($name = 'clause' or $name = 'terms' or
-			$name = 'section-title' or ($name = 'p' and @type = 'section-title')) and $section != '' and $organization != 'IEEE'"/>
+			$name = 'section-title' or ($name = 'p' and @type = 'section-title')) and $section != '' and $outputformat != 'IEEE'"/>
 			
 			<xsl:variable name="wrapper" select="$name"/>
 			
@@ -711,13 +711,13 @@
 					<xsl:when test="bibdata/relation[@type = 'adopted-from']">nat-meta</xsl:when>
 					<xsl:when test="$organization = 'BSI'">nat-meta</xsl:when>
 					<xsl:when test="$organization = 'IEC'">std-meta</xsl:when>
-					<xsl:when test="$organization = 'IEEE'">std-meta</xsl:when>
+					<xsl:when test="$outputformat = 'IEEE'">std-meta</xsl:when>
 					<xsl:otherwise>iso-meta</xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
 			
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE'">
+				<xsl:when test="$outputformat = 'IEEE'">
 					<xsl:apply-templates select="bibdata" mode="front_ieee">
 						<xsl:with-param name="element_name" select="$element_name"/>
 					</xsl:apply-templates>
@@ -781,7 +781,7 @@
 	<xsl:template name="insertBack">
 		<xsl:if test="annex or bibliography/references or indexsect or .//index">
 			<back>
-				<xsl:if test="$organization = 'IEEE'">
+				<xsl:if test="$outputformat = 'IEEE'">
 					<xsl:apply-templates select="preface/acknowledgements" mode="front_preface">
 						<xsl:with-param name="process">true</xsl:with-param>
 					</xsl:apply-templates>
@@ -2105,7 +2105,7 @@
 						</xsl:choose>
 					</xsl:attribute>
 					
-					<xsl:if test="$organization != 'IEEE'">
+					<xsl:if test="$outputformat != 'IEEE'">
 						<xsl:attribute name="sec-type"><xsl:value-of select="$sec_type"/></xsl:attribute>
 					
 						<xsl:call-template name="insert_label">
@@ -2137,16 +2137,16 @@
 		<xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
 		
 		<app>
-			<xsl:if test="not($organization = 'IEEE' and starts-with(@id,'_'))">
+			<xsl:if test="not($outputformat = 'IEEE' and starts-with(@id,'_'))">
 				<xsl:attribute name="id">
 					<xsl:value-of select="$id"/>
 				</xsl:attribute>
 			</xsl:if>
-			<xsl:if test="$organization = 'IEEE' and references">
+			<xsl:if test="$outputformat = 'IEEE' and references">
 				<xsl:copy-of select="references/@id"/>
 			</xsl:if>
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE'">
+				<xsl:when test="$outputformat = 'IEEE'">
 					<xsl:attribute name="normative">no</xsl:attribute>
 					<xsl:if test="normalize-space(@obligation) != ''">
 						<xsl:attribute name="normative">
@@ -2184,7 +2184,7 @@
 				</xsl:choose>
 			</label>
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE'">
+				<xsl:when test="$outputformat = 'IEEE'">
 					<annex-type>
 						<xsl:text>(</xsl:text>
 						<xsl:value-of select="@obligation"/>
@@ -2269,7 +2269,7 @@
 	
 	<xsl:template match="bibitem[1][ancestor::references[@normative='true']]" priority="2">
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE'">
+			<xsl:when test="$outputformat = 'IEEE'">
 				<list>
 					<xsl:attribute name="list-content">normative-references</xsl:attribute>
 					<xsl:attribute name="list-type">simple</xsl:attribute>
@@ -2321,7 +2321,7 @@
 					<xsl:apply-templates select="docidentifier"/>
 					<xsl:apply-templates select="title" mode="mixed_citation"/>
 				</xsl:when>
-				<xsl:when test="(@type = 'standard' or @type = 'international-standard' or docnumber or fetched) and $organization != 'IEEE'">
+				<xsl:when test="(@type = 'standard' or @type = 'international-standard' or docnumber or fetched) and $outputformat != 'IEEE'">
 					<std>
 						<xsl:variable name="urn" select="docidentifier[@type = 'URN']"/>
 						<xsl:variable name="docidentifier_URN" select="$bibitems_URN/bibitem[@id = $id]/urn"/>
@@ -2397,7 +2397,7 @@
 						</xsl:choose>
 					</std>
 				</xsl:when>
-				<xsl:when test="$organization = 'IEEE'">
+				<xsl:when test="$outputformat = 'IEEE'">
 					<!-- <xsl:choose>
 						<xsl:when test="@type = 'standard'">
 							<xsl:apply-templates select="." mode="IEEE"/>
@@ -2594,11 +2594,11 @@
 		</xsl:variable>
 		<xsl:variable name="xref_fn">
 			<xref ref-type="fn" rid="fn_{$number_id}"> <!-- {$sfx} rid="fn_{$number}" -->
-				<sup><xsl:value-of select="$number"/><xsl:if test="$organization != 'IEEE'">)</xsl:if></sup>
+				<sup><xsl:value-of select="$number"/><xsl:if test="$outputformat != 'IEEE'">)</xsl:if></sup>
 			</xref>
 			<fn id="fn_{$number_id}"> <!-- {$sfx} -->
 				<label>
-					<sup><xsl:value-of select="$number"/><xsl:if test="$organization != 'IEEE'">)</xsl:if></sup>
+					<sup><xsl:value-of select="$number"/><xsl:if test="$outputformat != 'IEEE'">)</xsl:if></sup>
 				</label>
 				<xsl:apply-templates/>
 			</fn>
@@ -2674,7 +2674,7 @@
 			<xsl:otherwise>
 				<sec id="{$id}">
 					<xsl:if test="normalize-space($sec_type) != ''">
-						<xsl:if test="$organization != 'IEEE'">
+						<xsl:if test="$outputformat != 'IEEE'">
 							<xsl:attribute name="sec-type">
 								<xsl:value-of select="$sec_type"/>
 							</xsl:attribute>
@@ -2736,7 +2736,7 @@
 		
 		
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE'">
+			<xsl:when test="$outputformat = 'IEEE'">
 				<xsl:if test="not(preceding-sibling::term)">	<!-- for 1st only -->
 					<std-def-list>
 						<xsl:apply-templates select="preceding-sibling::*[1][self::admonition][@type='editorial']">
@@ -2817,7 +2817,7 @@
 	
 	<xsl:template match="termnote"> <!--  mode="termEntry" -->
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE'">
+			<xsl:when test="$outputformat = 'IEEE'">
 				 <xsl:call-template name="note"/>
 			</xsl:when>
 			<xsl:otherwise>
@@ -3011,7 +3011,7 @@
 		
 		<xsl:variable name="process">
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and preceding-sibling::*[1][self::p] and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false' and not(ancestor::li)">false</xsl:when> <!-- preceding-sibling::*[1][self::p] -->
+				<xsl:when test="$outputformat = 'IEEE' and $skip = 'true' and preceding-sibling::*[1][self::p] and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false' and not(ancestor::li)">false</xsl:when> <!-- preceding-sibling::*[1][self::p] -->
 				<xsl:otherwise>true</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -3019,7 +3019,7 @@
 		<xsl:if test="$process = 'true'">
 			<list> 
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEEE'">
+					<xsl:when test="$outputformat = 'IEEE'">
 						<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
 					</xsl:when>
 					<xsl:otherwise>
@@ -3053,7 +3053,7 @@
 		
 		<xsl:variable name="process">
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and preceding-sibling::*[1][self::p] and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false' and not(ancestor::li)">false</xsl:when>
+				<xsl:when test="$outputformat = 'IEEE' and $skip = 'true' and preceding-sibling::*[1][self::p] and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false' and not(ancestor::li)">false</xsl:when>
 				<xsl:otherwise>true</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -3061,7 +3061,7 @@
 		<xsl:if test="$process = 'true'">
 			<list>
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEEE'">
+					<xsl:when test="$outputformat = 'IEEE'">
 						<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
 					</xsl:when>
 					<xsl:otherwise>
@@ -3100,7 +3100,7 @@
 				</xsl:variable>
 				<xsl:attribute name="list-type">
 					<xsl:choose>
-						<xsl:when test="$organization = 'IEEE'">ordered</xsl:when>
+						<xsl:when test="$outputformat = 'IEEE'">ordered</xsl:when>
 						<xsl:otherwise><xsl:value-of select="$list-type"/></xsl:otherwise>
 					</xsl:choose>
 				</xsl:attribute>
@@ -3308,7 +3308,7 @@
 				<xsl:variable name="docidentifier">
 					<xsl:value-of select="docidentifier[not(@type = 'metanorma' or @type = 'metanorma-ordinal')][1]"/>
 					<!-- <xsl:if test="starts-with(@id, 'hidden_bibitem_')"> -->
-					<xsl:if test="@hidden = 'true' and not($organization = 'IEEE')">
+					<xsl:if test="@hidden = 'true' and $outputformat != 'IEEE'">
 						<xsl:text> </xsl:text>
 						<xsl:value-of select="translate(docnumber, '&#xa0;&#8209;', ' -')"/>
 					</xsl:if>
@@ -3331,7 +3331,7 @@
 					<xsl:value-of select="$docidentifier"/>
 				</docidentifier>
 				
-				<xsl:if test="$organization = 'IEEE'">
+				<xsl:if test="$outputformat = 'IEEE'">
 					<xsl:copy-of select="formattedref"/>
 				</xsl:if>
 			</bibitem>
@@ -3539,7 +3539,7 @@
 			
 		</xsl:if> <!-- eref for $organization = 'BSI' -->
 		
-		<xsl:if test="$organization = 'IEEE'">
+		<xsl:if test="$outputformat = 'IEEE'">
 			<xsl:if test="$bibitem_URN/@type = 'standard'">
 				<mixed-citation>
 					<!-- <debug><xsl:copy-of select="$bibitem_URN"/></debug> -->
@@ -3557,7 +3557,7 @@
 			</xsl:if>
 		</xsl:if>
 		
-		<xsl:if test="$organization != 'IEC' and $organization != 'BSI' and $organization != 'IEEE'">
+		<xsl:if test="$organization != 'IEC' and $organization != 'BSI' and $outputformat != 'IEEE'">
 	
 			<xsl:variable name="citeas_" select="java:replaceAll(java:java.lang.String.new(@citeas),'--','—')"/>
 			<xsl:variable name="citeas">
@@ -4053,7 +4053,7 @@
 	<xsl:template match="admonition">
 		<xsl:param name="inside_term">false</xsl:param>
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE' and (parent::introduction or following-sibling::*[1][self::term] or (following-sibling::*[1][self::dl] and parent::definitions) or (parent::dd and ancestor::definitions))">
+			<xsl:when test="$outputformat = 'IEEE' and (parent::introduction or following-sibling::*[1][self::term] or (following-sibling::*[1][self::dl] and parent::definitions) or (parent::dd and ancestor::definitions))">
 				<xsl:choose>
 					<xsl:when test="parent::introduction">
 						<boxed-text position="anchor">
@@ -4186,7 +4186,7 @@
 		
 		<xsl:variable name="process">
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and preceding-sibling::*[1][self::p] and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false'">false</xsl:when>
+				<xsl:when test="$outputformat = 'IEEE' and $skip = 'true' and preceding-sibling::*[1][self::p] and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false'">false</xsl:when>
 				<xsl:otherwise>true</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -4205,7 +4205,7 @@
 			
 			<xsl:element name="{$wrap-element}">
 			<!-- <table-wrap id="{$id}"> --> <!-- position="float" -->
-				<xsl:if test="not($organization = 'IEEE' and starts-with(@id,'_'))">
+				<xsl:if test="not($outputformat = 'IEEE' and starts-with(@id,'_'))">
 					<xsl:attribute name="id">
 						<xsl:value-of select="$id"/>
 					</xsl:attribute>
@@ -4233,7 +4233,7 @@
 					<xsl:if test="not(ancestor::preface and starts-with(preceding-sibling::*[self::title]/text(), 'Amendments'))">
 						<xsl:attribute name="position">
 							<xsl:choose>
-								<xsl:when test="$organization = 'IEEE'">anchor</xsl:when>
+								<xsl:when test="$outputformat = 'IEEE'">anchor</xsl:when>
 								<xsl:otherwise>float</xsl:otherwise>
 							</xsl:choose>
 						</xsl:attribute>
@@ -4277,7 +4277,7 @@
 				</xsl:if>
 				<table>
 					<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix')]"/>
-					<xsl:if test="$organization = 'IEEE'">
+					<xsl:if test="$outputformat = 'IEEE'">
 					 <xsl:attribute name="cellpadding">5</xsl:attribute>
 					 <xsl:attribute name="frame">box</xsl:attribute>
 					 <xsl:attribute name="rules">all</xsl:attribute>
@@ -4390,7 +4390,7 @@
 	
 	<xsl:template match="colgroup/col">
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE'">
+			<xsl:when test="$outputformat = 'IEEE'">
 				<xsl:copy></xsl:copy>
 			</xsl:when>
 			<xsl:otherwise>
@@ -4409,10 +4409,10 @@
 	<xsl:template match="td | th">
 		<xsl:element name="{local-name()}"> <!-- <th> <td> -->
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE' and p/@align[. = 'justified']">
+				<xsl:when test="$outputformat = 'IEEE' and p/@align[. = 'justified']">
 					<xsl:attribute name="align">justify</xsl:attribute>
 				</xsl:when>
-				<xsl:when test="$organization = 'IEEE' and @align='left' and @valign='top'">
+				<xsl:when test="$outputformat = 'IEEE' and @align='left' and @valign='top'">
 					<xsl:apply-templates select="@*[local-name() != 'align' and local-name() != 'valign']"/>
 					<xsl:if test="@colspan">
 						<xsl:apply-templates select="@align"/>
@@ -4438,7 +4438,7 @@
 		
 		<xsl:variable name="process">
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and preceding-sibling::*[1][self::p] and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false'">false</xsl:when>
+				<xsl:when test="$outputformat = 'IEEE' and $skip = 'true' and preceding-sibling::*[1][self::p] and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false'">false</xsl:when>
 				<xsl:otherwise>true</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -4449,10 +4449,10 @@
 			</xsl:variable>
 			<xsl:variable name="id" select="$elements//element[@source_id = $current_id]/@id"/> -->
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE' and parent::formula">
+				<xsl:when test="$outputformat = 'IEEE' and parent::formula">
 					<xsl:call-template name="create_variable-list"/>
 				</xsl:when>
-				<xsl:when test="$organization = 'IEEE' and parent::definitions">
+				<xsl:when test="$outputformat = 'IEEE' and parent::definitions">
 					<std-def-list>
 						<xsl:apply-templates select="preceding-sibling::*[1][self::admonition][@type='editorial']">
 							<xsl:with-param name="inside_term">true</xsl:with-param>
@@ -4468,7 +4468,7 @@
 						<xsl:call-template name="create_array"/>
 					</p> -->
 					<def-list>
-						<xsl:if test="not($organization = 'IEEE' and starts-with(@id,'_'))">
+						<xsl:if test="not($outputformat = 'IEEE' and starts-with(@id,'_'))">
 							<xsl:copy-of select="@id"/>
 						</xsl:if>
 						<xsl:if test="preceding-sibling::*[1][self::title][contains(normalize-space(), 'Abbrev')]">
@@ -4561,7 +4561,7 @@
 			<!-- <debug_x><xsl:value-of select="$x"/></debug_x> -->
 			<term>
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEEE' and ($x = '&#xd;' or $x = '&#xa;' or $x = '&#xd;&#xa;' or $x = '=' or $x = ':')">
+					<xsl:when test="$outputformat = 'IEEE' and ($x = '&#xd;' or $x = '&#xa;' or $x = '&#xd;&#xa;' or $x = '=' or $x = ':')">
 						<xsl:for-each select="xalan:nodeset($term_nodes)/node()">
 							<xsl:choose>
 								<xsl:when test="position() = last()"><xsl:value-of select="substring(., 1, string-length(.) - 1)"/></xsl:when>
@@ -4575,7 +4575,7 @@
 				</xsl:choose>
 			</term>
 			<def>
-				<xsl:if test="$organization = 'IEEE'">
+				<xsl:if test="$outputformat = 'IEEE'">
 					<x>
 						<xsl:if test="$x = '&#xd;' or $x = '&#xa;' or $x = '&#xd;&#xa;' or $x = '=' or $x = ':'"><xsl:value-of select="$x"/></xsl:if>
 					</x>
@@ -4587,7 +4587,7 @@
 	
 	<xsl:template match="dd" mode="dl"/>
 	<xsl:template match="dd" mode="dd">
-		<p><xsl:if test="not($organization = 'IEEE' and starts-with(p[1]/@id,'_'))"><xsl:copy-of select="p[1]/@id"/></xsl:if><xsl:apply-templates /></p>
+		<p><xsl:if test="not($outputformat = 'IEEE' and starts-with(p[1]/@id,'_'))"><xsl:copy-of select="p[1]/@id"/></xsl:if><xsl:apply-templates /></p>
 	</xsl:template>
 	
 	<!-- IEEE -->
@@ -4657,10 +4657,10 @@
 			</xsl:when>
 			<xsl:otherwise>	
 				<fig id="{$id}">
-					<xsl:if test="$organization != 'IEEE'">
+					<xsl:if test="$outputformat != 'IEEE'">
 						<xsl:attribute name="fig-type">figure</xsl:attribute>
 					</xsl:if>
-					<xsl:if test="$organization = 'IEEE'">
+					<xsl:if test="$outputformat = 'IEEE'">
 						<xsl:attribute name="position">anchor</xsl:attribute>
 					</xsl:if>
 					<label>
@@ -4687,7 +4687,7 @@
 		</xsl:if>
 		<caption>
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE'">
+				<xsl:when test="$outputformat = 'IEEE'">
 					<p>
 						<xsl:apply-templates/>
 					</p>
@@ -4723,12 +4723,12 @@
 		<!-- <xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable> -->
 		<!-- NISO STS TagLibrary: https://www.niso-sts.org/TagLibrary/niso-sts-TL-1-0-html/element/graphic.html -->
 		<graphic xlink:href="{@id}"> <!-- id="{$id}"  xlink:href="{$id}"-->
-			<xsl:if test="$organization != 'IEEE'">
+			<xsl:if test="$outputformat != 'IEEE'">
 				<xsl:copy-of select="@id"/>
 			</xsl:if>
 			<!-- <xsl:copy-of select="@mimetype"/> -->
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE'">
+				<xsl:when test="$outputformat = 'IEEE'">
 					<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
 				</xsl:when>
 				<xsl:otherwise>
@@ -4746,7 +4746,7 @@
   <xsl:template match="image[not(parent::figure)]">
     <graphic>
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE'">
+				<xsl:when test="$outputformat = 'IEEE'">
 					<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
 				</xsl:when>
 				<xsl:otherwise>
@@ -4763,7 +4763,7 @@
 	</xsl:template>
 	
 	<xsl:template match="image/@mimetype">
-		<xsl:if test="$organization != 'IEEE'">
+		<xsl:if test="$outputformat != 'IEEE'">
 			<xsl:copy-of select="."/>
 		</xsl:if>
 	</xsl:template> <!-- created image processing -->
@@ -4781,7 +4781,7 @@
 		
 		<xsl:variable name="process">
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),':')) = 'true'">false</xsl:when>
+				<xsl:when test="$outputformat = 'IEEE' and $skip = 'true' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),':')) = 'true'">false</xsl:when>
 				<xsl:otherwise>true</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -4804,7 +4804,7 @@
 			</xsl:variable>
 			
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),':')) = 'false' and not(parent::dd)"> <!-- and not(parent::p) -->
+				<xsl:when test="$outputformat = 'IEEE' and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),':')) = 'false' and not(parent::dd)"> <!-- and not(parent::p) -->
 					<p>
 						<xsl:copy-of select="$disp-formula"/>
 					</p>
@@ -4825,7 +4825,7 @@
 		<xsl:if test="$isSemanticXML = 'true' and not(name)">
 			<xsl:variable name="formula_id" select="../@id"/>
 			<xsl:variable name="section" select="normalize-space(../@section)"/>
-			<xsl:if test="$section != '' and not(../@unnumbered=  'true') and not($organization = 'IEEE')">
+			<xsl:if test="$section != '' and not(../@unnumbered=  'true') and not($outputformat = 'IEEE')">
 				<label><xsl:value-of select="$section"/></label>
 			</xsl:if>
 		</xsl:if>
@@ -4873,7 +4873,7 @@
 		
 		<xsl:variable name="process">
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE' and $skip = 'true' and preceding-sibling::*[1][self::p] and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false'">false</xsl:when>
+				<xsl:when test="$outputformat = 'IEEE' and $skip = 'true' and preceding-sibling::*[1][self::p] and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false'">false</xsl:when>
 				<xsl:otherwise>true</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -4881,7 +4881,7 @@
 		<xsl:if test="$process = 'true'">
 	
 			<xsl:choose>
-				<xsl:when test="$format = 'NISO' and $organization != 'IEEE'">
+				<xsl:when test="$format = 'NISO' and $outputformat != 'IEEE'">
 					<code>
 						<xsl:apply-templates select="@*"/>
 						<xsl:apply-templates/>
@@ -4890,7 +4890,7 @@
 				<!-- ISO -->
 				<xsl:otherwise>
 					<xsl:choose>
-						<xsl:when test="$organization = 'IEEE' and normalize-space(@lang) != ''">
+						<xsl:when test="$outputformat = 'IEEE' and normalize-space(@lang) != ''">
 							<code>
 								<xsl:if test="@lang != 'EXPRESS'">
 									<xsl:attribute name="code-type"><xsl:value-of select="@lang"/></xsl:attribute>
@@ -5245,7 +5245,7 @@
 				<xsl:otherwise>
 					<xsl:value-of select="$label"/>
 					<!-- <xsl:copy-of select="@*"/> -->
-					<xsl:if test="$organization = 'IEEE'">
+					<xsl:if test="$outputformat = 'IEEE'">
 						<xsl:if test="not(contains($label,'.') or contains($label,')') ) and not(parent::ul)"> <!-- add dot for 1st level label only -->
 							<xsl:text>.</xsl:text>
 						</xsl:if>

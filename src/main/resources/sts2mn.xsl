@@ -27,6 +27,8 @@
 	
 	<xsl:param name="self_testing">false</xsl:param> <!-- true false -->
 	
+	<xsl:variable name="inputformat">STS</xsl:variable>
+	
 	<xsl:variable name="OUTPUT_FORMAT">xml</xsl:variable> <!-- don't change it -->
 	
 	<xsl:variable name="type_xml">

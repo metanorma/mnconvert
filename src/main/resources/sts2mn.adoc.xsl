@@ -30,6 +30,13 @@
 	
 	<xsl:key name="ids" match="*" use="@id"/> 
 	
+	<xsl:variable name="inputformat">
+		<xsl:choose>
+			<xsl:when test="/standards-document">IEEE</xsl:when>
+			<xsl:otherwise>STS</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	
 	<xsl:variable name="OUTPUT_FORMAT">adoc</xsl:variable> <!-- don't change it -->
 	
 	<!-- false --> <!-- true, for new features -->
@@ -56,7 +63,6 @@
 		<xsl:choose>
 			<xsl:when test="/standard/front/nat-meta/std-ident/originator = 'PAS'">PAS</xsl:when>
 			<xsl:when test="/standard/front/nat-meta/@originator = 'BSI' or /standard/front/iso-meta/secretariat = 'BSI'">BSI</xsl:when>
-			<xsl:when test="/standards-document">IEEE</xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="/standard/front/*/doc-ident/sdo"/>
 			</xsl:otherwise>
@@ -426,7 +432,7 @@
 		<xsl:if test="$split-bibdata != 'true'">
 			
 			
-			<xsl:if test="$organization = 'IEEE'">
+			<xsl:if test="$inputformat = 'IEEE'">
 				
 				<xsl:variable name="contrib-groups_">
 					<xsl:for-each select="std-meta/contrib-group">
@@ -490,7 +496,7 @@
 					<xsl:value-of select="@sec-type"/>
 					<xsl:if test="not(@sec-type)">
 						<xsl:choose>
-							<xsl:when test="$organization = 'IEEE' and title = 'Introduction'">introduction</xsl:when>
+							<xsl:when test="$inputformat = 'IEEE' and title = 'Introduction'">introduction</xsl:when>
 							<xsl:otherwise><xsl:value-of select="@id"/></xsl:otherwise>
 						</xsl:choose>
 					</xsl:if>
@@ -499,7 +505,7 @@
 				<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 				<xsl:variable name="filename">
 					<xsl:value-of select="$sectionsFolder"/><xsl:text>/00-</xsl:text>
-					<xsl:if test="$organization != 'IEEE'">
+					<xsl:if test="$inputformat = 'STS'">
 						<xsl:value-of select="$number"/><xsl:text>-</xsl:text>
 					</xsl:if>
 					<xsl:value-of select="$section_name"/><xsl:text>.</xsl:text><xsl:value-of select="$docfile_ext"/>
@@ -642,7 +648,7 @@
 		
 		<!-- :language: en -->
 		<xsl:apply-templates select="doc-ident/language"/>
-		<xsl:if test="$organization = 'IEEE'">
+		<xsl:if test="$inputformat = 'IEEE'">
 			<xsl:text>:language: en</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
@@ -1042,7 +1048,7 @@
 		</xsl:variable>
 		<xsl:if test="normalize-space($date) != ''">
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE'">
+				<xsl:when test="$inputformat = 'IEEE'">
 					<xsl:choose>
 						<xsl:when test="@date-type = 'published'">
 							<!-- <xsl:text>:published-date: </xsl:text> -->
@@ -1431,7 +1437,7 @@
 	
 	<xsl:template match="permissions/copyright-statement">
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE'"><!-- skip --></xsl:when>
+			<xsl:when test="$inputformat = 'IEEE'"><!-- skip --></xsl:when>
 			<xsl:otherwise>
 				<xsl:text>:semantic-metadata-copyright-statement: </xsl:text><xsl:value-of select="."/>
 				<xsl:text>&#xa;</xsl:text>
@@ -1583,7 +1589,7 @@
 	
 	<xsl:template match="kwd-group">
 		<xsl:choose>
-			<xsl:when test="$organization != 'IEEE' or @kwd-group-type = 'AuthorFree'">
+			<xsl:when test="$inputformat = 'STS' or @kwd-group-type = 'AuthorFree'">
 				<xsl:text>:keywords: </xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
@@ -1822,7 +1828,7 @@
 	
 	<xsl:template match="front/notes" priority="2">
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE'"><!-- skip --></xsl:when>
+			<xsl:when test="$inputformat = 'IEEE'"><!-- skip --></xsl:when>
 			<xsl:otherwise>
 				<xsl:text>&#xa;</xsl:text>
 				<xsl:text>[.preface,type="front_notes"]</xsl:text>
@@ -1862,7 +1868,7 @@
 	
 	<xsl:template match="front/sec[title = 'Notice to users']" priority="2">
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE'"><!-- skip --></xsl:when>
+			<xsl:when test="$inputformat = 'IEEE'"><!-- skip --></xsl:when>
 			<xsl:otherwise>
 				<xsl:apply-templates />
 			</xsl:otherwise>
@@ -1873,7 +1879,7 @@
 	<xsl:template match="front/ack | back/ack[title = 'Acknowledgements']">
 		<xsl:call-template name="setId"/>
 		<xsl:text>[.preface</xsl:text>
-		<xsl:if test="not($organization = 'IEEE') or ancestor::back">
+		<xsl:if test="$inputformat = 'STS' or ancestor::back">
 			<xsl:text>,heading=acknowledgements</xsl:text>
 		</xsl:if>
 		<xsl:text>]</xsl:text>
@@ -1966,7 +1972,7 @@
 	<xsl:template match="sec[@sec-type = 'terms']/title | sec[@sec-type = 'terms']//sec/title | sec[.//std-def-list]/title" priority="2">
 	
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE' and ../../self::body and . != 'Definitions'">
+			<xsl:when test="$inputformat = 'IEEE' and ../../self::body and . != 'Definitions'">
 				<xsl:variable name="level">
 					<xsl:call-template name="getLevel"/>
 				</xsl:variable>				
@@ -2371,7 +2377,7 @@
 						<xsl:text>&#xa;</xsl:text>
 				</xsl:if> -->
 				
-				<xsl:if test="not($organization = 'IEEE' and contains($p_text,'Bibliographical references are') and parent::app and following-sibling::ref-list)">
+				<xsl:if test="not($inputformat = 'IEEE' and contains($p_text,'Bibliographical references are') and parent::app and following-sibling::ref-list)">
 					<xsl:value-of select="$p_text"/>
 					<xsl:text>&#xa;</xsl:text>
 					<xsl:variable name="isLastPinCommentary" select="preceding-sibling::p[starts-with(normalize-space(), $commentary_on) and 
@@ -2575,7 +2581,7 @@
 		
 		<xsl:variable name="model_std_">
 			<xsl:choose>
-				<xsl:when test="$organization = 'IEEE'">
+				<xsl:when test="$inputformat = 'IEEE'">
 					<xsl:call-template name="build_ieee_model_std"/>
 				</xsl:when>
 				<xsl:otherwise>
@@ -3383,7 +3389,7 @@
 	</xsl:template>
 	
 	<xsl:template match="mixed-citation">
-		<xsl:if test="$organization = 'IEEE' and (ancestor::ref-list or ancestor::list[@list-content = 'normative-references'])"><xsl:text>, </xsl:text></xsl:if>
+		<xsl:if test="$inputformat = 'IEEE' and (ancestor::ref-list or ancestor::list[@list-content = 'normative-references'])"><xsl:text>, </xsl:text></xsl:if>
 		<xsl:if test="preceding-sibling::node()">
 			<xsl:text> </xsl:text>
 		</xsl:if>
@@ -3415,7 +3421,7 @@
 	
 	<xsl:template match="mixed-citation[std and not(ancestor::ref) and not(ancestor::list[@list-content = 'normative-references'])][following-sibling::*[1][self::xref[@ref-type = 'bibr']]]">
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE'">
+			<xsl:when test="$inputformat = 'IEEE'">
 				<!-- link will be added in the following xref -->
 				<!-- <xsl:text>&lt;&lt;</xsl:text>
 				<xsl:value-of select="following-sibling::*[1][self::xref[@ref-type = 'bibr']]/@rid"/>
@@ -3838,8 +3844,8 @@
 	
 	<xsl:template name="alignmentProcessing">
 		
-		<xsl:variable name="defaultAlignment"><xsl:if test="not($organization = 'IEEE')">left</xsl:if></xsl:variable>
-		<xsl:variable name="defaultVAlignment"><xsl:if test="not($organization = 'IEEE')">top</xsl:if></xsl:variable>
+		<xsl:variable name="defaultAlignment"><xsl:if test="$inputformat = 'STS'">left</xsl:if></xsl:variable>
+		<xsl:variable name="defaultVAlignment"><xsl:if test="$inputformat = 'STS'">top</xsl:if></xsl:variable>
 
 		<xsl:if test="(@align and @align != $defaultAlignment) or (@valign and @valign != $defaultVAlignment)">
 			
@@ -3877,7 +3883,7 @@
 		<xsl:choose>
 			<xsl:when test="@align = 'center'">^</xsl:when>
 			<xsl:when test="@align = 'right'">&gt;</xsl:when>
-			<xsl:when test="@align = 'left' and $organization = 'IEEE'">&lt;</xsl:when>
+			<xsl:when test="@align = 'left' and $inputformat = 'IEEE'">&lt;</xsl:when>
 			<!-- <xsl:otherwise>&lt;</xsl:otherwise> --> <!-- left -->
 		</xsl:choose>
 	</xsl:template>
@@ -3885,7 +3891,7 @@
 		<xsl:choose>
 			<xsl:when test="@valign = 'middle'">.^</xsl:when>
 			<xsl:when test="@valign = 'bottom'">.&gt;</xsl:when>
-			<xsl:when test="@valign = 'top' and $organization = 'IEEE'">.&lt;</xsl:when>
+			<xsl:when test="@valign = 'top' and $inputformat = 'IEEE'">.&lt;</xsl:when>
 			<!-- <xsl:otherwise>.&lt;</xsl:otherwise> --> <!-- top -->
 		</xsl:choose>
 	</xsl:template>
@@ -3975,7 +3981,7 @@
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$sectionsFolder}/{$annex_label}.adoc">
 			<xsl:text>&#xa;</xsl:text>
-			<xsl:if test="not($organization = 'IEEE' and ref-list)"><!-- special case for IEEE, ref-list inside app -->
+			<xsl:if test="not($inputformat = 'IEEE' and ref-list)"><!-- special case for IEEE, ref-list inside app -->
 				<xsl:call-template name="setId"/>
 			</xsl:if>
 			<xsl:text>[appendix</xsl:text>
@@ -4197,7 +4203,7 @@
 			<xsl:text>&#xa;</xsl:text> -->
 		</xsl:if>
 		
-		<xsl:if test="$organization = 'IEEE' and ancestor::app">
+		<xsl:if test="$inputformat = 'IEEE' and ancestor::app">
 			<!-- special case with additional [bibliography] in annex --> 
 			<xsl:text>[[</xsl:text>
 			<xsl:value-of select="ancestor::app/@id"/>
@@ -4212,7 +4218,7 @@
 		<xsl:apply-templates/>
 		
 		
-		<xsl:if test="$organization = 'IEEE' and ancestor::app">
+		<xsl:if test="$inputformat = 'IEEE' and ancestor::app">
 			<!-- put hidden items -->
 			<xsl:variable name="hidden_bibitems">
 				<xsl:for-each select="//mixed-citation[not(ancestor::list-item[@list-content='normative-references']) and not(ancestor::ref-list)][not(following-sibling::*[1][self::xref/@ref-type = 'bibr'])]/std">
@@ -4337,7 +4343,7 @@
 						
 						<xsl:variable name="referenceText">
 							
-							<xsl:if test="not($organization = 'IEEE' and mixed-citation/@publication-type = 'standard')">
+							<xsl:if test="not($inputformat = 'IEEE' and mixed-citation/@publication-type = 'standard')">
 								<!-- note: @referenceText and @label_number added at ref_fix step -->
 								<xsl:if test="@label_number != '' and @referenceText != ''">
 									<xsl:text>(</xsl:text>
@@ -4362,7 +4368,7 @@
 							</xsl:if>
 							
 							<xsl:choose>
-								<xsl:when test="$organization = 'IEEE'">
+								<xsl:when test="$inputformat = 'IEEE'">
 									<xsl:variable name="text" select="java:replaceAll(java:java.lang.String.new($referenceText), '(\s|\h)Std(\s|\h)', ' ')"/> <!-- remove ' Std ' -->
 									<xsl:value-of select="translate($text,'™','')"/> <!-- remove trademark sign -->
 								</xsl:when>
@@ -4384,8 +4390,15 @@
 					<xsl:variable name="reference_desc">
 						<xsl:apply-templates/>
 					</xsl:variable>
-					<xsl:value-of select="normalize-space($reference_desc)"/>
-				
+					<xsl:choose>
+						<xsl:when test="$inputformat = 'IEEE'">
+							<xsl:value-of select="normalize-space($reference_desc)"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$reference_desc"/>
+						</xsl:otherwise>
+					</xsl:choose>
+					
 				</xsl:otherwise>
 			</xsl:choose>
 		
@@ -4441,7 +4454,7 @@
 	
 	<xsl:template match="ref/mixed-citation/std | list[@list-content = 'normative-references']/list-item//mixed-citation/std">
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE'">
+			<xsl:when test="$inputformat = 'IEEE'">
 				<xsl:apply-templates />
 			</xsl:when>
 			<xsl:otherwise>
@@ -4847,7 +4860,7 @@
 		<xsl:apply-templates select="@language"/>
 		<xsl:apply-templates select="@code-type"/>
 		<xsl:apply-templates select="@preformat-type"/>
-		<xsl:if test="$organization = 'IEEE' and contains(preceding-sibling::*[1],'EXPRESS')">
+		<xsl:if test="$inputformat = 'IEEE' and contains(preceding-sibling::*[1],'EXPRESS')">
 			<xsl:text>,EXPRESS</xsl:text>
 		</xsl:if>
 		<xsl:text>]</xsl:text>
@@ -4899,7 +4912,7 @@
 	<xsl:template match="disp-formula">
 	
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE' and ancestor::def"> <!-- process as inline-formula -->
+			<xsl:when test="$inputformat = 'IEEE' and ancestor::def"> <!-- process as inline-formula -->
 				<xsl:text>&#xa;+&#xa;</xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
@@ -4912,7 +4925,7 @@
 			
 		<xsl:call-template name="setId"/>
 		
-		<xsl:if test="$organization = 'IEEE' and tex-math and not(contains(tex-math,'\tag{'))">
+		<xsl:if test="$inputformat = 'IEEE' and tex-math and not(contains(tex-math,'\tag{'))">
 			<xsl:text>[%unnumbered]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
@@ -4949,7 +4962,7 @@
 	<xsl:variable name="regexEquationXref">(.*)Equation $</xsl:variable>
 	<xsl:template match="text()[following-sibling::node()[1][self::xref and @ref-type='disp-formula']]" priority="2">
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE' and java:org.metanorma.utils.RegExHelper.matches($regexEquationXref, .) = 'true'">
+			<xsl:when test="$inputformat = 'IEEE' and java:org.metanorma.utils.RegExHelper.matches($regexEquationXref, .) = 'true'">
 				<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),$regexEquationXref,'$1')"/>
 			</xsl:when>
 			<xsl:otherwise>
@@ -5170,7 +5183,7 @@
 	
 	<xsl:template match="boxed-text">
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE' and ancestor::front and ancestor::sec[title = 'Introduction']"><!-- skip --></xsl:when>
+			<xsl:when test="$inputformat = 'IEEE' and ancestor::front and ancestor::sec[title = 'Introduction']"><!-- skip --></xsl:when>
 			<xsl:otherwise>
 				<xsl:text>[[boxed-text_</xsl:text><xsl:number level="any"/><xsl:text>]]</xsl:text>
 				<xsl:text>&#xa;</xsl:text>
@@ -5556,7 +5569,7 @@
 			<xsl:text>]]</xsl:text>
 		</xsl:if>
 		
-		<xsl:if test="title and not(label) and not(@sec-type) and not(ancestor::*[@sec-type]) and not(title = 'Index') and not($organization = 'IEEE')"> <!--  and count(*) = count(title) + count(sec) -->
+		<xsl:if test="title and not(label) and not(@sec-type) and not(ancestor::*[@sec-type]) and not(title = 'Index') and $inputformat = 'STS'"> <!--  and count(*) = count(title) + count(sec) -->
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:text>[discrete</xsl:text>
 				<xsl:if test="java:org.metanorma.utils.RegExHelper.matches($regexSectionTitle, normalize-space(title)) = 'true'">

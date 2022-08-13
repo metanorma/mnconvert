@@ -111,7 +111,7 @@ public class mnconvert {
                     .longOpt("input-format")
                     .desc("input format")
                     .hasArg()
-                    .argName("metanorma|sts|rfc")
+                    .argName("metanorma|sts|ieee|rfc")
                     .required(false)
                     .build());
             addOption(Option.builder("s")
@@ -347,6 +347,7 @@ public class mnconvert {
                 XsltConverter converter = null;
                 String defaultOutputFormat = null;
                 switch (inputFormat) {
+                    case "ieee":
                     case "sts":
                         {
                             STS2MN_XsltConverter sts2mn = new STS2MN_XsltConverter();
