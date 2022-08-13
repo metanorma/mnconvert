@@ -953,7 +953,7 @@
 				<xsl:value-of select="$std-ref_text"/>
 				<xsl:if test="normalize-space($std-ref_text) = ''">
 					<xsl:choose>
-						<xsl:when test="$organization != 'IEEE'">
+						<xsl:when test="$inputformat = 'STS'">
 							<xsl:variable name="mixed-citation_first_text_" select="normalize-space(translate((mixed-citation//text()[normalize-space()!=''])[1], '&#xA0;&#x2011;', ' -'))"/>
 							<xsl:variable name="mixed-citation_first_text">
 								<xsl:choose>
@@ -989,7 +989,7 @@
 			<xsl:variable name="content-type">
 				<xsl:choose>
 					<xsl:when test="(not(@content-type) or @content-type = 'standard') and
-							$referenceText != '' and java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, $referenceText) = 'false' and $organization != 'IEEE'">standard_other</xsl:when>
+							$referenceText != '' and java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, $referenceText) = 'false' and $inputformat = 'STS'">standard_other</xsl:when>
 					<xsl:when test="@content-type"><xsl:value-of select="@content-type"/></xsl:when>
 					<xsl:when test="java:org.metanorma.utils.RegExHelper.matches($start_standard_regex, $referenceText) = 'true'">standard</xsl:when>
 				</xsl:choose>
@@ -1205,7 +1205,7 @@
 	
 	<xsl:template match="fig/caption/p" mode="model_fig">
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEEE'">
+			<xsl:when test="$inputformat = 'IEEE'">
 				<title_main>
 					<xsl:apply-templates mode="model_fig"/>
 				</title_main>
