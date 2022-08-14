@@ -10,7 +10,7 @@ You will need the `maven` build tool and `make`.
 == Usage
 
 
-=== 1. Check ISO/NISO STS xml against XSD, DTD.
+=== 1. Check ISO/NISO STS XML against XSD, DTD.
 
 [source,sh]
 ----
@@ -22,7 +22,7 @@ java -jar mnconvert-1.20.0.jar xml_file --check-type xsd-niso
 - `--tagset`, `-ts` - use Interchange (value 'interchange', default) or Extended (value 'extended') NISO STS Tag Set in NISO DTD/XSD validation
 - `--mathml`, `-m` - use MathML version 2 (value '2') or 3 (value '3', default) in NISO DTD/XSD validation
 
-or check any xml against XSD, DTD.
+or check any XML against XSD, DTD.
 
 [source,sh]
 ----
@@ -33,7 +33,7 @@ java -jar mnconvert-1.20.0.jar xml_file --validation-against <path DTD or XSD>
 - `--idrefchecking`, `-idref` - Enable checking of ID/IDREF constraints (for XSD only)
 
 
-=== 2. Convert ISO/NISO STS xml to Metanorma xml or adoc.
+=== 2. Convert ISO/NISO STS XML to Metanorma XML or Metanorma AsciiDoc.
 
 [source,sh]
 ----
@@ -44,10 +44,10 @@ java -jar mnconvert-1.20.0.jar xml_file [options]
 - `--output`, `-o` - path to output file, optional
 - `--output-format`, `-of` - xml|adoc(default), optional
 - `--imagesdir`, `-img` - folder with images (default 'images'), optional
-- `--split-bibdata`, `-sb` - create Metanorma Adoc and Relaton XML, optional
+- `--split-bibdata`, `-sb` - create Metanorma AsciiDoc and Relaton XML, optional
 - `--type`, `-st` - type of standard to generate (iso, bsi, etc.), optional
 
-=== 3. Convert Metanorma xml to ISO/NISO STS xml.
+=== 3. Convert Metanorma XML to ISO/NISO STS XML.
 
 [source,sh]
 ----
@@ -84,7 +84,7 @@ java -jar mnconvert-1.20.0.jar docx_file [options]
 - `--output`, `-o` - path to output file, optional
 
 
-=== 6. Convert from IEEE xml to adoc.
+=== 6. Convert from IEEE STL XML to Metanorma AsciiDoc.
 
 ----
 java -jar mnconvert-1.20.0.jar xml_file [options]
@@ -95,7 +95,7 @@ java -jar mnconvert-1.20.0.jar xml_file [options]
 - `--imagesdir`, `-img` - folder with images (default 'images'), optional
 
 
-=== 7. Convert Metanorma xml to IEEE xml.
+=== 7. Convert Metanorma xml to IEEE STL XML.
 
 [source,sh]
 ----
