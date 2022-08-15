@@ -46,6 +46,7 @@ java -jar mnconvert-1.20.0.jar xml_file [options]
 - `--imagesdir`, `-img` - folder with images (default 'images'), optional
 - `--split-bibdata`, `-sb` - create Metanorma AsciiDoc and Relaton XML, optional
 - `--type`, `-st` - type of standard to generate (iso, bsi, etc.), optional
+- `--semantic`, `-sx` - generate semantic Metanorma XML
 
 === 3. Convert Metanorma XML to ISO/NISO STS XML.
 
