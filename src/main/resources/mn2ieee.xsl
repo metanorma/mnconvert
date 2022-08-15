@@ -268,11 +268,11 @@
 		<xsl:variable name="pos"><xsl:number/></xsl:variable>
 		<ics>
 			<ics-code><xsl:value-of select="."/></ics-code>
-			<!-- <xsl:apply-templates select="ancestor::bibdata/../misc-container/semantic-metadata[ics-desc][$pos]/ics-desc"/> -->
+			<xsl:apply-templates select="../text" mode="front_ieee"/>
 		</ics>
 	</xsl:template>
 	
-	<xsl:template match="semantic-metadata/ics-desc">
+	<xsl:template match="ics/text" mode="front_ieee">
 		<ics-desc><xsl:value-of select="."/></ics-desc>
 	</xsl:template>
 	
