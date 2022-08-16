@@ -463,7 +463,8 @@
 						</xsl:when>						
 						<xsl:when test="self::figure">
 							<xsl:number format="A" count="annex"/>
-							<xsl:number format=".1-1" level="any" count="figure[ancestor::annex/@id = $curr_annexid]"/>
+							<xsl:number format=".1" level="any" count="figure[not(parent::figure)][ancestor::annex/@id = $curr_annexid]"/>
+							<xsl:number format="-1" count="figure[parent::figure][ancestor::annex/@id = $curr_annexid]"/>
 						</xsl:when>
 						<xsl:when test="$level = 1">							
 							<xsl:choose>
@@ -2718,72 +2719,6 @@
 	</xsl:template>
 
 
-	<xsl:template match="term">
-		<xsl:variable name="current_id">
-			<xsl:call-template name="getId"/>
-		</xsl:variable>
-		
-		<xsl:variable name="section">
-			<xsl:choose>
-				<xsl:when test="normalize-space(name) != '' and  normalize-space(translate(name, '0123456789.', '')) = ''">
-					<xsl:value-of select="name"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="@section"/>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		
-		
-		<xsl:choose>
-			<xsl:when test="$outputformat = 'IEEE'">
-				<xsl:if test="not(preceding-sibling::term)">	<!-- for 1st only -->
-					<std-def-list>
-						<xsl:apply-templates select="preceding-sibling::*[1][self::admonition][@type='editorial']">
-							<xsl:with-param name="inside_term">true</xsl:with-param>
-						</xsl:apply-templates>
-						<xsl:for-each select=". | following-sibling::term">
-							<!-- Example:
-							<std-def-list-item>
-								<term>term name (alt name)</term>
-								<x>: </x>
-								<def>
-									<p>description</p>
-								</def>
-							</std-def-list-item>
-						-->
-						<std-def-list-item>
-							<term>
-								<xsl:apply-templates select="preferred[1]/node()"/>
-								<xsl:for-each select="preferred[position() &gt;= 2]">
-									<xsl:if test="position() = 1">
-										<xsl:text> (</xsl:text>
-									</xsl:if>
-									<xsl:apply-templates />
-									<xsl:if test="position() != last()">
-										<xsl:text>, </xsl:text>
-									</xsl:if>
-									<xsl:if test="position() = last()">
-										<xsl:text>)</xsl:text>
-									</xsl:if>
-								</xsl:for-each>
-							</term>
-							<x><xsl:text>: </xsl:text></x>
-							<def><xsl:apply-templates select="definition/node()"/></def>
-							<xsl:apply-templates select="*[not(self::definition or self::preferred)]"/>
-						</std-def-list-item>
-						</xsl:for-each>
-					</std-def-list>
-				</xsl:if>
-			</xsl:when>
-			
-			<xsl:otherwise>
-		
-				
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>	
-
 	<xsl:template match="term/text()">
 		<xsl:value-of select="normalize-space()"/>
 	</xsl:template>
@@ -4051,32 +3986,11 @@
 	
 	<!-- https://github.com/metanorma/mn2sts/issues/8 -->
 	<xsl:template match="admonition">
-		<xsl:param name="inside_term">false</xsl:param>
-		<xsl:choose>
-			<xsl:when test="$outputformat = 'IEEE' and (parent::introduction or following-sibling::*[1][self::term] or (following-sibling::*[1][self::dl] and parent::definitions) or (parent::dd and ancestor::definitions))">
-				<xsl:choose>
-					<xsl:when test="parent::introduction">
-						<boxed-text position="anchor">
-							<p>
-								<xsl:apply-templates />
-							</p>
-						</boxed-text>
-					</xsl:when>
-					<xsl:when test="$inside_term = 'true'">
-						<editing-instruction>
-							<xsl:apply-templates />
-						</editing-instruction>
-					</xsl:when>
-				</xsl:choose>
-			</xsl:when>
-			<xsl:otherwise>
-				<non-normative-note>
-					<xsl:copy-of select="@id"/>
-					<label><xsl:value-of select="java:toUpperCase(java:java.lang.String.new(@type))"/></label>
-					<xsl:apply-templates />
-				</non-normative-note>
-			</xsl:otherwise>
-		</xsl:choose>		
+		<non-normative-note>
+			<xsl:copy-of select="@id"/>
+			<label><xsl:value-of select="java:toUpperCase(java:java.lang.String.new(@type))"/></label>
+			<xsl:apply-templates />
+		</non-normative-note>
 	</xsl:template>
 	
 	
@@ -4435,50 +4349,20 @@
 	<!-- =============================== -->
 	<xsl:template match="dl">
 		<xsl:param name="skip">true</xsl:param>
-		
-		<xsl:variable name="process">
-			<xsl:choose>
-				<xsl:when test="$outputformat = 'IEEE' and $skip = 'true' and preceding-sibling::*[1][self::p] and normalize-space(java:endsWith(java:java.lang.String.new(normalize-space(preceding-sibling::*[1][self::p])),'.')) = 'false'">false</xsl:when>
-				<xsl:otherwise>true</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		
-		<xsl:if test="$process = 'true'">
-			<!-- <xsl:variable name="current_id">
-				<xsl:call-template name="getId"/>
-			</xsl:variable>
-			<xsl:variable name="id" select="$elements//element[@source_id = $current_id]/@id"/> -->
-			<xsl:choose>
-				<xsl:when test="$outputformat = 'IEEE' and parent::formula">
-					<xsl:call-template name="create_variable-list"/>
-				</xsl:when>
-				<xsl:when test="$outputformat = 'IEEE' and parent::definitions">
-					<std-def-list>
-						<xsl:apply-templates select="preceding-sibling::*[1][self::admonition][@type='editorial']">
-							<xsl:with-param name="inside_term">true</xsl:with-param>
-						</xsl:apply-templates>
-						<xsl:apply-templates mode="std-def-list"/>
-					</std-def-list>
-				</xsl:when>
-				<xsl:when test="preceding-sibling::*[1][self::figure] or preceding-sibling::*[1][self::stem]">
-					<xsl:call-template name="create_array"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<!-- <p>
-						<xsl:call-template name="create_array"/>
-					</p> -->
-					<def-list>
-						<xsl:if test="not($outputformat = 'IEEE' and starts-with(@id,'_'))">
-							<xsl:copy-of select="@id"/>
-						</xsl:if>
-						<xsl:if test="preceding-sibling::*[1][self::title][contains(normalize-space(), 'Abbrev')]">
-							<xsl:attribute name="list-type">abbreviations</xsl:attribute>
-						</xsl:if>
-						<xsl:apply-templates mode="dl"/>
-					</def-list>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:if>
+		<xsl:choose>
+			<xsl:when test="preceding-sibling::*[1][self::figure] or preceding-sibling::*[1][self::stem]">
+				<xsl:call-template name="create_array"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<def-list>
+					<xsl:copy-of select="@id"/>
+					<xsl:if test="preceding-sibling::*[1][self::title][contains(normalize-space(), 'Abbrev')]">
+						<xsl:attribute name="list-type">abbreviations</xsl:attribute>
+					</xsl:if>
+					<xsl:apply-templates mode="dl"/>
+				</def-list>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template name="create_array">
@@ -4508,36 +4392,9 @@
 			<xsl:call-template name="note"/>
 		</xsl:for-each>
 	</xsl:template>
-	
-	
-	<xsl:template name="create_variable-list">
-		<variable-list>
-			<xsl:if test="preceding-sibling::*[1][self::stem]">
-				<p>where</p>
-				<xsl:apply-templates select="dt" mode="variable-list"/>
-			</xsl:if>
-		</variable-list>
-	</xsl:template>
-	<xsl:template match="dt" mode="variable-list">
-		<var-item>
-			<term>
-				<xsl:apply-templates/>
-			</term>
-			<xsl:apply-templates select="following-sibling::dd[1]" mode="variable-list"/>
-		</var-item>
-	</xsl:template>
-	<xsl:template match="dd" mode="variable-list">
-		<def>
-			<p>
-				<xsl:apply-templates/>
-			</p>
-		</def>
-	</xsl:template>
-	
-	
+		
 	<xsl:template match="dl/note" priority="2"/>
-	
-	
+		
 	<xsl:template match="dt">
 		<tr>
 			<td align="left" scope="row" valign="top"><xsl:apply-templates/></td>
@@ -4553,33 +4410,10 @@
 	<xsl:template match="dt" mode="dl">
 		<def-item>
 			<xsl:copy-of select="@id"/>
-			<xsl:variable name="term_nodes">
-				<xsl:apply-templates />
-			</xsl:variable>
-			<xsl:variable name="term_nodes_last" select="xalan:nodeset($term_nodes)/node()[last()]"/>
-			<xsl:variable name="x" select="substring($term_nodes_last, string-length($term_nodes_last))"/>
-			<!-- <debug_x><xsl:value-of select="$x"/></debug_x> -->
 			<term>
-				<xsl:choose>
-					<xsl:when test="$outputformat = 'IEEE' and ($x = '&#xd;' or $x = '&#xa;' or $x = '&#xd;&#xa;' or $x = '=' or $x = ':')">
-						<xsl:for-each select="xalan:nodeset($term_nodes)/node()">
-							<xsl:choose>
-								<xsl:when test="position() = last()"><xsl:value-of select="substring(., 1, string-length(.) - 1)"/></xsl:when>
-								<xsl:otherwise><xsl:copy-of select="."/></xsl:otherwise>
-							</xsl:choose>
-						</xsl:for-each>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:copy-of select="$term_nodes"/>
-					</xsl:otherwise>
-				</xsl:choose>
+				<xsl:apply-templates />
 			</term>
 			<def>
-				<xsl:if test="$outputformat = 'IEEE'">
-					<x>
-						<xsl:if test="$x = '&#xd;' or $x = '&#xa;' or $x = '&#xd;&#xa;' or $x = '=' or $x = ':'"><xsl:value-of select="$x"/></xsl:if>
-					</x>
-				</xsl:if>
 				<xsl:apply-templates select="following-sibling::dd[1]" mode="dd"/>
 			</def>
 		</def-item>
@@ -4587,30 +4421,13 @@
 	
 	<xsl:template match="dd" mode="dl"/>
 	<xsl:template match="dd" mode="dd">
-		<p><xsl:if test="not($outputformat = 'IEEE' and starts-with(p[1]/@id,'_'))"><xsl:copy-of select="p[1]/@id"/></xsl:if><xsl:apply-templates /></p>
+		<p>
+			<xsl:copy-of select="p[1]/@id"/>
+			
+			<xsl:apply-templates />
+		</p>
 	</xsl:template>
 	
-	<!-- IEEE -->
-	<xsl:template match="dt" mode="std-def-list">
-		<std-def-list-item>
-			<xsl:if test="ancestor::definitions">
-				<xsl:apply-templates select="following-sibling::dd[1]/admonition[@type='editorial']">
-					<xsl:with-param name="inside_term">true</xsl:with-param>
-				</xsl:apply-templates>
-			</xsl:if>
-			<term>
-				<xsl:apply-templates />
-			</term>
-			<def>
-				<xsl:apply-templates select="following-sibling::dd[1]" mode="dd_std-def-list"/>
-			</def>
-		</std-def-list-item>
-	</xsl:template>
-	<xsl:template match="dd" mode="std-def-list"/>
-	
-	<xsl:template match="dd" mode="dd_std-def-list">
-		<p><xsl:apply-templates select="node()[not(self::admonition[@type='editorial'])]"/></p>
-	</xsl:template>
 	
 	<!-- =============================== -->
 	<!-- END Definitions list processing -->
