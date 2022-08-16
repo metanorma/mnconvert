@@ -60,6 +60,8 @@
 				<xsl:choose>
 					<xsl:when test="$stage = 'draft' and date[@type='issued']">approved-draft</xsl:when>
 					<xsl:when test="$stage = 'draft'">unapproved-draft</xsl:when>
+					<xsl:when test="$stage = 'superseded'">inactive-superseded</xsl:when>
+					<xsl:when test="$stage = 'withdrawn'">inactive-withdrawn</xsl:when>
 					<xsl:otherwise>active</xsl:otherwise>
 				</xsl:choose>
 			</xsl:attribute>

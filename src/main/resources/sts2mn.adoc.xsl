@@ -685,6 +685,8 @@
 		:docsubstage: 60 -->		
 		<xsl:apply-templates select="doc-ident/release-version"/>
 		
+		<xsl:apply-templates select="/*/@std-status" mode="IEEE"/>
+		
 		<xsl:if test="ics[normalize-space() != '']">
 			<xsl:text>:library-ics: </xsl:text>
 			<xsl:for-each select="ics[normalize-space() != '']">
@@ -1822,6 +1824,22 @@
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
+	<xsl:template match="@std-status" mode="IEEE">
+		<xsl:if test="$inputformat = 'IEEE'">
+			<xsl:variable name="docstage">
+				<xsl:choose>
+					<xsl:when test=". = 'approved-draft' or . = 'unapproved-draft'">draft</xsl:when>
+					<xsl:when test=". = 'inactive-superseded'">superseded</xsl:when>
+					<xsl:when test=". = 'inactive-withdrawn'">withdrawn</xsl:when>
+				</xsl:choose>
+			</xsl:variable>
+			<xsl:if test="normalize-space($docstage) != ''">
+				<xsl:text>:docstage: </xsl:text><xsl:value-of select="$docstage"/>
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:if>
+		</xsl:if>
+	</xsl:template>
+		
 	<!-- =========== -->
 	<!-- end bibdata (standard/front) -->
 	<!-- =========== -->
