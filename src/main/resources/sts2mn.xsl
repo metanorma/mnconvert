@@ -1563,6 +1563,8 @@
 				<xsl:when test="../tbx:normativeAuthorization/@value = 'preferredTerm'">preferred</xsl:when>
 				<xsl:when test="../tbx:normativeAuthorization/@value = 'admittedTerm'">admitted</xsl:when>
 				<xsl:when test="../tbx:normativeAuthorization/@value = 'deprecatedTerm'">deprecates</xsl:when>
+				<xsl:when test="not(bold) and ancestor::sec[parent::body]//tbx:term[bold]">preferred</xsl:when>
+				<xsl:when test="bold and ancestor::sec[parent::body]//tbx:term[not(bold)]">admitted</xsl:when>
 				<xsl:otherwise>preferred</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -1586,6 +1588,10 @@
 				</xsl:element>
 			</xsl:otherwise>
 		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template match="tbx:term[count(node()) = 1]/bold" priority="2">
+		<xsl:apply-templates />
 	</xsl:template>
 	
 	<xsl:template name="createTermElement">

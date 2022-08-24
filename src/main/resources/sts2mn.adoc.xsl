@@ -2285,6 +2285,7 @@
 				<xsl:choose>
 					<xsl:when test="../tbx:normativeAuthorization/@value = 'admittedTerm'">alt</xsl:when>
 					<xsl:when test="../tbx:normativeAuthorization/@value = 'deprecatedTerm'">deprecated</xsl:when>
+					<xsl:when test="not(bold) and ancestor::sec[parent::body]//tbx:term[bold]">preferred</xsl:when> <!-- special case for https://github.com/metanorma/metanorma-iso/issues/765: when there is a term in bold -->
 					<xsl:otherwise>alt</xsl:otherwise>
 				</xsl:choose>
 				<xsl:text>:[</xsl:text>
@@ -2293,6 +2294,10 @@
 			</xsl:otherwise>			
 		</xsl:choose>
 		<xsl:apply-templates select="../tbx:termType" mode="term"/>
+	</xsl:template>
+	
+	<xsl:template match="tbx:term[count(node()) = 1]/bold" priority="2">
+		<xsl:apply-templates />
 	</xsl:template>
 	
 	<xsl:template match="tbx:termType" mode="term">
