@@ -2330,7 +2330,7 @@
 			<xsl:apply-templates />
 		</xsl:variable>
 		
-		<xsl:variable name="regex_domain">^(&lt;(.*)&gt;)?(\s|\h)*(.*)</xsl:variable>
+		<xsl:variable name="regex_domain">(?s)^(&lt;(.*)&gt;)?(\s|\h)*(.*)$</xsl:variable> <!-- (?s)  for single line. Dot matches newline characters -->
 		
 		<xsl:variable name="domain" select="normalize-space(java:replaceAll(java:java.lang.String.new($text), $regex_domain, '$2'))"/>
 		<xsl:variable name="definition" select="java:replaceAll(java:java.lang.String.new($text), $regex_domain, '$4')"/>
