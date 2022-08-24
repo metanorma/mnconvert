@@ -1479,6 +1479,8 @@
 	<xsl:variable name="regexSectionTitle" select="'^Section(\s|\h)+[0-9]+(:|\-|\.)*(\s|\h)*(.*)$'"/>
 	<xsl:variable name="regexSectionLabel" select="'^Section(\s|\h)+[0-9]+$'"/>
 	
+	<xsl:variable name="regex_term_domain">(?s)^(&lt;(.*)&gt;)?(\s|\h)*(.*)$</xsl:variable> <!-- (?s)  for single line. Dot matches newline characters -->
+	
 	<xsl:template name="getStyleColor">
 		<xsl:variable name="value" select="normalize-space(substring-after(., 'color:'))"/>
 		<xsl:choose>

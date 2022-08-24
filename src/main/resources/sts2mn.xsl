@@ -1489,6 +1489,11 @@
 	<xsl:template match="tbx:langSet/text()[normalize-space() = '']"/> <!-- linearization -->
 	
 	<xsl:template match="tbx:definition">
+		<xsl:variable name="initial_text" select="node()[1][self::text()]"/>
+		<xsl:variable name="domain" select="normalize-space(java:replaceAll(java:java.lang.String.new($initial_text), $regex_term_domain, '$2'))"/>
+		<xsl:if test="$domain != ''">
+			<domain><xsl:value-of select="$domain"/></domain>
+		</xsl:if>
 		<definition>
 			<xsl:choose>
 				<xsl:when test="$type_xml = 'presentation'">
@@ -1505,6 +1510,12 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</definition>
+	</xsl:template>
+	
+	<!-- initial text in definition -->
+	<xsl:template match="tbx:definition/node()[1][self::text()]">
+		<xsl:variable name="initial_text" select="."/>
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($initial_text), $regex_term_domain, '$4')"/>
 	</xsl:template>
 	
 	<xsl:template match="tbx:entailedTerm">
