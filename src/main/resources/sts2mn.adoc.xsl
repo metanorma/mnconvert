@@ -2326,9 +2326,24 @@
 	<!-- <xsl:template match="text()[. = '&#xa;']"/> -->
 	
 	<xsl:template match="tbx:definition">
-		<xsl:apply-templates />
-		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
+		<xsl:variable name="text">
+			<xsl:apply-templates />
+		</xsl:variable>
+		
+		<xsl:variable name="regex_domain">^(&lt;(.*)&gt;)?(\s|\h)*(.*)</xsl:variable>
+		
+		<xsl:variable name="domain" select="normalize-space(java:replaceAll(java:java.lang.String.new($text), $regex_domain, '$2'))"/>
+		<xsl:variable name="definition" select="java:replaceAll(java:java.lang.String.new($text), $regex_domain, '$4')"/>
+		
+		<xsl:if test="$domain != ''">
+			<xsl:text>domain:[</xsl:text>
+			<xsl:value-of select="$domain"/>
+			<xsl:text>]</xsl:text>
+			<xsl:text>&#xa;&#xa;</xsl:text>
+		</xsl:if>
+		
+		<xsl:value-of select="$definition"/>
+		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="tbx:tig"/>
