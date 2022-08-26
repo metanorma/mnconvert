@@ -1966,14 +1966,24 @@
 	
 	<!-- Text before references -->
 	<xsl:template match="sec[@sec-type = 'norm-refs' or title = 'Normative references' or list/@list-content = 'normative-references']/p" priority="2">
-		<xsl:if test="not(preceding-sibling::*[1][self::p])"> <!-- first p in norm-refs -->
+	
+		<xsl:variable name="p_text">
+			<xsl:if test="not(preceding-sibling::*[1][self::p]) and not(following-sibling::*[1][self::p])"> <!-- only one p in norm-refs -->
+				<xsl:call-template name="p"/>
+			</xsl:if>
+		</xsl:variable>
+		<xsl:variable name="no_norm_refs" select="normalize-space(starts-with(normalize-space($p_text), 'There are no normative references'))"/> <!-- true if 'p' starts with 'There are no ...'-->
+		
+		<xsl:if test="not(preceding-sibling::*[1][self::p]) and $no_norm_refs = 'false'"> <!-- first p in norm-refs -->
 			<xsl:text>[NOTE,type=boilerplate]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:text>--</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
-		<xsl:call-template name="p"/>
-		<xsl:if test="not(following-sibling::*[1][self::p])"> <!-- last p in norm-refs -->
+		<xsl:if test="$no_norm_refs = 'false'">
+			<xsl:call-template name="p"/>
+		</xsl:if>
+		<xsl:if test="not(following-sibling::*[1][self::p]) and $no_norm_refs = 'false'"> <!-- last p in norm-refs -->
 			<xsl:call-template name="addIndexTerms"/>
 			<xsl:text>--</xsl:text>
 			<xsl:text>&#xa;&#xa;</xsl:text>
