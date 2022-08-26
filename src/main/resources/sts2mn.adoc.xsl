@@ -2007,27 +2007,29 @@
 		</xsl:choose>
 	
 		
-		
 		<xsl:if test="ancestor::sec[java:toLowerCase(java:java.lang.String.new(title)) = 'terms and definitions'] or ancestor::sec[java:toLowerCase(java:java.lang.String.new(title)) = 'definitions'][.//std-def-list]">
-			<xsl:text>[.boilerplate]</xsl:text>
-			<xsl:text>&#xa;</xsl:text>
-			<xsl:variable name="level">
-				<xsl:call-template name="getLevel">
-					<xsl:with-param name="addon">1</xsl:with-param>
-				</xsl:call-template>
-			</xsl:variable>
-			<xsl:value-of select="$level"/>
-			<xsl:choose>
-				<!-- if there isn't paragraph after title -->
-				<!-- https://www.metanorma.org/author/topics/document-format/section-terms/#overriding-predefined-text -->
-				<xsl:when test="following-sibling::*[1][self::term-sec] or following-sibling::*[1][self::sec]">
-					<xsl:text> {blank}</xsl:text>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:text> My predefined text</xsl:text>
-				</xsl:otherwise>
-			</xsl:choose>
-			<xsl:text>&#xa;</xsl:text>
+			<xsl:if test="not(following-sibling::*[1][self::term-sec] or following-sibling::*[1][self::sec])"> <!-- if there are elements after title -->
+				<xsl:text>[.boilerplate]</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:variable name="level">
+					<xsl:call-template name="getLevel">
+						<xsl:with-param name="addon">1</xsl:with-param>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:value-of select="$level"/>
+				<!-- <xsl:choose> -->
+					<!-- if there isn't paragraph after title -->
+					<!-- https://www.metanorma.org/author/topics/document-format/section-terms/#overriding-predefined-text -->
+					<!--<xsl:when test="following-sibling::*[1][self::term-sec] or following-sibling::*[1][self::sec]">
+						<xsl:text> {blank}</xsl:text>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:text> My predefined text</xsl:text>
+					</xsl:otherwise>
+				</xsl:choose> -->
+				<xsl:text> My predefined text</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
+			</xsl:if>
 		</xsl:if>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
