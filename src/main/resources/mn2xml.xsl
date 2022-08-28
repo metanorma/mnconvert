@@ -2409,6 +2409,9 @@
 						</xsl:otherwise>
 					</xsl:choose> -->
 					<xsl:choose>
+						<xsl:when test="@type and @type != 'standard'">
+							<xsl:apply-templates select="." mode="IEEE_non_standard"/>
+						</xsl:when>
 						<xsl:when test="formattedref">
 							<xsl:apply-templates select="formattedref" mode="IEEE"/>
 							<xsl:apply-templates select="formattedref/node()[self::fn or self::xref]"/>
