@@ -991,4 +991,17 @@
 		</xsl:choose>		
 	</xsl:template>
 	
+	<xsl:template match="bibitem" mode="IEEE_non_standard">
+		<mixed-citation>
+			<xsl:attribute name="publication-format">
+				<xsl:choose>
+					<xsl:when test="uri">online</xsl:when>
+					<xsl:otherwise>print</xsl:otherwise>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:attribute name="publication-type"><xsl:value-of select="@type"/></xsl:attribute>
+			<xsl:apply-templates select="formattedref"/>
+		</mixed-citation>
+	</xsl:template>
+	
 </xsl:stylesheet>
