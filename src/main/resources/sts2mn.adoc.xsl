@@ -3486,19 +3486,19 @@
 	</xsl:template>
 	
 	<xsl:template match="mixed-citation/article-title | mixed-citation[@publication-type != 'standard']/source">
-		<xsl:text>span.title[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
+		<xsl:text>span:title[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="mixed-citation/publisher-name">
-		<xsl:text>span.publisher[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
+		<xsl:text>span:publisher[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="mixed-citation/publisher-loc">
-		<xsl:text>span.pubplace[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
+		<xsl:text>span:pubplace[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="mixed-citation/year">
-		<xsl:text>span.pubyear[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
+		<xsl:text>span:pubyear[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
 	</xsl:template>
 	
 	<!-- Example:
@@ -3513,14 +3513,14 @@
 		<xsl:variable name="type">
 			<xsl:if test="$type_ != '' and $type_ != 'author'">.<xsl:value-of select="$type_"/></xsl:if>
 		</xsl:variable>
-		<xsl:text>span.surname</xsl:text><xsl:value-of select="$type"/><xsl:text>[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
+		<xsl:text>span:surname</xsl:text><xsl:value-of select="$type"/><xsl:text>[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
 	</xsl:template>
 	<xsl:template match="mixed-citation//given-names">
 		<xsl:variable name="type_" select="ancestor::person-group/@person-group-type"/>
 		<xsl:variable name="type">
 			<xsl:if test="$type_ != '' and $type_ != 'author'">.<xsl:value-of select="$type_"/></xsl:if>
 		</xsl:variable>
-		<xsl:text>span.givenname</xsl:text><xsl:value-of select="$type"/><xsl:text>[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
+		<xsl:text>span:givenname</xsl:text><xsl:value-of select="$type"/><xsl:text>[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
 	</xsl:template>
 	
 	<!-- Example: <pub-id specific-use="repno">GET 2500</pub-id> -->
@@ -3529,11 +3529,11 @@
 		<xsl:variable name="type">
 			<xsl:if test="$type_ != ''">.<xsl:value-of select="$type_"/></xsl:if>
 		</xsl:variable>
-		<xsl:text>span.docid</xsl:text><xsl:value-of select="$type"/><xsl:text>[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
+		<xsl:text>span:docid</xsl:text><xsl:value-of select="$type"/><xsl:text>[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="mixed-citation/uri">
-		<xsl:text>span.uri[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
+		<xsl:text>span:uri[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
 	</xsl:template>
 	
 	<!-- =============== -->
