@@ -61,7 +61,7 @@ public class rfc2mnTests {
     }
 
 
-    @Test
+    /*@Test
     public void successCheckXMLv2() throws ParseException, Exception {
         System.out.println(name.getMethodName());
         ClassLoader classLoader = getClass().getClassLoader();
@@ -72,9 +72,9 @@ public class rfc2mnTests {
         boolean isValid = rngValidator.validate(xmlString, "V2");
 
         assertTrue(isValid);        
-    }
+    }*/
 
-    @Test
+    /*@Test
     public void successCheckXMLv3() throws ParseException, Exception {
         System.out.println(name.getMethodName());
         ClassLoader classLoader = getClass().getClassLoader();
@@ -85,7 +85,7 @@ public class rfc2mnTests {
         boolean isValid = rngValidator.validate(xmlString, "V3.7991");
 
         assertTrue(isValid);        
-    }
+    }*/
     
     @Test
     public void successCheckXMLv3latest() throws ParseException, Exception {
