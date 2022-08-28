@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.Scanner;
 import java.util.logging.Level;
+import javax.net.ssl.HttpsURLConnection;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -193,8 +195,27 @@ public class RFC2MN_XsltConverter extends XsltConverter {
                         StringReader stringInput = new StringReader(" ");
                         return new InputSource(stringInput);
                 }
-                else {
-                        return null; // use default behavior
+                else if (systemId.toLowerCase().startsWith("https")) {
+                    
+                    HttpsTrustManager.allowAllSSL();
+                    
+                    URL obj = new URL(systemId);
+                    HttpsURLConnection conn = (HttpsURLConnection) obj.openConnection();
+
+                    int status = conn.getResponseCode();
+                    if ((status != HttpsURLConnection.HTTP_OK) &&
+                        (status == HttpsURLConnection.HTTP_MOVED_TEMP
+                        || status == HttpsURLConnection.HTTP_MOVED_PERM
+                        || status == HttpsURLConnection.HTTP_SEE_OTHER)) {
+
+                        String newUrl = conn.getHeaderField("Location");
+                        conn = (HttpsURLConnection) new URL(newUrl).openConnection();
+                    }
+                    
+                    return new InputSource(conn.getInputStream());
+
+                } else {
+                    return null; // use default behavior
                 }
             }
         };
