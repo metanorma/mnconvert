@@ -144,6 +144,11 @@ public class MN2STS_XsltConverter extends XsltConverter {
             STSValidator validator = new STSValidator(outputFilePath, checkType);
             if (!filepathDTDorXSD.isEmpty()) {
                 validator.setFilepathDTDorXSD(filepathDTDorXSD);
+            }
+            else if (outputFormat.toUpperCase().equals("IEEE") && filepathDTDorXSD.isEmpty())  {
+                logger.log(Level.WARNING, "Validation skipped, because DTD/XSD is not specified (missing '--validation-against <path to DTD/XSD>').");
+                logger.info("End!");
+                return true;
             } else {
                 validator.setTagset(tagset);
                 validator.setMathmlVersion(mathmlVersion);
@@ -154,8 +159,7 @@ public class MN2STS_XsltConverter extends XsltConverter {
             }
             
             logger.info("End!");
-        
-        
+         
         } catch (Exception e) {
             //e.printStackTrace(System.err);
             logger.severe(e.toString());
