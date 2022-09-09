@@ -1898,6 +1898,7 @@
 																ext/editorialgroup/secretariat |
 																ext/stagename|
 																ext/ics/code | 
+																ext/ics/text | 
 																copyright/from |
 																ext/structuredidentifier |
 																ext/editorialgroup/agency |
