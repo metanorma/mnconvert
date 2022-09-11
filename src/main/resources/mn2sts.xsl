@@ -14,6 +14,13 @@
 	<xsl:param name="debug">false</xsl:param>
 	<xsl:param name="outputformat">NISO</xsl:param>
 	
+	<xsl:key name="element_by_id" match="*" use="@id"/>
+	
+	<!-- special element 'footnote' is wrapper for xref + fn, will be removed at last step -->
+	<xsl:key name="footnotes_in_text" match="footnote[not(ancestor::table-wrap or ancestor::fig)]" use="normalize-space()"/>
+	
+	<xsl:key name="footnotes_in_text_iterator" match="footnote[not(ancestor::table-wrap or ancestor::fig)]" use="'all'"/>
+	
 	<xsl:include href="mn2xml.xsl"/>
 	
 	<xsl:template match="/*" mode="xml">
@@ -22,16 +29,21 @@
 				<xsl:call-template name="insertXMLcontent"/>
 			</standard>
 		</xsl:variable>
+		
+		<xsl:variable name="xml_footnotes_fix">
+			<xsl:apply-templates select="xalan:nodeset($xml)" mode="footnotes_fix"/>
+		</xsl:variable>
+		
 		<xsl:choose>
 			<xsl:when test="$organization = 'IEC' or $organization = 'ISO'">
 				<!-- id generation for IEC and ISO with Guidelines rules -->
 				<xsl:variable name="xml_with_id_new">
-					<xsl:apply-templates select="xalan:nodeset($xml)" mode="id_generate"/>
+					<xsl:apply-templates select="xalan:nodeset($xml_footnotes_fix)" mode="id_generate"/>
 				</xsl:variable>
 				<xsl:apply-templates select="xalan:nodeset($xml_with_id_new)" mode="id_replace"/>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:copy-of select="$xml"/>
+				<xsl:copy-of select="$xml_footnotes_fix"/>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -220,7 +232,7 @@
 	</xsl:template>
 	
 	<!-- footnote in the text -->
-	<xsl:template match="fn[not(ancestor::table or ancestor::fig)]" mode="id_generate">
+	<!-- <xsl:template match="fn2[not(ancestor::table-wrap or ancestor::fig)]" mode="id_generate">
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:variable name="number"><xsl:number level="any" count="fn[not(ancestor::table or ancestor::fig)]"/></xsl:variable>
@@ -228,6 +240,26 @@
 				<xsl:choose>
 					<xsl:when test="$organization = 'IEC'">foo-<xsl:value-of select="$number"/></xsl:when>
 					<xsl:when test="$organization = 'ISO'">fn_<xsl:value-of select="$number"/></xsl:when>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template> -->
+	
+	
+	<!-- footnote in the table -->
+	<xsl:template match="fn[ancestor::table-wrap]" mode="id_generate">
+		<xsl:variable name="table_number" select="ancestor::table-wrap/@section"/>
+		<xsl:variable name="table_id" select="ancestor::table-wrap/@id"/>
+		<!-- footnote number in the current table -->
+		<xsl:variable name="fn_number"><xsl:number level="any" count="fn[ancestor::table-wrap/@id = $table_id]"/></xsl:variable>
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			<xsl:variable name="number"><xsl:number level="any" count="fn[not(ancestor::table or ancestor::fig)]"/></xsl:variable>
+			<xsl:attribute name="id_new">
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'">tfn-<xsl:value-of select="$table_number"/>-<xsl:value-of select="$fn_number"/></xsl:when>
+					<xsl:when test="$organization = 'ISO'">table-fn_<xsl:value-of select="$table_number"/>.<xsl:value-of select="$fn_number"/></xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -269,8 +301,8 @@
 		</xsl:attribute>
 	</xsl:template>
 	
-	<!--  -->
-	
+	<!-- remove @id from 'list' and 'p' if starts with '_' -->
+	<xsl:template match="*[self::list or self::p]/@id[starts-with(., '_')]" mode="id_replace"/>
 	
 	<!-- ================================== -->
 	<!-- END: id replacement for IEC/ISO ID scheme -->
@@ -456,5 +488,118 @@
 	<!-- ===================== -->
 	<!-- END tbx:entailedTerm -->
 	<!-- ===================== -->
+	
+	
+	<!-- ================================== -->
+	<!-- remove helper attributes -->
+	<!-- ================================== -->
+	<xsl:template match="@*|node()" mode="clean">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="clean" />
+		</xsl:copy>
+	</xsl:template>
+	<!-- ================================== -->
+	<!-- END helper attributes -->
+	<!-- ================================== -->
+	
+	
+	<!-- ===================================== -->
+	<!-- unique fn in text only -->
+	<!-- ===================================== -->
+	<xsl:template match="@*|node()" mode="footnotes_fix">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="footnotes_fix" />
+		</xsl:copy>
+	</xsl:template>
+	
+	<!-- element 'footnote' is special wrapper for xref and fn -->
+	<xsl:template match="footnote[not(ancestor::table-wrap or ancestor::fig)]" mode="footnotes_fix">
+		
+		<xsl:variable name="curr_text" select="normalize-space()"/>
+		<xsl:variable name="curr_id" select="@id"/>
+		
+		<!-- get all footnotes in text -->
+		<xsl:variable name="footnotes_all_">
+			<xsl:for-each select="key('footnotes_in_text_iterator', 'all')">
+				<xsl:copy-of select="."/>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:variable name="footnotes_all" select="xalan:nodeset($footnotes_all_)"/>
+		<!-- <footnotes_all><xsl:copy-of select="$footnotes_all"/></footnotes_all> -->
+		
+		<!-- get unique footnotes in text -->
+		<xsl:variable name="footnotes_unique_">
+			<xsl:for-each select="$footnotes_all/*[generate-id(.) = generate-id(key('footnotes_in_text', normalize-space())[1])]">
+				<xsl:copy>
+					<xsl:copy-of select="@*"/>
+					<xsl:attribute name="number"><xsl:value-of select="position()"/></xsl:attribute>
+					<xsl:copy-of select="node()"/>
+				</xsl:copy>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:variable name="footnotes_unique" select="xalan:nodeset($footnotes_unique_)"/>
+		<!-- <footnotes_unique><xsl:copy-of select="$footnotes_unique"/></footnotes_unique> -->
+		
+		<xsl:variable name="number_in_footnotes_unique" select="normalize-space($footnotes_unique/footnote[@id = $curr_id]/@number)"/>
+		
+		<xsl:choose>
+			<xsl:when test="$number_in_footnotes_unique != ''"> <!-- if current fn is first occurrence -->
+				<xsl:apply-templates select="xref" mode="footnotes_fix_update">
+					<xsl:with-param name="number" select="$number_in_footnotes_unique"/>
+				</xsl:apply-templates>
+				<xsl:apply-templates select="fn" mode="footnotes_fix_update">
+					<xsl:with-param name="number" select="$number_in_footnotes_unique"/>
+				</xsl:apply-templates>
+			</xsl:when>
+			<xsl:otherwise>
+				<!-- if current fn is not first occurrence -->
+				<!-- find unique footnote by current text -->
+				<xsl:variable name="number" select="$footnotes_unique/footnote[normalize-space() = $curr_text]/@number"/>
+				<xsl:apply-templates select="xref" mode="footnotes_fix_update">
+					<xsl:with-param name="number" select="$number"/>
+				</xsl:apply-templates>
+				<!-- no need to put 'fn' -->
+			</xsl:otherwise>
+		</xsl:choose>
+
+	</xsl:template>
+	
+	<xsl:template match="footnote[ancestor::table-wrap or ancestor::fig]" mode="footnotes_fix">
+		<xsl:apply-templates mode="footnotes_fix"/>
+	</xsl:template>
+	
+	<xsl:template match="xref" mode="footnotes_fix_update">
+		<xsl:param name="number"/>
+		<xref ref-type="fn">
+			<xsl:attribute name="rid">
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'">foo-<xsl:value-of select="$number"/></xsl:when>
+					<xsl:when test="$organization = 'ISO'">fn_<xsl:value-of select="$number"/></xsl:when>
+				</xsl:choose>
+			</xsl:attribute>
+			<sup><xsl:value-of select="$number"/><xsl:if test="$organization = 'ISO'">)</xsl:if></sup>
+		</xref>
+	</xsl:template>
+	
+	<xsl:template match="fn" mode="footnotes_fix_update">
+		<xsl:param name="number"/>
+		<fn>
+			<xsl:attribute name="id">
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'">foo-<xsl:value-of select="$number"/></xsl:when>
+					<xsl:when test="$organization = 'ISO'">fn_<xsl:value-of select="$number"/></xsl:when>
+				</xsl:choose>
+			</xsl:attribute>
+			<label>
+				<sup><xsl:value-of select="$number"/><xsl:if test="$organization = 'ISO'">)</xsl:if></sup>
+			</label>
+			<xsl:copy-of select="node()[not(self::label)]"/>
+		</fn>
+	</xsl:template>
+	
+	
+	<!-- ===================================== -->
+	<!-- unique fn in text only -->
+	<!-- ===================================== -->
 	
 </xsl:stylesheet>

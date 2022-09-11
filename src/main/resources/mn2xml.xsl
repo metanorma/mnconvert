@@ -8,8 +8,6 @@
 			exclude-result-prefixes="xalan java metanorma-class" 
 			version="1.0">
 
-	<xsl:key name="element_by_id" match="*" use="@id"/>
-	
 	<!-- ===================== -->
 	<!-- remove namespace -->
 	<!-- for simplify templates: use '<xsl:template match="element">' instead of '<xsl:template match="*[local-name() = 'element']"> -->
@@ -406,8 +404,10 @@
 					<xsl:text>.</xsl:text>
 					<xsl:number format="1" level="any" count="formula[ancestor::*[generate-id() = $root_element_id] and not(@unnumbered = 'true')]"/>
 				</xsl:when>
-				<xsl:when test="self::bibitem and ancestor::references[@normative='true']">norm_ref_<xsl:number/></xsl:when>
-				<xsl:when test="self::bibitem">ref_<xsl:number/></xsl:when>
+				<!-- <xsl:when test="self::bibitem and ancestor::references[@normative='true']">norm_ref_<xsl:number/></xsl:when> -->
+				<xsl:when test="self::bibitem and ancestor::references[@normative='true']"><xsl:number/></xsl:when>
+				<!-- <xsl:when test="self::bibitem">ref_<xsl:number/></xsl:when> -->
+				<xsl:when test="self::bibitem"><xsl:number/></xsl:when>
 				<xsl:when test="ancestor::bibliography">
 					<xsl:value-of select="$sectionNum"/>
 				</xsl:when>
@@ -2581,22 +2581,25 @@
 		</xsl:variable>
 		
 		<xsl:variable name="xref_fn">
-			<xref ref-type="fn" rid="fn_{$number}">
-				<sup><xsl:value-of select="$number"/></sup>
-			</xref>
-			<fn id="fn_{$number}">
-				<label>
+			<!-- 'footnote' is special wrapper for further processing in mode="footnotes_fix" -->
+			<footnote id="{generate-id()}">
+				<xref ref-type="fn" rid="fn_{$number}">
 					<sup><xsl:value-of select="$number"/></sup>
-				</label>
-				<xsl:choose>
-					<xsl:when test="p">
-						<xsl:apply-templates/>
-					</xsl:when>
-					<xsl:otherwise>
-						<p><xsl:apply-templates/></p>
-					</xsl:otherwise>
-				</xsl:choose>
-			</fn>
+				</xref>
+				<fn id="fn_{$number}">
+					<label>
+						<sup><xsl:value-of select="$number"/></sup>
+					</label>
+					<xsl:choose>
+						<xsl:when test="p">
+							<xsl:apply-templates/>
+						</xsl:when>
+						<xsl:otherwise>
+							<p><xsl:apply-templates/></p>
+						</xsl:otherwise>
+					</xsl:choose>
+				</fn>
+			</footnote>
 		</xsl:variable>
 
 		<xsl:copy-of select="$xref_fn"/>
@@ -2619,15 +2622,18 @@
 			<xsl:if test="ancestor::table"><xsl:value-of select="ancestor::table[1]/@id"/>_</xsl:if>
 		</xsl:variable>
 		<xsl:variable name="xref_fn">
-			<xref ref-type="fn" rid="fn_{$number_id}"> <!-- {$sfx} rid="fn_{$number}" -->
-				<sup><xsl:value-of select="$number"/><xsl:if test="$outputformat != 'IEEE'">)</xsl:if></sup>
-			</xref>
-			<fn id="fn_{$number_id}"> <!-- {$sfx} -->
-				<label>
+			<!-- 'footnote' is special wrapper for further processing in mode="footnotes_fix" -->
+			<footnote id="{generate-id()}">
+				<xref ref-type="fn" rid="fn_{$number_id}"> <!-- {$sfx} rid="fn_{$number}" -->
 					<sup><xsl:value-of select="$number"/><xsl:if test="$outputformat != 'IEEE'">)</xsl:if></sup>
-				</label>
-				<xsl:apply-templates/>
-			</fn>
+				</xref>
+				<fn id="fn_{$number_id}"> <!-- {$sfx} -->
+					<label>
+						<sup><xsl:value-of select="$number"/><xsl:if test="$outputformat != 'IEEE'">)</xsl:if></sup>
+					</label>
+					<xsl:apply-templates/>
+				</fn>
+			</footnote>
 		</xsl:variable>
 		
 		<xsl:choose>		
