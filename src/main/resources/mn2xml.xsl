@@ -36,21 +36,8 @@
 	<!-- END remove namespace -->
 	<!-- ===================== -->
 	
-	<xsl:variable name="xml_step2_">
-		<xsl:apply-templates select="$xml_step1" mode="add_attributes"/>
-	</xsl:variable>
-	<xsl:variable name="xml_step2" select="xalan:nodeset($xml_step2_)"/>
-	
 	<xsl:variable name="xml_">
-		<xsl:choose>
-			<xsl:when test="$organization = 'IEC' or $organization = 'ISO'">
-				<!-- id replacement for IEC/ISO ID scheme -->
-				<xsl:apply-templates select="$xml_step2" mode="id_replace"/>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:copy-of select="$xml_step2"/>
-			</xsl:otherwise>
-		</xsl:choose>
+		<xsl:apply-templates select="$xml_step1" mode="add_attributes"/>
 	</xsl:variable>
 	
 	<!-- ===================== -->
@@ -119,109 +106,92 @@
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="add_attributes"/>
 			
-			<xsl:choose>
-				<!-- additional attributes -->
-				<xsl:when test="$name = 'annex' or
-									$name = 'appendix' or
-									$name = 'bibitem' or
-									$name = 'clause' or
-									$name = 'introduction' or
-									$name = 'references' or
-									$name = 'terms' or
-									$name = 'definitions' or
-									$name = 'term' or
-									$name = 'preferred' or
-									$name = 'admitted' or
-									$name = 'deprecates' or
-									$name = 'domain' or
-									$name = 'bookmark' or
-									$name = 'em' or
-									$name = 'table' or
-									$name = 'dl' or
-									$name = 'ol' or
-									$name = 'ul' or
-									$name = 'li' or
-									$name = 'figure' or 
-									$name = 'image' or
-									$name = 'formula' or
-									$name = 'stem' or
-									$name = 'section-title' or
-									($name = 'p' and @type = 'section-title')">
-									
-					<xsl:variable name="section">
-						<xsl:choose>
-							<xsl:when test="normalize-space(title/tab[1]/preceding-sibling::node()) != ''">
-								<!-- presentation xml data -->
-								<xsl:value-of select="title/tab[1]/preceding-sibling::node()"/>
-							</xsl:when>
-							<xsl:when test="self::term and normalize-space(name) != '' and  normalize-space(translate(name, '0123456789.', '')) = ''"> <!-- if term's name contains digits and dots only, for instance, '3.2' -->
-								<xsl:value-of select="name"/>
-							</xsl:when>
-							<xsl:when test="title and not(title/tab) and normalize-space(translate(title, '0123456789.', '')) = ''"> <!-- if title contains digits and dots only, for example '4.1.3' -->
-								<xsl:value-of select="title"/>
-							</xsl:when>
-							<xsl:when test="(self::table or self::figure) and contains(name, '&#8212; ')"> <!-- if table's or figure's name contains number -->
-								<xsl:variable name="_name" select="substring-before(name, '&#8212; ')"/>
-								<xsl:value-of select="translate(normalize-space(translate($_name, '&#xa0;', ' ')), ' ', '&#xa0;')"/>
-							</xsl:when>
-							<xsl:when test="(self::table or self::figure) and not(ancestor::sections or ancestor::annex or ancestor::preface)" />
-							<xsl:otherwise>
-								<xsl:variable name="section_">
-									<xsl:call-template name="getSection">
-										<xsl:with-param name="sectionNum" select="$sectionNum_"/>
-									</xsl:call-template>
-								</xsl:variable>
+			<!-- additional attributes -->
+			<xsl:if test="$name = 'annex' or
+								$name = 'appendix' or
+								$name = 'bibitem' or
+								$name = 'clause' or
+								$name = 'introduction' or
+								$name = 'references' or
+								$name = 'terms' or
+								$name = 'definitions' or
+								$name = 'term' or
+								$name = 'preferred' or
+								$name = 'admitted' or
+								$name = 'deprecates' or
+								$name = 'domain' or
+								$name = 'bookmark' or
+								$name = 'em' or
+								$name = 'table' or
+								$name = 'dl' or
+								$name = 'ol' or
+								$name = 'ul' or
+								$name = 'li' or
+								$name = 'figure' or 
+								$name = 'image' or
+								$name = 'formula' or
+								$name = 'stem' or
+								$name = 'section-title' or
+								($name = 'p' and @type = 'section-title')">
 								
-								<xsl:choose>
-									<xsl:when test="(self::table or self::figure) and $section_ = ''"/>
-									<xsl:when test="$section_ = '0' and not(@type='intro')" />
-									<xsl:otherwise>
-										<!-- <xsl:choose>
-											<xsl:when test="$name = 'annex'">Annex&#xA0;<xsl:value-of select="$section_"/></xsl:when>
-											<xsl:when test="$name = 'table'">Table&#xA0;<xsl:value-of select="$section_"/></xsl:when>
-											<xsl:when test="$name = 'figure'">Figure&#xA0;<xsl:value-of select="$section_"/></xsl:when>
-											<xsl:otherwise><xsl:value-of select="$section_"/></xsl:otherwise>
-										</xsl:choose> -->
-										<xsl:value-of select="$section_"/>
-									</xsl:otherwise>
-								</xsl:choose>
-							</xsl:otherwise>
-						</xsl:choose>				
-					</xsl:variable>
-					
-					<xsl:attribute name="section"><xsl:value-of select="$section"/></xsl:attribute>
-					
-					<xsl:variable name="section_prefix">
-						<xsl:choose>
-							<xsl:when test="$name = 'annex'">Annex&#xA0;</xsl:when>
-							<xsl:when test="$name = 'table'">Table&#xA0;</xsl:when>
-							<xsl:when test="$name = 'figure'">Figure&#xA0;</xsl:when>
-							<xsl:when test="($name = 'clause' or $name = 'terms' or ($name = 'references' and @normative='true')) and $section != '' and not(contains($section, '.'))">Clause </xsl:when> <!-- first level clause -->
-							<xsl:when test="$name = 'section-title' or ($name = 'p' and @type = 'section-title')">Section </xsl:when>
-							<xsl:when test="$name = 'formula' and ($organization = 'IEC' or $outputformat = 'IEEE')">Equation </xsl:when>
-						</xsl:choose>
-					</xsl:variable>
-					
-					<xsl:attribute name="section_prefix"><xsl:value-of select="$section_prefix"/></xsl:attribute>
-					
-					<xsl:if test="$organization = 'IEC' or $organization = 'ISO'">
-						<xsl:apply-templates select="." mode="id_generate">
-							<xsl:with-param name="ancestor" select="$ancestor"/>
-							<xsl:with-param name="section" select="$section"/>
-						</xsl:apply-templates>
-					</xsl:if>
-					
-				</xsl:when>
+				<xsl:variable name="section">
+					<xsl:choose>
+						<xsl:when test="normalize-space(title/tab[1]/preceding-sibling::node()) != ''">
+							<!-- presentation xml data -->
+							<xsl:value-of select="title/tab[1]/preceding-sibling::node()"/>
+						</xsl:when>
+						<xsl:when test="self::term and normalize-space(name) != '' and  normalize-space(translate(name, '0123456789.', '')) = ''"> <!-- if term's name contains digits and dots only, for instance, '3.2' -->
+							<xsl:value-of select="name"/>
+						</xsl:when>
+						<xsl:when test="title and not(title/tab) and normalize-space(translate(title, '0123456789.', '')) = ''"> <!-- if title contains digits and dots only, for example '4.1.3' -->
+							<xsl:value-of select="title"/>
+						</xsl:when>
+						<xsl:when test="(self::table or self::figure) and contains(name, '&#8212; ')"> <!-- if table's or figure's name contains number -->
+							<xsl:variable name="_name" select="substring-before(name, '&#8212; ')"/>
+							<xsl:value-of select="translate(normalize-space(translate($_name, '&#xa0;', ' ')), ' ', '&#xa0;')"/>
+						</xsl:when>
+						<xsl:when test="(self::table or self::figure) and not(ancestor::sections or ancestor::annex or ancestor::preface)" />
+						<xsl:otherwise>
+							<xsl:variable name="section_">
+								<xsl:call-template name="getSection">
+									<xsl:with-param name="sectionNum" select="$sectionNum_"/>
+								</xsl:call-template>
+							</xsl:variable>
+							
+							<xsl:choose>
+								<xsl:when test="(self::table or self::figure) and $section_ = ''"/>
+								<xsl:when test="$section_ = '0' and not(@type='intro')" />
+								<xsl:otherwise>
+									<!-- <xsl:choose>
+										<xsl:when test="$name = 'annex'">Annex&#xA0;<xsl:value-of select="$section_"/></xsl:when>
+										<xsl:when test="$name = 'table'">Table&#xA0;<xsl:value-of select="$section_"/></xsl:when>
+										<xsl:when test="$name = 'figure'">Figure&#xA0;<xsl:value-of select="$section_"/></xsl:when>
+										<xsl:otherwise><xsl:value-of select="$section_"/></xsl:otherwise>
+									</xsl:choose> -->
+									<xsl:value-of select="$section_"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:otherwise>
+					</xsl:choose>				
+				</xsl:variable>
 				
-				<xsl:otherwise> <!-- for another elements -->
-					
-					<xsl:if test="$organization = 'IEC' or $organization = 'ISO'">
-						<xsl:apply-templates select="." mode="id_generate">
-							<xsl:with-param name="ancestor" select="$ancestor"/>
-						</xsl:apply-templates>
-					</xsl:if>
-				</xsl:otherwise>
-			</xsl:choose>
+				<xsl:attribute name="section"><xsl:value-of select="$section"/></xsl:attribute>
+				
+				<xsl:variable name="section_prefix">
+					<xsl:choose>
+						<xsl:when test="$name = 'annex'">Annex&#xA0;</xsl:when>
+						<xsl:when test="$name = 'table'">Table&#xA0;</xsl:when>
+						<xsl:when test="$name = 'figure'">Figure&#xA0;</xsl:when>
+						<xsl:when test="($name = 'clause' or $name = 'terms' or ($name = 'references' and @normative='true')) and $section != '' and not(contains($section, '.'))">Clause </xsl:when> <!-- first level clause -->
+						<xsl:when test="$name = 'section-title' or ($name = 'p' and @type = 'section-title')">Section </xsl:when>
+						<xsl:when test="$name = 'formula' and ($organization = 'IEC' or $outputformat = 'IEEE')">Equation </xsl:when>
+					</xsl:choose>
+				</xsl:variable>
+				
+				<xsl:attribute name="section_prefix"><xsl:value-of select="$section_prefix"/></xsl:attribute>
+				
+			</xsl:if>
+
 
 			<xsl:apply-templates select="node()" mode="add_attributes">
 				<xsl:with-param name="sectionNum" select="$sectionNum_"/>
@@ -230,138 +200,10 @@
 		
 	</xsl:template>
 	
-	<!-- ================================================== -->
-	<!-- id generation for IEC and ISO with Guidelines rules -->
-	<!-- ================================================== -->
-	<xsl:template match="*" mode="id_generate"/> <!-- skip any element except elements below -->
-	
-	<xsl:template match="clause" mode="id_generate">
-		<xsl:param name="ancestor"/>
-		<xsl:param name="section"/>
-		<xsl:attribute name="id_new">
-			<xsl:choose>
-				<xsl:when test="$organization = 'IEC'">sec-<xsl:value-of select="$section"/></xsl:when>
-				<xsl:when test="$organization = 'ISO'">sec_<xsl:value-of select="$section"/></xsl:when>
-			</xsl:choose>
-		</xsl:attribute>
-	</xsl:template>
-	
-	<xsl:template match="foreword" mode="id_generate">
-		<xsl:attribute name="id_new">
-			<xsl:choose>
-				<xsl:when test="$organization = 'IEC'">sec-foreword</xsl:when>
-				<xsl:when test="$organization = 'ISO'">sec_foreword</xsl:when>
-			</xsl:choose>
-		</xsl:attribute>
-	</xsl:template>
-	
-	<xsl:template match="introduction" mode="id_generate">
-		<xsl:attribute name="id_new">
-			<xsl:choose>
-				<xsl:when test="$organization = 'IEC'">sec-introduction</xsl:when>
-				<xsl:when test="$organization = 'ISO'">sec_intro</xsl:when>
-			</xsl:choose>
-		</xsl:attribute>
-	</xsl:template>
-	
-	<xsl:template match="references[not(@normative = 'true')]" mode="id_generate">
-		<xsl:attribute name="id_new">
-			<xsl:choose>
-				<xsl:when test="$organization = 'IEC'">sec-bibliography</xsl:when>
-				<xsl:when test="$organization = 'ISO'">sec_bibl</xsl:when>
-			</xsl:choose>
-		</xsl:attribute>
-	</xsl:template>
-	
-	<xsl:template match="indexsect" mode="id_generate">
-		<xsl:attribute name="id_new">
-			<xsl:choose>
-				<xsl:when test="$organization = 'IEC'">sec-index</xsl:when>
-				<xsl:when test="$organization = 'ISO'">sec_index</xsl:when>
-			</xsl:choose>
-		</xsl:attribute>
-	</xsl:template>
-	
-	<xsl:template match="annex" mode="id_generate">
-		<xsl:param name="section"/>
-		<xsl:attribute name="id_new">
-			<xsl:choose>
-				<xsl:when test="$organization = 'IEC'">anx-<xsl:value-of select="$section"/></xsl:when>
-				<xsl:when test="$organization = 'ISO'">sec_<xsl:value-of select="$section"/></xsl:when>
-			</xsl:choose>
-		</xsl:attribute>
-	</xsl:template>
-	
-	<xsl:template match="table[not(@unnumbered = 'true')]" mode="id_generate">
-		<xsl:param name="section"/>
-		<xsl:attribute name="id_new">
-			<xsl:choose>
-				<xsl:when test="$organization = 'IEC'">tab-<xsl:value-of select="$section"/></xsl:when>
-				<xsl:when test="$organization = 'ISO'">tab_<xsl:value-of select="$section"/></xsl:when>
-			</xsl:choose>
-		</xsl:attribute>
-	</xsl:template>
-	
-	<xsl:template match="figure[not(@unnumbered = 'true')]" mode="id_generate">
-		<xsl:param name="section"/>
-		<xsl:attribute name="id_new">
-			<xsl:choose>
-				<xsl:when test="$organization = 'IEC'">tab-<xsl:value-of select="$section"/></xsl:when>
-				<xsl:when test="$organization = 'ISO'">fig_<xsl:value-of select="$section"/></xsl:when>
-			</xsl:choose>
-		</xsl:attribute>
-	</xsl:template>
-	
-	<xsl:template match="formula[not(@unnumbered = 'true')]" mode="id_generate">
-		<xsl:param name="section"/>
-		<xsl:attribute name="id_new">
-			<xsl:choose>
-				<xsl:when test="$organization = 'IEC'">for-<xsl:value-of select="$section"/></xsl:when>
-				<xsl:when test="$organization = 'ISO'">formula_<xsl:value-of select="$section"/></xsl:when>
-			</xsl:choose>
-		</xsl:attribute>
-	</xsl:template>
-	<!-- ================================================== -->
-	<!-- END: id generation for IEC and ISO with Guidelines rules -->
-	<!-- ================================================== -->
-	
 	<!-- ===================== -->
 	<!-- END add attributes -->
 	<!-- ===================== -->
-	
-	<!-- ================================== -->
-	<!-- id replacement for IEC/ISO ID scheme -->
-	<!-- ================================== -->
-	<xsl:template match="@*|node()" mode="id_replace">
-		<xsl:copy>
-			<xsl:apply-templates select="@*|node()" mode="id_replace" />
-		</xsl:copy>
-	</xsl:template>
-	
-	<xsl:template match="*[@id_new]" mode="id_replace" priority="2">
-		<xsl:copy>
-			<xsl:copy-of select="@*[not(local-name() = 'id_new')]"/>
-			<xsl:attribute name="id"><xsl:value-of select="@id_new"/></xsl:attribute>
-			<xsl:apply-templates select="node()" mode="id_replace" />
-		</xsl:copy>
-	</xsl:template>
-	
-	<!-- xref/@target -->
-	<xsl:template match="@target" mode="id_replace" priority="2">
-		<xsl:variable name="reference" select="."/>
-		<xsl:variable name="id_new" select="key('element_by_id', $reference)/@id_new"/>
-		<xsl:attribute name="target">
-			<xsl:value-of select="$id_new"/>
-			<xsl:if test="normalize-space($id_new) = ''">
-				<xsl:value-of select="$reference"/>
-			</xsl:if>
-		</xsl:attribute>
-	</xsl:template>
-	
-	<!-- ================================== -->
-	<!-- END: id replacement for IEC/ISO ID scheme -->
-	<!-- ================================== -->
-	
+
 	
 	<xsl:variable name="xml" select="xalan:nodeset($xml_)"/>
 	
@@ -2350,6 +2192,7 @@
 					</xsl:if>
 				</xsl:otherwise>
 			</xsl:choose>
+			<xsl:call-template name="addSectionAttribute"/>
 			
 			<label>
 				<xsl:choose>
@@ -2488,6 +2331,8 @@
 				</xsl:if>
 			</xsl:attribute> -->
 			<xsl:copy-of select="@id"/>
+			
+			<xsl:call-template name="addSectionAttribute"/>
 			
 			<xsl:apply-templates select="docidentifier[@type = 'metanorma']" mode="docidentifier_metanorma"/>
 			<xsl:if test="not(docidentifier[@type='metanorma'])">
@@ -2854,6 +2699,7 @@
 			<xsl:when test="$processFloatingTitle = 'false' and preceding-sibling::p[1][@type = 'floating-title']"><!-- skip processing, see template for 'p' --></xsl:when> <!--  or @type = 'section-title' -->
 			<xsl:otherwise>
 				<sec id="{$id}">
+					<xsl:call-template name="addSectionAttribute"/>
 					<xsl:if test="normalize-space($sec_type) != ''">
 						<xsl:if test="$outputformat != 'IEEE'">
 							<xsl:attribute name="sec-type">
@@ -4347,6 +4193,8 @@
 						<xsl:attribute name="content-type"><xsl:value-of select="$processing_instruction_content_type"/></xsl:attribute>
 					</xsl:if>
 					
+					<xsl:call-template name="addSectionAttribute"/>
+					
 				</xsl:if>
 				<xsl:variable name="label">
 					<xsl:choose>
@@ -4631,6 +4479,8 @@
 			<xsl:if test="$element_name = 'fig-group'">
 				<xsl:attribute name="content-type">figures</xsl:attribute>
 			</xsl:if>
+			<xsl:call-template name="addSectionAttribute"/>
+			
 			<label><xsl:value-of select="@section"/></label>
 			<xsl:apply-templates />
 		</xsl:element>
@@ -4660,6 +4510,8 @@
 					<xsl:if test="$outputformat = 'IEEE'">
 						<xsl:attribute name="position">anchor</xsl:attribute>
 					</xsl:if>
+					<xsl:call-template name="addSectionAttribute"/>
+					
 					<label>
 						<xsl:choose>
 							<xsl:when test="ancestor::amend/autonumber[@type = 'figure']">
@@ -4796,6 +4648,7 @@
 					<xsl:if test="$id != ''">
 						<xsl:attribute name="id"><xsl:value-of select="$id"/></xsl:attribute>
 					</xsl:if>
+					<xsl:call-template name="addSectionAttribute"/>
 					<xsl:apply-templates />
 				</disp-formula>
 			</xsl:variable>
@@ -5369,5 +5222,11 @@
 			</xsl:call-template>
 		</xsl:if>
 	</xsl:template> <!-- split -->
+	
+	<xsl:template name="addSectionAttribute">
+		<xsl:if test="$organization = 'IEC' or $organization = 'ISO'">
+			<xsl:copy-of select="@section"/>
+		</xsl:if>
+	</xsl:template>
 	
 </xsl:stylesheet>

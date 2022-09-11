@@ -17,9 +17,23 @@
 	<xsl:include href="mn2xml.xsl"/>
 	
 	<xsl:template match="/*" mode="xml">
-		<standard xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:tbx="urn:iso:std:iso:30042:ed-1" xmlns:xlink="http://www.w3.org/1999/xlink">
-			<xsl:call-template name="insertXMLcontent"/>
-		</standard>
+		<xsl:variable name="xml">
+			<standard xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:tbx="urn:iso:std:iso:30042:ed-1" xmlns:xlink="http://www.w3.org/1999/xlink">
+				<xsl:call-template name="insertXMLcontent"/>
+			</standard>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEC' or $organization = 'ISO'">
+				<!-- id generation for IEC and ISO with Guidelines rules -->
+				<xsl:variable name="xml_with_id_new">
+					<xsl:apply-templates select="xalan:nodeset($xml)" mode="id_generate"/>
+				</xsl:variable>
+				<xsl:apply-templates select="xalan:nodeset($xml_with_id_new)" mode="id_replace"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy-of select="$xml"/>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="metanorma-collection" mode="xml" priority="2">
@@ -62,6 +76,208 @@
 		
 		</standard>
 	</xsl:template>
+	
+	<!-- ================================================== -->
+	<!-- id generation for IEC and ISO with Guidelines rules -->
+	<!-- ================================================== -->
+	<xsl:template match="@*|node()" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="sec[@sec-type = 'foreword']" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			<xsl:attribute name="id_new">
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'">sec-foreword</xsl:when>
+					<xsl:when test="$organization = 'ISO'">sec_foreword</xsl:when>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>	
+	
+	<xsl:template match="sec[@sec-type = 'intro']" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			<xsl:attribute name="id_new">
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'">sec-introduction</xsl:when>
+					<xsl:when test="$organization = 'ISO'">sec_intro</xsl:when>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>	
+	
+	<xsl:template match="sec" mode="id_generate"> <!-- [ancestor::body] -->
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			<xsl:attribute name="id_new">
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'">sec-<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$organization = 'ISO'">sec_<xsl:value-of select="@section"/></xsl:when>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="back/ref-list[@content-type = 'bibl']" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			<xsl:attribute name="id_new">
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'">sec-bibliography</xsl:when>
+					<xsl:when test="$organization = 'ISO'">sec_bibl</xsl:when>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="back/ref-list[@content-type = 'bibl']/ref" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			<xsl:attribute name="id_new">
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'">bib-<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$organization = 'ISO'">biblref_<xsl:value-of select="@section"/></xsl:when>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="back/index" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			<xsl:attribute name="id_new">
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'">sec-index</xsl:when>
+					<xsl:when test="$organization = 'ISO'">sec_index</xsl:when>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="app" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			<xsl:attribute name="id_new">
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'">anx-<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$organization = 'ISO'">sec_<xsl:value-of select="@section"/></xsl:when>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
+	<!-- Numbered table -->
+	<xsl:template match="table-wrap[label]" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			<xsl:attribute name="id_new">
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'">tab-<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$organization = 'ISO'">tab_<xsl:value-of select="@section"/></xsl:when>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
+	<!-- Numbered figure -->
+	<xsl:template match="fig[label] | fig-group[label]" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			<xsl:attribute name="id_new">
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'">tab-<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$organization = 'ISO'">fig_<xsl:value-of select="@section"/></xsl:when>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
+	<!-- Numbered formula -->
+	<xsl:template match="disp-formula[label]" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			<xsl:attribute name="id_new">
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'">for-<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$organization = 'ISO'">formula_<xsl:value-of select="@section"/></xsl:when>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
+	<!-- footnote in the text -->
+	<xsl:template match="fn[not(ancestor::table or ancestor::fig)]" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			<xsl:variable name="number"><xsl:number level="any" count="fn[not(ancestor::table or ancestor::fig)]"/></xsl:variable>
+			<xsl:attribute name="id_new">
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'">foo-<xsl:value-of select="$number"/></xsl:when>
+					<xsl:when test="$organization = 'ISO'">fn_<xsl:value-of select="$number"/></xsl:when>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
+	<!-- ================================================== -->
+	<!-- END: id generation for IEC and ISO with Guidelines rules -->
+	<!-- ================================================== -->
+	
+	<!-- ================================== -->
+	<!-- id replacement for IEC/ISO ID scheme -->
+	<!-- ================================== -->
+	<xsl:template match="@*|node()" mode="id_replace">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="id_replace" />
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="*[@id_new]" mode="id_replace" priority="2">
+		<xsl:copy>
+			<xsl:apply-templates select="@*[not(local-name() = 'id_new')]" mode="id_replace"/>
+			<xsl:attribute name="id"><xsl:value-of select="@id_new"/></xsl:attribute>
+			<xsl:apply-templates select="node()" mode="id_replace" />
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="@section[not(parent::element)]" mode="id_replace" priority="2"/> <!-- the tag 'element' is using for debug purposes -->
+	
+	<!-- xref/@rid, eref/@bibitemid -->
+	<xsl:template match="@rid | @bibitemid" mode="id_replace" priority="2">
+		<xsl:variable name="reference" select="."/>
+		<xsl:variable name="id_new" select="key('element_by_id', $reference)/@id_new"/>
+		<xsl:attribute name="{local-name()}">
+			<xsl:value-of select="$id_new"/>
+			<xsl:if test="normalize-space($id_new) = ''">
+				<xsl:value-of select="$reference"/>
+			</xsl:if>
+		</xsl:attribute>
+	</xsl:template>
+	
+	<!--  -->
+	
+	
+	<!-- ================================== -->
+	<!-- END: id replacement for IEC/ISO ID scheme -->
+	<!-- ================================== -->
+	
+	
+	
 	
 	<xsl:template match="term">
 		<xsl:variable name="current_id">
