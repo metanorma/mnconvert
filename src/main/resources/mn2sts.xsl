@@ -17,9 +17,11 @@
 	<xsl:key name="element_by_id" match="*" use="@id"/>
 	
 	<!-- special element 'footnote' is wrapper for xref + fn, will be removed at last step -->
+	<xsl:key name="footnotes_in_text_iterator" match="footnote[not(ancestor::table-wrap or ancestor::fig)]" use="'all'"/>
 	<xsl:key name="footnotes_in_text" match="footnote[not(ancestor::table-wrap or ancestor::fig)]" use="normalize-space()"/>
 	
-	<xsl:key name="footnotes_in_text_iterator" match="footnote[not(ancestor::table-wrap or ancestor::fig)]" use="'all'"/>
+	<xsl:key name="footnotes_in_table_iterator" match="footnote[ancestor::table-wrap]" use="concat('all_tables_', ancestor::table-wrap/@id)"/>
+	
 	
 	<xsl:include href="mn2xml.xsl"/>
 	
@@ -31,7 +33,7 @@
 		</xsl:variable>
 		
 		<xsl:variable name="xml_footnotes_fix">
-			<xsl:apply-templates select="xalan:nodeset($xml)" mode="footnotes_fix"/>
+			<xsl:apply-templates select="xalan:nodeset($xml)" mode="footnotes_update"/>
 		</xsl:variable>
 		
 		<xsl:choose>
@@ -248,7 +250,7 @@
 	
 	
 	<!-- footnote in the table -->
-	<xsl:template match="fn[ancestor::table-wrap]" mode="id_generate">
+	<xsl:template match="fn2[ancestor::table-wrap]" mode="id_generate">
 		<xsl:variable name="table_number" select="ancestor::table-wrap/@section"/>
 		<xsl:variable name="table_id" select="ancestor::table-wrap/@id"/>
 		<!-- footnote number in the current table -->
@@ -504,16 +506,19 @@
 	
 	
 	<!-- ===================================== -->
-	<!-- unique fn in text only -->
+	<!-- unique fn -->
 	<!-- ===================================== -->
-	<xsl:template match="@*|node()" mode="footnotes_fix">
+	<xsl:template match="@*|node()" mode="footnotes_update">
 		<xsl:copy>
-			<xsl:apply-templates select="@*|node()" mode="footnotes_fix" />
+			<xsl:apply-templates select="@*|node()" mode="footnotes_update" />
 		</xsl:copy>
 	</xsl:template>
 	
+	<!-- ===================================== -->
+	<!-- unique fn in text only -->
+	<!-- ===================================== -->
 	<!-- element 'footnote' is special wrapper for xref and fn -->
-	<xsl:template match="footnote[not(ancestor::table-wrap or ancestor::fig)]" mode="footnotes_fix">
+	<xsl:template match="footnote[not(ancestor::table-wrap or ancestor::fig)]" mode="footnotes_update">
 		
 		<xsl:variable name="curr_text" select="normalize-space()"/>
 		<xsl:variable name="curr_id" select="@id"/>
@@ -544,62 +549,192 @@
 		
 		<xsl:choose>
 			<xsl:when test="$number_in_footnotes_unique != ''"> <!-- if current fn is first occurrence -->
-				<xsl:apply-templates select="xref" mode="footnotes_fix_update">
-					<xsl:with-param name="number" select="$number_in_footnotes_unique"/>
+				<xsl:apply-templates select="xref" mode="footnotes_update_in_text">
+					<xsl:with-param name="fn_number" select="$number_in_footnotes_unique"/>
 				</xsl:apply-templates>
-				<xsl:apply-templates select="fn" mode="footnotes_fix_update">
-					<xsl:with-param name="number" select="$number_in_footnotes_unique"/>
+				<xsl:apply-templates select="fn" mode="footnotes_update_in_text">
+					<xsl:with-param name="fn_number" select="$number_in_footnotes_unique"/>
 				</xsl:apply-templates>
 			</xsl:when>
 			<xsl:otherwise>
 				<!-- if current fn is not first occurrence -->
 				<!-- find unique footnote by current text -->
-				<xsl:variable name="number" select="$footnotes_unique/footnote[normalize-space() = $curr_text]/@number"/>
-				<xsl:apply-templates select="xref" mode="footnotes_fix_update">
-					<xsl:with-param name="number" select="$number"/>
+				<xsl:variable name="fn_number" select="$footnotes_unique/footnote[normalize-space() = $curr_text]/@number"/>
+				<xsl:apply-templates select="xref" mode="footnotes_update_in_text">
+					<xsl:with-param name="fn_number" select="$fn_number"/>
 				</xsl:apply-templates>
 				<!-- no need to put 'fn' -->
 			</xsl:otherwise>
 		</xsl:choose>
 
-	</xsl:template>
+	</xsl:template> <!-- footnote[not(ancestor::table-wrap or ancestor::fig)] -->
 	
-	<xsl:template match="footnote[ancestor::table-wrap or ancestor::fig]" mode="footnotes_fix">
-		<xsl:apply-templates mode="footnotes_fix"/>
-	</xsl:template>
-	
-	<xsl:template match="xref" mode="footnotes_fix_update">
-		<xsl:param name="number"/>
+
+	<xsl:template match="xref" mode="footnotes_update_in_text">
+		<xsl:param name="fn_number"/>
 		<xref ref-type="fn">
 			<xsl:attribute name="rid">
-				<xsl:choose>
-					<xsl:when test="$organization = 'IEC'">foo-<xsl:value-of select="$number"/></xsl:when>
-					<xsl:when test="$organization = 'ISO'">fn_<xsl:value-of select="$number"/></xsl:when>
-				</xsl:choose>
+				<xsl:call-template name="generateFootnoteInText">
+					<xsl:with-param name="fn_number" select="$fn_number"/>
+				</xsl:call-template>
 			</xsl:attribute>
-			<sup><xsl:value-of select="$number"/><xsl:if test="$organization = 'ISO'">)</xsl:if></sup>
+			<sup><xsl:value-of select="$fn_number"/><xsl:if test="$organization = 'ISO'">)</xsl:if></sup>
 		</xref>
 	</xsl:template>
 	
-	<xsl:template match="fn" mode="footnotes_fix_update">
-		<xsl:param name="number"/>
+	<xsl:template match="fn" mode="footnotes_update_in_text">
+		<xsl:param name="fn_number"/>
 		<fn>
 			<xsl:attribute name="id">
-				<xsl:choose>
-					<xsl:when test="$organization = 'IEC'">foo-<xsl:value-of select="$number"/></xsl:when>
-					<xsl:when test="$organization = 'ISO'">fn_<xsl:value-of select="$number"/></xsl:when>
-				</xsl:choose>
+				<xsl:call-template name="generateFootnoteInText">
+					<xsl:with-param name="fn_number" select="$fn_number"/>
+				</xsl:call-template>
 			</xsl:attribute>
 			<label>
-				<sup><xsl:value-of select="$number"/><xsl:if test="$organization = 'ISO'">)</xsl:if></sup>
+				<sup><xsl:value-of select="$fn_number"/><xsl:if test="$organization = 'ISO'">)</xsl:if></sup>
 			</label>
 			<xsl:copy-of select="node()[not(self::label)]"/>
 		</fn>
 	</xsl:template>
 	
+	<xsl:template name="generateFootnoteInText">
+		<xsl:param name="fn_number"/>
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEC'">foo-<xsl:value-of select="$fn_number"/></xsl:when>
+			<xsl:when test="$organization = 'ISO'">fn_<xsl:value-of select="$fn_number"/></xsl:when>
+		</xsl:choose>
+	</xsl:template>
+	<!-- ===================================== -->
+	<!-- END: unique fn in text only -->
+	<!-- ===================================== -->
+	
+	
 	
 	<!-- ===================================== -->
-	<!-- unique fn in text only -->
+	<!-- unique fn in table -->
+	<!-- ===================================== -->
+	<xsl:template match="footnote[ancestor::table-wrap]" mode="footnotes_update">
+		
+		<xsl:variable name="curr_text" select="normalize-space()"/>
+		<xsl:variable name="curr_id" select="@id"/>
+		
+		<xsl:variable name="table_id" select="ancestor::table-wrap/@id"/>
+		
+		<!-- get all footnotes in text -->
+		<xsl:variable name="footnotes_all_">
+			<xsl:for-each select="key('footnotes_in_table_iterator', concat('all_tables_', $table_id))">
+				<xsl:copy-of select="."/>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:variable name="footnotes_all" select="xalan:nodeset($footnotes_all_)"/>
+		<!-- <footnotes_all><xsl:copy-of select="$footnotes_all"/></footnotes_all> -->
+		
+		<xsl:variable name="footnotes_unique_">
+			<xsl:for-each select="$footnotes_all/*">
+				<xsl:variable name="text" select="normalize-space()"/>
+				<xsl:if test="not(preceding-sibling::*[normalize-space() = $text])">
+					<xsl:copy>
+						<xsl:copy-of select="@*"/>
+						<xsl:copy-of select="node()"/>
+					</xsl:copy>
+				</xsl:if>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:variable name="footnotes_unique_numbered">
+			<xsl:for-each select="xalan:nodeset($footnotes_unique_)/*">
+				<xsl:copy>
+					<xsl:copy-of select="@*"/>
+					<xsl:attribute name="number"><xsl:value-of select="position()"/></xsl:attribute>
+					<xsl:copy-of select="node()"/>
+				</xsl:copy>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:variable name="footnotes_unique" select="xalan:nodeset($footnotes_unique_numbered)"/>
+		<!-- <footnotes_unique><xsl:copy-of select="$footnotes_unique"/></footnotes_unique> -->
+		
+		<xsl:variable name="number_in_footnotes_unique" select="normalize-space($footnotes_unique/footnote[@id = $curr_id]/@number)"/>
+		
+		<xsl:variable name="table_number" select="ancestor::table-wrap/@section"/>
+		
+		<xsl:choose>
+			<xsl:when test="$number_in_footnotes_unique != ''"> <!-- if current fn is first occurrence -->
+				<xsl:apply-templates select="xref" mode="footnotes_update_in_table">
+					<xsl:with-param name="table_number" select="$table_number"/>
+					<xsl:with-param name="fn_number" select="$number_in_footnotes_unique"/>
+				</xsl:apply-templates>
+				<xsl:apply-templates select="fn" mode="footnotes_update_in_table">
+					<xsl:with-param name="table_number" select="$table_number"/>
+					<xsl:with-param name="fn_number" select="$number_in_footnotes_unique"/>
+				</xsl:apply-templates>
+			</xsl:when>
+			<xsl:otherwise>
+				<!-- if current fn is not first occurrence -->
+				<!-- find unique footnote by current text -->
+				<xsl:variable name="fn_number" select="$footnotes_unique/footnote[normalize-space() = $curr_text]/@number"/>
+				<xsl:apply-templates select="xref" mode="footnotes_update_in_table">
+					<xsl:with-param name="table_number" select="$table_number"/>
+					<xsl:with-param name="fn_number" select="$fn_number"/>
+				</xsl:apply-templates>
+				<!-- no need to put 'fn' -->
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template> <!-- footnote[ancestor::table-wrap] -->
+	
+	<xsl:template match="xref" mode="footnotes_update_in_table">
+		<xsl:param name="table_number"/>
+		<xsl:param name="fn_number"/>
+		<xref ref-type="fn">
+			<xsl:attribute name="rid">
+				<xsl:call-template name="generateFootnoteInTable">
+					<xsl:with-param name="table_number" select="$table_number"/>
+					<xsl:with-param name="fn_number" select="$fn_number"/>
+				</xsl:call-template>
+			</xsl:attribute>
+			<xsl:copy-of select="node()"/> <!-- a) b) ... -->
+		</xref>
+	</xsl:template>
+	
+	<xsl:template match="fn" mode="footnotes_update_in_table">
+		<xsl:param name="table_number"/>
+		<xsl:param name="fn_number"/>
+		<fn>
+			<xsl:attribute name="id">
+				<xsl:call-template name="generateFootnoteInTable">
+					<xsl:with-param name="table_number" select="$table_number"/>
+					<xsl:with-param name="fn_number" select="$fn_number"/>
+				</xsl:call-template>
+			</xsl:attribute>
+			<xsl:copy-of select="node()"/> <!-- a) b) ... -->
+		</fn>
+	</xsl:template>
+	
+	<xsl:template name="generateFootnoteInTable">
+		<xsl:param name="table_number"/>
+		<xsl:param name="fn_number"/>
+		<xsl:choose>
+			<xsl:when test="$organization = 'IEC'">tfn-<xsl:value-of select="$table_number"/>-<xsl:value-of select="$fn_number"/></xsl:when>
+			<xsl:when test="$organization = 'ISO'">table-fn_<xsl:value-of select="$table_number"/>.<xsl:value-of select="$fn_number"/></xsl:when>
+		</xsl:choose>
+	</xsl:template>
+	<!-- ===================================== -->
+	<!-- END: unique fn in table -->
+	<!-- ===================================== -->
+	
+	
+	
+	<!-- ===================================== -->
+	<!-- unique fn in figure -->
+	<!-- ===================================== -->
+	<xsl:template match="footnote[ancestor::fig]" mode="footnotes_update">
+		<xsl:apply-templates mode="footnotes_update"/>
+	</xsl:template>
+	<!-- ===================================== -->
+	<!-- END: unique fn in figure -->
+	<!-- ===================================== -->
+	
+	
+	<!-- ===================================== -->
+	<!-- END: unique fn -->
 	<!-- ===================================== -->
 	
 </xsl:stylesheet>
