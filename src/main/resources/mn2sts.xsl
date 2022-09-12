@@ -243,6 +243,37 @@
 		</xsl:copy>
 	</xsl:template>
 	
+	<xsl:template match="list-item" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			
+			<xsl:variable name="section_parent" select="normalize-space(ancestor::sec[1]/@section)"/>
+			<xsl:variable name="id_parent" select="normalize-space(ancestor::sec[1]/@id)"/>
+			
+			<xsl:if test="$organization = 'IEC' and $section_parent != ''">
+				<xsl:attribute name="id_new">
+					<xsl:text>lis-</xsl:text><xsl:value-of select="$section_parent"/>
+					<xsl:for-each select="ancestor::list">
+						<xsl:text>-L</xsl:text>
+						
+						<xsl:choose>
+							<xsl:when test="ancestor::list-item"> <!-- if sub-list -->
+								<xsl:for-each select="ancestor::list-item[1]">
+									<xsl:number format="1"/> <!-- number in the parent list-item -->
+								</xsl:for-each>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:number level="any" count="list[ancestor::sec[1]/@id = $id_parent]"/> <!-- number in the section -->
+							</xsl:otherwise>
+						</xsl:choose>
+						
+					</xsl:for-each>
+					<xsl:text>-</xsl:text><xsl:number format="1"/> <!-- item number -->
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
 	<!-- ===================================== -->
 	<!-- unique fn in text only -->
 	<!-- ===================================== -->
