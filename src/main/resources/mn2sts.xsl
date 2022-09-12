@@ -231,6 +231,18 @@
 		</xsl:copy>
 	</xsl:template>
 	
+	<xsl:template match="p" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			<xsl:if test="$organization = 'IEC'">
+				<xsl:attribute name="id_new">
+					<xsl:text>p-</xsl:text><xsl:number format="1" level="any"/>
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
 	<!-- ===================================== -->
 	<!-- unique fn in text only -->
 	<!-- ===================================== -->
@@ -310,7 +322,8 @@
 			<label>
 				<sup><xsl:value-of select="$fn_number"/><xsl:if test="$organization = 'ISO'">)</xsl:if></sup>
 			</label>
-			<xsl:copy-of select="node()[not(self::label)]"/>
+			<!-- <xsl:copy-of select="node()[not(self::label)]"/> -->
+			<xsl:apply-templates select="node()[not(self::label)]" mode="id_generate" />
 		</fn>
 	</xsl:template>
 	
@@ -421,7 +434,8 @@
 					<xsl:with-param name="fn_number" select="$fn_number"/>
 				</xsl:call-template>
 			</xsl:attribute>
-			<xsl:copy-of select="node()"/> <!-- a) b) ... -->
+			<!-- <xsl:copy-of select="node()"/>  --><!-- a) b) ... -->
+			<xsl:apply-templates select="node()" mode="id_generate" />
 		</fn>
 	</xsl:template>
 	
@@ -533,7 +547,8 @@
 					<xsl:with-param name="fn_number" select="$fn_number"/>
 				</xsl:call-template>
 			</xsl:attribute>
-			<xsl:copy-of select="node()"/> <!-- a) b) ... -->
+			<!-- <xsl:copy-of select="node()"/> --> <!-- a) b) ... -->
+			<xsl:apply-templates select="node()" mode="id_generate" />
 		</fn>
 	</xsl:template>
 	
