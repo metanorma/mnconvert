@@ -2200,7 +2200,7 @@
 						<xsl:value-of select="ancestor::amend/autonumber[@type = 'annex']/text()"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:value-of select="@section"/>
+						<xsl:value-of select="@section_prefix"/><xsl:value-of select="@section"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</label>
@@ -4211,7 +4211,7 @@
 						<xsl:when test="$isKeyTable = 'true'">Key</xsl:when>
 						<xsl:when test="@unnumbered = 'true'"></xsl:when>
 						<xsl:otherwise>
-							<xsl:value-of select="@section"/>
+							<xsl:value-of select="@section_prefix"/><xsl:value-of select="@section"/>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
@@ -4524,7 +4524,7 @@
 								<xsl:value-of select="ancestor::amend/autonumber[@type = 'figure']/text()"/>
 							</xsl:when>
 							<xsl:otherwise>
-								<xsl:value-of select="@section"/>
+								<xsl:value-of select="@section_prefix"/><xsl:value-of select="@section"/>
 							</xsl:otherwise>
 						</xsl:choose>
 					</label>
@@ -5233,6 +5233,17 @@
 		<xsl:if test="$organization = 'IEC' or $organization = 'ISO'">
 			<xsl:copy-of select="@section"/>
 		</xsl:if>
+	</xsl:template>
+	
+	
+	<xsl:template match="@*|node()" mode="footnotes_update">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="footnotes_update" />
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="footnote" mode="footnotes_update">
+		<xsl:apply-templates mode="footnotes_update"/>
 	</xsl:template>
 	
 </xsl:stylesheet>
