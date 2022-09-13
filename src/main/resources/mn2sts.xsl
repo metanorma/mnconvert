@@ -231,6 +231,24 @@
 		</xsl:copy>
 	</xsl:template>
 	
+	<xsl:template match="non-normative-note[not(ancestor::table-wrap or ancestor::fig)]" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			
+			<xsl:variable name="section_parent" select="normalize-space(ancestor::sec[1]/@section)"/>
+			<xsl:variable name="id_parent" select="normalize-space(ancestor::sec[1]/@id)"/>
+			
+			<xsl:if test="$organization = 'IEC' and $section_parent != ''">
+				<xsl:attribute name="id_new">
+					<!-- Example: not-3.5-1 -->
+					<xsl:text>not-</xsl:text><xsl:value-of select="$section_parent"/><xsl:text>-</xsl:text>
+					<xsl:number level="any" count="non-normative-note[ancestor::sec[1]/@id = $id_parent]"/> <!-- number in the section -->
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
 	<xsl:template match="p" mode="id_generate">
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="id_generate" />
@@ -632,7 +650,7 @@
 	</xsl:template>
 	
 	<!-- remove @id from 'list' and 'p' if starts with '_' -->
-	<xsl:template match="*[self::list or self::p]/@id[starts-with(., '_')]" mode="id_replace"/>
+	<xsl:template match="*[self::list or self::p or self::non-normative-note]/@id[starts-with(., '_')]" mode="id_replace"/>
 	
 	<!-- ================================== -->
 	<!-- END: id replacement for IEC/ISO ID scheme -->
