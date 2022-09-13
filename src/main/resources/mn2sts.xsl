@@ -330,6 +330,28 @@
 		</xsl:copy>
 	</xsl:template>
 	
+	<!-- Note to entry -->
+	<xsl:template match="tbx:note" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			
+			<xsl:variable name="section_parent" select="normalize-space(ancestor::term-sec[1]/@section)"/>
+			<xsl:variable name="id_parent" select="normalize-space(ancestor::term-sec[1]/@id)"/>
+			
+			<xsl:if test="$organization = 'IEC' and $section_parent != ''">
+				<xsl:attribute name="id_new">
+					<!-- Example: nte-3.1.3-1 -->
+					<xsl:text>nte-</xsl:text><xsl:value-of select="$section_parent"/><xsl:text>-</xsl:text>
+					<xsl:number level="any" count="tbx:note[ancestor::term-sec[1]/@id = $id_parent]"/> <!-- number in the section -->
+				</xsl:attribute>
+			</xsl:if>
+			
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
+	
+	
 	<xsl:template match="mml:math" mode="id_generate">
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="id_generate" />
@@ -769,7 +791,8 @@
 		</xsl:variable>
 	
 		<term-sec id="sec_{$section}"><!-- id="{$current_id}" -->
-					
+			<xsl:call-template name="addSectionAttribute"/>
+			
 			<xsl:call-template name="insert_label">
 				<xsl:with-param name="label" select="$section"/>
 				<xsl:with-param name="isAddition" select="count(title/node()[normalize-space() != ''][1][self::add]) = 1"/>
