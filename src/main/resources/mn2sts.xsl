@@ -335,7 +335,7 @@
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:if test="$organization = 'IEC'">
 				<xsl:attribute name="id_new">
-					<xsl:text>mml-</xsl:text><xsl:number format="1" level="any"/>
+					<xsl:text>mml-m</xsl:text><xsl:number format="1" level="any"/>
 				</xsl:attribute>
 			</xsl:if>
 			<xsl:apply-templates select="node()" mode="id_generate" />
