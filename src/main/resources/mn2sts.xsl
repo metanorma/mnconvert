@@ -330,6 +330,21 @@
 		</xsl:copy>
 	</xsl:template>
 	
+	
+	<!-- Term section -->
+	<xsl:template match="term-sec" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			<xsl:attribute name="id_new">
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'">con-<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$organization = 'ISO'">sec_<xsl:value-of select="@section"/></xsl:when>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
 	<!-- Term entry -->
 	<xsl:template match="tbx:termEntry" mode="id_generate">
 		<xsl:copy>
@@ -338,12 +353,12 @@
 			<xsl:variable name="section_parent" select="normalize-space(ancestor::term-sec[1]/@section)"/>
 			<xsl:variable name="id_parent" select="normalize-space(ancestor::term-sec[1]/@id)"/>
 			
-			<xsl:if test="$organization = 'IEC' and $section_parent != ''">
-				<xsl:attribute name="id_new">
-					<!-- Example: te-3.1.3 -->
-					<xsl:text>te-</xsl:text><xsl:value-of select="$section_parent"/>
-				</xsl:attribute>
-			</xsl:if>
+			<xsl:attribute name="id_new">
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'"><xsl:text>te-</xsl:text><xsl:value-of select="$section_parent"/></xsl:when> <!-- Example: te-3.1.3 -->
+					<xsl:when test="$organization = 'ISO'"><xsl:text>term_</xsl:text><xsl:value-of select="$section_parent"/></xsl:when> <!-- Example: term_3.1 -->
+				</xsl:choose>
+			</xsl:attribute>
 			
 			<xsl:apply-templates select="node()" mode="id_generate" />
 		</xsl:copy>
@@ -789,7 +804,7 @@
 	<xsl:template match="@section[not(parent::element)]" mode="id_replace" priority="2"/> <!-- the tag 'element' is using for debug purposes -->
 	
 	<!-- xref/@rid, eref/@bibitemid -->
-	<xsl:template match="@rid | @bibitemid" mode="id_replace" priority="2">
+	<xsl:template match="@rid | @bibitemid | @target" mode="id_replace" priority="2">
 		<xsl:variable name="reference" select="."/>
 		<xsl:variable name="id_new" select="key('element_by_id', $reference)/@id_new"/>
 		<xsl:attribute name="{local-name()}">
