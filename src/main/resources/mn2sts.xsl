@@ -288,6 +288,17 @@
 		</xsl:copy>
 	</xsl:template>
 	
+	<xsl:template match="mml:math" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			<xsl:if test="$organization = 'IEC'">
+				<xsl:attribute name="id_new">
+					<xsl:text>mml-</xsl:text><xsl:number format="1" level="any"/>
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
 	
 	<xsl:template match="p" mode="id_generate">
 		<xsl:copy>
