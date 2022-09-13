@@ -269,6 +269,25 @@
 		</xsl:copy>
 	</xsl:template>
 	
+	<!-- Note in figure -->
+	<xsl:template match="non-normative-note[ancestor::fig]" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			
+			<xsl:variable name="section_figure_parent" select="normalize-space(ancestor::fig[1]/@section)"/>
+			<xsl:variable name="id_parent" select="normalize-space(ancestor::fig[1]/@id)"/>
+			
+			<xsl:if test="$organization = 'IEC' and $section_figure_parent != ''">
+				<xsl:attribute name="id_new">
+					<!-- Example: not-3.5-1 -->
+					<xsl:text>fno-</xsl:text><xsl:value-of select="$section_figure_parent"/><xsl:text>-</xsl:text>
+					<xsl:number level="any" count="non-normative-note[ancestor::fig[1]/@id = $id_parent]"/> <!-- number in the table -->
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
 	
 	<xsl:template match="p" mode="id_generate">
 		<xsl:copy>
