@@ -330,6 +330,23 @@
 		</xsl:copy>
 	</xsl:template>
 	
+	<!-- Term -->
+	<xsl:template match="tbx:term" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			
+			<xsl:if test="$organization = 'IEC'">
+				<xsl:attribute name="id_new">
+					<!-- Example: ter-sound_pressure -->
+					<xsl:text>ter-</xsl:text><xsl:value-of select="translate(normalize-space(),' &#xa0;()','__')"/> <!-- 'sound pressure' to 'sound_pressure' -->
+				</xsl:attribute>
+			</xsl:if>
+			
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
+	
 	<!-- Note to entry -->
 	<xsl:template match="tbx:note" mode="id_generate">
 		<xsl:copy>
