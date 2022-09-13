@@ -203,6 +203,27 @@
 		</xsl:copy>
 	</xsl:template>
 	
+	<!-- Non-numbered table -->
+	<xsl:template match="table-wrap[not(label)]" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			
+			<xsl:variable name="section_parent" select="normalize-space(ancestor::sec[1]/@section)"/>
+			<xsl:variable name="id_parent" select="normalize-space(ancestor::sec[1]/@id)"/>
+			
+			<xsl:if test="$organization = 'IEC' and $section_parent != ''">
+				<xsl:attribute name="id_new">
+					<!-- Example: for-informal-5.6-1 -->
+					<xsl:text>tab-informal-</xsl:text><xsl:value-of select="$section_parent"/><xsl:text>-</xsl:text>
+					<xsl:number level="any" count="table-wrap[not(label)][ancestor::sec[1]/@id = $id_parent]"/> <!-- number in the section -->
+				</xsl:attribute>
+			</xsl:if>
+			
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
+	
 	<!-- Numbered figure -->
 	<xsl:template match="fig[label] | fig-group[label]" mode="id_generate">
 		<xsl:copy>
