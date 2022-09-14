@@ -123,6 +123,20 @@
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
 		</xsl:copy>
+	</xsl:template>
+	
+	<!-- discrepancy in the Guidelines -->
+	<xsl:template match="sec[@sec-type = 'scope']" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			<xsl:attribute name="id_new">
+				<xsl:choose>
+					<xsl:when test="$organization = 'IEC'">sec-scope</xsl:when>
+					<xsl:when test="$organization = 'ISO'">sec_scope</xsl:when>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
 	</xsl:template>	
 	
 	<xsl:template match="sec" mode="id_generate"> <!-- [ancestor::body] -->
