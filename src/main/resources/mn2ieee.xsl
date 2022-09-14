@@ -17,57 +17,65 @@
 	
 	<xsl:template match="/*" mode="xml">
 		
-		<standards-document xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink">
+		<xsl:variable name="xml">
+			<standards-document xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink">
+			
+				<!-- attributes for the element standards-document -->
+				<xsl:variable name="stage" select="bibdata/status/stage"/>
+				<xsl:attribute name="article-status">
+					<xsl:choose>
+						<xsl:when test="$stage = 'active' or $stage = 'draft' or $stage = 'developing'">active</xsl:when>
+						<xsl:otherwise>inactive</xsl:otherwise>
+					</xsl:choose>
+				</xsl:attribute>
+				
+				<xsl:variable name="doctype" select="bibdata/ext/doctype"/>
+				
+				<xsl:variable name="subdoctype" select="bibdata/ext/subdoctype[normalize-space(@language) = '']"/> <!-- amendment, corrigendum, erratum -->
+				
+				<xsl:attribute name="content-type">
+					<xsl:choose>
+						<xsl:when test="$subdoctype = 'amendment' or $subdoctype = 'corrigendum'"><xsl:value-of select="$subdoctype"/></xsl:when>
+						<xsl:when test="$subdoctype = 'erratum'">errata</xsl:when>
+						<xsl:when test="$doctype = 'standard' or $doctype = 'guide' or $doctype = 'recommended-practice'"><xsl:value-of select="$doctype"/></xsl:when>
+						<xsl:otherwise><xsl:value-of select="$doctype"/></xsl:otherwise>
+					</xsl:choose>
+				</xsl:attribute>
+				
+				<xsl:attribute name="dtd-version">1.7</xsl:attribute>
+				
+				<xsl:variable name="open-access" select="normalize-space(misc-container/semantic-metadata/open-access)"/>
+				<xsl:if test="$open-access != ''">
+					<xsl:attribute name="open-access"><xsl:value-of select="$open-access"/></xsl:attribute>
+				</xsl:if>
+				
+				<xsl:attribute name="revision">
+					<xsl:choose>
+						<xsl:when test="bibdata/relation[@type='updates']">yes</xsl:when>
+						<xsl:otherwise>no</xsl:otherwise>
+					</xsl:choose>
+				</xsl:attribute>
+				
+				<!-- To do: active-reserved, inactive-reserved, inactive-superseded, inactive-withdrawn -->
+				<xsl:attribute name="std-status">
+					<xsl:choose>
+						<xsl:when test="$stage = 'draft' and date[@type='issued']">approved-draft</xsl:when>
+						<xsl:when test="$stage = 'draft'">unapproved-draft</xsl:when>
+						<xsl:when test="$stage = 'superseded'">inactive-superseded</xsl:when>
+						<xsl:when test="$stage = 'withdrawn'">inactive-withdrawn</xsl:when>
+						<xsl:otherwise>active</xsl:otherwise>
+					</xsl:choose>
+				</xsl:attribute>
+			
+				<xsl:call-template name="insertXMLcontent"/>
+			</standards-document>
+		</xsl:variable>
+
+		<xsl:variable name="xml_footnotes_fix">
+			<xsl:apply-templates select="xalan:nodeset($xml)" mode="footnotes_update"/>
+		</xsl:variable>
 		
-			<!-- attributes for the element standards-document -->
-			<xsl:variable name="stage" select="bibdata/status/stage"/>
-			<xsl:attribute name="article-status">
-				<xsl:choose>
-					<xsl:when test="$stage = 'active' or $stage = 'draft' or $stage = 'developing'">active</xsl:when>
-					<xsl:otherwise>inactive</xsl:otherwise>
-				</xsl:choose>
-			</xsl:attribute>
-			
-			<xsl:variable name="doctype" select="bibdata/ext/doctype"/>
-			
-			<xsl:variable name="subdoctype" select="bibdata/ext/subdoctype[normalize-space(@language) = '']"/> <!-- amendment, corrigendum, erratum -->
-			
-			<xsl:attribute name="content-type">
-				<xsl:choose>
-					<xsl:when test="$subdoctype = 'amendment' or $subdoctype = 'corrigendum'"><xsl:value-of select="$subdoctype"/></xsl:when>
-					<xsl:when test="$subdoctype = 'erratum'">errata</xsl:when>
-					<xsl:when test="$doctype = 'standard' or $doctype = 'guide' or $doctype = 'recommended-practice'"><xsl:value-of select="$doctype"/></xsl:when>
-					<xsl:otherwise><xsl:value-of select="$doctype"/></xsl:otherwise>
-				</xsl:choose>
-			</xsl:attribute>
-			
-			<xsl:attribute name="dtd-version">1.7</xsl:attribute>
-			
-			<xsl:variable name="open-access" select="normalize-space(misc-container/semantic-metadata/open-access)"/>
-			<xsl:if test="$open-access != ''">
-				<xsl:attribute name="open-access"><xsl:value-of select="$open-access"/></xsl:attribute>
-			</xsl:if>
-			
-			<xsl:attribute name="revision">
-				<xsl:choose>
-					<xsl:when test="bibdata/relation[@type='updates']">yes</xsl:when>
-					<xsl:otherwise>no</xsl:otherwise>
-				</xsl:choose>
-			</xsl:attribute>
-			
-			<!-- To do: active-reserved, inactive-reserved, inactive-superseded, inactive-withdrawn -->
-			<xsl:attribute name="std-status">
-				<xsl:choose>
-					<xsl:when test="$stage = 'draft' and date[@type='issued']">approved-draft</xsl:when>
-					<xsl:when test="$stage = 'draft'">unapproved-draft</xsl:when>
-					<xsl:when test="$stage = 'superseded'">inactive-superseded</xsl:when>
-					<xsl:when test="$stage = 'withdrawn'">inactive-withdrawn</xsl:when>
-					<xsl:otherwise>active</xsl:otherwise>
-				</xsl:choose>
-			</xsl:attribute>
-		
-			<xsl:call-template name="insertXMLcontent"/>
-		</standards-document>
+		<xsl:copy-of select="$xml_footnotes_fix"/>
 
 	</xsl:template>
 

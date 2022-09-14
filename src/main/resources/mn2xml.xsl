@@ -8,7 +8,6 @@
 			exclude-result-prefixes="xalan java metanorma-class" 
 			version="1.0">
 
-	
 	<!-- ===================== -->
 	<!-- remove namespace -->
 	<!-- for simplify templates: use '<xsl:template match="element">' instead of '<xsl:template match="*[local-name() = 'element']"> -->
@@ -17,9 +16,6 @@
 		<xsl:apply-templates mode="remove_namespace"/>
 	</xsl:variable>
 	<xsl:variable name="xml_step1" select="xalan:nodeset($xml_step1_)"/>
-	<xsl:variable name="xml_">
-		<xsl:apply-templates select="$xml_step1" mode="add_attributes"/>
-	</xsl:variable>
 	
 	<xsl:template match="*" mode="remove_namespace" priority="2">
 		<xsl:element name="{local-name()}">
@@ -38,6 +34,10 @@
 	<!-- END remove namespace -->
 	<!-- ===================== -->
 	
+	<xsl:variable name="xml_">
+		<xsl:apply-templates select="$xml_step1" mode="add_attributes"/>
+	</xsl:variable>
+	
 	<!-- ===================== -->
 	<!-- add attributes -->
 	<!-- ===================== -->
@@ -54,6 +54,13 @@
 		<xsl:param name="sectionNum"/>
 		
 		<xsl:variable name="name" select="local-name()"/>
+		
+		<xsl:variable name="ancestor">
+			<xsl:choose>
+				<xsl:when test="ancestor::sections">sections</xsl:when>
+				<xsl:when test="ancestor::annex">annex</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
 		
 		<xsl:variable name="sectionNum_">
 		
@@ -131,13 +138,13 @@
 							<!-- presentation xml data -->
 							<xsl:value-of select="title/tab[1]/preceding-sibling::node()"/>
 						</xsl:when>
-						<xsl:when test="self::term and normalize-space(name) != '' and  normalize-space(translate(name, '0123456789.', '')) = ''">
+						<xsl:when test="self::term and normalize-space(name) != '' and  normalize-space(translate(name, '0123456789.', '')) = ''"> <!-- if term's name contains digits and dots only, for instance, '3.2' -->
 							<xsl:value-of select="name"/>
 						</xsl:when>
-						<xsl:when test="title and not(title/tab) and normalize-space(translate(title, '0123456789.', '')) = ''">
+						<xsl:when test="title and not(title/tab) and normalize-space(translate(title, '0123456789.', '')) = ''"> <!-- if title contains digits and dots only, for example '4.1.3' -->
 							<xsl:value-of select="title"/>
 						</xsl:when>
-						<xsl:when test="(self::table or self::figure) and contains(name, '&#8212; ')">
+						<xsl:when test="(self::table or self::figure) and contains(name, '&#8212; ')"> <!-- if table's or figure's name contains number -->
 							<xsl:variable name="_name" select="substring-before(name, '&#8212; ')"/>
 							<xsl:value-of select="translate(normalize-space(translate($_name, '&#xa0;', ' ')), ' ', '&#xa0;')"/>
 						</xsl:when>
@@ -153,12 +160,13 @@
 								<xsl:when test="(self::table or self::figure) and $section_ = ''"/>
 								<xsl:when test="$section_ = '0' and not(@type='intro')" />
 								<xsl:otherwise>
-									<xsl:choose>
+									<!-- <xsl:choose>
 										<xsl:when test="$name = 'annex'">Annex&#xA0;<xsl:value-of select="$section_"/></xsl:when>
 										<xsl:when test="$name = 'table'">Table&#xA0;<xsl:value-of select="$section_"/></xsl:when>
 										<xsl:when test="$name = 'figure'">Figure&#xA0;<xsl:value-of select="$section_"/></xsl:when>
 										<xsl:otherwise><xsl:value-of select="$section_"/></xsl:otherwise>
-									</xsl:choose>
+									</xsl:choose> -->
+									<xsl:value-of select="$section_"/>
 								</xsl:otherwise>
 							</xsl:choose>
 						</xsl:otherwise>
@@ -168,14 +176,20 @@
 				<xsl:attribute name="section"><xsl:value-of select="$section"/></xsl:attribute>
 				
 				<xsl:variable name="section_prefix">
-					<xsl:if test="($name = 'clause' or $name = 'terms' or ($name = 'references' and @normative='true')) and $section != '' and not(contains($section, '.'))">Clause </xsl:if> <!-- first level clause -->
-					<xsl:if test="$name = 'section-title' or ($name = 'p' and @type = 'section-title')">Section </xsl:if>
-					<xsl:if test="$name = 'formula' and ($organization = 'IEC' or $outputformat = 'IEEE')">Equation </xsl:if>
+					<xsl:choose>
+						<xsl:when test="$name = 'annex'">Annex&#xA0;</xsl:when>
+						<xsl:when test="$name = 'table'">Table&#xA0;</xsl:when>
+						<xsl:when test="$name = 'figure'">Figure&#xA0;</xsl:when>
+						<xsl:when test="($name = 'clause' or $name = 'terms' or ($name = 'references' and @normative='true')) and $section != '' and not(contains($section, '.'))">Clause </xsl:when> <!-- first level clause -->
+						<xsl:when test="$name = 'section-title' or ($name = 'p' and @type = 'section-title')">Section </xsl:when>
+						<xsl:when test="$name = 'formula' and ($organization = 'IEC' or $outputformat = 'IEEE')">Equation </xsl:when>
+					</xsl:choose>
 				</xsl:variable>
 				
 				<xsl:attribute name="section_prefix"><xsl:value-of select="$section_prefix"/></xsl:attribute>
 				
 			</xsl:if>
+
 
 			<xsl:apply-templates select="node()" mode="add_attributes">
 				<xsl:with-param name="sectionNum" select="$sectionNum_"/>
@@ -187,6 +201,8 @@
 	<!-- ===================== -->
 	<!-- END add attributes -->
 	<!-- ===================== -->
+
+	
 	<xsl:variable name="xml" select="xalan:nodeset($xml_)"/>
 	
 	<xsl:variable name="format" select="normalize-space($outputformat)"/>
@@ -388,8 +404,10 @@
 					<xsl:text>.</xsl:text>
 					<xsl:number format="1" level="any" count="formula[ancestor::*[generate-id() = $root_element_id] and not(@unnumbered = 'true')]"/>
 				</xsl:when>
-				<xsl:when test="self::bibitem and ancestor::references[@normative='true']">norm_ref_<xsl:number/></xsl:when>
-				<xsl:when test="self::bibitem">ref_<xsl:number/></xsl:when>
+				<!-- <xsl:when test="self::bibitem and ancestor::references[@normative='true']">norm_ref_<xsl:number/></xsl:when> -->
+				<xsl:when test="self::bibitem and ancestor::references[@normative='true']"><xsl:number/></xsl:when>
+				<!-- <xsl:when test="self::bibitem">ref_<xsl:number/></xsl:when> -->
+				<xsl:when test="self::bibitem"><xsl:number/></xsl:when>
 				<xsl:when test="ancestor::bibliography">
 					<xsl:value-of select="$sectionNum"/>
 				</xsl:when>
@@ -2174,6 +2192,7 @@
 					</xsl:if>
 				</xsl:otherwise>
 			</xsl:choose>
+			<xsl:call-template name="addSectionAttribute"/>
 			
 			<label>
 				<xsl:choose>
@@ -2181,7 +2200,7 @@
 						<xsl:value-of select="ancestor::amend/autonumber[@type = 'annex']/text()"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:value-of select="@section"/>
+						<xsl:value-of select="@section_prefix"/><xsl:value-of select="@section"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</label>
@@ -2312,6 +2331,8 @@
 				</xsl:if>
 			</xsl:attribute> -->
 			<xsl:copy-of select="@id"/>
+			
+			<xsl:call-template name="addSectionAttribute"/>
 			
 			<xsl:apply-templates select="docidentifier[@type = 'metanorma']" mode="docidentifier_metanorma"/>
 			<xsl:if test="not(docidentifier[@type='metanorma'])">
@@ -2560,22 +2581,25 @@
 		</xsl:variable>
 		
 		<xsl:variable name="xref_fn">
-			<xref ref-type="fn" rid="fn_{$number}">
-				<sup><xsl:value-of select="$number"/></sup>
-			</xref>
-			<fn id="fn_{$number}">
-				<label>
+			<!-- 'footnote' is special wrapper for further processing in mode="footnotes_fix" -->
+			<footnote id="{generate-id()}">
+				<xref ref-type="fn" rid="fn_{$number}">
 					<sup><xsl:value-of select="$number"/></sup>
-				</label>
-				<xsl:choose>
-					<xsl:when test="p">
-						<xsl:apply-templates/>
-					</xsl:when>
-					<xsl:otherwise>
-						<p><xsl:apply-templates/></p>
-					</xsl:otherwise>
-				</xsl:choose>
-			</fn>
+				</xref>
+				<fn id="fn_{$number}">
+					<label>
+						<sup><xsl:value-of select="$number"/></sup>
+					</label>
+					<xsl:choose>
+						<xsl:when test="p">
+							<xsl:apply-templates/>
+						</xsl:when>
+						<xsl:otherwise>
+							<p><xsl:apply-templates/></p>
+						</xsl:otherwise>
+					</xsl:choose>
+				</fn>
+			</footnote>
 		</xsl:variable>
 
 		<xsl:copy-of select="$xref_fn"/>
@@ -2598,15 +2622,18 @@
 			<xsl:if test="ancestor::table"><xsl:value-of select="ancestor::table[1]/@id"/>_</xsl:if>
 		</xsl:variable>
 		<xsl:variable name="xref_fn">
-			<xref ref-type="fn" rid="fn_{$number_id}"> <!-- {$sfx} rid="fn_{$number}" -->
-				<sup><xsl:value-of select="$number"/><xsl:if test="$outputformat != 'IEEE'">)</xsl:if></sup>
-			</xref>
-			<fn id="fn_{$number_id}"> <!-- {$sfx} -->
-				<label>
+			<!-- 'footnote' is special wrapper for further processing in mode="footnotes_fix" -->
+			<footnote id="{generate-id()}">
+				<xref ref-type="fn" rid="fn_{$number_id}"> <!-- {$sfx} rid="fn_{$number}" -->
 					<sup><xsl:value-of select="$number"/><xsl:if test="$outputformat != 'IEEE'">)</xsl:if></sup>
-				</label>
-				<xsl:apply-templates/>
-			</fn>
+				</xref>
+				<fn id="fn_{$number_id}"> <!-- {$sfx} -->
+					<label>
+						<sup><xsl:value-of select="$number"/><xsl:if test="$outputformat != 'IEEE'">)</xsl:if></sup>
+					</label>
+					<xsl:apply-templates/>
+				</fn>
+			</footnote>
 		</xsl:variable>
 		
 		<xsl:choose>		
@@ -2678,6 +2705,7 @@
 			<xsl:when test="$processFloatingTitle = 'false' and preceding-sibling::p[1][@type = 'floating-title']"><!-- skip processing, see template for 'p' --></xsl:when> <!--  or @type = 'section-title' -->
 			<xsl:otherwise>
 				<sec id="{$id}">
+					<xsl:call-template name="addSectionAttribute"/>
 					<xsl:if test="normalize-space($sec_type) != ''">
 						<xsl:if test="$outputformat != 'IEEE'">
 							<xsl:attribute name="sec-type">
@@ -4171,6 +4199,8 @@
 						<xsl:attribute name="content-type"><xsl:value-of select="$processing_instruction_content_type"/></xsl:attribute>
 					</xsl:if>
 					
+					<xsl:call-template name="addSectionAttribute"/>
+					
 				</xsl:if>
 				<xsl:variable name="label">
 					<xsl:choose>
@@ -4181,7 +4211,7 @@
 						<xsl:when test="$isKeyTable = 'true'">Key</xsl:when>
 						<xsl:when test="@unnumbered = 'true'"></xsl:when>
 						<xsl:otherwise>
-							<xsl:value-of select="@section"/>
+							<xsl:value-of select="@section_prefix"/><xsl:value-of select="@section"/>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
@@ -4455,6 +4485,8 @@
 			<xsl:if test="$element_name = 'fig-group'">
 				<xsl:attribute name="content-type">figures</xsl:attribute>
 			</xsl:if>
+			<xsl:call-template name="addSectionAttribute"/>
+			
 			<label><xsl:value-of select="@section"/></label>
 			<xsl:apply-templates />
 		</xsl:element>
@@ -4484,13 +4516,15 @@
 					<xsl:if test="$outputformat = 'IEEE'">
 						<xsl:attribute name="position">anchor</xsl:attribute>
 					</xsl:if>
+					<xsl:call-template name="addSectionAttribute"/>
+					
 					<label>
 						<xsl:choose>
 							<xsl:when test="ancestor::amend/autonumber[@type = 'figure']">
 								<xsl:value-of select="ancestor::amend/autonumber[@type = 'figure']/text()"/>
 							</xsl:when>
 							<xsl:otherwise>
-								<xsl:value-of select="@section"/>
+								<xsl:value-of select="@section_prefix"/><xsl:value-of select="@section"/>
 							</xsl:otherwise>
 						</xsl:choose>
 					</label>
@@ -4620,6 +4654,7 @@
 					<xsl:if test="$id != ''">
 						<xsl:attribute name="id"><xsl:value-of select="$id"/></xsl:attribute>
 					</xsl:if>
+					<xsl:call-template name="addSectionAttribute"/>
 					<xsl:apply-templates />
 				</disp-formula>
 			</xsl:variable>
@@ -5193,5 +5228,22 @@
 			</xsl:call-template>
 		</xsl:if>
 	</xsl:template> <!-- split -->
+	
+	<xsl:template name="addSectionAttribute">
+		<xsl:if test="$organization = 'IEC' or $organization = 'ISO'">
+			<xsl:copy-of select="@section"/>
+		</xsl:if>
+	</xsl:template>
+	
+	
+	<xsl:template match="@*|node()" mode="footnotes_update">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="footnotes_update" />
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="footnote" mode="footnotes_update">
+		<xsl:apply-templates mode="footnotes_update"/>
+	</xsl:template>
 	
 </xsl:stylesheet>
