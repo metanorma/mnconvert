@@ -213,7 +213,7 @@
 			
 			<xsl:if test="$organization = 'IEC' and $section_parent != ''">
 				<xsl:attribute name="id_new">
-					<!-- Example: for-informal-5.6-1 -->
+					<!-- Example: tab-informal-5.6-1 -->
 					<xsl:text>tab-informal-</xsl:text><xsl:value-of select="$section_parent"/><xsl:text>-</xsl:text>
 					<xsl:number level="any" count="table-wrap[not(label)][ancestor::sec[1]/@id = $id_parent]"/> <!-- number in the section -->
 				</xsl:attribute>
@@ -302,7 +302,7 @@
 			
 			<xsl:if test="$organization = 'IEC' and $section_table_parent != ''">
 				<xsl:attribute name="id_new">
-					<!-- Example: not-3.5-1 -->
+					<!-- Example: tno-3-1 -->
 					<xsl:text>tno-</xsl:text><xsl:value-of select="$section_table_parent"/><xsl:text>-</xsl:text>
 					<xsl:number level="any" count="non-normative-note[ancestor::table-wrap[1]/@id = $id_parent]"/> <!-- number in the table -->
 				</xsl:attribute>
@@ -321,7 +321,7 @@
 			
 			<xsl:if test="$organization = 'IEC' and $section_figure_parent != ''">
 				<xsl:attribute name="id_new">
-					<!-- Example: not-3.5-1 -->
+					<!-- Example: fno-3-1 -->
 					<xsl:text>fno-</xsl:text><xsl:value-of select="$section_figure_parent"/><xsl:text>-</xsl:text>
 					<xsl:number level="any" count="non-normative-note[ancestor::fig[1]/@id = $id_parent]"/> <!-- number in the table -->
 				</xsl:attribute>
@@ -1018,19 +1018,6 @@
 	<!-- ===================== -->
 	<!-- END tbx:entailedTerm -->
 	<!-- ===================== -->
-	
-	
-	<!-- ================================== -->
-	<!-- remove helper attributes -->
-	<!-- ================================== -->
-	<xsl:template match="@*|node()" mode="clean">
-		<xsl:copy>
-			<xsl:apply-templates select="@*|node()" mode="clean" />
-		</xsl:copy>
-	</xsl:template>
-	<!-- ================================== -->
-	<!-- END helper attributes -->
-	<!-- ================================== -->
 	
 	
 </xsl:stylesheet>
