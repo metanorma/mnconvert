@@ -815,6 +815,21 @@
 		</xsl:attribute>
 	</xsl:template>
 	
+	<!-- named-content/@xlink:href -->
+	<!-- Example: <named-content xlink:href="#paddy" -->
+	<xsl:template match="named-content/@xlink:href" mode="id_replace" priority="2">
+		<xsl:variable name="reference" select="substring-after(.,'#')"/>
+		<xsl:variable name="id_new" select="key('element_by_id', $reference)/@id_new"/>
+		<xsl:attribute name="xlink:href">
+			<xsl:text>#</xsl:text>
+			<xsl:value-of select="$id_new"/>
+			<xsl:if test="normalize-space($id_new) = ''">
+				<xsl:value-of select="$reference"/>
+			</xsl:if>
+		</xsl:attribute>
+	</xsl:template>
+	
+	
 	<!-- remove @id from 'list' and 'p' if starts with '_' -->
 	<xsl:template match="*[self::list or self::p or self::non-normative-note]/@id[starts-with(., '_')]" mode="id_replace"/>
 	
