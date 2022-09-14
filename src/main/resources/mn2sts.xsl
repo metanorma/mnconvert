@@ -117,6 +117,7 @@
 			<xsl:attribute name="id_new">
 				<xsl:choose>
 					<xsl:when test="$organization = 'IEC'">sec-introduction</xsl:when>
+					<xsl:when test="$organization = 'ISO' and .//sec">sec_0</xsl:when>
 					<xsl:when test="$organization = 'ISO'">sec_intro</xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
