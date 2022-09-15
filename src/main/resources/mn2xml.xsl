@@ -729,7 +729,7 @@
 					<!-- If //bibdata/relation[@type = 'adopted-from'] exists -->
 					<xsl:when test="bibdata/relation[@type = 'adopted-from']">nat-meta</xsl:when>
 					<xsl:when test="$organization = 'BSI'">nat-meta</xsl:when>
-					<xsl:when test="$organization = 'IEC' or $organization = 'ISO'">std-meta</xsl:when>
+					<xsl:when test="($organization = 'IEC' or $organization = 'ISO') and $format = 'NISO'">std-meta</xsl:when>
 					<xsl:when test="$outputformat = 'IEEE'">std-meta</xsl:when>
 					<xsl:otherwise>iso-meta</xsl:otherwise>
 				</xsl:choose>
