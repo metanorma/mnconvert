@@ -729,7 +729,7 @@
 					<!-- If //bibdata/relation[@type = 'adopted-from'] exists -->
 					<xsl:when test="bibdata/relation[@type = 'adopted-from']">nat-meta</xsl:when>
 					<xsl:when test="$organization = 'BSI'">nat-meta</xsl:when>
-					<xsl:when test="$organization = 'IEC'">std-meta</xsl:when>
+					<xsl:when test="$organization = 'IEC' or $organization = 'ISO'">std-meta</xsl:when>
 					<xsl:when test="$outputformat = 'IEEE'">std-meta</xsl:when>
 					<xsl:otherwise>iso-meta</xsl:otherwise>
 				</xsl:choose>
@@ -1047,7 +1047,9 @@
 			
 			<xsl:if test="$element_name = 'std-meta'">
 				<proj-id>
-					<xsl:text>iec:proj:</xsl:text>
+					<xsl:if test="$organization = 'IEC'">
+						<xsl:text>iec:proj:</xsl:text>
+					</xsl:if>
 					<xsl:apply-templates select="ext/structuredidentifier/project-number" mode="front"/>
 					<xsl:if test="normalize-space($part_number) != ''">:<xsl:value-of select="$part_number"/></xsl:if>
 				</proj-id>
