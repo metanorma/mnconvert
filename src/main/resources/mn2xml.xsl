@@ -3730,6 +3730,32 @@
 	
 	<xsl:template match="link">
 		<xsl:choose>
+		
+			<xsl:when test="$organization = 'ISO' or $organization = 'IEC'">
+				<!-- Metanorma XML examples:
+					<link target="https://www.iso.org/obp"/>
+					<link target="mailto:gehf@vacheequipment.fic"/>
+					<link target="http://www.iso.org/directives">www.iso.org/directives</link>
+					<link target="http://standards.iso.org/iso/10303/tech/step_titles.htm">ISO website</link>
+				-->
+				<xsl:variable name="link_text" select="normalize-space()"/>
+				<xsl:variable name="isIncompleteURL" select="normalize-space(not(starts-with(@target, 'http:') or starts-with(@target, 'https:') or starts-with(@target, 'ftp:') or starts-with(@target, 'mailto:')))"/> <!-- true or false -->
+				<xsl:choose>
+					<xsl:when test="$isIncompleteURL = 'true' or ($link_text != '' and $link_text != @target)"> <!-- Incomplete URLs or display text hides the actual link -->
+						<ext-link>
+							<xsl:attribute name="xlink:href">
+								<xsl:value-of select="@target"/>
+							</xsl:attribute>
+							<xsl:apply-templates />
+						</ext-link>
+					</xsl:when>
+					<xsl:otherwise>
+						<!-- <uri>http://my.url</uri> -->
+						<uri><xsl:value-of select="@target"/></uri>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when> <!-- ISO, IEC -->
+		
 			<xsl:when test="normalize-space() = '' or $organization = 'IEC'">
 				<uri><xsl:value-of select="@target"/></uri>
 			</xsl:when>
