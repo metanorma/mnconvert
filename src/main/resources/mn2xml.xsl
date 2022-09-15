@@ -1366,38 +1366,83 @@
 			<!-- <release-version-id> -->
 			<xsl:apply-templates select="../misc-container/semantic-metadata/release-version-id" mode="front"/>
 			
-			<permissions>
-				<xsl:choose>
-					<xsl:when test="$metanorma_type = 'IEC'">
+			<!-- <metanorma_type><xsl:value-of select="$metanorma_type"/></metanorma_type> -->
+			<xsl:choose>
+				<xsl:when test="$metanorma_type = 'IEC'">
+					
+					<xsl:for-each select="copyright">
+						<xsl:variable name="pos" select="position()"/>
+						
+						<permissions>
+							<copyright-statement>
+								<xsl:apply-templates select="/*/boilerplate/copyright-statement[$pos]/clause/*[1]/node()"/>
+							</copyright-statement>
+							<copyright-year>
+								<xsl:apply-templates select="from" mode="front"/>
+							</copyright-year>
+							<copyright-holder>
+								<xsl:apply-templates select="owner/organization/abbreviation" mode="front"/>
+							</copyright-holder>
+							
+							<xsl:for-each select="/*/boilerplate/copyright-statement[$pos]">
+								<license>
+									<license-p><xsl:apply-templates select="clause/p[@id = 'boilerplate-message' or not(starts-with(@id, 'boilerplate-'))]/node()"/></license-p>
+									<xsl:if test="clause/p[@id = 'boilerplate-name' or @id = 'boilerplate-address']">
+										<license-p>
+											<address>
+												<addr-line>
+													<xsl:for-each select="clause/p[@id = 'boilerplate-name' or @id = 'boilerplate-address']">
+														<xsl:apply-templates />
+														<xsl:if test="position() != last()">, </xsl:if>
+													</xsl:for-each>
+												</addr-line>
+											</address>
+										</license-p>
+									</xsl:if>
+								</license>
+							</xsl:for-each>
+						</permissions>
+					</xsl:for-each>
+				
+					<!-- <xsl:call-template name="put_copyright_year"/>
+					<xsl:call-template name="put_copyright_holder"/>
+					<xsl:if test="/*/boilerplate/copyright-statement/clause/p">
+						<license>
+							<license-p><xsl:apply-templates select="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-message' or not(starts-with(@id, 'boilerplate-'))]/node()"/></license-p>
+							<xsl:if test="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-name' or @id = 'boilerplate-address']">
+								<license-p>
+									<address>
+										<addr-line>
+											<xsl:for-each select="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-name' or @id = 'boilerplate-address']">
+												<xsl:apply-templates />
+												<xsl:if test="position() != last()">, </xsl:if>
+											</xsl:for-each>
+										</addr-line>
+									</address>
+								</license-p>
+							</xsl:if>
+						</license>
+					</xsl:if> -->
+				</xsl:when>
+				<xsl:when test="$metanorma_type = 'ISO'">
+					<permissions>
+						<copyright-statement>All rights reserved</copyright-statement>
 						<xsl:call-template name="put_copyright_year"/>
 						<xsl:call-template name="put_copyright_holder"/>
-						<xsl:if test="/*/boilerplate/copyright-statement/clause/p">
-							<license>
-								<license-p><xsl:apply-templates select="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-message' or not(starts-with(@id, 'boilerplate-'))]/node()"/></license-p>
-								<xsl:if test="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-name' or @id = 'boilerplate-address']">
-									<license-p>
-										<address>
-											<addr-line>
-												<xsl:for-each select="/*/boilerplate/copyright-statement/clause/p[@id = 'boilerplate-name' or @id = 'boilerplate-address']">
-													<xsl:apply-templates />
-													<xsl:if test="position() != last()">, </xsl:if>
-												</xsl:for-each>
-											</addr-line>
-										</address>
-									</license-p>
-								</xsl:if>
-							</license>
-						</xsl:if>
-					</xsl:when>
-					<xsl:when test="$organization = 'BSI'">
+					</permissions>
+				</xsl:when>
+				<xsl:when test="$organization = 'BSI'">
+					<permissions>
 						<xsl:apply-templates select="../misc-container/semantic-metadata/copyright-statement"/>
 						<xsl:call-template name="put_copyright_year"/>
 						<xsl:call-template name="put_copyright_holder">
 							<xsl:with-param name="from">name</xsl:with-param>
 						</xsl:call-template>
-					</xsl:when>
-					
-					<xsl:otherwise> <!-- not IEC and not BSI -->
+					</permissions>
+				</xsl:when>
+				
+				<xsl:otherwise> <!-- not IEC, ISO and not BSI -->
+					<permissions>
 						<!-- <copyright-statement>All rights reserved</copyright-statement> -->
 						<xsl:apply-templates select="/*/boilerplate/copyright-statement"/>
 						<xsl:call-template name="put_copyright_year"/>
@@ -1405,10 +1450,9 @@
 						
 						<xsl:apply-templates select="/*/boilerplate/legal-statement"/>
 						<xsl:apply-templates select="/*/boilerplate/license-statement"/>
-						
-					</xsl:otherwise>
-				</xsl:choose>
-			</permissions>
+					</permissions>
+				</xsl:otherwise>
+			</xsl:choose>
 			
 			<xsl:for-each select="uri">
 				<self-uri xlink:type="simple" xmlns:xlink="http://www.w3.org/1999/xlink">
