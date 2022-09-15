@@ -8,6 +8,8 @@
 			exclude-result-prefixes="xalan java metanorma-class" 
 			version="1.0">
 
+	<xsl:variable name="metanorma_type" select="java:toUpperCase(java:java.lang.String.new(substring-before(local-name(//*[contains(local-name(), '-standard')]), '-')))"/> <!-- ISO, IEC, ... -->
+
 	<!-- ===================== -->
 	<!-- remove namespace -->
 	<!-- for simplify templates: use '<xsl:template match="element">' instead of '<xsl:template match="*[local-name() = 'element']"> -->
@@ -182,7 +184,7 @@
 						<xsl:when test="$name = 'figure'">Figure&#xA0;</xsl:when>
 						<xsl:when test="($name = 'clause' or $name = 'terms' or ($name = 'references' and @normative='true')) and $section != '' and not(contains($section, '.'))">Clause </xsl:when> <!-- first level clause -->
 						<xsl:when test="$name = 'section-title' or ($name = 'p' and @type = 'section-title')">Section </xsl:when>
-						<xsl:when test="$name = 'formula' and ($organization = 'IEC' or $outputformat = 'IEEE')">Equation </xsl:when>
+						<xsl:when test="$name = 'formula' and ($metanorma_type = 'IEC' or $metanorma_type = 'IEEE')">Equation </xsl:when>
 					</xsl:choose>
 				</xsl:variable>
 				
@@ -729,7 +731,7 @@
 					<!-- If //bibdata/relation[@type = 'adopted-from'] exists -->
 					<xsl:when test="bibdata/relation[@type = 'adopted-from']">nat-meta</xsl:when>
 					<xsl:when test="$organization = 'BSI'">nat-meta</xsl:when>
-					<xsl:when test="($organization = 'IEC' or $organization = 'ISO') and $format = 'NISO'">std-meta</xsl:when>
+					<xsl:when test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and $format = 'NISO'">std-meta</xsl:when>
 					<xsl:when test="$outputformat = 'IEEE'">std-meta</xsl:when>
 					<xsl:otherwise>iso-meta</xsl:otherwise>
 				</xsl:choose>
@@ -1047,7 +1049,7 @@
 			
 			<xsl:if test="$element_name = 'std-meta'">
 				<proj-id>
-					<xsl:if test="$organization = 'IEC'">
+					<xsl:if test="$metanorma_type = 'IEC'">
 						<xsl:text>iec:proj:</xsl:text>
 					</xsl:if>
 					<xsl:apply-templates select="ext/structuredidentifier/project-number" mode="front"/>
@@ -1244,7 +1246,7 @@
 				</xsl:otherwise>
 			</xsl:choose>
 			
-			<xsl:if test="$organization = 'ISO' or $organization = 'IEC'">
+			<xsl:if test="$metanorma_type = 'ISO' or $metanorma_type = 'IEC'">
 				<xsl:for-each select="date[not(@type='release')][normalize-space(on) != '']">
 					<!-- example: <meta-date type="stability-date">2024-12-31</meta-date> -->
 					<meta-date>
@@ -1366,7 +1368,7 @@
 			
 			<permissions>
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEC'">
+					<xsl:when test="$metanorma_type = 'IEC'">
 						<xsl:call-template name="put_copyright_year"/>
 						<xsl:call-template name="put_copyright_holder"/>
 						<xsl:if test="/*/boilerplate/copyright-statement/clause/p">
@@ -1421,7 +1423,7 @@
 			
 			<xsl:variable name="custom-meta-group_">
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEC'">
+					<xsl:when test="$metanorma_type = 'IEC'">
 						<xsl:apply-templates select="ext/price-code" mode="custom_meta"/>
 					</xsl:when>
 					<xsl:when test="$organization = 'BSI'">
@@ -2020,7 +2022,7 @@
 	</xsl:template>
 	<xsl:template match="boilerplate/copyright-statement//p//br"  priority="1">
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEC'"><xsl:text>, </xsl:text></xsl:when>
+			<xsl:when test="$metanorma_type = 'IEC'"><xsl:text>, </xsl:text></xsl:when>
 			<xsl:otherwise><xsl:value-of select="'&#x2028;'"/><!-- linebreak --></xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>	
@@ -2029,11 +2031,11 @@
 	</xsl:template>
 		
 	<xsl:template match="boilerplate/legal-statement">
-		<xsl:if test="$organization = 'IEC'">
+		<xsl:if test="$metanorma_type = 'IEC'">
 			<!-- in foreword -->
 			<xsl:apply-templates/>
 		</xsl:if>
-		<xsl:if test="$organization != 'IEC'">
+		<xsl:if test="$metanorma_type != 'IEC'">
 			<license specific-use="legal">
 				<xsl:for-each select="clause[1]/title">
 					<xsl:attribute name="xlink:title">
@@ -2048,11 +2050,11 @@
 	<xsl:template match="boilerplate/legal-statement/clause/title" priority="1"/>
 	<xsl:template match="boilerplate/legal-statement/clause/text()[normalize-space() = '']"/>  <!-- linearization -->
 	<xsl:template match="boilerplate/legal-statement/clause" priority="1">
-		<xsl:if test="$organization = 'IEC'">
+		<xsl:if test="$metanorma_type = 'IEC'">
 			<!-- in foreword -->
 			<xsl:apply-templates/>
 		</xsl:if>
-		<xsl:if test="$organization != 'IEC'">
+		<xsl:if test="$metanorma_type != 'IEC'">
 			<license-p>
 				<xsl:if test="$format = 'NISO'">
 					<xsl:attribute name="id">
@@ -2138,7 +2140,7 @@
 					
 					<xsl:apply-templates select="title"/>
 					
-					<xsl:if test="$organization = 'IEC' and $name = 'foreword'">
+					<xsl:if test="$metanorma_type = 'IEC' and $name = 'foreword'">
 						<!-- put legal-statement in Foreword -->
 						<xsl:apply-templates select="/*/boilerplate/legal-statement"/>
 					</xsl:if>
@@ -2354,7 +2356,7 @@
 						<!-- Example of resulted xml: <std-id std-id-link-type="urn" std-id-type="undated">urn:iec:std:iec:62391-1::::</std-id>
 						  <std-ref>IEC&#160;62391&#8211;1</std-ref> -->
 						
-						<xsl:if test="$organization = 'IEC'">
+						<xsl:if test="$metanorma_type = 'IEC'">
 							<xsl:variable name="docidentifier" select="docidentifier[not(@type = 'metanorma' or @type = 'metanorma-ordinal' or @type = 'URN')][1]"/>
 							<std-id>
 								<xsl:attribute name="std-id-link-type">
@@ -2385,7 +2387,7 @@
 							</std-id>
 						</xsl:if>
 						
-						<xsl:if test="$organization != 'IEC'">
+						<xsl:if test="$metanorma_type != 'IEC'">
 							<xsl:choose>
 								<xsl:when test="$docidentifier_URN != ''">
 									<xsl:attribute name="std-id">
@@ -2533,7 +2535,7 @@
 	</xsl:template>
 	
 	<xsl:template match="bibitem/title" priority="2">	
-		<xsl:if test="$organization != 'IEC'">
+		<xsl:if test="$metanorma_type != 'IEC'">
 			<xsl:text>, </xsl:text>
 		</xsl:if>
 		<title><xsl:apply-templates/></title>
@@ -3052,10 +3054,10 @@
 					<xsl:choose>
 						<!-- <xsl:when test="@type = 'arabic'">alpha-lower</xsl:when> -->
 						<!-- <xsl:when test="$type = 'arabic' and $organization = 'IEEE'">ordered</xsl:when> -->
-						<xsl:when test="$type = 'arabic' and not($organization = 'IEC')">order</xsl:when>
+						<xsl:when test="$type = 'arabic' and not($metanorma_type = 'IEC')">order</xsl:when>
 						<xsl:otherwise>
 							<xsl:choose>
-								<xsl:when test="$organization = 'IEC' and normalize-space($type) = ''">arabic</xsl:when>
+								<xsl:when test="$metanorma_type = 'IEC' and normalize-space($type) = ''">arabic</xsl:when>
 								<xsl:when test="normalize-space($type) = ''">alpha-lower</xsl:when>
 								<xsl:when test="$type = 'alphabet'">alpha-lower</xsl:when>
 								<xsl:when test="$type = 'alphabet_upper'">alpha-upper</xsl:when>
@@ -3104,7 +3106,7 @@
 				<xsl:when test="local-name(..) = 'ul' and ancestor::indexsect"><!-- no label for index item --></xsl:when>
 				<xsl:when test="local-name(..) = 'ul' and (../@type = 'bullet' or normalize-space(../@type) = '')">
 					<xsl:choose>
-						<xsl:when test="$organization = 'ISO'">
+						<xsl:when test="$metanorma_type = 'ISO'">
 							<label>—</label>
 						</xsl:when>
 						<xsl:when test="$list-type = 'simple'"></xsl:when>
@@ -3152,7 +3154,7 @@
 					
 					<xsl:variable name="list-item-label">
 						<xsl:choose>
-							<xsl:when test="$type = 'order' and not($organization = 'IEC')">
+							<xsl:when test="$type = 'order' and not($metanorma_type = 'IEC')">
 								<xsl:number value="$start_value + $curr_value" format="1)"/>
 							</xsl:when>
 							<xsl:when test="$type = 'arabic'">
@@ -3344,7 +3346,7 @@
 			</xsl:choose>
 		</xsl:variable>
 	
-		<xsl:if test="$organization = 'IEC'">
+		<xsl:if test="$metanorma_type = 'IEC'">
 			
 			<!-- Example of resulted xml:
 			<std>
@@ -3526,7 +3528,7 @@
 			</xsl:if>
 		</xsl:if>
 		
-		<xsl:if test="$organization != 'IEC' and $organization != 'BSI' and $outputformat != 'IEEE'">
+		<xsl:if test="$metanorma_type != 'IEC' and $organization != 'BSI' and $outputformat != 'IEEE'">
 	
 			<xsl:variable name="citeas_" select="java:replaceAll(java:java.lang.String.new(@citeas),'--','—')"/>
 			<xsl:variable name="citeas">
@@ -3733,7 +3735,7 @@
 	<xsl:template match="link">
 		<xsl:choose>
 		
-			<xsl:when test="$organization = 'ISO' or $organization = 'IEC'">
+			<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'IEC'">
 				<!-- Metanorma XML examples:
 					<link target="https://www.iso.org/obp"/>
 					<link target="mailto:gehf@vacheequipment.fic"/>
@@ -3758,13 +3760,13 @@
 				</xsl:choose>
 			</xsl:when> <!-- ISO, IEC -->
 		
-			<xsl:when test="normalize-space() = '' or $organization = 'IEC'">
+			<xsl:when test="normalize-space() = '' or $metanorma_type = 'IEC'">
 				<uri><xsl:value-of select="@target"/></uri>
 			</xsl:when>
 			<xsl:otherwise>
 				<ext-link>
 					<xsl:choose>
-						<xsl:when test="$organization = 'ISO'">
+						<xsl:when test="$metanorma_type = 'ISO'">
 							<xsl:attribute name="ext-link-type">uri</xsl:attribute>
 						</xsl:when>
 						<xsl:otherwise>
@@ -4351,7 +4353,7 @@
 	
 	<xsl:template match="colgroup" mode="table">
 		<xsl:choose>
-			<xsl:when test="$organization = 'ISO'">
+			<xsl:when test="$metanorma_type = 'ISO'">
 				<!-- skip creation of element colgroup, just copy nested col -->
 				<xsl:apply-templates />
 			</xsl:when>
@@ -5258,7 +5260,7 @@
 	</xsl:template> <!-- split -->
 	
 	<xsl:template name="addSectionAttribute">
-		<xsl:if test="$organization = 'IEC' or $organization = 'ISO'">
+		<xsl:if test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO'">
 			<xsl:copy-of select="@section"/>
 		</xsl:if>
 	</xsl:template>

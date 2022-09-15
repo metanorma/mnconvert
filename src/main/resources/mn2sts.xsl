@@ -35,7 +35,7 @@
 		</xsl:variable>
 		
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEC' or $organization = 'ISO'">
+			<xsl:when test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO'">
 				<!-- id generation for IEC and ISO with Guidelines rules -->
 				<xsl:variable name="xml_with_id_new">
 					<xsl:apply-templates select="xalan:nodeset($xml)" mode="id_generate"/>
@@ -103,8 +103,8 @@
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:attribute name="id_new">
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEC'">sec-foreword</xsl:when>
-					<xsl:when test="$organization = 'ISO'">sec_foreword</xsl:when>
+					<xsl:when test="$metanorma_type = 'IEC'">sec-foreword</xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO'">sec_foreword</xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -116,9 +116,9 @@
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:attribute name="id_new">
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEC'">sec-introduction</xsl:when>
-					<xsl:when test="$organization = 'ISO' and .//sec">sec_0</xsl:when>
-					<xsl:when test="$organization = 'ISO'">sec_intro</xsl:when>
+					<xsl:when test="$metanorma_type = 'IEC'">sec-introduction</xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO' and .//sec">sec_0</xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO'">sec_intro</xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -131,8 +131,8 @@
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:attribute name="id_new">
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEC'">sec-scope</xsl:when>
-					<xsl:when test="$organization = 'ISO'">sec_scope</xsl:when>
+					<xsl:when test="$metanorma_type = 'IEC'">sec-scope</xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO'">sec_scope</xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -144,8 +144,8 @@
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:attribute name="id_new">
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEC'">sec-<xsl:value-of select="@section"/></xsl:when>
-					<xsl:when test="$organization = 'ISO'">sec_<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'IEC'">sec-<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO'">sec_<xsl:value-of select="@section"/></xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -157,8 +157,8 @@
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:attribute name="id_new">
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEC'">sec-bibliography</xsl:when>
-					<xsl:when test="$organization = 'ISO'">sec_bibl</xsl:when>
+					<xsl:when test="$metanorma_type = 'IEC'">sec-bibliography</xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO'">sec_bibl</xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -170,8 +170,8 @@
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:attribute name="id_new">
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEC'">bib-<xsl:value-of select="@section"/></xsl:when>
-					<xsl:when test="$organization = 'ISO'">biblref_<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'IEC'">bib-<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO'">biblref_<xsl:value-of select="@section"/></xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -183,8 +183,8 @@
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:attribute name="id_new">
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEC'">sec-index</xsl:when>
-					<xsl:when test="$organization = 'ISO'">sec_index</xsl:when>
+					<xsl:when test="$metanorma_type = 'IEC'">sec-index</xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO'">sec_index</xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -196,8 +196,8 @@
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:attribute name="id_new">
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEC'">anx-<xsl:value-of select="@section"/></xsl:when>
-					<xsl:when test="$organization = 'ISO'">sec_<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'IEC'">anx-<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO'">sec_<xsl:value-of select="@section"/></xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -210,8 +210,8 @@
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:attribute name="id_new">
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEC'">tab-<xsl:value-of select="@section"/></xsl:when>
-					<xsl:when test="$organization = 'ISO'">tab_<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'IEC'">tab-<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO'">tab_<xsl:value-of select="@section"/></xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -226,7 +226,7 @@
 			<xsl:variable name="section_parent" select="normalize-space(ancestor::sec[1]/@section)"/>
 			<xsl:variable name="id_parent" select="normalize-space(ancestor::sec[1]/@id)"/>
 			
-			<xsl:if test="$organization = 'IEC' and $section_parent != ''">
+			<xsl:if test="$metanorma_type = 'IEC' and $section_parent != ''">
 				<xsl:attribute name="id_new">
 					<!-- Example: tab-informal-5.6-1 -->
 					<xsl:text>tab-informal-</xsl:text><xsl:value-of select="$section_parent"/><xsl:text>-</xsl:text>
@@ -245,8 +245,8 @@
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:attribute name="id_new">
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEC'">fig-<xsl:value-of select="@section"/></xsl:when>
-					<xsl:when test="$organization = 'ISO'">fig_<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'IEC'">fig-<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO'">fig_<xsl:value-of select="@section"/></xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -259,8 +259,8 @@
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:attribute name="id_new">
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEC'">for-<xsl:value-of select="translate(@section,'()','')"/></xsl:when> <!-- (1) to 1 -->
-					<xsl:when test="$organization = 'ISO'">formula_<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'IEC'">for-<xsl:value-of select="translate(@section,'()','')"/></xsl:when> <!-- (1) to 1 -->
+					<xsl:when test="$metanorma_type = 'ISO'">formula_<xsl:value-of select="@section"/></xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -275,7 +275,7 @@
 			<xsl:variable name="section_parent" select="normalize-space(ancestor::sec[1]/@section)"/>
 			<xsl:variable name="id_parent" select="normalize-space(ancestor::sec[1]/@id)"/>
 			
-			<xsl:if test="$organization = 'IEC' and $section_parent != ''">
+			<xsl:if test="$metanorma_type = 'IEC' and $section_parent != ''">
 				<xsl:attribute name="id_new">
 					<!-- Example: for-informal-5.6-1 -->
 					<xsl:text>for-informal-</xsl:text><xsl:value-of select="$section_parent"/><xsl:text>-</xsl:text>
@@ -295,7 +295,7 @@
 			<xsl:variable name="section_parent" select="normalize-space(ancestor::sec[1]/@section)"/>
 			<xsl:variable name="id_parent" select="normalize-space(ancestor::sec[1]/@id)"/>
 			
-			<xsl:if test="$organization = 'IEC' and $section_parent != ''">
+			<xsl:if test="$metanorma_type = 'IEC' and $section_parent != ''">
 				<xsl:attribute name="id_new">
 					<!-- Example: not-3.5-1 -->
 					<xsl:text>not-</xsl:text><xsl:value-of select="$section_parent"/><xsl:text>-</xsl:text>
@@ -315,7 +315,7 @@
 			<xsl:variable name="section_table_parent" select="normalize-space(ancestor::table-wrap[1]/@section)"/>
 			<xsl:variable name="id_parent" select="normalize-space(ancestor::table-wrap[1]/@id)"/>
 			
-			<xsl:if test="$organization = 'IEC' and $section_table_parent != ''">
+			<xsl:if test="$metanorma_type = 'IEC' and $section_table_parent != ''">
 				<xsl:attribute name="id_new">
 					<!-- Example: tno-3-1 -->
 					<xsl:text>tno-</xsl:text><xsl:value-of select="$section_table_parent"/><xsl:text>-</xsl:text>
@@ -334,7 +334,7 @@
 			<xsl:variable name="section_figure_parent" select="normalize-space(ancestor::fig[1]/@section)"/>
 			<xsl:variable name="id_parent" select="normalize-space(ancestor::fig[1]/@id)"/>
 			
-			<xsl:if test="$organization = 'IEC' and $section_figure_parent != ''">
+			<xsl:if test="$metanorma_type = 'IEC' and $section_figure_parent != ''">
 				<xsl:attribute name="id_new">
 					<!-- Example: fno-3-1 -->
 					<xsl:text>fno-</xsl:text><xsl:value-of select="$section_figure_parent"/><xsl:text>-</xsl:text>
@@ -352,8 +352,8 @@
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:attribute name="id_new">
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEC'">con-<xsl:value-of select="@section"/></xsl:when>
-					<xsl:when test="$organization = 'ISO'">sec_<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'IEC'">con-<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO'">sec_<xsl:value-of select="@section"/></xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -370,8 +370,8 @@
 			
 			<xsl:attribute name="id_new">
 				<xsl:choose>
-					<xsl:when test="$organization = 'IEC'"><xsl:text>te-</xsl:text><xsl:value-of select="$section_parent"/></xsl:when> <!-- Example: te-3.1.3 -->
-					<xsl:when test="$organization = 'ISO'"><xsl:text>term_</xsl:text><xsl:value-of select="$section_parent"/></xsl:when> <!-- Example: term_3.1 -->
+					<xsl:when test="$metanorma_type = 'IEC'"><xsl:text>te-</xsl:text><xsl:value-of select="$section_parent"/></xsl:when> <!-- Example: te-3.1.3 -->
+					<xsl:when test="$metanorma_type = 'ISO'"><xsl:text>term_</xsl:text><xsl:value-of select="$section_parent"/></xsl:when> <!-- Example: term_3.1 -->
 				</xsl:choose>
 			</xsl:attribute>
 			
@@ -384,7 +384,7 @@
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			
-			<xsl:if test="$organization = 'IEC'">
+			<xsl:if test="$metanorma_type = 'IEC'">
 				<xsl:attribute name="id_new">
 					<!-- Example: ter-sound_pressure -->
 					<xsl:text>ter-</xsl:text><xsl:value-of select="translate(normalize-space(),' &#xa0;()','__')"/> <!-- 'sound pressure' to 'sound_pressure' -->
@@ -404,7 +404,7 @@
 			<xsl:variable name="section_parent" select="normalize-space(ancestor::term-sec[1]/@section)"/>
 			<xsl:variable name="id_parent" select="normalize-space(ancestor::term-sec[1]/@id)"/>
 			
-			<xsl:if test="$organization = 'IEC' and $section_parent != ''">
+			<xsl:if test="$metanorma_type = 'IEC' and $section_parent != ''">
 				<xsl:attribute name="id_new">
 					<!-- Example: nte-3.1.3-1 -->
 					<xsl:text>nte-</xsl:text><xsl:value-of select="$section_parent"/><xsl:text>-</xsl:text>
@@ -421,7 +421,7 @@
 	<xsl:template match="mml:math" mode="id_generate">
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="id_generate" />
-			<xsl:if test="$organization = 'IEC'">
+			<xsl:if test="$metanorma_type = 'IEC'">
 				<xsl:attribute name="id_new">
 					<xsl:text>mml-m</xsl:text><xsl:number format="1" level="any"/>
 				</xsl:attribute>
@@ -433,7 +433,7 @@
 	<xsl:template match="p" mode="id_generate">
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="id_generate" />
-			<xsl:if test="$organization = 'IEC'">
+			<xsl:if test="$metanorma_type = 'IEC'">
 				<xsl:attribute name="id_new">
 					<xsl:text>p-</xsl:text><xsl:number format="1" level="any"/>
 				</xsl:attribute>
@@ -449,7 +449,7 @@
 			<xsl:variable name="section_parent" select="normalize-space(ancestor::sec[1]/@section)"/>
 			<xsl:variable name="id_parent" select="normalize-space(ancestor::sec[1]/@id)"/>
 			
-			<xsl:if test="$organization = 'IEC' and $section_parent != ''">
+			<xsl:if test="$metanorma_type = 'IEC' and $section_parent != ''">
 				<xsl:attribute name="id_new">
 					<xsl:text>lis-</xsl:text><xsl:value-of select="$section_parent"/>
 					<xsl:for-each select="ancestor::list">
@@ -537,7 +537,7 @@
 					<xsl:with-param name="fn_number" select="$fn_number"/>
 				</xsl:call-template>
 			</xsl:attribute>
-			<sup><xsl:value-of select="$fn_number"/><xsl:if test="$organization = 'ISO'">)</xsl:if></sup>
+			<sup><xsl:value-of select="$fn_number"/><xsl:if test="$metanorma_type = 'ISO'">)</xsl:if></sup>
 		</xref>
 	</xsl:template>
 	
@@ -550,7 +550,7 @@
 				</xsl:call-template>
 			</xsl:attribute>
 			<label>
-				<sup><xsl:value-of select="$fn_number"/><xsl:if test="$organization = 'ISO'">)</xsl:if></sup>
+				<sup><xsl:value-of select="$fn_number"/><xsl:if test="$metanorma_type = 'ISO'">)</xsl:if></sup>
 			</label>
 			<!-- <xsl:copy-of select="node()[not(self::label)]"/> -->
 			<xsl:apply-templates select="node()[not(self::label)]" mode="id_generate" />
@@ -560,8 +560,8 @@
 	<xsl:template name="generateFootnoteInText">
 		<xsl:param name="fn_number"/>
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEC'">foo-<xsl:value-of select="$fn_number"/></xsl:when>
-			<xsl:when test="$organization = 'ISO'">fn_<xsl:value-of select="$fn_number"/></xsl:when>
+			<xsl:when test="$metanorma_type = 'IEC'">foo-<xsl:value-of select="$fn_number"/></xsl:when>
+			<xsl:when test="$metanorma_type = 'ISO'">fn_<xsl:value-of select="$fn_number"/></xsl:when>
 			<xsl:otherwise><xsl:value-of select="@id"/></xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -673,8 +673,8 @@
 		<xsl:param name="table_number"/>
 		<xsl:param name="fn_number"/>
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEC'">tfn-<xsl:value-of select="$table_number"/>-<xsl:value-of select="$fn_number"/></xsl:when>
-			<xsl:when test="$organization = 'ISO'">table-fn_<xsl:value-of select="$table_number"/>.<xsl:value-of select="$fn_number"/></xsl:when>
+			<xsl:when test="$metanorma_type = 'IEC'">tfn-<xsl:value-of select="$table_number"/>-<xsl:value-of select="$fn_number"/></xsl:when>
+			<xsl:when test="$metanorma_type = 'ISO'">table-fn_<xsl:value-of select="$table_number"/>.<xsl:value-of select="$fn_number"/></xsl:when>
 			<xsl:otherwise><xsl:value-of select="@id"/></xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -786,8 +786,8 @@
 		<xsl:param name="figure_number"/>
 		<xsl:param name="fn_number"/>
 		<xsl:choose>
-			<xsl:when test="$organization = 'IEC'">figfn-<xsl:value-of select="$figure_number"/>-<xsl:value-of select="$fn_number"/></xsl:when>
-			<xsl:when test="$organization = 'ISO'">figure-fn_<xsl:value-of select="$figure_number"/>.<xsl:value-of select="$fn_number"/></xsl:when>
+			<xsl:when test="$metanorma_type = 'IEC'">figfn-<xsl:value-of select="$figure_number"/>-<xsl:value-of select="$fn_number"/></xsl:when>
+			<xsl:when test="$metanorma_type = 'ISO'">figure-fn_<xsl:value-of select="$figure_number"/>.<xsl:value-of select="$fn_number"/></xsl:when>
 			<xsl:otherwise><xsl:value-of select="@id"/></xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -971,18 +971,18 @@
 			</xsl:variable>
 			<xsl:if test="normalize-space($normativeAuthorization) != ''">
 				<xsl:choose>
-					<xsl:when test="$organization != 'IEC' and $element_name = 'preferred' and not(following-sibling::admitted or preceding-sibling::admitted or
+					<xsl:when test="$metanorma_type != 'IEC' and $element_name = 'preferred' and not(following-sibling::admitted or preceding-sibling::admitted or
 					following-sibling::deprecates or preceding-sibling::deprecates)"></xsl:when>
 					<xsl:otherwise>
 						<tbx:normativeAuthorization value="{$normativeAuthorization}"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:if>
-			<xsl:if test="@type or letter-symbol or $organization = 'IEC'">
+			<xsl:if test="@type or letter-symbol or $metanorma_type = 'IEC'">
 				<xsl:variable name="value">
 					<xsl:choose>
 						<xsl:when test="letter-symbol">symbol</xsl:when>
-						<xsl:when test="$organization = 'IEC' and (@type = 'full' or normalize-space(@type) = '')">fullForm</xsl:when>
+						<xsl:when test="$metanorma_type = 'IEC' and (@type = 'full' or normalize-space(@type) = '')">fullForm</xsl:when>
 						<xsl:when test="@type = 'full'">variant</xsl:when>
 						<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
 					</xsl:choose>
