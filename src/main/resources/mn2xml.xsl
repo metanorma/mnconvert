@@ -2162,6 +2162,10 @@
 	<xsl:template match="preface/*[not(self::abstract or @type = 'section-title' or self::section-title)]" mode="front_preface" name="preface_node">
 		<xsl:param name="skipIntroduction">true</xsl:param>
 		<xsl:variable name="name" select="local-name()"/>
+		<xsl:variable name="title">
+			<xsl:apply-templates select="title"/>
+		</xsl:variable>
+		<xsl:variable name="title_text" select="normalize-space(java:toLowerCase(java:java.lang.String.new($title)))"/>
 		<xsl:choose>
 			<!-- For BSI, Introduction section placed in body -->
 			<xsl:when test="$skipIntroduction = 'true' and $name = 'introduction' and $nat_meta_only = 'true'"></xsl:when> <!-- $organization = 'BSI' -->
@@ -2169,12 +2173,21 @@
 				<xsl:variable name="sec_type">
 					<xsl:choose>
 						<xsl:when test="@type"><xsl:value-of select="@type"/></xsl:when>
-						<xsl:when test="$name = 'introduction'">intro</xsl:when>
-						<xsl:when test="$name = 'foreword'">foreword</xsl:when>
+						<xsl:when test="$name = 'introduction' or
+														$title_text = 'introduction' or
+														$title_text = 'introducción' or
+														$title_text = 'введение'">intro</xsl:when>
+						<xsl:when test="$name = 'foreword' or 
+														$title_text = 'foreword' or
+														$title_text = 'avant-propos' or
+														$title_text = 'prólogo' or
+														$title_text = 'prólogo de la versión en español' or
+														$title_text = 'предисловие'">foreword</xsl:when>
 						<!-- <xsl:when test="not(preceding-sibling::*) and $name != 'foreword'">titlepage</xsl:when> -->
 						<xsl:otherwise>sec_<xsl:value-of select="$name"/></xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
+				
 				<sec>
 					<xsl:attribute name="id">
 						<xsl:choose>
@@ -2194,7 +2207,8 @@
 						</xsl:call-template>
 					</xsl:if>
 					
-					<xsl:apply-templates select="title"/>
+					<!-- <xsl:apply-templates select="title"/> -->
+					<xsl:copy-of select="$title"/>
 					
 					<xsl:if test="$metanorma_type = 'IEC' and $name = 'foreword'">
 						<!-- put legal-statement in Foreword -->
@@ -2742,12 +2756,34 @@
 			</xsl:message>
 		</xsl:if>
 	
+		<xsl:variable name="title">
+			<xsl:apply-templates select="title"/>
+		</xsl:variable>
+		<xsl:variable name="title_text" select="normalize-space(java:toLowerCase(java:java.lang.String.new($title)))"/>
+	
 		<xsl:variable name="sec_type">
 			<xsl:choose>
-				<xsl:when test="@type='scope'">scope</xsl:when>
-				<xsl:when test="@type='intro'">intro</xsl:when>
-				<xsl:when test="@normative='true'">norm-refs</xsl:when>
-				<xsl:when test="@id = 'tda' or @id = 'terms' or self::terms or (contains(title[1], 'Terms') and not(ancestor::clause))">terms</xsl:when>
+				<xsl:when test="@type='scope' or
+									$title_text = 'scope' or
+									$title_text = &quot;omaine d&apos;applicatione&quot; or
+									$title_text = 'objeto y campo de aplicación' or
+									$title_text = 'область применения'">scope</xsl:when>
+				<xsl:when test="@type='intro' or
+												$title_text = 'introduction' or
+												$title_text = 'introducción' or
+												$title_text = 'введение'">intro</xsl:when>
+				<xsl:when test="@normative='true' or
+									$title_text = 'normative references' or
+									$title_text = 'références normatives' or
+									$title_text = 'referencias normativas' or
+									$title_text = 'нормативные ссылки'">norm-refs</xsl:when>
+				<xsl:when test="@id = 'tda' or @id = 'terms' or self::terms or (contains(title[1], 'Terms') and not(ancestor::clause)) or
+									$title_text = 'terms and definitions' or
+									starts-with($title_text, 'terms, definitions') or
+									$title_text = 'termes et definitions' or 
+									starts-with($title_text, 'termes, définitions') or
+									$title_text = 'тérminos y definiciones' or
+									$title_text = 'термины и определения'">terms</xsl:when>
 				<xsl:when test="ancestor::foreword"><xsl:value-of select="@type"/></xsl:when>
 				<xsl:otherwise><!-- <xsl:value-of select="@id"/> --></xsl:otherwise>
 			</xsl:choose>
@@ -2786,7 +2822,8 @@
 						</xsl:otherwise>
 					</xsl:choose>
 					
-					<xsl:apply-templates select="title"/>
+					<!-- <xsl:apply-templates select="title"/> -->
+					<xsl:copy-of select="$title"/>
 					
 					<xsl:if test="@change">
 						<editing-instruction>
