@@ -2226,6 +2226,8 @@
 		<xsl:apply-templates select="." mode="section-title"/>
 	</xsl:template>
 	
+	<xsl:variable name="annex_not_integral_part_text">(This annex does not form an integral part </xsl:variable>
+  
 	<xsl:template match="annex" mode="back">
 		
 		<xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
@@ -2251,7 +2253,38 @@
 						</xsl:attribute>
 					</xsl:if>
 				</xsl:when>
+				
+				<xsl:when test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO'">
+					<xsl:choose>
+						<!-- title contains '(This annex does not form an integral part of this Recommendation | International Standard)' -->
+						<xsl:when test="title//text()[contains(., $annex_not_integral_part_text)]"><!-- no indication of "informative" or "normative" in --></xsl:when>
+						<xsl:otherwise>
+							<xsl:choose>
+								<xsl:when test="$metanorma_type = 'IEC'">
+									<xsl:attribute name="content-type">
+										<xsl:choose>
+											<xsl:when test="@obligation  = 'informative'">informative</xsl:when>
+											<xsl:when test="@obligation  = 'normative'">normative</xsl:when>
+											<xsl:otherwise>normative</xsl:otherwise>
+										</xsl:choose>
+									</xsl:attribute>
+								</xsl:when>
+								<xsl:when test="$metanorma_type = 'ISO'">
+									<xsl:attribute name="content-type">
+										<xsl:choose>
+											<xsl:when test="@obligation  = 'informative'">inform-annex</xsl:when>
+											<xsl:when test="@obligation  = 'normative'">normative-annex</xsl:when>
+											<xsl:otherwise>normative-annex</xsl:otherwise>
+										</xsl:choose>
+									</xsl:attribute>
+								</xsl:when>
+							</xsl:choose>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
+				
 				<xsl:otherwise>
+				
 					<xsl:attribute name="content-type">inform-annex</xsl:attribute>
 					<xsl:if test="normalize-space(@obligation) != ''">
 						<xsl:attribute name="content-type">
@@ -2289,6 +2322,17 @@
 						<xsl:text>)</xsl:text>
 					</annex-type>
 				</xsl:when>
+				<xsl:when test="$metanorma_type = 'ISO'">
+					<annex-type>
+						<xsl:text>(</xsl:text>
+						<xsl:value-of select="@obligation"/>
+						<xsl:if test="normalize-space(@obligation) = ''">
+							<xsl:text>normative</xsl:text>
+						</xsl:if>
+						<xsl:text>)</xsl:text>
+					</annex-type>
+				</xsl:when>
+				<xsl:when test="$metanorma_type = 'IEC'"><!-- no need <annex-type> --></xsl:when>
 				<xsl:otherwise>
 					<xsl:if test="normalize-space(@obligation) != ''">
 						<annex-type>(<xsl:value-of select="@obligation"/>)</annex-type>
