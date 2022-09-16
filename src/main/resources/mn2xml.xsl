@@ -198,6 +198,10 @@
 				
 				<xsl:attribute name="section_prefix"><xsl:value-of select="$section_prefix"/></xsl:attribute>
 				
+				<xsl:if test="amend and not(title)">
+					<xsl:attribute name="empty_label">true</xsl:attribute>
+				</xsl:if>
+				
 			</xsl:if>
 
 
@@ -2776,6 +2780,7 @@
 							<xsl:call-template name="insert_label">
 								<xsl:with-param name="label" select="$section"/>
 								<xsl:with-param name="isAddition" select="count(title/node()[normalize-space() != ''][1][self::add]) = 1"/>
+								<xsl:with-param name="isEmptyLabel" select="@empty_label"/>
 							</xsl:call-template>
 						
 						</xsl:otherwise>
@@ -5160,9 +5165,11 @@
 		<xsl:param name="color"/>
 		<xsl:param name="isNotePAS">false</xsl:param>
 		<xsl:param name="colorNote"/>
+		<xsl:param name="isEmptyLabel"/>
 		
 		<label>
 			<xsl:choose>
+				<xsl:when test="$isEmptyLabel = 'true'"><!-- empty label for amendment without title --></xsl:when>
 				<xsl:when test="$isNotePAS = 'true'">
 					<italic>
 						<styled-content style="color:{$colorNote};">
