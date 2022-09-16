@@ -146,6 +146,14 @@
 						<xsl:when test="title and not(title/tab) and normalize-space(translate(title, '0123456789.', '')) = ''"> <!-- if title contains digits and dots only, for example '4.1.3' -->
 							<xsl:value-of select="title"/>
 						</xsl:when>
+						
+						 <!-- amendment title with section number and title : 5.5.1, fourth paragraph -->
+						<xsl:when test="amend and title and not(title/tab) and normalize-space(translate(substring-before(title, ','), '0123456789.', '')) = '' and contains (title/node()[1], ',')">
+							<xsl:for-each select="title/node()[1]">
+								<xsl:value-of select="substring-before(., ',')"/>
+							</xsl:for-each>
+						</xsl:when>
+			
 						<xsl:when test="(self::table or self::figure) and contains(name, '&#8212; ')"> <!-- if table's or figure's name contains number -->
 							<xsl:variable name="_name" select="substring-before(name, '&#8212; ')"/>
 							<xsl:value-of select="translate(normalize-space(translate($_name, '&#xa0;', ' ')), ' ', '&#xa0;')"/>
@@ -4857,6 +4865,24 @@
 	<xsl:template match="title" name="title">
 		<xsl:choose>
 			<xsl:when test="not(tab) and normalize-space(translate(., '0123456789.', '')) = ''"><!-- put number in label, see above --></xsl:when>
+			
+			 <!-- amendment title with section number and title : 5.5.1, fourth paragraph -->
+			<xsl:when test="not(tab) and following-sibling::amend and normalize-space(translate(substring-before(., ','), '0123456789.', '')) = '' and contains (node()[1], ',')">
+			<!-- put number in label, see above -->
+				<title>
+					<xsl:for-each select="node()">
+						<xsl:choose>
+							<xsl:when test="position() = 1">
+								<xsl:value-of select="substring-after(., ',')"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:apply-templates/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:for-each>
+				</title>
+			</xsl:when>
+			
 			<xsl:otherwise>
 				<title>
 					<xsl:choose>
@@ -4889,6 +4915,10 @@
 		<xsl:value-of select="substring-after(substring-after(., $annex_integral_part_text), ')')"/>
 	</xsl:template>
 	
+	
+	<!-- ========================= -->
+	<!-- Amendment -->
+	<!-- ========================= -->
 	<xsl:template match="amend">
 		<!-- <p id="{@id}"> -->
 			<xsl:apply-templates />
@@ -4944,6 +4974,10 @@
 	</xsl:template>
 	
 	<xsl:template match="amend/autonumber"/>
+	<!-- ========================= -->
+	<!-- END: Amendment -->
+	<!-- ========================= -->
+	
 	
 	<xsl:template match="comment()[starts-with(., 'STS: ')]">
 		<xsl:value-of disable-output-escaping="yes" select="substring-after(., 'STS: ')"/>

@@ -920,6 +920,14 @@
 		</tbx:note>
 	</xsl:template>
 	
+	<xsl:template match="amend//termnote[not(ancestor::term)]">
+		<non-normative-note>
+			<p>
+				<xsl:apply-templates />
+			</p>
+		</non-normative-note>
+	</xsl:template>
+	
 	<xsl:template match="termsource">
 		<tbx:source>
 			<xsl:apply-templates />
