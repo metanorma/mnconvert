@@ -170,7 +170,12 @@
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:attribute name="id_new">
 				<xsl:choose>
-					<xsl:when test="$metanorma_type = 'IEC'">bib-<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'IEC'">
+						<xsl:choose>
+							<xsl:when test="label">bib-<xsl:value-of select="translate(label,'[]()','')"/></xsl:when>
+							<xsl:otherwise>bib-<xsl:value-of select="@section"/></xsl:otherwise>
+						</xsl:choose>
+					</xsl:when>
 					<xsl:when test="$metanorma_type = 'ISO'">biblref_<xsl:value-of select="@section"/></xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
