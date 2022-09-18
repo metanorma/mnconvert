@@ -165,7 +165,8 @@
 		</xsl:copy>
 	</xsl:template>
 	
-	<xsl:template match="back/ref-list[@content-type = 'bibl']/ref" mode="id_generate">
+	<!-- Bibliography item -->
+	<xsl:template match="back/ref-list[@content-type = 'bibl']//ref" mode="id_generate">
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:attribute name="id_new">

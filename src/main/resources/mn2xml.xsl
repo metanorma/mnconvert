@@ -420,6 +420,7 @@
 				</xsl:when>
 				<!-- <xsl:when test="self::bibitem and ancestor::references[@normative='true']">norm_ref_<xsl:number/></xsl:when> -->
 				<xsl:when test="self::bibitem and ancestor::references[@normative='true']"><xsl:number/></xsl:when>
+				<xsl:when test="self::bibitem and parent::references[not(@normative='true')]"><xsl:number level="any" count="bibitem[parent::references[not(@normative='true')]]"/></xsl:when>
 				<!-- <xsl:when test="self::bibitem">ref_<xsl:number/></xsl:when> -->
 				<xsl:when test="self::bibitem"><xsl:number/></xsl:when>
 				<xsl:when test="ancestor::bibliography">
@@ -2398,7 +2399,14 @@
 	
 	<xsl:template match="bibliography/clause/references[not(@normative='true')]">
 		<ref-list>
-			<xsl:copy-of select="@id"/>
+			<xsl:choose>
+				<xsl:when test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO'">
+					<xsl:attribute name="content-type">bibl</xsl:attribute>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:copy-of select="@id"/>
+				</xsl:otherwise>
+			</xsl:choose>
 			<xsl:apply-templates/>
 		</ref-list>
 	</xsl:template>
