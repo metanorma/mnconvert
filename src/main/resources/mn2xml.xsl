@@ -4600,9 +4600,18 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<def-list>
-					<xsl:copy-of select="@id"/>
-					<xsl:if test="preceding-sibling::*[1][self::title][contains(normalize-space(), 'Abbrev')]">
-						<xsl:attribute name="list-type">abbreviations</xsl:attribute>
+					<xsl:if test="not(starts-with(@id,'_'))">
+						<xsl:copy-of select="@id"/>
+					</xsl:if>
+					
+					<xsl:if test="preceding-sibling::*[1][self::title][contains(normalize-space(), 'Abbrev')] or 
+					(($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and (dt[starts-with(@id, 'abb-')] or dt[starts-with(@id, 'abb_')]))">
+						<xsl:attribute name="list-type">
+							<xsl:choose>
+								<xsl:when test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO'">abbreviation</xsl:when>
+								<xsl:otherwise>abbreviations</xsl:otherwise>
+							</xsl:choose>
+						</xsl:attribute>
 					</xsl:if>
 					<xsl:apply-templates mode="dl"/>
 				</def-list>
