@@ -5128,7 +5128,13 @@
 								<xsl:for-each select="$index_entries/*[@letter = $letter]">
 									<xsl:copy>
 										<xsl:copy-of select="@*[local-name() != 'letter']"/>
+										<xsl:if test="$metanorma_type = 'IEC'">
+											<xsl:attribute name="id">df-<xsl:number /></xsl:attribute>
+										</xsl:if>
 										<xsl:copy-of select="node()"/>
+										<xsl:if test="$metanorma_type = 'IEC'">
+											<see-entry>df <xsl:number /></see-entry>
+										</xsl:if>
 									</xsl:copy>
 								</xsl:for-each>
 							</index-div>
@@ -5221,10 +5227,17 @@
 						<xsl:attribute name="letter"><xsl:value-of select="java:toUpperCase(java:java.lang.String.new(substring(normalize-space($term),1,1)))"/></xsl:attribute>
 					</xsl:if>
 					<xsl:copy-of select="$term"/>
-					<nav-pointer-group>
-						<nav-pointer specific-use="section" rid="{$element_target/@id}"/>
-						<nav-pointer specific-use="section"><xsl:value-of select="$element_target/@section"/></nav-pointer>
-					</nav-pointer-group>
+					<xsl:choose>
+						<xsl:when test="$metanorma_type = 'IEC'">
+							<see-entry><xsl:value-of select="$element_target/@section"/></see-entry>
+						</xsl:when>
+						<xsl:otherwise>
+							<nav-pointer-group>
+								<nav-pointer specific-use="section" rid="{$element_target/@id}"/>
+								<nav-pointer specific-use="section"><xsl:value-of select="$element_target/@section"/></nav-pointer>
+							</nav-pointer-group>
+						</xsl:otherwise>
+					</xsl:choose>
 					<xsl:if test="self::primary">
 						<xsl:for-each select="../secondary">
 							<xsl:call-template name="insert_index_reference">
