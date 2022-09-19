@@ -2573,8 +2573,15 @@
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template> -->
 	
-	<xsl:template match="non-normative-note[count(*[not(local-name() = 'label')]) &gt; 1]" priority="2">
-		<xsl:text>[NOTE]</xsl:text>
+	<xsl:template match="non-normative-note[count(*[not(local-name() = 'label')]) &gt; 1 or @content-type = 'warning' or @content-type = 'important' or @content-type = 'caution']" priority="2">
+		<xsl:choose>
+			<xsl:when test="@content-type = 'warning' or @content-type = 'important' or @content-type = 'caution'">
+				<xsl:text>[</xsl:text><xsl:value-of select="java:toUpperCase(java:java.lang.String.new(@content-type))"/><xsl:text>]</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text>[NOTE]</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>====</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
