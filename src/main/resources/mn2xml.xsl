@@ -5094,11 +5094,26 @@
 							<title>INDEX</title>
 						</index-title-group>
 						<index-div>
-							<xsl:for-each select=".//index">
-								<xsl:sort select="primary"/>
-								<xsl:apply-templates select="primary">
-									<xsl:with-param name="mode">NISO</xsl:with-param>
-								</xsl:apply-templates>
+							<xsl:variable name="index-entries_">
+								<xsl:for-each select=".//index">
+									<xsl:sort select="primary"/>
+									<xsl:apply-templates select="primary">
+										<xsl:with-param name="mode">NISO</xsl:with-param>
+									</xsl:apply-templates>
+								</xsl:for-each>
+							</xsl:variable>
+							<xsl:variable name="index-entries" select="xalan:nodeset($index-entries_)"/>
+							<xsl:for-each select="$index-entries/*">
+								<xsl:variable name="letter" select="@letter"/>
+								<xsl:if test="not(preceding-sibling::*[@letter = $letter])">
+									<index-title-group>
+										<title><xsl:value-of select="$letter"/></title>
+									</index-title-group>
+								</xsl:if>
+								<xsl:copy>
+									<xsl:copy-of select="@*[local-name() != 'letter']"/>
+									<xsl:copy-of select="node()"/>
+								</xsl:copy>
 							</xsl:for-each>
 						</index-div>
 					</index>
@@ -5179,9 +5194,15 @@
 		<xsl:choose>
 			<xsl:when test="$mode = 'NISO'">
 				<index-entry>
-					<term>
-						<xsl:apply-templates />
-					</term>
+					<xsl:variable name="term">
+						<term>
+							<xsl:apply-templates />
+						</term>
+					</xsl:variable>
+					<xsl:if test="self::primary">
+						<xsl:attribute name="letter"><xsl:value-of select="java:toUpperCase(java:java.lang.String.new(substring(normalize-space($term),1,1)))"/></xsl:attribute>
+					</xsl:if>
+					<xsl:copy-of select="$term"/>
 					<nav-pointer-group>
 						<nav-pointer specific-use="section" rid="{$element_target/@id}"/>
 						<nav-pointer specific-use="section"><xsl:value-of select="$element_target/@section"/></nav-pointer>
