@@ -4,8 +4,10 @@
 			xmlns:xlink="http://www.w3.org/1999/xlink" 
 			xmlns:xalan="http://xml.apache.org/xalan" 
 			xmlns:java="http://xml.apache.org/xalan/java" 
+			xmlns:redirect="http://xml.apache.org/xalan/redirect"
 			xmlns:metanorma-class="xalan://org.metanorma.utils.RegExHelper"
 			exclude-result-prefixes="xalan java metanorma-class" 
+			extension-element-prefixes="redirect"
 			version="1.0">
 
 	<xsl:variable name="metanorma_type" select="java:toUpperCase(java:java.lang.String.new(substring-before(local-name(//*[contains(local-name(), '-standard')]), '-')))"/> <!-- ISO, IEC, ... -->
@@ -561,6 +563,10 @@
 	<!-- root element, for example: iso-standard -->
 	<xsl:template match="/*">
 		<xsl:variable name="startTime" select="java:getTime(java:java.util.Date.new())"/>
+		
+		<redirect:write file="test.xml">
+			<xsl:copy-of select="$xml"/>
+		</redirect:write>
 		
 		<xsl:apply-templates select="$xml" mode="xml"/>
     
@@ -5093,29 +5099,41 @@
 						<index-title-group>
 							<title>INDEX</title>
 						</index-title-group>
-						<index-div>
-							<xsl:variable name="index-entries_">
-								<xsl:for-each select=".//index">
-									<xsl:sort select="primary"/>
-									<xsl:apply-templates select="primary">
-										<xsl:with-param name="mode">NISO</xsl:with-param>
-									</xsl:apply-templates>
-								</xsl:for-each>
-							</xsl:variable>
-							<xsl:variable name="index-entries" select="xalan:nodeset($index-entries_)"/>
-							<xsl:for-each select="$index-entries/*">
+						
+						<xsl:variable name="index_entries_">
+							<xsl:for-each select=".//index">
+								<xsl:sort select="primary"/>
+								<xsl:apply-templates select="primary">
+									<xsl:with-param name="mode">NISO</xsl:with-param>
+								</xsl:apply-templates>
+							</xsl:for-each>
+						</xsl:variable>
+						<xsl:variable name="index_entries" select="xalan:nodeset($index_entries_)"/>
+						
+						<xsl:variable name="index_letters">
+							<xsl:for-each select="$index_entries/*">
 								<xsl:variable name="letter" select="@letter"/>
 								<xsl:if test="not(preceding-sibling::*[@letter = $letter])">
-									<index-title-group>
-										<title><xsl:value-of select="$letter"/></title>
-									</index-title-group>
+									<letter><xsl:value-of select="$letter"/></letter>
 								</xsl:if>
-								<xsl:copy>
-									<xsl:copy-of select="@*[local-name() != 'letter']"/>
-									<xsl:copy-of select="node()"/>
-								</xsl:copy>
 							</xsl:for-each>
-						</index-div>
+						</xsl:variable>
+						
+						<xsl:for-each select="xalan:nodeset($index_letters)/*">
+							<xsl:variable name="letter" select="."/>
+							<index-div>
+								<index-title-group>
+									<title><xsl:value-of select="$letter"/></title>
+								</index-title-group>
+								<xsl:for-each select="$index_entries/*[@letter = $letter]">
+									<xsl:copy>
+										<xsl:copy-of select="@*[local-name() != 'letter']"/>
+										<xsl:copy-of select="node()"/>
+									</xsl:copy>
+								</xsl:for-each>
+							</index-div>
+						</xsl:for-each>
+						
 					</index>
 				</xsl:when>
 				<xsl:otherwise>
