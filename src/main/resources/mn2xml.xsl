@@ -3020,65 +3020,89 @@
 		<!-- <xsl:if test="$debug = 'true'">
 			<xsl:message>DEBUG: p processing <xsl:number level="any" count="*[local-name() = 'p']"/></xsl:message>
 		</xsl:if> -->
-		<xsl:variable name="parent_name" select="local-name(..)"/>
-		<xsl:choose>
-			<!-- <xsl:when test="parent::*[local-name() = 'termexample'] or 
-														parent::*[local-name() = 'definition']  or 
-														parent::*[local-name() = 'termnote'] or 
-														parent::*[local-name() = 'modification'] or
-														parent::*[local-name() = 'dd']">
-				<xsl:apply-templates />
-			</xsl:when> -->
-			<xsl:when test="$parent_name = 'termexample' or 
-														$parent_name = 'definition'  or 
-														$parent_name = 'verbaldefinition'  or 
-														$parent_name = 'verbal-definition'  or 
-														$parent_name = 'termnote' or 
-														$parent_name = 'modification' or
-														$parent_name = 'dd'">
-				<xsl:if test="preceding-sibling::*[1][self::p]"><break /></xsl:if>
-				<xsl:apply-templates />
-			</xsl:when>
-			<xsl:when test="@type = 'floating-title'">
-				<!-- create parent element with floating title, for nested clauses (sec) -->
-				<sec>
-					<xsl:copy-of select="@id"/>
-					<title><xsl:apply-templates /></title>
-					<xsl:apply-templates select="following-sibling::*[preceding-sibling::p[1][@type = 'floating-title']]">
-						<xsl:with-param name="processFloatingTitle">true</xsl:with-param>
-					</xsl:apply-templates>
-				</sec>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:choose>
-					<xsl:when test="parent::li and (ancestor::note or ancestor::termnote) and $color-title != ''"> <!-- for PAS, list item text in the note -->
-						<p>
-							<italic>
-								<styled-content style="color:{$color-title};">
-									<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
+		<xsl:variable name="paragraph_">
+			<xsl:variable name="parent_name" select="local-name(..)"/>
+			<xsl:choose>
+				<!-- <xsl:when test="parent::*[local-name() = 'termexample'] or 
+															parent::*[local-name() = 'definition']  or 
+															parent::*[local-name() = 'termnote'] or 
+															parent::*[local-name() = 'modification'] or
+															parent::*[local-name() = 'dd']">
+					<xsl:apply-templates />
+				</xsl:when> -->
+				<xsl:when test="$parent_name = 'termexample' or 
+															$parent_name = 'definition'  or 
+															$parent_name = 'verbaldefinition'  or 
+															$parent_name = 'verbal-definition'  or 
+															$parent_name = 'termnote' or 
+															$parent_name = 'modification' or
+															$parent_name = 'dd'">
+					<xsl:if test="preceding-sibling::*[1][self::p]"><break /></xsl:if>
+					<xsl:apply-templates />
+				</xsl:when>
+				<xsl:when test="@type = 'floating-title'">
+					<!-- create parent element with floating title, for nested clauses (sec) -->
+					<sec>
+						<xsl:copy-of select="@id"/>
+						<title><xsl:apply-templates /></title>
+						<xsl:apply-templates select="following-sibling::*[preceding-sibling::p[1][@type = 'floating-title']]">
+							<xsl:with-param name="processFloatingTitle">true</xsl:with-param>
+						</xsl:apply-templates>
+					</sec>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:choose>
+						<xsl:when test="parent::li and (ancestor::note or ancestor::termnote) and $color-title != ''"> <!-- for PAS, list item text in the note -->
+							<p>
+								<italic>
+									<styled-content style="color:{$color-title};">
+										<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
+										<xsl:apply-templates />
+									</styled-content>
+								</italic>
+							</p>
+						</xsl:when>
+						<xsl:when test="$organization = 'BSI' and @align = 'center'">
+							<p>
+								<xsl:apply-templates select="@*[not(local-name() = 'align')]"/>
+								<styled-content style="text-alignment: center">
 									<xsl:apply-templates />
 								</styled-content>
-							</italic>
-						</p>
-					</xsl:when>
-					<xsl:when test="$organization = 'BSI' and @align = 'center'">
-						<p>
-							<xsl:apply-templates select="@*[not(local-name() = 'align')]"/>
-							<styled-content style="text-alignment: center">
+							</p>
+						</xsl:when>
+						<xsl:otherwise>
+							<p>
+								<xsl:if test="$organization != 'BSI'">
+									<xsl:copy-of select="@id"/>
+								</xsl:if>
+								<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
 								<xsl:apply-templates />
-							</styled-content>
-						</p>
-					</xsl:when>
-					<xsl:otherwise>
+							</p>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="paragraph" select="xalan:nodeset($paragraph_)"/>
+		<xsl:choose>
+			<xsl:when test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and $paragraph/p/list"> <!-- move list(s) outside of p -->
+				<xsl:for-each select="$paragraph/p/list">
+					<xsl:variable name="curr_list_id" select="generate-id()"/>
+					<p>
+						<xsl:copy-of select="../@*"/>
+						<xsl:copy-of select="preceding-sibling::node()[not(self::list) and following-sibling::list[1][generate-id() = $curr_list_id]]"/>
+					</p>
+					<xsl:copy-of select="."/>
+					<xsl:if test="not(following-sibling::list) and following-sibling::node()[normalize-space() != '']"> <!-- current list is last and there are next elements in paragraph -->
 						<p>
-							<xsl:if test="$organization != 'BSI'">
-								<xsl:copy-of select="@id"/>
-							</xsl:if>
-							<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
-							<xsl:apply-templates />
+							<xsl:copy-of select="../@*"/>
+							<xsl:copy-of select="following-sibling::node()"/>
 						</p>
-					</xsl:otherwise>
-				</xsl:choose>
+					</xsl:if>
+				</xsl:for-each>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy-of select="$paragraph"/>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
