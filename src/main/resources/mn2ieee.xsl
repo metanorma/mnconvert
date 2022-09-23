@@ -38,6 +38,7 @@
 						<xsl:when test="$subdoctype = 'amendment' or $subdoctype = 'corrigendum'"><xsl:value-of select="$subdoctype"/></xsl:when>
 						<xsl:when test="$subdoctype = 'erratum'">errata</xsl:when>
 						<xsl:when test="$doctype = 'standard' or $doctype = 'guide' or $doctype = 'recommended-practice'"><xsl:value-of select="$doctype"/></xsl:when>
+						<xsl:when test="$doctype = 'international-standard'">standard</xsl:when>
 						<xsl:otherwise><xsl:value-of select="$doctype"/></xsl:otherwise>
 					</xsl:choose>
 				</xsl:attribute>
@@ -426,11 +427,17 @@
 	
 	<xsl:template match="copyright/owner" mode="front_ieee_permissions">
 		<copyright-holder>
-			<xsl:attribute name="copyright-owner">
+			<xsl:variable name="copyright_owner">
 				<xsl:value-of select="organization/abbreviation"/>
 				<xsl:if test="not(organization/abbreviation)">
 					<xsl:value-of select="organization/name"/>
 				</xsl:if>
+			</xsl:variable>
+			<xsl:attribute name="copyright-owner">
+				<xsl:choose>
+					<xsl:when test="contains('Alcatel-Lucent, Australian-Crown, British-Crown, Canadian-Crown, Crown, CCBY, EU, IBM, IEEE, OAPA, NA, Other, Unknown, USGov', $copyright_owner)"><xsl:value-of select="$copyright_owner"/></xsl:when>
+					<xsl:otherwise>Other</xsl:otherwise>
+				</xsl:choose>
 			</xsl:attribute>
 			<xsl:value-of select="ancestor::bibdata/contributor[role[@type = 'publisher']]/organization/abbreviation"/>
 		</copyright-holder>
@@ -812,6 +819,25 @@
 
 	</xsl:template>	
 	
+	<xsl:template match="admitted | deprecates | domain">
+		<def><term><xsl:apply-templates /></term></def>
+	</xsl:template>
+	
+	<xsl:template match="termsource">
+		<term>
+			<related-object source-id="{origin/@bibitemid}">
+				<xsl:value-of select="origin"/>
+			</related-object>
+		</term>
+	</xsl:template>
+	
+	<xsl:template match="example | termexample" priority="2">
+		<non-normative-note>
+			<label>EXAMPLE</label>
+			<p><xsl:apply-templates /></p>
+		</non-normative-note>
+	</xsl:template>
+	
 	<!-- =============================== -->
 	<!-- Definitions list processing (redefine from mn2xml.xsl) -->
 	<!-- =============================== -->
@@ -1010,6 +1036,30 @@
 			<xsl:attribute name="publication-type"><xsl:value-of select="@type"/></xsl:attribute>
 			<xsl:apply-templates select="formattedref"/>
 		</mixed-citation>
+	</xsl:template>
+	
+	<xsl:template match="figure/note" priority="2">
+		<p>
+			<xsl:call-template name="note"/>
+		</p>
+	</xsl:template>
+	
+	<xsl:template match="figure[figure]" priority="2">
+		<xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
+		<!-- IEEE doesn't support fig-group -->
+		<fig>
+			<xsl:attribute name="id"><xsl:value-of select="$id"/></xsl:attribute>
+			<label><xsl:value-of select="@section"/></label>
+			<xsl:apply-templates select="name"/>
+		</fig>
+		<xsl:apply-templates select="node()[not(self::name)]"/>
+	</xsl:template>
+	
+	<xsl:template match="annotation" priority="2">
+		<named-content content-type="annotation">
+			<xsl:copy-of select="@id"/>
+			<xsl:apply-templates select="node()/node()"/>
+		</named-content>
 	</xsl:template>
 	
 </xsl:stylesheet>
