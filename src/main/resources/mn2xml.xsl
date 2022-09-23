@@ -2593,6 +2593,7 @@
 		<xsl:variable name="bibitem_URN_" select="$bibitems_URN/bibitem[@id = current()/@id]"/>
 		<xsl:variable name="bibitem_URN" select="xalan:nodeset($bibitem_URN_)"/>
 		<list-item>
+			<xsl:copy-of select="@id"/>
 			<p>
 				<xsl:choose>
 					<xsl:when test="formattedref">
@@ -4459,9 +4460,20 @@
 				<!-- move notes outside table -->
 				<xsl:if test="note">
 					<table-wrap-foot>
-						<xsl:for-each select="note">
-							<xsl:call-template name="note"/>
-						</xsl:for-each>
+						<xsl:choose>
+							<xsl:when test="$outputformat = 'IEEE'">
+								<p>
+									<xsl:for-each select="note">
+										<xsl:call-template name="note"/>
+									</xsl:for-each>
+								</p>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:for-each select="note">
+									<xsl:call-template name="note"/>
+								</xsl:for-each>
+							</xsl:otherwise>
+						</xsl:choose>
 					</table-wrap-foot>
 				</xsl:if>
 			<!-- </table-wrap> -->
@@ -4688,9 +4700,6 @@
 	<!-- =============================== -->
 	
 	<xsl:template match="figure[figure]" priority="1">
-		<xsl:variable name="current_id">
-			<xsl:call-template name="getId"/>
-		</xsl:variable>
 		
 		<xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
 		
@@ -5524,7 +5533,7 @@
 	</xsl:template> <!-- split -->
 	
 	<xsl:template name="addSectionAttribute">
-		<xsl:if test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO'">
+		<xsl:if test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and $outputformat != 'IEEE'">
 			<xsl:copy-of select="@section"/>
 		</xsl:if>
 	</xsl:template>
