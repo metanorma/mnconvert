@@ -809,15 +809,47 @@
 							</xsl:if>
 						</xsl:for-each>
 					</term>
-					<x><xsl:text>: </xsl:text></x>
-					<def><xsl:apply-templates select="definition/node()"/></def>
+					<xsl:variable name="def">
+						<xsl:apply-templates select="definition/node()"/>
+					</xsl:variable>
+					<xsl:if test="normalize-space($def) != ''">
+						<x><xsl:text>: </xsl:text></x>
+						<def><xsl:copy-of select="$def"/></def>
+					</xsl:if>
 					<xsl:apply-templates select="*[not(self::definition or self::preferred)]"/>
 				</std-def-list-item>
 				</xsl:for-each>
 			</std-def-list>
 		</xsl:if>
-
 	</xsl:template>	
+	
+	<xsl:template match="term/related">
+		<related-term-group>
+			<xsl:apply-templates select="@type"/>
+			<italic>See:</italic>
+			<term>
+				<xsl:apply-templates select="node()[not(self::xref)]"/>
+			</term>
+		</related-term-group>
+	</xsl:template>
+
+	<xsl:template match="term/related/@type">
+		<xsl:attribute name="related-term-type">
+			<xsl:choose>
+				<xsl:when test=". = 'seealso'">see-also</xsl:when>
+				<xsl:when test=". = 'equivalent'">synonym</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="."/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:attribute>
+	</xsl:template>
+
+	<xsl:template match="term/related/preferred">
+		<xsl:apply-templates />
+	</xsl:template>
+
+	<xsl:template match="term//abbreviation-type"/>
 	
 	<xsl:template match="admitted | deprecates | domain">
 		<def><term><xsl:apply-templates /></term></def>
