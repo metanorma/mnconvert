@@ -2305,7 +2305,17 @@
 				<xsl:text>]</xsl:text>
 			</xsl:otherwise>			
 		</xsl:choose>
-		<xsl:apply-templates select="../tbx:termType" mode="term"/>
+		
+		<xsl:variable name="metadata">
+			<xsl:apply-templates select="../tbx:termType" mode="term"/>
+			<xsl:apply-templates select="../tbx:partOfSpeech" mode="term"/>
+		</xsl:variable>
+		<xsl:if test="normalize-space($metadata) != ''">
+			<xsl:text>&#xa;&#xa;</xsl:text>
+			<xsl:text>[%metadata]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:value-of select="$metadata"/>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="tbx:term[count(node()) = 1]/bold" priority="2">
@@ -2313,14 +2323,25 @@
 	</xsl:template>
 	
 	<xsl:template match="tbx:termType" mode="term">
-		<xsl:text>&#xa;&#xa;</xsl:text>
-		<xsl:text>[%metadata]</xsl:text>
-		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>type:: </xsl:text>
 		<xsl:choose>
 			<xsl:when test="@value = 'variant'">full</xsl:when>
 			<xsl:otherwise><xsl:value-of select="@value"/></xsl:otherwise> <!-- Example: abbreviation -->
 		</xsl:choose>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="tbx:partOfSpeech" mode="term">
+		<xsl:text>grammar::</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:choose>
+			<xsl:when test="@value = 'noun'">isNoun</xsl:when>
+			<xsl:when test="@value = 'verb'">isVerb</xsl:when>
+			<xsl:when test="@value = 'adj'">isAdjective</xsl:when>
+			<xsl:when test="@value = 'adv'">isAdverb</xsl:when>
+			<xsl:otherwise>is<xsl:value-of select="@value"/></xsl:otherwise>
+		</xsl:choose>
+		<xsl:text>::: true</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
