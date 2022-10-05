@@ -1575,6 +1575,7 @@
 						<name>
 							<xsl:call-template name="createTermElement"/>
 						</name>
+						<xsl:apply-templates select="../tbx:partOfSpeech" mode="term"/>
 					</expression>
 					<!-- Example: <field-of-application>in dependability</field-of-application> -->
 					<xsl:apply-templates select="../tbx:usageNote" mode="term"/>
@@ -1616,6 +1617,21 @@
 	<xsl:template match="tbx:normativeAuthorization"/>
 	
 	<xsl:template match="tbx:partOfSpeech"/>
+	
+	<xsl:template match="tbx:partOfSpeech" mode="term">
+		<xsl:variable name="elementName">
+			<xsl:choose>
+				<xsl:when test="@value = 'noun'">isNoun</xsl:when>
+				<xsl:when test="@value = 'verb'">isVerb</xsl:when>
+				<xsl:when test="@value = 'adj'">isAdjective</xsl:when>
+				<xsl:when test="@value = 'adv'">isAdverb</xsl:when>
+				<xsl:otherwise>is<xsl:value-of select="@value"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<grammar>
+			<xsl:element name="{$elementName}">true</xsl:element>
+		</grammar>
+	</xsl:template>
 	
 	<xsl:template match="tbx:termType"/>
 	
