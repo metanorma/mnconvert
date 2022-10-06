@@ -1571,14 +1571,25 @@
 		<xsl:choose>
 			<xsl:when test="$type_xml = 'semantic'">
 				<xsl:element name="{$element_name}">
-					<expression>
+				
+					<xsl:variable name="element_type_name">
+						<xsl:choose>
+							<xsl:when test="../tbx:termType/@value = 'symbol'">letter-symbol</xsl:when>
+							<xsl:otherwise>expression</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+				
+					<xsl:element name="{$element_type_name}">
+						<xsl:apply-templates select="../tbx:termType[@value = 'abbreviation' or @value = 'fullForm']" mode="term"/>
 						<name>
 							<xsl:call-template name="createTermElement"/>
 						</name>
+						<xsl:apply-templates select="../tbx:termType[@value = 'acronym']" mode="term"/>
 						<xsl:apply-templates select="../tbx:partOfSpeech" mode="term"/>
-					</expression>
+					</xsl:element>
 					<!-- Example: <field-of-application>in dependability</field-of-application> -->
 					<xsl:apply-templates select="../tbx:usageNote" mode="term"/>
+					
 				</xsl:element>
 			</xsl:when>
 			<xsl:otherwise>
@@ -1599,12 +1610,12 @@
 		<xsl:param name="element_name"/>
 		<xsl:variable name="termType" select="normalize-space(../tbx:termType/@value)"/>
 		<xsl:if test="$termType != ''">
-			<xsl:attribute name="type">
+			<!-- <xsl:attribute name="type">
 				<xsl:choose>
 					<xsl:when test="$termType = 'variant'">full</xsl:when>
-					<xsl:otherwise><xsl:value-of select="$termType"/></xsl:otherwise> <!-- Example: abbreviation -->
+					<xsl:otherwise><xsl:value-of select="$termType"/></xsl:otherwise>
 				</xsl:choose>
-			</xsl:attribute>
+			</xsl:attribute> -->
 		</xsl:if>
 		<xsl:choose>
 			<xsl:when test="$type_xml = 'presentation' and $element_name = 'preferred'">
@@ -1634,6 +1645,19 @@
 	</xsl:template>
 	
 	<xsl:template match="tbx:termType"/>
+	
+	<xsl:template match="tbx:termType[@value = 'abbreviation' or @value = 'fullForm']" mode="term">
+		<xsl:attribute name="type">
+			<xsl:choose>
+				<xsl:when test="@value = 'fullForm'">full</xsl:when>
+				<xsl:otherwise><xsl:value-of select="@value"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:attribute>
+	</xsl:template>
+	
+	<xsl:template match="tbx:termType[@value = 'acronym']" mode="term">
+		<abbreviation-type><xsl:value-of select="@value"/></abbreviation-type>
+	</xsl:template>
 	
 	<xsl:template match="tbx:usageNote"/>
 	<xsl:template match="tbx:usageNote" mode="term">

@@ -975,6 +975,7 @@
 					</xsl:choose>
 				</xsl:attribute>
 			</tbx:partOfSpeech>
+			
 			<xsl:variable name="element_name" select="local-name()"/>
 			<xsl:variable name="normativeAuthorization">
 				<xsl:choose>
@@ -992,17 +993,21 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:if>
-			<xsl:if test="@type or letter-symbol or $metanorma_type = 'IEC'">
-				<xsl:variable name="value">
-					<xsl:choose>
-						<xsl:when test="letter-symbol">symbol</xsl:when>
-						<xsl:when test="$metanorma_type = 'IEC' and (@type = 'full' or normalize-space(@type) = '')">fullForm</xsl:when>
-						<xsl:when test="@type = 'full'">variant</xsl:when>
-						<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
-					</xsl:choose>
-				</xsl:variable>
+			
+			<xsl:variable name="value">
+				<xsl:choose>
+					<xsl:when test="letter-symbol">symbol</xsl:when>
+					<xsl:when test=".//abbreviation-type = 'acronym'">acronym</xsl:when>
+					<xsl:when test=".//expression/@type = 'abbreviation'">abbreviation</xsl:when>
+					<xsl:when test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and .//expression/@type = 'full'">fullForm</xsl:when> <!-- or normalize-space(.//expression/@type) = '') -->
+					<xsl:when test="@type = 'full'">variant</xsl:when>
+					<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
+			<xsl:if test="normalize-space($value) != ''">
 				<tbx:termType value="{$value}"/>
 			</xsl:if>
+			
 			<xsl:apply-templates select="field-of-application" mode="usageNote"/>
 		</tbx:tig>
 	</xsl:template>
@@ -1011,6 +1016,7 @@
 		<tbx:usageNote><xsl:apply-templates/></tbx:usageNote>
 	</xsl:template>
 	
+	<xsl:template match="abbreviation-type"/>
 	<!-- ===================== -->
 	<!-- tbx:entailedTerm -->
 	<!-- ===================== -->
