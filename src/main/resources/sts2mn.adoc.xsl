@@ -2323,10 +2323,25 @@
 	</xsl:template>
 	
 	<xsl:template match="tbx:termType" mode="term">
-		<xsl:text>type:: </xsl:text>
 		<xsl:choose>
-			<xsl:when test="@value = 'variant'">full</xsl:when>
-			<xsl:otherwise><xsl:value-of select="@value"/></xsl:otherwise> <!-- Example: abbreviation -->
+			<xsl:when test="@value = 'acronym'">
+				<xsl:text>abbreviation-type:: </xsl:text><xsl:value-of select="@value"/>
+			</xsl:when>
+			<xsl:when test="@value = 'symbol'">
+				<xsl:text>letter-symbol:: true</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text>type:: </xsl:text>
+					<xsl:choose>
+						<xsl:when test="@value = 'fullForm'">
+							<xsl:text>full</xsl:text>
+						</xsl:when>
+						<!-- <xsl:when test="@value = 'formula'">
+						<xsl:when test="@value = 'equation'"> -->
+						<xsl:when test="@value = 'variant'">full</xsl:when>
+						<xsl:otherwise><xsl:value-of select="@value"/></xsl:otherwise> <!-- Example: abbreviation -->
+					</xsl:choose>
+			</xsl:otherwise>
 		</xsl:choose>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
