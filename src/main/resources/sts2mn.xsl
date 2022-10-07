@@ -1518,6 +1518,38 @@
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($initial_text), $regex_term_domain, '$4')"/>
 	</xsl:template>
 	
+	<!-- =============== -->
+	<!-- tbx:see  -->
+	<!-- =============== -->
+	<xsl:template match="tbx:see">
+		<termnote>
+			<p>
+				<xsl:variable name="lang" select="ancestor::tbx:langSet/@xml:lang"/>
+				<xsl:choose>
+					<xsl:when test="$lang = 'en' or $lang = ''">See</xsl:when>
+					<xsl:when test="$lang = 'fr'">Voir</xsl:when>
+					<xsl:when test="$lang = 'ru'">См.</xsl:when>
+				</xsl:choose>
+				<xsl:text> </xsl:text>
+				<xsl:apply-templates select="@target"/>
+				<xsl:apply-templates />
+				
+				<xsl:choose>
+					<xsl:when test="$lang = 'en' or $lang = ''"> for more information.</xsl:when>
+					<xsl:when test="$lang = 'fr'"> pour plus d'informations.</xsl:when>
+					<xsl:when test="$lang = 'ru'"> для дополнительной информации.</xsl:when>
+				</xsl:choose>
+			</p>
+		</termnote>
+	</xsl:template>
+	<xsl:template match="tbx:see/@target">
+		<xref target="{.}"/>
+	</xsl:template>
+	<!-- =============== -->
+	<!-- END: tbx:see  -->
+	<!-- =============== -->
+	
+	
 	<xsl:template match="tbx:entailedTerm">
 		<xsl:variable name="target" select="substring-after(@target, 'term_')"/>
 		<xsl:choose>
