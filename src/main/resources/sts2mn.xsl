@@ -1494,6 +1494,7 @@
 		<xsl:if test="$domain != ''">
 			<domain><xsl:value-of select="$domain"/></domain>
 		</xsl:if>
+		
 		<definition>
 			<xsl:choose>
 				<xsl:when test="$type_xml = 'presentation'">
@@ -1516,6 +1517,10 @@
 	<xsl:template match="tbx:definition/node()[1][self::text()]">
 		<xsl:variable name="initial_text" select="."/>
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($initial_text), $regex_term_domain, '$4')"/>
+	</xsl:template>
+	
+	<xsl:template match="tbx:subjectField">
+		<domain><xsl:apply-templates/></domain>
 	</xsl:template>
 	
 	<!-- =============== -->
