@@ -998,7 +998,18 @@
 	
 	<xsl:template match="termsource">
 		<tbx:source>
-			<xsl:apply-templates />
+			<xsl:variable name="source">
+				<xsl:apply-templates />
+			</xsl:variable>
+			<xsl:choose>
+				<xsl:when test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO'">
+					<!-- 'std' inside tbx:source should be omitted for ISO, IEC. -->
+					<xsl:value-of select="$source"/> <!-- just text -->
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:copy-of select="$source"/>
+				</xsl:otherwise>
+			</xsl:choose>
 		</tbx:source>
 	</xsl:template>
 	
