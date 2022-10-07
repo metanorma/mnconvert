@@ -926,6 +926,68 @@
 		</tbx:note>
 	</xsl:template>
 	
+	<!-- =============== -->
+	<!-- tbx:see generation -->
+	<!-- =============== -->
+	<xsl:variable name="text_see_prefix_regex">^(See |Voir |См. )(.*)</xsl:variable>
+	<xsl:variable name="text_see_suffix_regex">(.*)( for more information.| pour plus d'informations.| для дополнительной информации.)</xsl:variable>
+	
+	<xsl:template match="termnote[count(*) = 1 and 
+			java:org.metanorma.utils.RegExHelper.matches($text_see_prefix_regex, normalize-space()) = 'true' and 
+			java:org.metanorma.utils.RegExHelper.matches($text_see_suffix_regex, normalize-space()) = 'true']">
+			<!--  and 
+			(java:endsWith(java:java.lang.String.new(normalize-space()), $text_see_suffix_en) or java:endsWith(java:java.lang.String.new(normalize-space()), $text_see_suffix_fr)  java:endsWith(java:java.lang.String.new(normalize-space()), $text_see_suffix_ru)) -->
+			
+		<xsl:variable name="text_see__">
+			<tbx:see>
+				<xsl:apply-templates />
+			</tbx:see>
+		</xsl:variable>
+		<xsl:variable name="text_see_">
+			<xsl:apply-templates select="xalan:nodeset($text_see__)" mode="see"/>
+		</xsl:variable>
+		<xsl:variable name="text_see" select="xalan:nodeset($text_see_)"/>
+		
+		<xsl:choose>
+			<xsl:when test="count($text_see/*/node()[normalize-space() != '']) = 1 and $text_see/*/xref">
+				<!-- Example: <tbx:see target="sec_A"/> -->
+				<tbx:see target="{$text_see/*/xref/@rid}"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<!-- Example:  <tbx:see>Figures 1 et 2.</tbx:see> or more complex with text and elements -->
+				<xsl:copy-of select="$text_see"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template match="@*|node()" mode="see">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="see" />
+		</xsl:copy>
+	</xsl:template>
+	
+	<!-- last text() in termnote -->
+	<xsl:template match="tbx:see/text()[java:org.metanorma.utils.RegExHelper.matches($text_see_suffix_regex, .) = 'true' and not(following-sibling::node())]" mode="see">
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.), $text_see_suffix_regex, '$1')"/>
+	</xsl:template>
+	
+	<!-- first text() in termnote -->
+	<xsl:template match="tbx:see/text()[java:org.metanorma.utils.RegExHelper.matches($text_see_prefix_regex, .) = 'true' and not(preceding-sibling::node())]" mode="see">
+		<xsl:variable name="text_" select="java:replaceAll(java:java.lang.String.new(.), $text_see_prefix_regex, '$2')"/>
+		<xsl:choose>
+			<xsl:when test="not(following-sibling::node()) and 
+				java:org.metanorma.utils.RegExHelper.matches($text_see_suffix_regex, .) = 'true'">
+				<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text_), $text_see_suffix_regex, '$1')"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$text_"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	<!-- =============== -->
+	<!-- END: tbx:see generation -->
+	<!-- =============== -->
+	
 	<xsl:template match="amend//termnote[not(ancestor::term)]">
 		<non-normative-note>
 			<p>
