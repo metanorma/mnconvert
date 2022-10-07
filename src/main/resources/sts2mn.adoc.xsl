@@ -2397,6 +2397,38 @@
 		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
 	
+	<!-- =============== -->
+	<!-- tbx:see  -->
+	<!-- =============== -->
+	<xsl:template match="tbx:see">
+		<xsl:text>NOTE: </xsl:text>
+		<xsl:variable name="lang" select="ancestor::tbx:langSet/@xml:lang"/>
+		<xsl:choose>
+			<xsl:when test="$lang = 'en' or $lang = ''">See</xsl:when>
+			<xsl:when test="$lang = 'fr'">Voir</xsl:when>
+			<xsl:when test="$lang = 'ru'">См.</xsl:when>
+		</xsl:choose>
+		<xsl:text> </xsl:text>
+		<xsl:apply-templates select="@target"/>
+		<xsl:apply-templates />
+		
+		<xsl:choose>
+			<xsl:when test="$lang = 'en' or $lang = ''"> for more information.</xsl:when>
+			<xsl:when test="$lang = 'fr'"> pour plus d'informations.</xsl:when>
+			<xsl:when test="$lang = 'ru'"> для дополнительной информации.</xsl:when>
+		</xsl:choose>
+		
+		<xsl:text>&#xa;&#xa;</xsl:text>
+	</xsl:template>
+	<xsl:template match="tbx:see/@target">
+		<xsl:text>&lt;&lt;</xsl:text>
+		<xsl:value-of select="."/>
+		<xsl:text>&gt;&gt;</xsl:text>
+	</xsl:template>
+	<!-- =============== -->
+	<!-- END: tbx:see  -->
+	<!-- =============== -->
+	
 	<xsl:template match="tbx:tig"/>
 	
 	<xsl:template match="tbx:usageNote"/>
