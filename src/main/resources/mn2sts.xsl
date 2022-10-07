@@ -887,6 +887,9 @@
 			
 			<tbx:termEntry id="{$current_id}">
 				<tbx:langSet xml:lang="en">
+				
+					<xsl:apply-templates select="domain"/>
+					
 					<xsl:apply-templates select="node()[not(self::termexample or self::termnote or self::termsource or 
 																										self::preferred or self::admitted or self::deprecates or self::domain or 
 																										self::term)]"/>
@@ -897,7 +900,7 @@
 					
 					<xsl:apply-templates select="termsource"/>
 					
-					<xsl:apply-templates select="preferred | admitted | deprecates | domain"/>
+					<xsl:apply-templates select="preferred | admitted | deprecates"/>
 					
 				</tbx:langSet>
 			</tbx:termEntry>
@@ -1013,8 +1016,13 @@
 		</tbx:source>
 	</xsl:template>
 	
+	<xsl:template match="domain">
+		<tbx:subjectField>
+			<xsl:apply-templates />
+		</tbx:subjectField>
+	</xsl:template>
 	
-	<xsl:template match="preferred | admitted | deprecates | domain"> <!--  mode="termEntry" -->
+	<xsl:template match="preferred | admitted | deprecates"> <!--  mode="termEntry" -->
 		
 		<!-- <xsl:variable name="current_id">
 			<xsl:call-template name="getId"/>
@@ -1022,7 +1030,7 @@
 		
 		<xsl:variable name="id" select="$elements//element[@source_id = $current_id]/@id"/>	 -->
 		<!-- <xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable> -->
-		<xsl:variable name="number"><xsl:number count="preferred | admitted | deprecates | domain"/></xsl:variable>
+		<xsl:variable name="number"><xsl:number count="preferred | admitted | deprecates"/></xsl:variable>
 		<xsl:variable name="id">
 			<xsl:variable name="element_name" select="local-name()"/>
 			<xsl:for-each select="ancestor::term[1]">

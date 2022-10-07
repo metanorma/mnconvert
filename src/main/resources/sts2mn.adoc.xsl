@@ -2306,6 +2306,8 @@
 			</xsl:otherwise>			
 		</xsl:choose>
 		
+		<xsl:apply-templates select="ancestor::tbx:langSet/tbx:subjectField" mode="term"/>
+		
 		<xsl:variable name="metadata">
 			<xsl:apply-templates select="../tbx:termType" mode="term"/>
 			<xsl:apply-templates select="../tbx:partOfSpeech" mode="term"/>
@@ -2320,6 +2322,14 @@
 	
 	<xsl:template match="tbx:term[count(node()) = 1]/bold" priority="2">
 		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="tbx:subjectField"/>
+	<xsl:template match="tbx:subjectField" mode="term">
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>domain:[</xsl:text>
+		<xsl:apply-templates/>
+		<xsl:text>]</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="tbx:termType" mode="term">
