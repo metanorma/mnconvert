@@ -332,6 +332,7 @@
 								$name = 'em' or
 								$name = 'table' or
 								$name = 'dl' or
+								$name = 'dt' or
 								$name = 'ol' or
 								$name = 'ul' or
 								$name = 'li' or
@@ -353,6 +354,10 @@
 			
 			<xsl:variable name="parent">
 				<xsl:choose>
+				
+					<xsl:when test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and $name='dt' and 
+								(ancestor::dl/preceding-sibling::*[1][self::title][contains(normalize-space(), 'Abbrev')] or 
+								(starts-with(@id, 'abb-') or starts-with(@id, 'abb_')))">dt-abb</xsl:when>
 					<xsl:when test="ancestor::annex and not($name = 'figure' or $name = 'table' or $name = 'annex' or $name = 'fn' or $name = 'formula')">annex</xsl:when>
 					<xsl:when test="$name = 'bookmark'"><xsl:value-of select="local-name(ancestor::*[@id][1])"/></xsl:when>
 					<xsl:otherwise><xsl:value-of select="$name"/></xsl:otherwise>
@@ -4100,6 +4105,9 @@
 				<xsl:when test="$parent = 'fn'">fn</xsl:when>
 				<xsl:when test="$parent = 'bibitem'">bibr</xsl:when>
 				<xsl:when test="$parent = 'formula'">disp-formula</xsl:when>
+				<xsl:when test="$parent = 'ul' or $parent = 'ol' or $parent = 'li'">list</xsl:when>
+				<xsl:when test="$parent = 'term' and $metanorma_type = 'IEC'">other</xsl:when>
+				<xsl:when test="$parent = 'dt-abb'">other</xsl:when>
 				<xsl:otherwise>sec</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
