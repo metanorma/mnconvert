@@ -543,7 +543,9 @@
 					<xsl:with-param name="fn_number" select="$fn_number"/>
 				</xsl:call-template>
 			</xsl:attribute>
-			<sup><xsl:value-of select="$fn_number"/><xsl:if test="$metanorma_type = 'ISO'">)</xsl:if></sup>
+			<xsl:call-template name="insert_fn_label">
+				<xsl:with-param name="fn_number" select="$fn_number"/>
+			</xsl:call-template>
 		</xref>
 	</xsl:template>
 	
@@ -556,11 +558,28 @@
 				</xsl:call-template>
 			</xsl:attribute>
 			<label>
-				<sup><xsl:value-of select="$fn_number"/><xsl:if test="$metanorma_type = 'ISO'">)</xsl:if></sup>
+				<xsl:call-template name="insert_fn_label">
+					<xsl:with-param name="fn_number" select="$fn_number"/>
+				</xsl:call-template>
 			</label>
 			<!-- <xsl:copy-of select="node()[not(self::label)]"/> -->
 			<xsl:apply-templates select="node()[not(self::label)]" mode="id_generate" />
 		</fn>
+	</xsl:template>
+	
+	<xsl:template name="insert_fn_label">
+		<xsl:param name="fn_number"/>
+		<xsl:choose>
+			<xsl:when test="$metanorma_type = 'ISO'">
+				<sup><xsl:value-of select="$fn_number"/>)</sup>
+			</xsl:when>
+			<xsl:when test="$metanorma_type = 'IEC'">
+				<xsl:value-of select="$fn_number"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<sup><xsl:value-of select="$fn_number"/></sup>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template name="generateFootnoteInText">
