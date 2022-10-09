@@ -650,6 +650,9 @@
 		<xsl:param name="table_number"/>
 		<xsl:param name="fn_number"/>
 		<xref ref-type="fn">
+			<xsl:if test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO'">
+				<xsl:attribute name="ref-type">table-fn</xsl:attribute>
+			</xsl:if>
 			<xsl:attribute name="rid">
 				<xsl:call-template name="generateFootnoteInTable">
 					<xsl:with-param name="table_number" select="$table_number"/>
