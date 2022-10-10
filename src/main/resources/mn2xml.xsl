@@ -4618,10 +4618,29 @@
 			<xsl:when test="preceding-sibling::*[1][self::figure] or preceding-sibling::*[1][self::stem]">
 				<xsl:call-template name="create_array"/>
 			</xsl:when>
+			<xsl:when test="$metanorma_type = 'ISO' and @key = 'true'">
+				<table-wrap content-type="fig-index">
+					<xsl:if test="not(starts-with(@id,'_'))">
+						<xsl:copy-of select="@id"/>
+					</xsl:if>
+					<caption><title>Key</title></caption>
+					<table>
+						<tbody>
+							<xsl:apply-templates>
+								<xsl:with-param name="add_default_attributes">false</xsl:with-param>
+							</xsl:apply-templates>
+						</tbody>
+					</table>
+				</table-wrap>
+			</xsl:when>
 			<xsl:otherwise>
 				<def-list>
 					<xsl:if test="not(starts-with(@id,'_'))">
 						<xsl:copy-of select="@id"/>
+					</xsl:if>
+					
+					<xsl:if test="$metanorma_type = 'IEC' and @key = 'true'">
+						<xsl:attribute name="list-content">figure</xsl:attribute>
 					</xsl:if>
 					
 					<xsl:if test="preceding-sibling::*[1][self::title][contains(normalize-space(), 'Abbrev')] or 
@@ -4633,6 +4652,11 @@
 							</xsl:choose>
 						</xsl:attribute>
 					</xsl:if>
+					
+					<xsl:if test="$metanorma_type = 'IEC' and @key = 'true'">
+						<label>Key</label>
+					</xsl:if>
+					
 					<xsl:apply-templates mode="dl"/>
 				</def-list>
 			</xsl:otherwise>
@@ -4670,15 +4694,32 @@
 	<xsl:template match="dl/note" priority="2"/>
 		
 	<xsl:template match="dt">
+		<xsl:param name="add_default_attributes">true</xsl:param>
 		<tr>
-			<td align="left" scope="row" valign="top"><xsl:apply-templates/></td>
-			<xsl:apply-templates select="following-sibling::dd[1]" mode="array"/>
+			<td>
+				<xsl:if test="$add_default_attributes = 'true'">
+					<xsl:attribute name="align">left</xsl:attribute>
+					<xsl:attribute name="scope">row</xsl:attribute>
+					<xsl:attribute name="valign">top</xsl:attribute>
+				</xsl:if>
+				<xsl:apply-templates/>
+			</td>
+			<xsl:apply-templates select="following-sibling::dd[1]" mode="array">
+				<xsl:with-param name="add_default_attributes" select="$add_default_attributes"/>
+			</xsl:apply-templates>
 		</tr>
 	</xsl:template>
 	
 	<xsl:template match="dd"/>
 	<xsl:template match="dd" mode="array">
-		<td align="left" valign="top"><xsl:apply-templates/></td>
+		<xsl:param name="add_default_attributes">true</xsl:param>
+		<td>
+			<xsl:if test="$add_default_attributes = 'true'">
+				<xsl:attribute name="align">left</xsl:attribute>
+				<xsl:attribute name="valign">top</xsl:attribute>
+			</xsl:if>
+			<xsl:apply-templates/>
+		</td>
 	</xsl:template>
 	
 	<xsl:template match="dt" mode="dl">
