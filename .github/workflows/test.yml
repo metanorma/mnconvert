@@ -57,8 +57,17 @@ jobs:
 
       - if: matrix.os == 'ubuntu-latest'
         run: sudo gem install bundler metanorma-cli
+      
+      #temporary fix issue with bundler 2.3.23
+      - if: matrix.os == 'windows-latest'
+        run: |
+          gem install bundler:2.3.22 metanorma-cli
+          bundle _2.3.22_ update
 
-      - if: matrix.os != 'ubuntu-latest'
+#      - if: matrix.os != 'ubuntu-latest'
+#        run: gem install bundler metanorma-cli
+
+      - if: matrix.os == 'macos-latest'
         run: gem install bundler metanorma-cli
 
       - run: make testMN2STS
