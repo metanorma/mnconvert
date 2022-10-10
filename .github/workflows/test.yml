@@ -7,7 +7,7 @@ on:
   pull_request:
     paths-ignore:
       - .github/workflows/release.yml
-
+#        os: [ ubuntu-latest, windows-latest, macos-latest ]
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         java: [ 1.8 ]
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ windows-latest ]
         experimental: [ false ]
     steps:
       - uses: actions/checkout@v2
