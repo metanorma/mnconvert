@@ -68,7 +68,7 @@ jobs:
 #        run: gem install bundler metanorma-cli
 
       - if: matrix.os == 'macos-latest'
-         run: gem install bundler metanorma-cli
+        run: gem install bundler metanorma-cli
 
       - run: make testMN2STS
 
