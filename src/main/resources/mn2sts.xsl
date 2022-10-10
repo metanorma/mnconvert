@@ -669,7 +669,7 @@
 		<xsl:param name="table_number"/>
 		<xsl:param name="fn_number"/>
 		<xref ref-type="fn">
-			<xsl:if test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO'">
+			<xsl:if test="$metanorma_type = 'ISO'"> <!-- $metanorma_type = 'IEC' or  -->
 				<xsl:attribute name="ref-type">table-fn</xsl:attribute>
 			</xsl:if>
 			<xsl:attribute name="rid">
