@@ -110,7 +110,12 @@ documents.rxl: $(DESTSTSHTML) | bundle
 		documents $@
 
 bundle:
+ifeq ($(OS),Windows_NT)
+	gem install bundler:2.3.22
 	bundle
+else
+	bundle
+endif
 
 documents.html: documents.rxl
 	bundle exec relaton xml2html documents.rxl
