@@ -112,7 +112,6 @@ documents.rxl: $(DESTSTSHTML) | bundle
 bundle:
 	bundle
 
-
 documents.html: documents.rxl
 	bundle exec relaton xml2html documents.rxl
 
