@@ -60,7 +60,7 @@ jobs:
       
       #temporary fix issue with bundler 2.3.23
       - if: matrix.os == 'windows-latest'
-        run:
+        run: |
           gem install bundler -v 2.3.22
           bundle update
 
