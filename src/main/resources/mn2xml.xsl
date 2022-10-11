@@ -4602,9 +4602,51 @@
 				</xsl:otherwise>
 			</xsl:choose>
 			
-			<!-- <bold> -->
-				<xsl:apply-templates />
-			<!-- </bold> -->
+			<xsl:choose>
+				<xsl:when test="local-name() = 'th' and $metanorma_type = 'ISO' and not(node()[normalize-space != ''][1] != 'strong')">
+					<!-- For ISO only - enclose table cells text in bold  -->
+					<xsl:variable name="th_text_">
+						<xsl:apply-templates />
+					</xsl:variable>
+					<xsl:variable name="th_text" select="xalan:nodeset($th_text_)"/>
+					
+					<xsl:choose>
+						<xsl:when test="$th_text/break">
+							<xsl:for-each select="$th_text/break">
+								<xsl:variable name="curr_id" select="generate-id()"/>
+								<xsl:choose>
+									<xsl:when test="not(preceding-sibling::break)">
+										<bold>
+											<xsl:copy-of select="preceding-sibling::node()[following-sibling::break[1][generate-id() = $curr_id]]"/>
+										</bold>
+										<break/>
+									</xsl:when>
+									<xsl:when test="preceding-sibling::break">
+										<bold>
+											<xsl:copy-of select="preceding-sibling::break/following-sibling::node()[following-sibling::break[1][generate-id() = $curr_id]]"/>
+										</bold>
+										<break/>
+									</xsl:when>
+								</xsl:choose>
+								<xsl:if test="not(following-sibling::break)">
+									<bold>
+										<xsl:copy-of select="following-sibling::node()"/>
+									</bold>
+								</xsl:if>
+							</xsl:for-each>
+						</xsl:when>
+						<xsl:otherwise>
+							<bold>
+								<xsl:copy-of select="$th_text"/>
+							</bold>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
+				
+				<xsl:otherwise>
+					<xsl:apply-templates />
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:element>
 	</xsl:template>
 	
