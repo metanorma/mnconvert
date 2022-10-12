@@ -550,7 +550,7 @@
 		
 		<xsl:text>:local-cache-only:</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>:data-uri-image:</xsl:text>
+		<xsl:text>:data-uri-image: false</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		
 		<xsl:text>:imagesdir: </xsl:text><xsl:value-of select="$imagesdir"/>
