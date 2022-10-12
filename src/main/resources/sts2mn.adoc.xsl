@@ -3324,18 +3324,23 @@
 		</xsl:choose> -->
 	</xsl:template>
 	
-	<xsl:template match="ext-link">
+	<xsl:template match="ext-link | supplementary-material">
 		
 		<xsl:choose>
 			<xsl:when test="$organization = 'BSI' or $organization = 'PAS'">
 				<xsl:value-of select="translate(@xlink:href, '&#x2011;', '-')"/> <!-- non-breaking hyphen minus -->
 			</xsl:when>
 			<xsl:otherwise>
+				<xsl:if test="self::supplementary-material"><xsl:text>file://</xsl:text></xsl:if>
 				<xsl:value-of select="@xlink:href"/>
 			</xsl:otherwise>
 		</xsl:choose>
 		
 		<xsl:text>[</xsl:text><xsl:apply-templates /><xsl:text>]</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="supplementary-material/p">
+		<xsl:apply-templates />
 	</xsl:template>
 	
 	<!-- <xsl:template match="ext-link/@xlink:href">
