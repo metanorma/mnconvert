@@ -4233,16 +4233,29 @@
 	
 	<!-- https://github.com/metanorma/mn2sts/issues/8 -->
 	<xsl:template match="admonition">
-		<non-normative-note>
-			<xsl:copy-of select="@id"/>
-			<xsl:if test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO'">
-				<xsl:if test="@type = 'warning' or @type = 'important' or @type = 'caution'">
-					<xsl:attribute name="content-type"><xsl:value-of select="@type"/></xsl:attribute>
-				</xsl:if>
-			</xsl:if>
-			<label><xsl:value-of select="java:toUpperCase(java:java.lang.String.new(@type))"/></label>
-			<xsl:apply-templates />
-		</non-normative-note>
+		<xsl:choose>
+			<xsl:when test="@type = 'editorial' and ($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and $format = 'NISO'">
+			
+				<editing-instruction>
+					<xsl:apply-templates/>
+				</editing-instruction>
+				
+			</xsl:when>
+			<xsl:otherwise>
+			
+				<non-normative-note>
+					<xsl:copy-of select="@id"/>
+					<xsl:if test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO'">
+						<xsl:if test="@type = 'warning' or @type = 'important' or @type = 'caution'">
+							<xsl:attribute name="content-type"><xsl:value-of select="@type"/></xsl:attribute>
+						</xsl:if>
+					</xsl:if>
+					<label><xsl:value-of select="java:toUpperCase(java:java.lang.String.new(@type))"/></label>
+					<xsl:apply-templates />
+				</non-normative-note>
+				
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	
@@ -5047,7 +5060,13 @@
 		</sc>
 	</xsl:template>
 	
-	<xsl:template match="review"/>
+	<xsl:template match="review">
+		<xsl:if test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and $format = 'NISO'">
+			<editing-instruction specific-use="review">
+				<xsl:apply-templates/>
+			</editing-instruction>
+		</xsl:if>
+	</xsl:template>
 
 	<xsl:template match="sourcecode">
 		<xsl:param name="skip">true</xsl:param>
