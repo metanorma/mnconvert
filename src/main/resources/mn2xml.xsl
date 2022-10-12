@@ -3928,12 +3928,24 @@
 				<xsl:variable name="isIncompleteURL" select="normalize-space(not(starts-with(@target, 'http:') or starts-with(@target, 'https:') or starts-with(@target, 'ftp:') or starts-with(@target, 'mailto:')))"/> <!-- true or false -->
 				<xsl:choose>
 					<xsl:when test="$isIncompleteURL = 'true' or ($link_text != '' and $link_text != @target)"> <!-- Incomplete URLs or display text hides the actual link -->
-						<ext-link>
-							<xsl:attribute name="xlink:href">
-								<xsl:value-of select="@target"/>
-							</xsl:attribute>
-							<xsl:apply-templates />
-						</ext-link>
+						<xsl:choose>
+							<xsl:when test="starts-with(@target, 'file://')">
+								<supplementary-material>
+									<xsl:attribute name="xlink:href">
+										<xsl:value-of select="substring-after(@target, 'file://')"/>
+									</xsl:attribute>
+									<p><xsl:apply-templates /></p>
+								</supplementary-material>
+							</xsl:when>
+							<xsl:otherwise>
+								<ext-link>
+									<xsl:attribute name="xlink:href">
+										<xsl:value-of select="@target"/>
+									</xsl:attribute>
+									<xsl:apply-templates />
+								</ext-link>
+							</xsl:otherwise>
+						</xsl:choose>
 					</xsl:when>
 					<xsl:otherwise>
 						<!-- <uri>http://my.url</uri> -->

@@ -2121,6 +2121,15 @@
 		</link>
 	</xsl:template>
 	
+	<xsl:template match="supplementary-material">
+		<link target="file://{@xlink:href}">			
+			<xsl:apply-templates />
+		</link>
+	</xsl:template>
+	<xsl:template match="supplementary-material/p">
+		<xsl:apply-templates />
+	</xsl:template>
+	
 	<!-- special case -->
 	<xsl:template match="break[preceding-sibling::node()[1][self::styled-content[@style='text-alignment: center']]] | 
 						break[following-sibling::node()[1][self::styled-content[@style='text-alignment: center']]]"/>
