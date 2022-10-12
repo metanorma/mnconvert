@@ -4444,7 +4444,7 @@
 					<xsl:apply-templates select="name" mode="table"/>
 				</xsl:if>
 				<table>
-					<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix')]"/>
+					<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix' or local-name() = 'width')]"/>
 					<xsl:if test="$outputformat = 'IEEE'">
 					 <xsl:attribute name="cellpadding">5</xsl:attribute>
 					 <xsl:attribute name="frame">box</xsl:attribute>
@@ -4508,7 +4508,7 @@
 
 		<xsl:if test="starts-with(@id, concat($first_table_id, '_'))">
 			<table>
-				<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix')]"/>
+				<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix' or local-name() = 'width')]"/>
 				<xsl:apply-templates select="@width"/>
 				
 				<xsl:apply-templates select="colgroup" mode="table"/>
@@ -4529,14 +4529,19 @@
 	<!-- ========================================= -->
 	
 	<xsl:template match="table/@width">
-		<xsl:attribute name="width">
-			<xsl:choose>
-				<xsl:when test="contains(., 'px')">
-					<xsl:value-of select="substring-before(., 'px')"/>
-				</xsl:when>
-				<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
-			</xsl:choose>
-		</xsl:attribute>
+		<xsl:choose>
+			<xsl:when test="$metanorma_type = 'IEC'"><!-- no absolute number of pixels is indicated for table width. --></xsl:when>
+			<xsl:otherwise>
+				<xsl:attribute name="width">
+					<xsl:choose>
+						<xsl:when test="contains(., 'px')">
+							<xsl:value-of select="substring-before(., 'px')"/>
+						</xsl:when>
+						<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+					</xsl:choose>
+				</xsl:attribute>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="table/note" priority="2"/>
