@@ -1504,4 +1504,24 @@
 		</xsl:if>
 	</xsl:template>
 	
+	<xsl:template name="getInsDel">
+		<xsl:choose>
+			<xsl:when test="@style = 'addition' or @style-type = 'addition' or contains(@style-type, 'addition') or @specific-use = 'insert'">add</xsl:when>
+			<xsl:when test="@style = 'deletion' or @style-type = 'deletion' or contains(@style-type, 'deletion') or @specific-use = 'delete'">del</xsl:when>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template name="getAlignment_style-type">
+		<xsl:if test="contains(@style-type, 'align-')">
+			<xsl:variable name="align_" select="substring-after(@style-type, 'align-')"/>
+			<xsl:variable name="align">
+				<xsl:choose>
+					<xsl:when test="contains($align_, ';')"><xsl:value-of select="substring-before($align_,';')"/></xsl:when>
+					<xsl:otherwise><xsl:value-of select="$align_"/></xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
+			<xsl:value-of select="$align"/>
+		</xsl:if>
+	</xsl:template>
+	
 </xsl:stylesheet>

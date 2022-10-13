@@ -2052,9 +2052,22 @@
 	</xsl:template>
 	
 	<xsl:template match="p">
+		<xsl:variable name="operator">
+			<xsl:call-template name="getInsDel"/>
+		</xsl:variable>
 		<xsl:element name="{local-name()}">
 			<xsl:apply-templates select="@*"/>
-			<xsl:apply-templates />
+			
+			<xsl:choose>
+				<xsl:when test="$operator != ''">
+					<xsl:element name="{$operator}">
+						<xsl:apply-templates />
+					</xsl:element>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates />
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:element>
 	</xsl:template>
 	
@@ -2079,6 +2092,17 @@
 		<xsl:if test=". = 'indent'">
 			<xsl:attribute name="align"><xsl:value-of select="."/></xsl:attribute>
 		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="p/@style-type">
+		<xsl:for-each select="ancestor::p[1]">
+			<xsl:variable name="align">
+				<xsl:call-template name="getAlignment_style-type"/>
+			</xsl:variable>
+			<xsl:if test="$align != ''">
+				<xsl:attribute name="align"><xsl:value-of select="$align"/></xsl:attribute>
+			</xsl:if>
+		</xsl:for-each>
 	</xsl:template>
 	
 	<xsl:template match="title">
@@ -2865,6 +2889,17 @@
 	<xsl:template match="styled-content[@style = 'addition' or @style-type = 'addition']">
 		<add><xsl:apply-templates/></add>
 	</xsl:template>
+
+	<xsl:template match="styled-content[@style = 'addition' or @style-type = 'addition' or contains(@style-type, 'addition') or @specific-use = 'insert' or
+											@style = 'deletion' or @style-type = 'deletion' or contains(@style-type, 'deletion') or @specific-use = 'delete']">
+		<xsl:variable name="operator">
+			<xsl:call-template name="getInsDel"/>
+		</xsl:variable>
+		<xsl:element name="{$operator}">
+			<xsl:apply-templates />
+		</xsl:element>
+	</xsl:template>
+
 
 	<xsl:template name="insertTaskImageList"> 
 		<xsl:variable name="imageList">
