@@ -2585,6 +2585,15 @@
 
 	</xsl:template>
 	
+	<xsl:template match="tbx:entailedTerm[@xtarget]">
+		<!-- Example: {{<<bibliographic-anchor>>,term}} -->
+		<xsl:text>{{&lt;&lt;</xsl:text>
+		<xsl:value-of select="@xtarget"/>
+		<xsl:text>&gt;&gt;,</xsl:text>
+		<xsl:apply-templates/>
+		<xsl:text>}}</xsl:text>
+	</xsl:template>
+	
 	<!-- old: term:[term] -->
 	<!-- old: term:[term,rendering] -->
 	<!-- {{term}} -->

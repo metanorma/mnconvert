@@ -1574,6 +1574,20 @@
 		<xsl:text>)</xsl:text>
 	</xsl:template>
 	
+	<xsl:template match="tbx:entailedTerm[@xtarget]">
+		<!-- Example: {{<<bibliographic-anchor>>,term}} -->
+		<!-- <concept>
+				<refterm>term</refterm>
+				<renderterm>term</renderterm>
+				<eref bibitemid="bibliographic-anchor" />
+			</concept> -->
+		<concept>
+      <refterm><xsl:apply-templates/></refterm>
+      <renderterm><xsl:apply-templates/></renderterm>
+      <eref bibitemid="{@xtarget}" />
+		</concept>
+	</xsl:template>
+	
 	<xsl:template match="tbx:note">
 		<termnote>
 			<xsl:if test="$type_xml = 'presentation'">

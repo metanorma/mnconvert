@@ -1153,6 +1153,11 @@
 	<xsl:template match="text()[substring(normalize-space(),1,1) = ')'][preceding-sibling::*[1][self::xref] and preceding-sibling::*[2][self::em]]">
 		<xsl:value-of select="substring-after(., ')')"/>
 	</xsl:template>
+	
+	<xsl:template match="concept[eref[@bibitemid]]">
+		<tbx:entailedTerm xtarget="{eref/@bibitemid}"><xsl:apply-templates select="renderterm/node()"/></tbx:entailedTerm>
+	</xsl:template>
+	
 	<!-- ===================== -->
 	<!-- END tbx:entailedTerm -->
 	<!-- ===================== -->
