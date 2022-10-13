@@ -5463,11 +5463,45 @@
 	<xsl:template match="add[not(contains(., 'ace-tag'))]">
 		<styled-content>
 			<xsl:choose>
-				<xsl:when test="ancestor::table">
+				<xsl:when test="$metanorma_type = 'IEC'">
+					<xsl:attribute name="specific-use">insert</xsl:attribute>
+				</xsl:when>
+				<xsl:when test="$metanorma_type = 'ISO'">
 					<xsl:attribute name="style-type">addition</xsl:attribute>
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:attribute name="style">addition</xsl:attribute>
+					<xsl:choose>
+						<xsl:when test="ancestor::table">
+							<xsl:attribute name="style-type">addition</xsl:attribute>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:attribute name="style">addition</xsl:attribute>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:otherwise>
+			</xsl:choose>
+			<xsl:apply-templates/>
+		</styled-content>
+	</xsl:template>
+	
+	<xsl:template match="del[not(contains(., 'ace-tag'))]">
+		<styled-content>
+			<xsl:choose>
+				<xsl:when test="$metanorma_type = 'IEC'">
+					<xsl:attribute name="specific-use">delete</xsl:attribute>
+				</xsl:when>
+				<xsl:when test="$metanorma_type = 'ISO'">
+					<xsl:attribute name="style-type">deletion</xsl:attribute>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:choose>
+						<xsl:when test="ancestor::table">
+							<xsl:attribute name="style-type">deletion</xsl:attribute>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:attribute name="style">deletion</xsl:attribute>
+						</xsl:otherwise>
+					</xsl:choose>
 				</xsl:otherwise>
 			</xsl:choose>
 			<xsl:apply-templates/>

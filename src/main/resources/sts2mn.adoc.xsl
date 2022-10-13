@@ -2492,6 +2492,20 @@
 						<xsl:text>&#xa;</xsl:text>
 					</xsl:if>
 				</xsl:if>
+				
+				<xsl:variable name="operator">
+					<xsl:call-template name="getInsDel"/>
+				</xsl:variable>
+				
+				<xsl:variable name="align">
+					<xsl:call-template name="getAlignment_style-type"/>
+				</xsl:variable>
+				<xsl:if test="$align != ''">
+					<xsl:text>[align=</xsl:text><xsl:value-of select="$align"/><xsl:text>]</xsl:text>
+					<xsl:text>&#xa;</xsl:text>
+				</xsl:if>
+				
+				
 				<!-- <xsl:if test="not(parent::fig)">
 					<xsl:if test="@style-type = 'align-center'">
 						<xsl:text>[align=center]</xsl:text>
@@ -2504,7 +2518,12 @@
 				</xsl:if> -->
 				
 				<xsl:if test="not($inputformat = 'IEEE' and contains($p_text,'Bibliographical references are') and parent::app and following-sibling::ref-list)">
+					<xsl:value-of select="$operator"/><xsl:if test="$operator != ''"><xsl:text>:[</xsl:text></xsl:if>
+					
 					<xsl:value-of select="$p_text"/>
+					
+					<xsl:if test="$operator != ''"><xsl:text>]</xsl:text></xsl:if>
+					
 					<xsl:text>&#xa;</xsl:text>
 					<xsl:variable name="isLastPinCommentary" select="preceding-sibling::p[starts-with(normalize-space(), $commentary_on) and 
 								(starts-with(normalize-space(.//italic/text()), $commentary_on) or starts-with(normalize-space(.//italic2/text()), $commentary_on))] and
@@ -4597,7 +4616,20 @@
 							<xsl:value-of select="normalize-space($reference_desc)"/>
 						</xsl:when>
 						<xsl:otherwise>
+						
+							<xsl:variable name="operator">
+								<xsl:call-template name="getInsDel"/>
+							</xsl:variable>
+							<xsl:if test="$operator != ''">
+								<xsl:text> </xsl:text><xsl:value-of select="$operator"/><xsl:text>:[</xsl:text>
+							</xsl:if>
+						
 							<xsl:value-of select="$reference_desc"/>
+							
+							<xsl:if test="$operator != ''">
+								<xsl:text>]</xsl:text>
+							</xsl:if>
+							
 						</xsl:otherwise>
 					</xsl:choose>
 					
@@ -5404,18 +5436,24 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	<xsl:template match="styled-content[@style = 'addition' or @style-type = 'addition']">
+	<xsl:template match="styled-content[@style = 'addition' or @style-type = 'addition' or contains(@style-type, 'addition') or @specific-use = 'insert' or
+											@style = 'deletion' or @style-type = 'deletion' or contains(@style-type, 'deletion') or @specific-use = 'delete']">
+											
 		<xsl:variable name="preceding-sibling_local-name" select="local-name(preceding-sibling::node()[1])"/>
 		<xsl:variable name="following-sibling_local-name" select="local-name(following-sibling::node()[1])"/>
 		<xsl:variable name="space_before"><xsl:if test="($preceding-sibling_local-name != '' and $preceding-sibling_local-name != 'break' and $preceding-sibling_local-name != 'list') or parent::std"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		<xsl:variable name="space_after"><xsl:if test="$following-sibling_local-name != '' and $following-sibling_local-name != 'break' and $following-sibling_local-name != 'list'"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		
+		<xsl:variable name="operator">
+			<xsl:call-template name="getInsDel"/>
+		</xsl:variable>
+		
 		<xsl:value-of select="$space_before"/>
-		<xsl:text>add:[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
+		<xsl:value-of select="$operator"/><xsl:text>:[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
 		<xsl:value-of select="$space_after"/>
 	</xsl:template>
 	
-	<xsl:template match="styled-content[@style='text-alignment: center']">
+	<xsl:template match="styled-content[@style='text-alignment: center' or @style-type = 'align-center']">
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>[align=center]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
