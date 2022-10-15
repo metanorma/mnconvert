@@ -4067,15 +4067,34 @@
 		
 		<xsl:variable name="defaultAlignment"><xsl:if test="$inputformat = 'STS'">left</xsl:if></xsl:variable>
 		<xsl:variable name="defaultVAlignment"><xsl:if test="$inputformat = 'STS'">top</xsl:if></xsl:variable>
-
-		<xsl:if test="(@align and @align != $defaultAlignment) or (@valign and @valign != $defaultVAlignment)">
+		
+		<xsl:variable name="align_style-type">
+			<xsl:for-each select="p[1]">
+				<xsl:call-template name="getAlignment_style-type"/>
+			</xsl:for-each>
+		</xsl:variable>
+		
+		<xsl:variable name="valign_style-type">
+			<xsl:for-each select="p[1]">
+				<xsl:call-template name="getAlignment_style-type">
+					<xsl:with-param name="prefix">valign-</xsl:with-param>
+				</xsl:call-template>
+			</xsl:for-each>
+		</xsl:variable>
+		
+		<xsl:if test="(@align and @align != $defaultAlignment) or (@valign and @valign != $defaultVAlignment) or 
+						($align_style-type != '' and $align_style-type != $defaultAlignment) or ($valign_style-type != '' and $valign_style-type != $defaultVAlignment)">
 			
 			<xsl:variable name="align">
-				<xsl:call-template name="getAlignFormat"/>
+				<xsl:call-template name="getAlignFormat">
+					<xsl:with-param name="align_style-type" select="$align_style-type"/>
+				</xsl:call-template>
 			</xsl:variable>
 			
 			<xsl:variable name="valign">
-				<xsl:call-template name="getVAlignFormat"/>
+				<xsl:call-template name="getVAlignFormat">
+					<xsl:with-param name="valign_style-type" select="$valign_style-type"/>
+				</xsl:call-template>
 			</xsl:variable>
 			
 			<xsl:value-of select="$align"/>
@@ -4101,17 +4120,19 @@
 	</xsl:template>
 	
 	<xsl:template name="getAlignFormat">
+		<xsl:param name="align_style-type"/>
 		<xsl:choose>
-			<xsl:when test="@align = 'center'">^</xsl:when>
-			<xsl:when test="@align = 'right'">&gt;</xsl:when>
+			<xsl:when test="@align = 'center' or $align_style-type = 'center'">^</xsl:when>
+			<xsl:when test="@align = 'right' or $align_style-type = 'right'">&gt;</xsl:when>
 			<xsl:when test="@align = 'left' and $inputformat = 'IEEE'">&lt;</xsl:when>
 			<!-- <xsl:otherwise>&lt;</xsl:otherwise> --> <!-- left -->
 		</xsl:choose>
 	</xsl:template>
 	<xsl:template name="getVAlignFormat">
+		<xsl:param name="valign_style-type"/>
 		<xsl:choose>
-			<xsl:when test="@valign = 'middle'">.^</xsl:when>
-			<xsl:when test="@valign = 'bottom'">.&gt;</xsl:when>
+			<xsl:when test="@valign = 'middle' or $valign_style-type = 'middle'">.^</xsl:when>
+			<xsl:when test="@valign = 'bottom' or $valign_style-type = 'bottom'">.&gt;</xsl:when>
 			<xsl:when test="@valign = 'top' and $inputformat = 'IEEE'">.&lt;</xsl:when>
 			<!-- <xsl:otherwise>.&lt;</xsl:otherwise> --> <!-- top -->
 		</xsl:choose>

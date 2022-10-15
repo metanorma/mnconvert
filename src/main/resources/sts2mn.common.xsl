@@ -1512,15 +1512,23 @@
 	</xsl:template>
 	
 	<xsl:template name="getAlignment_style-type">
-		<xsl:if test="contains(@style-type, 'align-')">
-			<xsl:variable name="align_" select="substring-after(@style-type, 'align-')"/>
-			<xsl:variable name="align">
-				<xsl:choose>
-					<xsl:when test="contains($align_, ';')"><xsl:value-of select="substring-before($align_,';')"/></xsl:when>
-					<xsl:otherwise><xsl:value-of select="$align_"/></xsl:otherwise>
-				</xsl:choose>
+		<xsl:param name="prefix">align-</xsl:param>
+		<xsl:if test="@style-type">
+		
+			<xsl:variable name="style-type_">
+				<xsl:call-template name="split">
+					<xsl:with-param name="pText" select="@style-type"/>
+					<xsl:with-param name="sep" select="';'"/>
+				</xsl:call-template>
 			</xsl:variable>
-			<xsl:value-of select="$align"/>
+			<xsl:variable name="style-type" select="xalan:nodeset($style-type_)"/>
+			
+			<xsl:variable name="align" select="$style-type/item[starts-with(., $prefix)]"/>
+			<xsl:value-of select="substring-after($align, $prefix)"/>
+			<xsl:if test="normalize-space($align = '') and $prefix = 'align-'">
+				<xsl:variable name="indent" select="$style-type/item[. = 'indent']"/>
+				<xsl:value-of select="$indent"/>
+			</xsl:if>
 		</xsl:if>
 	</xsl:template>
 	
