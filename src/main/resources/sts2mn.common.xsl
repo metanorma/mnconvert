@@ -1512,6 +1512,7 @@
 	</xsl:template>
 	
 	<xsl:template name="getAlignment_style-type">
+		<xsl:param name="prefix">align-</xsl:param>
 		<xsl:if test="@style-type">
 		
 			<xsl:variable name="style-type_">
@@ -1522,8 +1523,12 @@
 			</xsl:variable>
 			<xsl:variable name="style-type" select="xalan:nodeset($style-type_)"/>
 			
-			<xsl:variable name="align" select="$style-type/item[starts-with(., 'align-')]"/>
-			<xsl:value-of select="substring-after($align, 'align-')"/>
+			<xsl:variable name="align" select="$style-type/item[starts-with(., $prefix)]"/>
+			<xsl:value-of select="substring-after($align, $prefix)"/>
+			<xsl:if test="normalize-space($align = '') and $prefix = 'align-'">
+				<xsl:variable name="indent" select="$style-type/item[. = 'indent']"/>
+				<xsl:value-of select="$indent"/>
+			</xsl:if>
 		</xsl:if>
 	</xsl:template>
 	

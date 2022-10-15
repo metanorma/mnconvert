@@ -2102,6 +2102,15 @@
 			<xsl:if test="$align != ''">
 				<xsl:attribute name="align"><xsl:value-of select="$align"/></xsl:attribute>
 			</xsl:if>
+			
+			<xsl:variable name="valign">
+				<xsl:call-template name="getAlignment_style-type">
+					<xsl:with-param name="prefix">valign-</xsl:with-param>
+				</xsl:call-template>
+			</xsl:variable>
+			<xsl:if test="$valign != ''">
+				<xsl:attribute name="valign"><xsl:value-of select="$valign"/></xsl:attribute>
+			</xsl:if>
 		</xsl:for-each>
 	</xsl:template>
 	
