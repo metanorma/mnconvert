@@ -2215,10 +2215,14 @@
 		</sup>
 	</xsl:template>
 	
-	<xsl:template match="monospace">
+	<xsl:template match="monospace | styled-content[@style = 'font-family:Courier,monospace'][not(ancestor::preformat)]">
 		<tt>
 			<xsl:apply-templates />
 		</tt>
+	</xsl:template>
+	
+	<xsl:template match="styled-content[@style = 'font-family:Courier,monospace'][ancestor::preformat]">
+		<xsl:apply-templates />
 	</xsl:template>
 	
 	<xsl:template match="sc">

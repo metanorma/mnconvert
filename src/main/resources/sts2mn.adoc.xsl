@@ -6105,7 +6105,7 @@
 	</xsl:template>
 	
 	<!-- remove redundant spaces -->
-	<xsl:template match="text()[not(parent::code) and not(parent::preformat) and not(parent::mml:*)]" mode="linearize">
+	<xsl:template match="text()[not(parent::code) and not(ancestor::preformat) and not(parent::mml:*)]" mode="linearize">
 		<xsl:choose>
 		
 			<xsl:when test="parent::standard or parent::body or parent::sec or parent::term-sec or parent::tbx:termEntry or parent::back or parent::app-group or parent::app or parent::ref-list or parent::ref or parent::fig or parent::caption or parent::table-wrap or parent::tr or parent::thead or parent::colgroup or parent::table or parent::tbody or parent::fn or parent::non-normative-note or parent::non-normative-example or parent::array or parent::list-item or parent::list or parent::boxed-text">
@@ -6320,6 +6320,13 @@
 	<xsl:template match="bold[not(node())]" mode="linearize"/>
 	<xsl:template match="sup[not(node())]" mode="linearize"/>
 	<xsl:template match="sub[not(node())]" mode="linearize"/>
+	
+	<xsl:template match="styled-content[@style = 'font-family:Courier,monospace']" mode="linearize">
+		<xsl:choose>
+			<xsl:when test="parent::preformat"><xsl:apply-templates mode="linearize"/></xsl:when>
+			<xsl:otherwise><monospace><xsl:apply-templates mode="linearize"/></monospace></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 	
 	<!-- ================== -->
 	<!-- convert array in sec with the title 'Abbreviated terms' to def-list -->
