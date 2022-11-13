@@ -175,10 +175,10 @@
 			<xsl:otherwise>
 			
 				<!-- <redirect:write file="{$outpath}/{$docfile_name}.linearized.xml">
-					<xsl:copy-of select="$linearized_xml"/>
+					<xsl:apply-templates select="xalan:nodeset($linearized_xml)" mode="print_as_xml"/>
 				</redirect:write>
 				<xsl:message>Linearized xml saved.</xsl:message> -->
-			
+				
 				<xsl:for-each select="$updated_xml">
 			
 					<xsl:choose>
@@ -6226,54 +6226,63 @@
 	</xsl:template>
 	
 	<!-- transform p with section number to sec and title -->
-	<xsl:template match="sec/p[java:org.metanorma.utils.RegExHelper.matches('^[0-9]+((\.[0-9]+)+((\s|\h).*)?)?$', normalize-space(.)) = 'true'][local-name(node()[1]) != 'xref']" mode="linearize">
-	
-		<xsl:variable name="title_without_bold">
-			<xsl:apply-templates mode="title_without_bold"/>
-		</xsl:variable>
-	
-		<xsl:variable name="title_first_component" select="xalan:nodeset($title_without_bold)/node()[1]"/>
-		<xsl:variable name="label">
-			<xsl:choose>
-				<xsl:when test="contains($title_first_component, ' ')">
-					<xsl:value-of select="substring-before($title_first_component, ' ')"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="normalize-space($title_first_component)"/>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-	
-		<xsl:variable name="title">
-			<xsl:for-each select="xalan:nodeset($title_without_bold)/node()">
-				<xsl:choose>
-					<xsl:when test="position() = 1">
-						<xsl:value-of select="substring-after(., ' ')"/>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:copy-of select="."/>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:for-each>
-		</xsl:variable>
-	
-		<sec>
-			<xsl:attribute name="sec_depth">
-				<xsl:value-of select="string-length($label) - string-length(translate($label, '.', '')) + 2"/>
-			</xsl:attribute>
-			<label>
-				<!-- to process these cases:
-				*0.3   Common principles of relationship management*
-				*0.3.1   The life cycle framework*
-				-->
-				<xsl:value-of select="$label"/>
-			</label>
-			<xsl:if test="normalize-space(xalan:nodeset($title)) != ''">
-				<title>
-					<xsl:copy-of select="$title"/>
-				</title>	
-			</xsl:if>
-		</sec>
+	<xsl:template match="sec/p[java:org.metanorma.utils.RegExHelper.matches('^[0-9]+((\.[0-9]+)+((\s|\h).*)?)?$', normalize-space(.)) = 'true'][local-name(node()[1]) != 'xref'][*[local-name() = 'bold']]" mode="linearize">
+		<xsl:choose>
+			<xsl:when test="$organization = 'BSI'">
+			
+				<xsl:variable name="title_without_bold">
+					<xsl:apply-templates mode="title_without_bold"/>
+				</xsl:variable>
+			
+				<xsl:variable name="title_first_component" select="xalan:nodeset($title_without_bold)/node()[1]"/>
+				<xsl:variable name="label">
+					<xsl:choose>
+						<xsl:when test="contains($title_first_component, ' ')">
+							<xsl:value-of select="substring-before($title_first_component, ' ')"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="normalize-space($title_first_component)"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+			
+				<xsl:variable name="title">
+					<xsl:for-each select="xalan:nodeset($title_without_bold)/node()">
+						<xsl:choose>
+							<xsl:when test="position() = 1">
+								<xsl:value-of select="substring-after(., ' ')"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:copy-of select="."/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:for-each>
+				</xsl:variable>
+			
+				<sec>
+					<xsl:attribute name="sec_depth">
+						<xsl:value-of select="string-length($label) - string-length(translate($label, '.', '')) + 2"/>
+					</xsl:attribute>
+					<label>
+						<!-- to process these cases:
+						*0.3   Common principles of relationship management*
+						*0.3.1   The life cycle framework*
+						-->
+						<xsl:value-of select="$label"/>
+					</label>
+					<xsl:if test="normalize-space(xalan:nodeset($title)) != ''">
+						<title>
+							<xsl:copy-of select="$title"/>
+						</title>	
+					</xsl:if>
+				</sec>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy>
+					<xsl:apply-templates select="@*|node()" mode="linearize"/>
+				</xsl:copy>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="@*|node()" mode="title_without_bold">
