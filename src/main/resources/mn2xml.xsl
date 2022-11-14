@@ -569,9 +569,9 @@
 	<xsl:template match="/*">
 		<xsl:variable name="startTime" select="java:getTime(java:java.util.Date.new())"/>
 		
-		<redirect:write file="test.xml">
+		<!-- <redirect:write file="test.xml">
 			<xsl:copy-of select="$xml"/>
-		</redirect:write>
+		</redirect:write> -->
 		
 		<xsl:apply-templates select="$xml" mode="xml"/>
     
@@ -5058,6 +5058,21 @@
 			<xsl:copy-of select="@*"/>
 			<xsl:apply-templates/>
 		</xsl:element>
+	</xsl:template>
+	
+	<xsl:template match="asciimath[following-sibling::latexmath or preceding-sibling::latexmath or following-sibling::mml:math or preceding-sibling::mml:math]"/>
+	
+	<!-- if there latexmath, then ignore mathml -->
+	<xsl:template match="mml:math[following-sibling::latexmath or preceding-sibling::latexmath]"/>
+	
+	<xsl:template match="latexmath">
+		<xsl:variable name="latex"><xsl:apply-templates/></xsl:variable>
+		<tex-math notation="LaTeX">
+			<xsl:choose>
+				<xsl:when test="starts-with(normalize-space($latex),'\[')"><xsl:value-of select="$latex"/></xsl:when>
+				<xsl:otherwise><xsl:text>$</xsl:text><xsl:value-of select="$latex"/><xsl:text>$</xsl:text></xsl:otherwise>
+			</xsl:choose>
+		</tex-math>
 	</xsl:template>
 	
 	<xsl:template match="tt">
