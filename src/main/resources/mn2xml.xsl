@@ -2031,7 +2031,8 @@
 																misc-container/semantic-metadata/isoviennaagreement |
 																misc-container/semantic-metadata/copyright-statement |
 																misc-container/semantic-metadata/color-preface-background |
-																misc-container/presentation-metadata/*"
+																misc-container/presentation-metadata/* |
+																misc-container/table[@id = '_misccontainer_anchor_aliases']"
 																mode="front_check"/>
 
 	<!-- skip processed structure and deep down -->
