@@ -5076,7 +5076,7 @@
 		</tex-math>
 	</xsl:template>
 	
-	<xsl:template match="tt">
+	<xsl:template match="tt | identifier[not(ancestor::requirement)]">
 		<monospace>
 			<xsl:apply-templates/>
 		</monospace>
