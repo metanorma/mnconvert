@@ -4730,8 +4730,12 @@
 						<label>Key</label>
 					</xsl:if>
 					
-					<xsl:apply-templates mode="dl"/>
+					<xsl:apply-templates select="node()[not(self::note)]" mode="dl"/>
 				</def-list>
+				<!-- move notes outside dl -->
+				<xsl:for-each select="note">
+					<xsl:call-template name="note"/>
+				</xsl:for-each>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
