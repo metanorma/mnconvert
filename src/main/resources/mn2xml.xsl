@@ -5528,6 +5528,65 @@
 		</styled-content>
 	</xsl:template>
 
+	<!-- ======================= -->
+	<!-- requirement processing  -->
+	<!-- ======================= -->
+
+	<xsl:template match="requirement">
+		<table-wrap>
+			<xsl:copy-of select="@id"/>
+			<xsl:attribute name="content-type">
+				<xsl:choose>
+					<xsl:when test="@type = 'class'">recommendclass</xsl:when>
+					<xsl:otherwise>recommend</xsl:otherwise>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:attribute name="specific-use">modspec</xsl:attribute>
+			<label></label>
+			<caption>
+				<xsl:apply-templates select="title"/>
+			</caption>
+			<table>
+				<tbody>
+					<xsl:apply-templates select="node()[not(self::title)]"/>
+				</tbody>
+			</table>
+		</table-wrap>
+	</xsl:template>
+	
+	<xsl:template match="requirement[not(ancestor::requirement)]/*[not(self::title)]">
+		<tr>
+			<th>
+				<xsl:choose>
+					<xsl:when test="local-name() = 'subject'">Target type</xsl:when>
+					<xsl:otherwise>
+						<xsl:call-template name="capitalize">
+							<xsl:with-param name="str" select="local-name()"/>
+						</xsl:call-template>
+					</xsl:otherwise>
+				</xsl:choose>
+			</th>
+			<td>
+				<xsl:choose>
+					<xsl:when test="local-name() = 'identifier'">
+						<monospace><xsl:apply-templates /></monospace>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:apply-templates />
+					</xsl:otherwise>
+				</xsl:choose>
+			</td>
+		</tr>
+	</xsl:template>
+	
+	<xsl:template match="requirement/requirement/identifier">
+		<monospace><xsl:apply-templates/></monospace>
+	</xsl:template>
+	
+	<!-- ======================= -->
+	<!-- END: requirement processing -->
+	<!-- ======================= -->
+
 	<xsl:template name="insert_label">
 		<xsl:param name="label"/>
 		<xsl:param name="isAddition">false</xsl:param>
