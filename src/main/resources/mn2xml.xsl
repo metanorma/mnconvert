@@ -5532,6 +5532,31 @@
 	<!-- requirement processing  -->
 	<!-- ======================= -->
 
+	<xsl:variable name="requirements_">
+		<xsl:for-each select="$xml//requirement[not(ancestor::requirement)]">
+			<xsl:copy>
+				<xsl:copy-of select="@id"/>
+				<xsl:copy-of select="@type"/>
+				<xsl:attribute name="num">
+					<xsl:choose>
+						<xsl:when test="@type = 'class'"><xsl:number count="requirement[not(ancestor::requirement)][@type = 'class']" level="any"/></xsl:when>
+						<xsl:otherwise><xsl:number count="requirement[not(ancestor::requirement)][not(@type = 'class')]" level="any"/></xsl:otherwise>
+					</xsl:choose>
+				</xsl:attribute>
+				<xsl:copy-of select="title"/>
+				<xsl:copy-of select="identifier"/>
+				
+				<xsl:for-each select="requirement">
+					<xsl:copy>
+						<xsl:copy-of select="identifier"/>
+					</xsl:copy>
+				</xsl:for-each>
+				
+			</xsl:copy>
+		</xsl:for-each>
+	</xsl:variable>
+	<xsl:variable name="requirements" select="xalan:nodeset($requirements_)"/>
+
 	<xsl:template match="requirement">
 		<table-wrap>
 			<xsl:copy-of select="@id"/>
@@ -5554,11 +5579,29 @@
 		</table-wrap>
 	</xsl:template>
 	
+	<xsl:template match="requirement/title">
+		<title>
+			<xsl:choose>
+				<xsl:when test="../@type = 'class'">Requirements class </xsl:when>
+				<xsl:otherwise>Requirement </xsl:otherwise>
+			</xsl:choose>
+			<xsl:number count="requirement[@type = 'class']" level="any"/>
+			<xsl:text>: </xsl:text>
+			<xsl:apply-templates />
+		</title>
+	</xsl:template>
+	
 	<xsl:template match="requirement[not(ancestor::requirement)]/*[not(self::title)]">
 		<tr>
 			<th>
 				<xsl:choose>
-					<xsl:when test="local-name() = 'subject'">Target type</xsl:when>
+					<xsl:when test="local-name() = 'subject' and @type = 'class'">Target type</xsl:when>
+					<xsl:when test="local-name() = 'description' and normalize-space(../@type) != 'class'">Statement</xsl:when>
+					<xsl:when test="local-name() = 'component' and @class != ''">
+						<xsl:call-template name="capitalize">
+							<xsl:with-param name="str" select="@class"/>
+						</xsl:call-template>
+					</xsl:when>
 					<xsl:otherwise>
 						<xsl:call-template name="capitalize">
 							<xsl:with-param name="str" select="local-name()"/>
@@ -5577,10 +5620,59 @@
 				</xsl:choose>
 			</td>
 		</tr>
+		
+		<xsl:if test="local-name() = 'subject' and normalize-space(../@type) != 'class'">
+			<tr>
+				<th>Included in</th>
+				<td>
+					<xsl:variable name="identifier" select="../identifier"/>
+					
+					<xsl:for-each select="$requirements/requirement[normalize-space(requirement/identifier) = $identifier]">
+						<xref rid="{@id}">Requirements class <xsl:value-of select="@num"/>: <xsl:value-of select="title"/></xref>
+						<xsl:if test="position() != last()">
+							<break/>
+						</xsl:if>
+					</xsl:for-each>
+				</td>
+			</tr>
+		</xsl:if>
+		
+	</xsl:template>
+	
+	<!-- first requirement/requirement -->
+	<xsl:template match="requirement/requirement[not(preceding-sibling::requirement)]">
+		<tr>
+			<th>Provisions</th>
+			<td>
+				<!--
+				<xref target="r-identifier-1-1">Requirement 1: Method for constructing identifiers defined</xref>
+				<br />
+				...
+				-->
+				<xsl:apply-templates/>
+				<xsl:apply-templates select="following-sibling::*">
+					<xsl:with-param name="process">true</xsl:with-param>
+				</xsl:apply-templates>
+			</td>
+		</tr>
+	</xsl:template>
+	
+	
+	
+	<xsl:template match="requirement/requirement[preceding-sibling::requirement]">
+		<xsl:param name="process">false</xsl:param>
+		<xsl:if test="$process = 'true'">
+			<break/>
+			<xsl:apply-templates/>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="requirement/requirement/identifier">
-		<monospace><xsl:apply-templates/></monospace>
+		<xsl:variable name="identifier" select="normalize-space(.)"/>
+		<xsl:variable name="requirement_" select="$requirements/requirement[normalize-space(identifier) = $identifier]"/>
+		<xsl:variable name="requirement" select="xalan:nodeset($requirement_)"/>
+		
+		<xref rid="{$requirement/@id}">Requirement <xsl:value-of select="$requirement/@num"/>: <xsl:value-of select="$requirement/title"/></xref>
 	</xsl:template>
 	
 	<!-- ======================= -->
