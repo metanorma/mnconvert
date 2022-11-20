@@ -44,7 +44,7 @@ java -jar mnconvert-1.27.0.jar xml_file [options]
 - `--output`, `-o` - path to output file, optional
 - `--output-format`, `-of` - xml|adoc(default), optional
 - `--imagesdir`, `-img` - folder with images (default 'images'), optional
-- `--split-bibdata`, `-sb` - create Metanorma AsciiDoc and Relaton XML, optional
+- `--split-bibdata`, `-sb` - create Metanorma AsciiDoc and Relaton XML, both with document's attributes only, optional
 - `--type`, `-st` - type of standard to generate (iso, bsi, etc.), optional
 - `--semantic`, `-sx` - generate semantic Metanorma XML instead of presentation Metanorma XML (for xml output format only)
 
