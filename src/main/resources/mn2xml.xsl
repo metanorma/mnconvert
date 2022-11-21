@@ -5561,6 +5561,7 @@
 	<xsl:template match="requirement">
 		<table-wrap>
 			<xsl:copy-of select="@id"/>
+			<xsl:copy-of select="@section"/>
 			<xsl:attribute name="content-type">
 				<xsl:choose>
 					<xsl:when test="@type = 'class'">recommendclass</xsl:when>
