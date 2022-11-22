@@ -159,7 +159,7 @@
 			
 						<xsl:when test="(self::table or self::requirement or self::figure) and contains(name, '&#8212; ')"> <!-- if table's or figure's name contains number -->
 							<xsl:variable name="_name" select="substring-before(name, '&#8212; ')"/>
-							<xsl:value-of select="translate(normalize-space(translate($_name, '&#xa0;', ' ')), ' ', '&#xa0;')"/>
+							<xsl:value-of select="substring-after(translate(normalize-space(translate($_name, '&#xa0;', ' ')), ' ', '&#xa0;'), '&#xa0;')"/>
 						</xsl:when>
 						<xsl:when test="(self::table or self::requirement or self::figure) and not(ancestor::sections or ancestor::annex or ancestor::preface)" />
 						<xsl:otherwise>
@@ -4448,6 +4448,14 @@
 					
 					<xsl:call-template name="addSectionAttribute"/>
 					
+					<!-- for requirements -->
+					<xsl:if test="@type">
+						<xsl:attribute name="content-type"><xsl:value-of select="@type"/></xsl:attribute>
+					</xsl:if>
+					<xsl:if test="@class">
+						<xsl:attribute name="specific-use"><xsl:value-of select="@class"/></xsl:attribute>
+					</xsl:if>
+					
 				</xsl:if>
 				<xsl:variable name="label">
 					<xsl:choose>
@@ -4471,7 +4479,7 @@
 					<xsl:apply-templates select="name" mode="table"/>
 				</xsl:if>
 				<table>
-					<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix' or local-name() = 'width')]"/>
+					<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix' or local-name() = 'width' or local-name() = 'class' or local-name() = 'type')]"/>
 					<xsl:if test="$outputformat = 'IEEE'">
 					 <xsl:attribute name="cellpadding">5</xsl:attribute>
 					 <xsl:attribute name="frame">box</xsl:attribute>
