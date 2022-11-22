@@ -233,7 +233,14 @@
 		<xsl:variable name="xref_array">
 			<xsl:variable name="identifier" select="normalize-space(../identifier)"/>
 			<xsl:for-each select="$requirements/requirement[requirement[normalize-space(identifier) = $identifier]]">
-				<xref rid="{@id}" ref-type="table">Requirements class <xsl:value-of select="@num"/>: <xsl:value-of select="title"/></xref>
+			
+				<xsl:call-template name="insert_xref">
+					<xsl:with-param name="rid" select="@id"/>
+					<xsl:with-param name="type" select="@type"/>
+					<xsl:with-param name="num" select="@num"/>
+					<xsl:with-param name="title" select="title"/>
+				</xsl:call-template>
+
 				<xsl:if test="position() != last()">
 					<break/>
 				</xsl:if>
@@ -287,7 +294,7 @@
 				...
 				-->
 				<xsl:apply-templates/>
-				<xsl:apply-templates select="following-sibling::*">
+				<xsl:apply-templates select="following-sibling::requirement">
 					<xsl:with-param name="process">true</xsl:with-param>
 				</xsl:apply-templates>
 			</td>
@@ -307,7 +314,13 @@
 		<xsl:variable name="requirement_" select="$requirements/requirement[normalize-space(identifier) = $identifier]"/>
 		<xsl:variable name="requirement" select="xalan:nodeset($requirement_)"/>
 		
-		<xref rid="{$requirement/@id}" ref-type="table">Requirement <xsl:value-of select="$requirement/@num"/>: <xsl:value-of select="$requirement/title"/></xref>
+		<xsl:call-template name="insert_xref">
+			<xsl:with-param name="rid" select="$requirement/@id"/>
+			<xsl:with-param name="type" select="$requirement/@type"/>
+			<xsl:with-param name="num" select="$requirement/@num"/>
+			<xsl:with-param name="title" select="$requirement/title"/>
+		</xsl:call-template>
+
 	</xsl:template>
 	
 	<!-- first requirement/inherit -->
@@ -356,9 +369,37 @@
 		<xsl:variable name="requirement_" select="$requirements/requirement[normalize-space(identifier) = $identifier]"/>
 		<xsl:variable name="requirement" select="xalan:nodeset($requirement_)"/>
 		
-		<xref rid="{$requirement/@id}" ref-type="table">Requirements class <xsl:value-of select="$requirement/@num"/>: <xsl:value-of select="$requirement/title"/></xref>
+		<xsl:call-template name="insert_xref">
+			<xsl:with-param name="rid" select="$requirement/@id"/>
+			<xsl:with-param name="type" select="$requirement/@type"/>
+			<xsl:with-param name="num" select="$requirement/@num"/>
+			<xsl:with-param name="title" select="$requirement/title"/>
+		</xsl:call-template>
 	</xsl:template>
 	
+	<xsl:template name="insert_xref">
+		<xsl:param name="rid"/>
+		<xsl:param name="type"/>
+		<xsl:param name="num"/>
+		<xsl:param name="title"/>
+		
+		<xref rid="{$rid}" ref-type="table">
+			<xsl:choose>
+				<xsl:when test="$type = 'class'">
+					<xsl:call-template name="getRequirementLabel">
+						<xsl:with-param name="node" select="'modspec'"/>
+						<xsl:with-param name="label" select="'requirementclass'"/>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:call-template name="getRequirementLabel">
+						<xsl:with-param name="label" select="'requirement'"/>
+					</xsl:call-template>
+				</xsl:otherwise>
+			</xsl:choose>
+			<xsl:text> </xsl:text>
+			<xsl:value-of select="$num"/>: <xsl:value-of select="$title"/></xref>
+	</xsl:template>
 	
 	<!-- ======================= -->
 	<!-- END: requirement processing -->
