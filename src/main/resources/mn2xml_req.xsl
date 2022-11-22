@@ -128,88 +128,98 @@
 		<xsl:variable name="requirement_type" select="../@type"/>
 		<tr>
 			<th>
+				<xsl:variable name="th">
+					<xsl:choose>
+						<xsl:when test="self::subject">
+							<xsl:choose>
+								<xsl:when test="$requirement_type = 'class'">
+									<xsl:call-template name="getRequirementLabel">
+										<xsl:with-param name="node" select="'modspec'"/>
+										<xsl:with-param name="label" select="'targettype'"/>
+									</xsl:call-template>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:call-template name="getRequirementLabel">
+										<xsl:with-param name="label" select="'subject'"/>
+									</xsl:call-template>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when> <!-- end subject -->
+						
+						<xsl:when test="self::target">
+							<xsl:choose>
+								<xsl:when test="$requirement_type = 'class'">
+									<xsl:call-template name="getRequirementLabel">
+										<xsl:with-param name="node" select="'modspec'"/>
+										<xsl:with-param name="label" select="'targettype'"/>
+									</xsl:call-template>
+								</xsl:when>
+								<xsl:when test="$requirement_type = 'conformanceclass'">
+									<xsl:call-template name="getRequirementLabel">
+										<xsl:with-param name="node" select="'modspec'"/>
+										<xsl:with-param name="label" select="'requirementclass'"/>
+									</xsl:call-template>
+								</xsl:when>
+								<xsl:when test="$requirement_type = 'verification' or $requirement_type = 'abstracttest'">
+									<xsl:call-template name="getRequirementLabel">
+										<xsl:with-param name="label" select="'requirement'"/>
+									</xsl:call-template>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:call-template name="getRequirementLabel">
+										<xsl:with-param name="node" select="'modspec'"/>
+										<xsl:with-param name="label" select="'target'"/>
+									</xsl:call-template>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when> <!-- end target -->
+						
+						<xsl:when test="self::description">
+							<xsl:variable name="recommend_class">
+								<xsl:for-each select="..">
+									<xsl:call-template name="get_recommend_class"/>
+								</xsl:for-each>
+							</xsl:variable>
+							<xsl:choose>
+								<xsl:when test="$recommend_class = 'recommend'">
+									<xsl:call-template name="getRequirementLabel">
+										<xsl:with-param name="node" select="'modspec'"/>
+										<xsl:with-param name="label" select="'statement'"/>
+									</xsl:call-template>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:call-template name="getRequirementLabel">
+										<xsl:with-param name="node" select="'modspec'"/>
+										<xsl:with-param name="label" select="'description'"/>
+									</xsl:call-template>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+						
+						<xsl:when test="self::component and @class != ''">
+							<xsl:call-template name="capitalize">
+								<xsl:with-param name="str" select="@class"/>
+							</xsl:call-template>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:call-template name="capitalize">
+								<xsl:with-param name="str" select="local-name()"/>
+							</xsl:call-template>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
 				<xsl:choose>
-					<xsl:when test="self::subject">
-						<xsl:choose>
-							<xsl:when test="$requirement_type = 'class'">
-								<xsl:call-template name="getRequirementLabel">
-									<xsl:with-param name="node" select="'modspec'"/>
-									<xsl:with-param name="label" select="'targettype'"/>
-								</xsl:call-template>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:call-template name="getRequirementLabel">
-									<xsl:with-param name="label" select="'subject'"/>
-								</xsl:call-template>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:when> <!-- end subject -->
-					
-					<xsl:when test="self::target">
-						<xsl:choose>
-							<xsl:when test="$requirement_type = 'class'">
-								<xsl:call-template name="getRequirementLabel">
-									<xsl:with-param name="node" select="'modspec'"/>
-									<xsl:with-param name="label" select="'targettype'"/>
-								</xsl:call-template>
-							</xsl:when>
-							<xsl:when test="$requirement_type = 'conformanceclass'">
-								<xsl:call-template name="getRequirementLabel">
-									<xsl:with-param name="node" select="'modspec'"/>
-									<xsl:with-param name="label" select="'requirementclass'"/>
-								</xsl:call-template>
-							</xsl:when>
-							<xsl:when test="$requirement_type = 'verification' or $requirement_type = 'abstracttest'">
-								<xsl:call-template name="getRequirementLabel">
-									<xsl:with-param name="label" select="'requirement'"/>
-								</xsl:call-template>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:call-template name="getRequirementLabel">
-									<xsl:with-param name="node" select="'modspec'"/>
-									<xsl:with-param name="label" select="'target'"/>
-								</xsl:call-template>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:when> <!-- end target -->
-					
-					<xsl:when test="self::description">
-						<xsl:variable name="recommend_class">
-							<xsl:for-each select="..">
-								<xsl:call-template name="get_recommend_class"/>
-							</xsl:for-each>
-						</xsl:variable>
-						<xsl:choose>
-							<xsl:when test="$recommend_class = 'recommend'">
-								<xsl:call-template name="getRequirementLabel">
-									<xsl:with-param name="node" select="'modspec'"/>
-									<xsl:with-param name="label" select="'statement'"/>
-								</xsl:call-template>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:call-template name="getRequirementLabel">
-									<xsl:with-param name="node" select="'modspec'"/>
-									<xsl:with-param name="label" select="'description'"/>
-								</xsl:call-template>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:when>
-					
-					<xsl:when test="local-name() = 'component' and @class != ''">
-						<xsl:call-template name="capitalize">
-							<xsl:with-param name="str" select="@class"/>
-						</xsl:call-template>
+					<xsl:when test="$metanorma_type = 'ISO'">
+						<bold><xsl:copy-of select="$th"/></bold>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:call-template name="capitalize">
-							<xsl:with-param name="str" select="local-name()"/>
-						</xsl:call-template>
+						<xsl:copy-of select="$th"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</th>
 			<td>
 				<xsl:choose>
-					<xsl:when test="local-name() = 'identifier'">
+					<xsl:when test="self::identifier">
 						<monospace><xsl:apply-templates /></monospace>
 					</xsl:when>
 					<xsl:otherwise>
@@ -219,18 +229,32 @@
 			</td>
 		</tr>
 		
-		<xsl:if test="local-name() = 'subject' and normalize-space(../@type) != 'class'">
+		
+		<xsl:variable name="xref_array">
+			<xsl:variable name="identifier" select="../identifier"/>
+			<xsl:for-each select="$requirements/requirement[normalize-space(requirement/identifier) = $identifier]">
+				<xref rid="{@id}" ref-type="table">Requirements class <xsl:value-of select="@num"/>: <xsl:value-of select="title"/></xref>
+				<xsl:if test="position() != last()">
+					<break/>
+				</xsl:if>
+			</xsl:for-each>
+		</xsl:variable>
+		<!-- <xref_array><xsl:copy-of select="$xref_array"/></xref_array> -->
+		<xsl:if test="normalize-space($xref_array) != '' and (self::subject or (self::identifier and not(../subject))) and (normalize-space(../@type) = '' or normalize-space(../@type) = 'verification')">
 			<tr>
-				<th>Included in</th>
+				<xsl:variable name="th">Included in</xsl:variable>
+				<th>
+					<xsl:choose>
+						<xsl:when test="$metanorma_type = 'ISO'">
+							<bold><xsl:value-of select="$th"/></bold>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$th"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</th>
 				<td>
-					<xsl:variable name="identifier" select="../identifier"/>
-					
-					<xsl:for-each select="$requirements/requirement[normalize-space(requirement/identifier) = $identifier]">
-						<xref rid="{@id}" ref-type="table">Requirements class <xsl:value-of select="@num"/>: <xsl:value-of select="title"/></xref>
-						<xsl:if test="position() != last()">
-							<break/>
-						</xsl:if>
-					</xsl:for-each>
+					<xsl:copy-of select="$xref_array"/>
 				</td>
 			</tr>
 		</xsl:if>
@@ -240,7 +264,17 @@
 	<!-- first requirement/requirement -->
 	<xsl:template match="requirement/requirement[not(preceding-sibling::requirement)]">
 		<tr>
-			<th>Provisions</th>
+			<xsl:variable name="th">Provisions</xsl:variable>
+			<th>
+				<xsl:choose>
+					<xsl:when test="$metanorma_type = 'ISO'">
+						<bold><xsl:value-of select="$th"/></bold>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="$th"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</th>
 			<td>
 				<!--
 				<xref target="r-identifier-1-1">Requirement 1: Method for constructing identifiers defined</xref>
