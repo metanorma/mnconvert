@@ -294,8 +294,6 @@
 		</tr>
 	</xsl:template>
 	
-	
-	
 	<xsl:template match="requirement/requirement[preceding-sibling::requirement]">
 		<xsl:param name="process">false</xsl:param>
 		<xsl:if test="$process = 'true'">
@@ -311,6 +309,56 @@
 		
 		<xref rid="{$requirement/@id}" ref-type="table">Requirement <xsl:value-of select="$requirement/@num"/>: <xsl:value-of select="$requirement/title"/></xref>
 	</xsl:template>
+	
+	<!-- first requirement/inherit -->
+	<xsl:template match="requirement/inherit[not(preceding-sibling::inherit)]">
+		<tr>
+			<xsl:variable name="th">
+				<xsl:call-template name="getRequirementLabel">
+					<xsl:with-param name="node" select="'modspec'"/>
+					<xsl:with-param name="label" select="'dependency'"/>
+				</xsl:call-template>
+			</xsl:variable>
+			<th>
+				<xsl:choose>
+					<xsl:when test="$metanorma_type = 'ISO'">
+						<bold><xsl:value-of select="$th"/></bold>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="$th"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</th>
+			<td>
+				<!--
+				<xref target="r-identifier-1-1">Requirement 1: Method for constructing identifiers defined</xref>
+				<br />
+				...
+				-->
+				<xsl:apply-templates select="." mode="inherit"/>
+				<xsl:apply-templates select="following-sibling::inherit">
+					<xsl:with-param name="process">true</xsl:with-param>
+				</xsl:apply-templates>
+			</td>
+		</tr>
+	</xsl:template>
+	
+	<xsl:template match="requirement/inherit[preceding-sibling::inherit]">
+		<xsl:param name="process">false</xsl:param>
+		<xsl:if test="$process = 'true'">
+			<break/>
+			<xsl:apply-templates select="." mode="inherit"/>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="requirement/inherit" mode="inherit">
+		<xsl:variable name="identifier" select="normalize-space(.)"/>
+		<xsl:variable name="requirement_" select="$requirements/requirement[normalize-space(identifier) = $identifier]"/>
+		<xsl:variable name="requirement" select="xalan:nodeset($requirement_)"/>
+		
+		<xref rid="{$requirement/@id}" ref-type="table">Requirements class <xsl:value-of select="$requirement/@num"/>: <xsl:value-of select="$requirement/title"/></xref>
+	</xsl:template>
+	
 	
 	<!-- ======================= -->
 	<!-- END: requirement processing -->
