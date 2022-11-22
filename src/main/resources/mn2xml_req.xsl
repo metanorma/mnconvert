@@ -231,8 +231,8 @@
 		
 		
 		<xsl:variable name="xref_array">
-			<xsl:variable name="identifier" select="../identifier"/>
-			<xsl:for-each select="$requirements/requirement[normalize-space(requirement/identifier) = $identifier]">
+			<xsl:variable name="identifier" select="normalize-space(../identifier)"/>
+			<xsl:for-each select="$requirements/requirement[requirement[normalize-space(identifier) = $identifier]]">
 				<xref rid="{@id}" ref-type="table">Requirements class <xsl:value-of select="@num"/>: <xsl:value-of select="title"/></xref>
 				<xsl:if test="position() != last()">
 					<break/>
@@ -242,7 +242,12 @@
 		<!-- <xref_array><xsl:copy-of select="$xref_array"/></xref_array> -->
 		<xsl:if test="normalize-space($xref_array) != '' and (self::subject or (self::identifier and not(../subject))) and (normalize-space(../@type) = '' or normalize-space(../@type) = 'verification')">
 			<tr>
-				<xsl:variable name="th">Included in</xsl:variable>
+				<xsl:variable name="th">
+					<xsl:call-template name="getRequirementLabel">
+						<xsl:with-param name="node" select="'modspec'"/>
+						<xsl:with-param name="label" select="'included_in'"/>
+					</xsl:call-template>
+				</xsl:variable>
 				<th>
 					<xsl:choose>
 						<xsl:when test="$metanorma_type = 'ISO'">
