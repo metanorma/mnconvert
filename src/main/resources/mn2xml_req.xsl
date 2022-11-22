@@ -117,7 +117,8 @@
 				<xsl:when test="../@type = 'class'">Requirements class </xsl:when>
 				<xsl:otherwise>Requirement </xsl:otherwise>
 			</xsl:choose>
-			<xsl:number count="requirement[@type = 'class']" level="any"/>
+			<xsl:variable name="id" select="../@id"/>
+			<xsl:value-of select="$requirements/requirement[@id = $id]/@num" />
 			<xsl:text>: </xsl:text>
 			<xsl:apply-templates />
 		</title>
