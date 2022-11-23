@@ -228,7 +228,9 @@
 						<xsl:with-param name="include_std_meta">true</xsl:with-param>
 					</xsl:call-template>
 			</bibdata>
-			<xsl:call-template name="processMetadata"/>
+			<xsl:if test="not($split-bibdata = 'true')">
+				<xsl:call-template name="processMetadata"/>
+			</xsl:if>
 		</xsl:for-each>
 		
 		<xsl:if test="not(nat-meta)">
@@ -240,7 +242,9 @@
 							<xsl:with-param name="include_std_meta">true</xsl:with-param>
 						</xsl:call-template>
 				</bibdata>
-				<xsl:call-template name="processMetadata"/>
+				<xsl:if test="not($split-bibdata = 'true')">
+					<xsl:call-template name="processMetadata"/>
+				</xsl:if>
 			</xsl:for-each>
 		
 			<xsl:if test="not(iso-meta)">
@@ -250,7 +254,9 @@
 								<xsl:with-param name="include_std_meta">true</xsl:with-param>
 							</xsl:call-template>
 					</bibdata>
-					<xsl:call-template name="processMetadata"/>
+					<xsl:if test="not($split-bibdata = 'true')">
+						<xsl:call-template name="processMetadata"/>
+					</xsl:if>
 				</xsl:for-each>
 				
 				<xsl:if test="not(reg-meta)">
@@ -258,7 +264,9 @@
 						<bibdata type="standard">
 								<xsl:call-template name="xxx-meta"/>
 						</bibdata>
-						<xsl:call-template name="processMetadata"/>
+						<xsl:if test="not($split-bibdata = 'true')">
+							<xsl:call-template name="processMetadata"/>
+						</xsl:if>
 					</xsl:for-each>
 				</xsl:if>
 			</xsl:if>
@@ -1850,7 +1858,7 @@
 		<name><xsl:apply-templates/></name>
 	</xsl:template>
 	
-	<xsl:template match="body//uri">
+	<xsl:template match="front/sec//uri | body//uri">
 		<link target="{.}"/>
 	</xsl:template>
 	
