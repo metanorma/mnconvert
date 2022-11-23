@@ -209,8 +209,10 @@
 			<!-- ======================= -->
 			<!-- ======================= -->
 			
-			<!-- create task.copyImages.adoc -->
-			<xsl:call-template name="insertTaskImageList"/>
+			<xsl:if test="not($split-bibdata = 'true')">
+				<!-- create task.copyImages.adoc -->
+				<xsl:call-template name="insertTaskImageList"/>
+			</xsl:if>
 		
 		</xsl:for-each>
 	</xsl:template>
@@ -854,7 +856,13 @@
 		<docidentifier type="ISO">
 			<xsl:apply-templates mode="bibdata"/>
 		</docidentifier>
-		<xsl:variable name="language_" select="substring(//*[contains(local-name(), '-meta')]/doc-ident/language,1,1)"/> <!-- iso-meta -->
+		<xsl:variable name="language_1st_letter" select="normalize-space(substring(//*[contains(local-name(), '-meta')]/doc-ident/language,1,1))"/> <!-- iso-meta -->
+		
+		<xsl:variable name="language_">
+			<xsl:value-of select="$language_1st_letter"/>
+			<xsl:if test="$language_1st_letter = ''"><xsl:value-of select="substring(../content-language, 1, 1)"/></xsl:if>
+		</xsl:variable>
+		
 		<xsl:variable name="language" select="java:toUpperCase(java:java.lang.String.new($language_))"/>
 		<docidentifier type="iso-with-lang">
 			<xsl:apply-templates mode="bibdata"/>
