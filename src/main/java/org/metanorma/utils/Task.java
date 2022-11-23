@@ -22,10 +22,10 @@ public class Task {
     
     public static void copyImages(String inputFolder, String imagesFolder, String outputFolder) {
         try {
-            if( !inputFolder.equals(outputFolder)) {
-                final String taskFilename = "task.copyImages.adoc";
-                Path taskFilePath = Paths.get(outputFolder, taskFilename);
-                File taskFile = taskFilePath.toFile();
+            final String taskFilename = "task.copyImages.adoc";
+            Path taskFilePath = Paths.get(outputFolder, taskFilename);
+            File taskFile = taskFilePath.toFile();
+            if (!inputFolder.equals(outputFolder)) {
                 if (taskFile.exists()) {
                     try (Stream<String> stream = Files.lines(taskFilePath, StandardCharsets.UTF_8)) 
                     {
@@ -47,9 +47,9 @@ public class Task {
                     {
                         e.printStackTrace();
                     }
-                    Files.delete(taskFile.toPath());
                 }
             }
+            Files.deleteIfExists(taskFile.toPath());
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Error on task ''Copy Images'':{0}", ex.toString());
         }
