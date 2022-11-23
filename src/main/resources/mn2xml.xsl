@@ -125,6 +125,7 @@
 								$name = 'bookmark' or
 								$name = 'em' or
 								$name = 'table' or
+								($name = 'requirement' and not(ancestor::requirement)) or
 								$name = 'dl' or
 								$name = 'ol' or
 								$name = 'ul' or
@@ -156,11 +157,11 @@
 							</xsl:for-each>
 						</xsl:when>
 			
-						<xsl:when test="(self::table or self::figure) and contains(name, '&#8212; ')"> <!-- if table's or figure's name contains number -->
+						<xsl:when test="(self::table or self::requirement or self::figure) and contains(name, '&#8212; ')"> <!-- if table's or figure's name contains number -->
 							<xsl:variable name="_name" select="substring-before(name, '&#8212; ')"/>
-							<xsl:value-of select="translate(normalize-space(translate($_name, '&#xa0;', ' ')), ' ', '&#xa0;')"/>
+							<xsl:value-of select="substring-after(translate(normalize-space(translate($_name, '&#xa0;', ' ')), ' ', '&#xa0;'), '&#xa0;')"/>
 						</xsl:when>
-						<xsl:when test="(self::table or self::figure) and not(ancestor::sections or ancestor::annex or ancestor::preface)" />
+						<xsl:when test="(self::table or self::requirement or self::figure) and not(ancestor::sections or ancestor::annex or ancestor::preface)" />
 						<xsl:otherwise>
 							<xsl:variable name="section_">
 								<xsl:call-template name="getSection">
@@ -169,7 +170,7 @@
 							</xsl:variable>
 							
 							<xsl:choose>
-								<xsl:when test="(self::table or self::figure) and $section_ = ''"/>
+								<xsl:when test="(self::table or self::requirement or self::figure) and $section_ = ''"/>
 								<xsl:when test="$section_ = '0' and not(@type='intro')" />
 								<xsl:otherwise>
 									<!-- <xsl:choose>
@@ -190,7 +191,7 @@
 				<xsl:variable name="section_prefix">
 					<xsl:choose>
 						<xsl:when test="$name = 'annex'">Annex&#xA0;</xsl:when>
-						<xsl:when test="$name = 'table'">Table&#xA0;</xsl:when>
+						<xsl:when test="$name = 'table' or $name = 'requirement'">Table&#xA0;</xsl:when>
 						<xsl:when test="$name = 'figure'">Figure&#xA0;</xsl:when>
 						<xsl:when test="($name = 'clause' or $name = 'terms' or ($name = 'references' and @normative='true')) and $section != '' and not(contains($section, '.'))">Clause </xsl:when> <!-- first level clause -->
 						<xsl:when test="$name = 'section-title' or ($name = 'p' and @type = 'section-title')">Section </xsl:when>
@@ -436,12 +437,12 @@
 				<xsl:when test="self::annex">
 					<xsl:number format="A" level="any" count="annex"/>
 				</xsl:when>
-				<xsl:when test="(self::table or self::figure) and not(ancestor::annex)">
+				<xsl:when test="(self::table[not(ancestor::misc-container)] or self::requirement[not(ancestor::requirement)] or self::figure) and not(ancestor::annex)">
 					<xsl:variable name="root_element_id" select="generate-id(ancestor::*[contains(local-name(), '-standard')])"/> <!-- prevent global numbering for metanorma-collection -->
 					<xsl:choose>
-						<xsl:when test="self::table">
+						<xsl:when test="self::table or self::requirement">
 							<xsl:variable name="table_number_">
-								<xsl:number format="1" level="any" count="table[ancestor::*[generate-id() = $root_element_id] and not(ancestor::annex) and not(@unnumbered = 'true')]"/>
+								<xsl:number format="1" level="any" count="*[self::table or self::requirement][ancestor::*[generate-id() = $root_element_id] and not(ancestor::annex or ancestor::misc-container or ancestor::requirement) and not(@unnumbered = 'true')]"/>
 							</xsl:variable>
 							<xsl:variable name="table_number" select="normalize-space($table_number_)"/>
 							<xsl:if test="$table_number != '0'"><xsl:value-of select="$table_number"/></xsl:if>
@@ -497,9 +498,9 @@
 					<xsl:variable name="annexid" select="normalize-space(/*/bibdata/ext/structuredidentifier/annexid)"/>
 					<xsl:variable name="curr_annexid" select="ancestor::annex/@id"/>							
 					<xsl:choose>
-						<xsl:when test="self::table">
+						<xsl:when test="self::table or self::requirement[not(ancestor::requirement)]">
 							<xsl:number format="A" count="annex"/>
-							<xsl:number format=".1" level="any" count="table[ancestor::annex/@id = $curr_annexid]"/>
+							<xsl:number format=".1" level="any" count="*[self::table or self::requirement][ancestor::annex/@id = $curr_annexid and not(ancestor::misc-container or ancestor::requirement)]"/>
 						</xsl:when>						
 						<xsl:when test="self::figure">
 							<xsl:number format="A" count="annex"/>
@@ -2031,7 +2032,8 @@
 																misc-container/semantic-metadata/isoviennaagreement |
 																misc-container/semantic-metadata/copyright-statement |
 																misc-container/semantic-metadata/color-preface-background |
-																misc-container/presentation-metadata/*"
+																misc-container/presentation-metadata/* |
+																misc-container/table[@id = '_misccontainer_anchor_aliases']"
 																mode="front_check"/>
 
 	<!-- skip processed structure and deep down -->
@@ -4446,6 +4448,14 @@
 					
 					<xsl:call-template name="addSectionAttribute"/>
 					
+					<!-- for requirements -->
+					<xsl:if test="@type">
+						<xsl:attribute name="content-type"><xsl:value-of select="@type"/></xsl:attribute>
+					</xsl:if>
+					<xsl:if test="@class">
+						<xsl:attribute name="specific-use"><xsl:value-of select="@class"/></xsl:attribute>
+					</xsl:if>
+					
 				</xsl:if>
 				<xsl:variable name="label">
 					<xsl:choose>
@@ -4469,7 +4479,7 @@
 					<xsl:apply-templates select="name" mode="table"/>
 				</xsl:if>
 				<table>
-					<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix' or local-name() = 'width')]"/>
+					<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix' or local-name() = 'width' or local-name() = 'class' or local-name() = 'type')]"/>
 					<xsl:if test="$outputformat = 'IEEE'">
 					 <xsl:attribute name="cellpadding">5</xsl:attribute>
 					 <xsl:attribute name="frame">box</xsl:attribute>
@@ -4729,8 +4739,12 @@
 						<label>Key</label>
 					</xsl:if>
 					
-					<xsl:apply-templates mode="dl"/>
+					<xsl:apply-templates select="node()[not(self::note)]" mode="dl"/>
 				</def-list>
+				<!-- move notes outside dl -->
+				<xsl:for-each select="note">
+					<xsl:call-template name="note"/>
+				</xsl:for-each>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -5075,7 +5089,7 @@
 		</tex-math>
 	</xsl:template>
 	
-	<xsl:template match="tt">
+	<xsl:template match="tt | identifier[not(ancestor::requirement)]">
 		<monospace>
 			<xsl:apply-templates/>
 		</monospace>
@@ -5522,6 +5536,14 @@
 			<xsl:apply-templates/>
 		</styled-content>
 	</xsl:template>
+
+	<!-- ======================= -->
+	<!-- requirement processing  -->
+	<!-- ======================= -->
+	<xsl:include href="mn2xml_req.xsl"/>
+	<!-- ======================= -->
+	<!-- END: requirement processing -->
+	<!-- ======================= -->
 
 	<xsl:template name="insert_label">
 		<xsl:param name="label"/>
