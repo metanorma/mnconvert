@@ -82,7 +82,10 @@ public class STS2MN_XsltConverter extends XsltConverter {
             String outputFilePathWithoutExtension = super.getDefaultOutputFilePath();
             
             if (outputFormat.equals("xml")) {
-                outputFilePath = outputFilePathWithoutExtension + "mn." + outputFormat;                    
+                outputFilePath = outputFilePathWithoutExtension + "mn." + outputFormat;
+                if (isSplitBibdata) { //relaton XML
+                    outputFilePath = getSplitBibdataFilename(outputFilePath, outputFormat);
+                }
             } else { // adoc
                 outputFilePath = outputFilePathWithoutExtension + outputFormat;
             }
@@ -129,6 +132,18 @@ public class STS2MN_XsltConverter extends XsltConverter {
                 logger.info(String.format(INPUT_LOG, XSL_INPUT, fileXSL));
             }
             logger.info(String.format(OUTPUT_LOG_STS2MN, outputFormat.toUpperCase(), outputFilePath));
+            if (isSplitBibdata) {
+                String addon_outputFormat = "";
+                String addon_outputFilePath = "";
+                if (outputFormat.equals("xml")) {
+                    addon_outputFormat = "adoc";
+                } else { // adoc output
+                    addon_outputFormat = "xml";
+                }
+                addon_outputFilePath = getSplitBibdataFilename(outputFilePath, addon_outputFormat);
+                logger.info(String.format(OUTPUT_LOG_STS2MN, addon_outputFormat.toUpperCase(), addon_outputFilePath));
+            }
+
             logger.info("");
             
             convertsts2mn();
@@ -161,6 +176,10 @@ public class STS2MN_XsltConverter extends XsltConverter {
         String outputFolder = fileOut.getAbsoluteFile().getParent();
 
         String bibdataFileName = fileOut.getName();
+        if (isSplitBibdata && outputFormat.equals("xml")) {
+            String addon_outputFormat = "adoc";
+            bibdataFileName = getSplitBibdataFilename(bibdataFileName, addon_outputFormat);
+        }
         String bibdataFileExt = Util.getFileExtension(bibdataFileName);
         bibdataFileName = bibdataFileName.substring(0, bibdataFileName.indexOf(bibdataFileExt) - 1);
 
@@ -214,11 +233,18 @@ public class STS2MN_XsltConverter extends XsltConverter {
             String xmlMetanorma = resultWriter.toString();
 
             File xmlFileOut = fileOut;
-            if (isSplitBibdata) { //relaton XML
+
+            if (isSplitBibdata && outputFormat.equals("adoc")) {
+                String addon_outputFormat = "xml";
+                String relatonXML = getSplitBibdataFilename(xmlFileOut.getAbsolutePath(), addon_outputFormat);
+                xmlFileOut = new File(relatonXML);
+            }
+
+            /*if (isSplitBibdata) { //relaton XML
                 String relatonXML = xmlFileOut.getAbsolutePath();
                 relatonXML = relatonXML.substring(0, relatonXML.lastIndexOf(".")) + ".rxl";
                 xmlFileOut = new File(relatonXML);
-            }
+            }*/
 
             Files.createDirectories(Paths.get(xmlFileOut.getAbsoluteFile().getParent()));
             try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(xmlFileOut.getAbsolutePath()))) {
@@ -257,14 +283,15 @@ public class STS2MN_XsltConverter extends XsltConverter {
             StreamResult sr = new StreamResult(resultWriter);
 
             transformer.transform(src, sr);
-            String adocMetanorma = resultWriter.toString();
+
+            /* String adocMetanorma = resultWriter.toString();
 
             File adocFileOut = fileOut;
             if (isSplitBibdata) { //relaton XML
                 String bibdataAdoc = adocFileOut.getAbsolutePath();
                 bibdataAdoc = bibdataAdoc.substring(0, bibdataAdoc.lastIndexOf(".")) + ".adoc";
                 adocFileOut = new File(bibdataAdoc);
-            }
+            }*/
 
             // no need to save resulted adoc here, because it saved via xslt xsl:redirect
             /*
@@ -302,5 +329,12 @@ public class STS2MN_XsltConverter extends XsltConverter {
         transformer.transform(src, sridentity);
         return resultWriteridentity.toString();
     }*/
-    
+
+    private String getSplitBibdataFilename(String filename, String outputFormat) {
+        String relatonXML = filename;
+        String extension = (outputFormat.equals("xml")) ? ".rxl" :  ".adoc";
+        relatonXML = relatonXML.substring(0, relatonXML.lastIndexOf(".")) + extension;
+        return relatonXML;
+    }
+
 }

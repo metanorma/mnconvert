@@ -212,22 +212,27 @@
 								</xsl:call-template>
 							</redirect:write>
 							
-							<redirect:open file="{$taskCopyImagesFilename}"/>
-							<xsl:call-template name="insertTaskImageList"/>
-							
-							<xsl:for-each select="xalan:nodeset($documents)/*">
-								<xsl:if test="$organization = 'PAS'">
-									<redirect:write file="{$taskCopyImagesFilename}">
-										<xsl:text>copyimage::</xsl:text><xsl:call-template name="getCoverPageImage"/><xsl:text>&#xa;</xsl:text>
-									</redirect:write>
-								</xsl:if>
-							</xsl:for-each>
-							<redirect:close file="{$taskCopyImagesFilename}"/>
+							<xsl:if test="not($split-bibdata = 'true')">
+								<redirect:open file="{$taskCopyImagesFilename}"/>
+								<xsl:call-template name="insertTaskImageList"/>
+								
+								<xsl:for-each select="xalan:nodeset($documents)/*">
+									<xsl:if test="$organization = 'PAS'">
+										<redirect:write file="{$taskCopyImagesFilename}">
+											<xsl:text>copyimage::</xsl:text><xsl:call-template name="getCoverPageImage"/><xsl:text>&#xa;</xsl:text>
+										</redirect:write>
+									</xsl:if>
+								</xsl:for-each>
+								<redirect:close file="{$taskCopyImagesFilename}"/>
+							</xsl:if>
 							
 						</xsl:when>
 						<xsl:otherwise><!-- no sub-part elements -->
 							<xsl:apply-templates />
-							<xsl:call-template name="insertTaskImageList"/>
+							
+							<xsl:if test="not($split-bibdata = 'true')">
+								<xsl:call-template name="insertTaskImageList"/>
+							</xsl:if>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:for-each>
