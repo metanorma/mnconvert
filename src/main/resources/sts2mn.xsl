@@ -377,6 +377,11 @@
 		
 		<!-- contributor role @type="publisher -->
 		<xsl:apply-templates select="std-ident/originator" mode="bibdata"/>
+		<xsl:if test="not(std-ident/originator)">
+			<xsl:apply-templates select="std-org/std-org-abbrev" mode="bibdata">
+				<xsl:with-param name="process">true</xsl:with-param>
+			</xsl:apply-templates>
+		</xsl:if>
 		
 		<!-- edition -->
 		<xsl:apply-templates select="std-ident/edition" mode="bibdata"/>
@@ -676,13 +681,15 @@
 															reg-meta/std-ident/part-number |
 															std-meta/std-ident/part-number |
 															iso-meta/page-count |
+															reg-meta/page-count |
+															nat-meta/page-count |
+															std-meta/page-count |
 															iso-meta/std-xref |
 															nat-meta/std-xref |
 															reg-meta/std-xref |
 															std-meta/std-xref |
 															reg-meta/meta-date |
 															reg-meta/wi-number |
-															reg-meta/page-count |
 															reg-meta/release-version-id |
 															iso-meta/custom-meta-group |
 															nat-meta/custom-meta-group |
@@ -702,6 +709,14 @@
 															nat-meta/self-uri |
 															reg-meta/self-uri |
 															std-meta/self-uri |
+															iso-meta/std-org |
+															nat-meta/std-org |
+															reg-meta/std-org |
+															std-meta/std-org |
+															iso-meta/std-org/std-org-abbrev |
+															nat-meta/std-org/std-org-abbrev |
+															reg-meta/std-org/std-org-abbrev |
+															std-meta/std-org/std-org-abbrev |
 															front/notes |
 															front/sec " mode="bibdata_check"/>
 	
@@ -996,7 +1011,7 @@
 	</xsl:template>
 	
 	
-	<xsl:template match="iso-meta/std-ident/originator | nat-meta/std-ident/originator | reg-meta/std-ident/originator| std-meta/std-ident/originator" mode="bibdata">
+	<xsl:template match="iso-meta/std-ident/originator | nat-meta/std-ident/originator | reg-meta/std-ident/originator| std-meta/std-ident/originator" mode="bibdata" name="publisher">
 		<contributor>
 			<role type="publisher"/>
 				<organization>
@@ -1011,6 +1026,13 @@
 					</abbreviation>
 				</organization>
 		</contributor>
+	</xsl:template>
+	
+	<xsl:template match="iso-meta/std-org/std-org-abbrev | nat-meta/std-org/std-org-abbrev | reg-meta/std-org/std-org-abbrev | std-meta/std-org/std-org-abbrev" mode="bibdata">
+		<xsl:param name="process">false</xsl:param>
+		<xsl:if test="$process = 'true'">
+			<xsl:call-template name="publisher"/>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="*[self::iso-meta or self::nat-meta or self::reg-meta or self::std-meta]/std-ident/edition[normalize-space() != '']" mode="bibdata">
@@ -2970,6 +2992,7 @@
 		<xsl:param name="abbreviation"/>
 		<xsl:choose>
 			<xsl:when test="$abbreviation = 'IEC'"><name>International Electrotechnical Commission</name></xsl:when>
+			<xsl:when test="$abbreviation = 'ISO'"><name>International Organization for Standardization</name></xsl:when>
 			<xsl:when test="$abbreviation = 'BSI'"><name>The British Standards Institution</name></xsl:when>
 		</xsl:choose>
 	</xsl:template>
