@@ -4491,6 +4491,9 @@
 					<xsl:apply-templates select="thead" mode="table"/>
 					<xsl:apply-templates select="tfoot" mode="table"/>
 					<xsl:apply-templates select="tbody" mode="table"/>
+					<xsl:if test="not(tbody)">
+						<xsl:call-template name="addEmpty_tbody"/>
+					</xsl:if>
 					<xsl:apply-templates />
 				</table>
 				
@@ -4524,6 +4527,44 @@
 		</xsl:if>
 	</xsl:template>
 
+	<xsl:template name="addEmpty_tbody">
+		<xsl:variable name="col_count">
+			<xsl:choose>
+				<xsl:when test="colgroup">
+					<xsl:value-of select="count(colgroup//col)"/>
+				</xsl:when>
+				<xsl:when test="thead">
+					<xsl:variable name="cols">
+						<xsl:for-each select="thead/tr[1]/*">
+							<col>
+								<xsl:choose>
+									<xsl:when test="@colspan"><xsl:value-of select="@colspan"/></xsl:when>
+									<xsl:otherwise>1</xsl:otherwise>
+								</xsl:choose>
+							</col>
+						</xsl:for-each>
+					</xsl:variable>
+					<xsl:value-of select="sum(xalan:nodeset($cols)/col)"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+		<tbody>
+			<tr>
+				<xsl:call-template name="addEmpty_td">
+					<xsl:with-param name="count" select="$col_count"/>
+				</xsl:call-template>
+			</tr>
+		</tbody>
+	</xsl:template>
+	<xsl:template name="addEmpty_td">
+		<xsl:param name="count"/>
+		<xsl:if test="$count &gt; 0">
+			<td valign="top" align="left"> </td>
+			<xsl:call-template name="addEmpty_td">
+				<xsl:with-param name="count" select="$count - 1"/>
+			</xsl:call-template>
+		</xsl:if>
+	</xsl:template>
 
 	<!-- ========================================= -->
 	<!-- <table-wrap>
