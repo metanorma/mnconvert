@@ -38,6 +38,13 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:attribute>
+				
+				<xsl:attribute name="title_prefix">
+					<xsl:for-each select="title">
+						<xsl:call-template name="getTitlePrefix"/>
+					</xsl:for-each>
+				</xsl:attribute>
+				
 				<xsl:copy-of select="title"/>
 				<xsl:copy-of select="identifier"/>
 				
@@ -197,6 +204,17 @@
 	
 	<xsl:template match="permission/title | requirement/title | recommendation/title">
 		<title>
+			<xsl:call-template name="getTitlePrefix"/>
+			
+			<xsl:variable name="id" select="../@id"/>
+			<xsl:value-of select="$requirements/requirement[@id = $id]/@num" />
+			<xsl:text>: </xsl:text>
+			<xsl:apply-templates />
+		</title>
+	</xsl:template>
+	
+	<xsl:template name="getTitlePrefix">
+		<xsl:variable name="prefix">
 			<xsl:choose>
 				<xsl:when test="parent::permission and ../@type = 'class'">
 					<xsl:call-template name="getRequirementLabel">
@@ -258,14 +276,10 @@
 					</xsl:choose>
 				</xsl:otherwise>
 			</xsl:choose>
-			<xsl:text> </xsl:text>
-			<xsl:variable name="id" select="../@id"/>
-			<xsl:value-of select="$requirements/requirement[@id = $id]/@num" />
-			<xsl:text>: </xsl:text>
-			<xsl:apply-templates />
-		</title>
+		</xsl:variable>
+		<xsl:value-of select="normalize-space($prefix)"/>
+		<xsl:text> </xsl:text>
 	</xsl:template>
-	
 	
 	
 	<xsl:template match="requirement[not(ancestor::requirement)]/*[not(self::title)]">
@@ -382,6 +396,7 @@
 					<xsl:with-param name="rid" select="@id"/>
 					<xsl:with-param name="type" select="@type"/>
 					<xsl:with-param name="num" select="@num"/>
+					<xsl:with-param name="title_prefix" select="@title_prefix"/>
 					<xsl:with-param name="title" select="title"/>
 				</xsl:call-template>
 
@@ -473,6 +488,7 @@
 			<xsl:with-param name="rid" select="$requirement/@id"/>
 			<xsl:with-param name="type" select="$requirement/@type"/>
 			<xsl:with-param name="num" select="$requirement/@num"/>
+			<xsl:with-param name="title_prefix" select="$requirement/@title_prefix"/>
 			<xsl:with-param name="title" select="$requirement/title"/>
 		</xsl:call-template>
 
@@ -528,6 +544,7 @@
 			<xsl:with-param name="rid" select="$requirement/@id"/>
 			<xsl:with-param name="type" select="$requirement/@type"/>
 			<xsl:with-param name="num" select="$requirement/@num"/>
+			<xsl:with-param name="title_prefix" select="$requirement/@title_prefix"/>
 			<xsl:with-param name="title" select="$requirement/title"/>
 		</xsl:call-template>
 	</xsl:template>
@@ -536,10 +553,12 @@
 		<xsl:param name="rid"/>
 		<xsl:param name="type"/>
 		<xsl:param name="num"/>
+		<xsl:param name="title_prefix"/>
 		<xsl:param name="title"/>
 		
 		<xref rid="{$rid}" ref-type="table">
-			<xsl:choose>
+			<xsl:value-of select="$title_prefix"/>
+			<!-- <xsl:choose>
 				<xsl:when test="$type = 'class'">
 					<xsl:call-template name="getRequirementLabel">
 						<xsl:with-param name="node" select="'modspec'"/>
@@ -552,7 +571,7 @@
 					</xsl:call-template>
 				</xsl:otherwise>
 			</xsl:choose>
-			<xsl:text> </xsl:text>
+			<xsl:text> </xsl:text> -->
 			<xsl:value-of select="$num"/>: <xsl:value-of select="$title"/></xref>
 	</xsl:template>
 	
