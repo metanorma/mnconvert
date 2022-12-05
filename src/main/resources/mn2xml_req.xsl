@@ -273,6 +273,17 @@
 		
 	</xsl:template>
 	
+	<xsl:template match="requirement/classification">
+		<tr>
+			<th>
+				<xsl:apply-templates select="*[1]/node()"/>
+			</th>
+			<td>
+				<xsl:apply-templates select="*[2]/node()"/>
+			</td>
+		</tr>
+	</xsl:template>
+	
 	<!-- first requirement/requirement -->
 	<xsl:template match="requirement/requirement[not(preceding-sibling::requirement)]">
 		<tr>
