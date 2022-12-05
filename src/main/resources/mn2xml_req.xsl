@@ -21,8 +21,21 @@
 				<xsl:copy-of select="@type"/>
 				<xsl:attribute name="num">
 					<xsl:choose>
-						<xsl:when test="@type = 'class'"><xsl:number count="requirement[not(ancestor::requirement)][@type = 'class']" level="any"/></xsl:when>
-						<xsl:otherwise><xsl:number count="requirement[not(ancestor::requirement)][not(@type = 'class')]" level="any"/></xsl:otherwise>
+						<xsl:when test="ancestor::annex">
+							<xsl:variable name="root_element_id" select="generate-id(ancestor::annex)"/>
+							<xsl:number format="A" level="any" count="annex"/>
+							<xsl:text>.</xsl:text>
+							<xsl:choose>
+								<xsl:when test="@type = 'class'"><xsl:number format="1" count="requirement[ancestor::*[generate-id() = $root_element_id]][not(ancestor::requirement)][@type = 'class']" level="any"/></xsl:when>
+								<xsl:otherwise><xsl:number format="1" count="requirement[ancestor::*[generate-id() = $root_element_id]][not(ancestor::requirement)][not(@type = 'class')]" level="any"/></xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+						<xsl:otherwise> <!-- for requirements in sections -->
+							<xsl:choose>
+								<xsl:when test="@type = 'class'"><xsl:number count="requirement[not(ancestor::requirement)][@type = 'class']" level="any"/></xsl:when>
+								<xsl:otherwise><xsl:number count="requirement[not(ancestor::requirement)][not(@type = 'class')]" level="any"/></xsl:otherwise>
+							</xsl:choose>
+						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:attribute>
 				<xsl:copy-of select="title"/>
@@ -111,18 +124,149 @@
 		</table-wrap>
 	</xsl:template>
 	
-	<xsl:template match="requirement/title">
+	
+	<!-- from mn-requirements\lib\metanorma\modspec\xrefs.rb :
+	def req_class_paths
+	[
+		{ klass: "permissionclass",
+			label: @labels["modspec"]["permissionclass"],
+			xpath: "permission[@type = 'class']" },
+			
+		{ klass: "requirementclass",
+			label: @labels["modspec"]["requirementclass"],
+			xpath: "requirement[@type = 'class']" },
+			
+		{ klass: "recommendationclass",
+			label: @labels["modspec"]["recommendationclass"],
+			xpath: "recommendation[@type = 'class']" },
+			
+		{ klass: "permissiontest",
+			label: @labels["modspec"]["conformancetest"],
+			xpath: "permission[@type = 'verification']" },
+			
+		{ klass: "recommendationtest",
+			label: @labels["modspec"]["conformancetest"],
+			xpath: "recommendation[@type = 'verification']" },
+			
+		{ klass: "requirementtest",
+			label: @labels["modspec"]["conformancetest"],
+			xpath: "requirement[@type = 'verification']" },
+			
+		{ klass: "abstracttest",
+			label: @labels["modspec"]["abstracttest"],
+			xpath: "permission[@type = 'abstracttest']" },
+			
+		{ klass: "abstracttest",
+			label: @labels["modspec"]["abstracttest"],
+			xpath: "requirement[@type = 'abstracttest']" },
+			
+		{ klass: "abstracttest",
+			label: @labels["modspec"]["abstracttest"],
+			xpath: "recommendation[@type = 'abstracttest']" },
+			
+		{ klass: "conformanceclass",
+			label: @labels["modspec"]["conformanceclass"],
+			xpath: "permission[@type = 'conformanceclass']" },
+			
+		{ klass: "conformanceclass",
+			label: @labels["modspec"]["conformanceclass"],
+			xpath: "requirement[@type = 'conformanceclass']" },
+			
+		{ klass: "conformanceclass",
+			label: @labels["modspec"]["conformanceclass"],
+			xpath: "recommendation[@type = 'conformanceclass']" },
+			
+		{ klass: "permission",
+			label: @labels["default"]["permission"],
+			xpath: "permission[not(@type = 'verification' or @type = 'class' " \
+						 "or @type = 'abstracttest' or @type = 'conformanceclass')]" },
+						 
+		{ klass: "recommendation",
+			label: @labels["default"]["recommendation"],
+			xpath: "recommendation[not(@type = 'verification' or " \
+						 "@type = 'class' or @type = 'abstracttest' or " \
+						 "@type = 'conformanceclass')]" },
+						 
+		{ klass: "requirement",
+			label: @labels["default"]["requirement"],
+			xpath: "requirement[not(@type = 'verification' or @type = 'class' " \
+						 "or @type = 'abstracttest' or @type = 'conformanceclass')]" },
+	]
+	end -->
+
+	
+	<xsl:template match="permission/title | requirement/title | recommendation/title">
 		<title>
 			<xsl:choose>
-				<xsl:when test="../@type = 'class'">Requirements class </xsl:when>
-				<xsl:otherwise>Requirement </xsl:otherwise>
+				<xsl:when test="parent::permission and ../@type = 'class'">
+					<xsl:call-template name="getRequirementLabel">
+						<xsl:with-param name="node" select="'modspec'"/>
+						<xsl:with-param name="label" select="'permissionclass'"/>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:when test="parent::requirement and ../@type = 'class'">
+					<xsl:call-template name="getRequirementLabel">
+						<xsl:with-param name="node" select="'modspec'"/>
+						<xsl:with-param name="label" select="'requirementclass'"/>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:when test="parent::recommendation and ../@type = 'class'">
+					<xsl:call-template name="getRequirementLabel">
+						<xsl:with-param name="node" select="'modspec'"/>
+						<xsl:with-param name="label" select="'recommendationclass'"/>
+					</xsl:call-template>
+				</xsl:when>
+				
+				<xsl:when test="../@type = 'verification'">
+					<xsl:call-template name="getRequirementLabel">
+						<xsl:with-param name="node" select="'modspec'"/>
+						<xsl:with-param name="label" select="'conformancetest'"/>
+					</xsl:call-template>
+				</xsl:when>
+				
+				<xsl:when test="../@type = 'abstracttest'">
+					<xsl:call-template name="getRequirementLabel">
+						<xsl:with-param name="node" select="'modspec'"/>
+						<xsl:with-param name="label" select="'abstracttest'"/>
+					</xsl:call-template>
+				</xsl:when>
+				
+				<xsl:when test="../@type = 'conformanceclass'">
+					<xsl:call-template name="getRequirementLabel">
+						<xsl:with-param name="node" select="'modspec'"/>
+						<xsl:with-param name="label" select="'conformanceclass'"/>
+					</xsl:call-template>
+				</xsl:when>
+				
+				<xsl:otherwise>
+					<xsl:choose>
+						<xsl:when test="parent::permission">
+							<xsl:call-template name="getRequirementLabel">
+								<xsl:with-param name="label" select="'permission'"/>
+							</xsl:call-template>
+						</xsl:when>
+						<xsl:when test="parent::recommendation">
+							<xsl:call-template name="getRequirementLabel">
+								<xsl:with-param name="label" select="'recommendation'"/>
+							</xsl:call-template>
+						</xsl:when>
+						<xsl:when test="parent::requirement">
+							<xsl:call-template name="getRequirementLabel">
+								<xsl:with-param name="label" select="'requirement'"/>
+							</xsl:call-template>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:otherwise>
 			</xsl:choose>
+			<xsl:text> </xsl:text>
 			<xsl:variable name="id" select="../@id"/>
 			<xsl:value-of select="$requirements/requirement[@id = $id]/@num" />
 			<xsl:text>: </xsl:text>
 			<xsl:apply-templates />
 		</title>
 	</xsl:template>
+	
+	
 	
 	<xsl:template match="requirement[not(ancestor::requirement)]/*[not(self::title)]">
 		<xsl:variable name="requirement_type" select="../@type"/>
