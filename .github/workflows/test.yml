@@ -27,6 +27,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.7
+          rubygems: latest
           bundler: 2.3.22
 
       - name: Set up JDK 1.8
