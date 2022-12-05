@@ -332,11 +332,13 @@
 								$name = 'bookmark' or
 								$name = 'em' or
 								$name = 'table' or
+								$name = 'requirement' or
 								$name = 'dl' or
 								$name = 'dt' or
 								$name = 'ol' or
 								$name = 'ul' or
 								$name = 'li' or
+								$name = 'example' or
 								$name = 'figure' or 
 								$name = 'image' or
 								$name = 'formula' or
