@@ -31,7 +31,7 @@
 			<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
 		</xsl:copy>
 	</xsl:template>
-	<xsl:template match="mml:*" mode="remove_namespace" priority="3">
+	<xsl:template match="mml:* | *[local-name() = 'svg']" mode="remove_namespace" priority="3">
 		<xsl:copy-of select="."/>
 	</xsl:template>
 	<!-- ===================== -->
@@ -332,11 +332,13 @@
 								$name = 'bookmark' or
 								$name = 'em' or
 								$name = 'table' or
+								$name = 'requirement' or
 								$name = 'dl' or
 								$name = 'dt' or
 								$name = 'ol' or
 								$name = 'ul' or
 								$name = 'li' or
+								$name = 'example' or
 								$name = 'figure' or 
 								$name = 'image' or
 								$name = 'formula' or
@@ -5036,6 +5038,14 @@
 	<xsl:template match="image/@width"/>	
 	
 	
+	<xsl:template match="*[local-name() = 'svg']">
+		<xsl:variable name="svg_string">
+			<xsl:apply-templates select="." mode="print_as_xml"/>
+		</xsl:variable>
+		<xsl:variable name="svg_string_base64" select="java:org.metanorma.utils.Base64Helper.encodeBase64($svg_string)"/>
+		<graphic xlink:href="data:image/svg+xml;base64,{$svg_string_base64}" mimetype="image/svg+xml"/>
+	</xsl:template>
+	
 	<xsl:template match="formula">
 		<xsl:param name="skip">true</xsl:param>
 		
@@ -5786,6 +5796,33 @@
 	
 	<xsl:template match="footnote" mode="footnotes_update">
 		<xsl:apply-templates mode="footnotes_update"/>
+	</xsl:template>
+	
+	<xsl:template match="*" mode="print_as_xml">
+		<xsl:text>&#xa;&lt;</xsl:text>
+		<xsl:value-of select="local-name()"/>
+		<xsl:for-each select="@*">
+			<xsl:text> </xsl:text>
+			<xsl:value-of select="local-name()"/>
+			<xsl:text>="</xsl:text>
+			<xsl:value-of select="."/>
+			<xsl:text>"</xsl:text>
+		</xsl:for-each>
+		
+		<xsl:for-each select="namespace::*">
+			<xsl:text> xmlns</xsl:text>
+			<xsl:variable name="xmlns_name" select="local-name()"/>
+			<xsl:if test="$xmlns_name != ''">:<xsl:value-of select="$xmlns_name"/></xsl:if>
+			<xsl:text>="</xsl:text>
+			<xsl:value-of select="."/>
+			<xsl:text>"</xsl:text>
+		</xsl:for-each>
+		
+		<xsl:text>&gt;</xsl:text>
+		<xsl:apply-templates mode="print_as_xml"/>
+		<xsl:text>&lt;/</xsl:text>
+		<xsl:value-of select="local-name()"/>
+		<xsl:text>&gt;</xsl:text>
 	</xsl:template>
 	
 </xsl:stylesheet>
