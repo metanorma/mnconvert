@@ -1141,6 +1141,10 @@
 		<!-- preceding-sibling-text='<xsl:value-of select="normalize-space(preceding-sibling::node()[1])"/>' -->
 		<xsl:if test="normalize-space(preceding-sibling::node()[1]) ='('">(</xsl:if>
 		<xsl:value-of select="normalize-space()"/>
+		<xsl:if test="$isSemanticXML = 'true'"> <!-- normalize-space() is empty for semantic xml, therefore we need 'calculate' term number -->
+			<xsl:variable name="xref_target" select="@target"/>
+			<xsl:value-of select="$elements//element[@id = $xref_target]/@section"/>
+		</xsl:if>
 		<xsl:if test="substring(normalize-space(following-sibling::node()[1]),1,1) =')'">)</xsl:if>
 		<!-- following-sibling-text='<xsl:value-of select="following-sibling::node()[1]"/>' -->
 	</xsl:template>
