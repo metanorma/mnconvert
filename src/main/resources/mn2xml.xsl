@@ -2217,10 +2217,13 @@
 					<xsl:if test="$outputformat != 'IEEE'">
 						<xsl:attribute name="sec-type"><xsl:value-of select="$sec_type"/></xsl:attribute>
 					
-						<xsl:call-template name="insert_label">
-							<xsl:with-param name="label" select="@section"/>
-							<xsl:with-param name="isAddition" select="count(title/node()[normalize-space() != ''][1][self::add]) = 1"/>
-						</xsl:call-template>
+						<xsl:variable name="section" select="normalize-space(@section)"/>
+						<xsl:if test="$section != ''">
+							<xsl:call-template name="insert_label">
+								<xsl:with-param name="label" select="@section"/>
+								<xsl:with-param name="isAddition" select="count(title/node()[normalize-space() != ''][1][self::add]) = 1"/>
+							</xsl:call-template>
+						</xsl:if>
 					</xsl:if>
 					
 					<!-- <xsl:apply-templates select="title"/> -->
