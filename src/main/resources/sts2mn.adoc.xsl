@@ -2226,16 +2226,39 @@
 	</xsl:template>
 	
 	<xsl:template match="tbx:termEntry">
-		<xsl:variable name="level">
-			<xsl:call-template name="getLevel"/>
-		</xsl:variable>
-		<xsl:value-of select="$level"/><xsl:text> </xsl:text>
-		<!-- <xsl:call-template name="setId"/> --><!-- [[ ]] -->
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="tbx:langSet">
+		<xsl:for-each select="ancestor::tbx:termEntry[1]">
+			<xsl:variable name="level">
+				<xsl:call-template name="getLevel"/>
+			</xsl:variable>
+			<xsl:value-of select="$level"/><xsl:text> </xsl:text>
+		</xsl:for-each>
+		
 		<xsl:apply-templates select=".//tbx:term" mode="term"/>	
 		<xsl:apply-templates select=".//tbx:usageNote" mode="term"/>	
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
+		
 		<xsl:apply-templates />
+
+	</xsl:template>
+	
+	<xsl:template match="tbx:langSet/text()"/>
+	<!-- <xsl:template match="text()[. = '&#xa;']"/> -->
+	
+	<xsl:template match="tbx:langSet/@xml:lang">
+		<xsl:if test=". != $language"> <!-- if lang is different than document main language, for instance 'fr' for 'en' document -->
+			<!-- Example:
+				[%metadata]
+				language:: fre
+			-->
+			<xsl:text>language:: </xsl:text>
+			<xsl:value-of select="."/>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="title" name="title">
@@ -2314,6 +2337,7 @@
 		<xsl:apply-templates select="ancestor::tbx:langSet/tbx:subjectField" mode="term"/>
 		
 		<xsl:variable name="metadata">
+			<xsl:apply-templates select="ancestor::tbx:langSet/@xml:lang"/>
 			<xsl:apply-templates select="../tbx:termType" mode="term"/>
 			<xsl:apply-templates select="../tbx:partOfSpeech" mode="term"/>
 		</xsl:variable>
@@ -2386,12 +2410,6 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	
-	<xsl:template match="tbx:langSet">
-		<xsl:apply-templates />
-	</xsl:template>
-	<xsl:template match="tbx:langSet/text()"/>
-	<!-- <xsl:template match="text()[. = '&#xa;']"/> -->
 	
 	<xsl:template match="tbx:definition">
 		<xsl:variable name="text">
