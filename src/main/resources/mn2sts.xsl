@@ -908,8 +908,19 @@
 			</xsl:call-template>
 			
 			<tbx:termEntry id="{$current_id}">
-				<tbx:langSet xml:lang="en">
+				<tbx:langSet>
 				
+					<xsl:attribute name="xml:lang">
+						<xsl:choose>
+							<xsl:when test=".//expression/@language">
+								<xsl:value-of select=".//expression/@language"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="ancestor::*[contains(local-name(), '-standard')]/bibdata/language"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+					
 					<xsl:apply-templates select="domain"/>
 					
 					<xsl:apply-templates select="node()[not(self::termexample or self::termnote or self::termsource or 

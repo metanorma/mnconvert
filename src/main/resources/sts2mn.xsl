@@ -47,6 +47,8 @@
 		</xsl:choose>
 	</xsl:variable> 
 
+	<xsl:variable name="language" select="//standard/front/*/doc-ident/language"/>
+
 	<xsl:variable name="_typestandard">
 		<xsl:choose>
 			<xsl:when test="$typestandard = ''">
@@ -1669,6 +1671,7 @@
 					</xsl:variable>
 				
 					<xsl:element name="{$element_type_name}">
+						<xsl:apply-templates select="ancestor::tbx:langSet/@xml:lang"/>
 						<xsl:apply-templates select="../tbx:termType[@value = 'abbreviation' or @value = 'fullForm']" mode="term"/>
 						<name>
 							<xsl:call-template name="createTermElement"/>
@@ -1689,6 +1692,14 @@
 				</xsl:element>
 			</xsl:otherwise>
 		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template match="tbx:langSet/@xml:lang">
+		<xsl:if test=". != $language"> <!-- if lang is different than document main language, for instance 'fr' for 'en' document -->
+			<xsl:attribute name="language">
+				<xsl:value-of select="."/>
+			</xsl:attribute>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="tbx:term[count(node()) = 1]/bold" priority="2">
