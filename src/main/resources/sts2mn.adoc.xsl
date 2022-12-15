@@ -3624,38 +3624,48 @@
 	
 	<!--Example: publication-type="report" -->
 	<xsl:template match="mixed-citation/@publication-type">
-		<xsl:text>span:type[</xsl:text><xsl:value-of select="."/><xsl:text>]</xsl:text>
+		<!-- available types see in '<define name="BibItemType" combine="choice">' https://github.com/metanorma/metanorma-ieee/blob/main/lib/metanorma/ieee/biblio.rng -->
+		<xsl:text>span:type[</xsl:text>
+			<xsl:choose>
+				<xsl:when test=". = 'government'">misc</xsl:when>
+				<xsl:when test=". = 'confpaper'">misc</xsl:when>
+				<xsl:when test=". = 'periodical'">misc</xsl:when>
+				<xsl:when test=". = 'report'">techreport</xsl:when>
+				<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+			</xsl:choose>
+		<xsl:text>]</xsl:text>
 	</xsl:template>
 	
 	<!-- Example: <article-title>&#x201c;Sound Barrier Walls for Transformers,&#x201d; AIEE Committee	Report</article-title> -->
-	<xsl:template match="mixed-citation/article-title | mixed-citation[@publication-type != 'standard']/source">
-		<xsl:text>span:title[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
+	<xsl:template match="mixed-citation/article-title | mixed-citation[@publication-type != 'standard']/source | mixed-citation/conf-name">
+		<!-- <xsl:text>span:title[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text> -->
+		<xsl:text>_</xsl:text><xsl:apply-templates /><xsl:text>_</xsl:text>
 	</xsl:template>
 	
 	<!-- Example: <publisher-name>Pacific Gas &amp; Electric Company</publisher-name> -->
-	<xsl:template match="mixed-citation/publisher-name">
+	<!-- <xsl:template match="mixed-citation/publisher-name">
 		<xsl:text>span:publisher[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
-	</xsl:template>
+	</xsl:template> -->
 	
 	<!-- Example: <publisher-loc>Pittsburgh, PA</publisher-loc> -->
-	<xsl:template match="mixed-citation/publisher-loc">
+	<!-- <xsl:template match="mixed-citation/publisher-loc">
 		<xsl:text>span:pubplace[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
-	</xsl:template>
+	</xsl:template> -->
 	
 	<!-- Example: <year>1993</year> -->
-	<xsl:template match="mixed-citation/year">
+	<!-- <xsl:template match="mixed-citation/year">
 		<xsl:text>span:pubyear[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
-	</xsl:template>
+	</xsl:template> -->
 	
 	<!-- Example: <fpage>60</fpage> <lpage>175</lpage> -->
-	<xsl:template match="mixed-citation/fpage">
+	<!-- <xsl:template match="mixed-citation/fpage">
 		<xsl:text>span:pages[</xsl:text><xsl:value-of select="."/><xsl:apply-templates select="following-sibling::*[1][self::lpage]" mode="lpage"/><xsl:text>]</xsl:text>
 	</xsl:template>
 	<xsl:template match="mixed-citation/lpage" />
 	<xsl:template match="mixed-citation/lpage" mode="lpage">
 		<xsl:text>-</xsl:text><xsl:value-of select="."/>
 	</xsl:template>
-	<xsl:template match="mixed-citation/text()[preceding-sibling::*[1][self::fpage] and following-sibling::*[1][self::lpage]]"/>
+	<xsl:template match="mixed-citation/text()[preceding-sibling::*[1][self::fpage] and following-sibling::*[1][self::lpage]]"/> -->
 	
 	<!-- Example:
 	<person-group person-group-type="author">
@@ -3664,7 +3674,7 @@
 		</string-name>
 		</person-group>
 	-->
-	<xsl:template match="mixed-citation//surname">
+	<!-- <xsl:template match="mixed-citation//surname">
 		<xsl:variable name="type_" select="ancestor::person-group/@person-group-type"/>
 		<xsl:variable name="type">
 			<xsl:if test="$type_ != '' and $type_ != 'author'">.<xsl:value-of select="$type_"/></xsl:if>
@@ -3677,20 +3687,20 @@
 			<xsl:if test="$type_ != '' and $type_ != 'author'">.<xsl:value-of select="$type_"/></xsl:if>
 		</xsl:variable>
 		<xsl:text>span:givenname</xsl:text><xsl:value-of select="$type"/><xsl:text>[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
-	</xsl:template>
+	</xsl:template> -->
 	
 	<!-- Example: <pub-id specific-use="repno">GET 2500</pub-id> -->
-	<xsl:template match="mixed-citation[@publication-type != 'standard']/pub-id">
+	<!-- <xsl:template match="mixed-citation[@publication-type != 'standard']/pub-id">
 		<xsl:variable name="type_" select="@specific-use"/>
 		<xsl:variable name="type">
 			<xsl:if test="$type_ != ''">.<xsl:value-of select="$type_"/></xsl:if>
 		</xsl:variable>
 		<xsl:text>span:docid</xsl:text><xsl:value-of select="$type"/><xsl:text>[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
-	</xsl:template>
+	</xsl:template> -->
 	
-	<xsl:template match="mixed-citation/uri">
+	<!-- <xsl:template match="mixed-citation/uri">
 		<xsl:text>span:uri[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
-	</xsl:template>
+	</xsl:template> -->
 	
 	<!-- =============== -->
 	<!-- Definitions list (dl) -->
