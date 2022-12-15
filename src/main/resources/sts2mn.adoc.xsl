@@ -3622,22 +3622,27 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<!--Example: publication-type="report" -->
 	<xsl:template match="mixed-citation/@publication-type">
 		<xsl:text>span:type[</xsl:text><xsl:value-of select="."/><xsl:text>]</xsl:text>
 	</xsl:template>
 	
+	<!-- Example: <article-title>&#x201c;Sound Barrier Walls for Transformers,&#x201d; AIEE Committee	Report</article-title> -->
 	<xsl:template match="mixed-citation/article-title | mixed-citation[@publication-type != 'standard']/source">
 		<xsl:text>span:title[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
 	</xsl:template>
 	
+	<!-- Example: <publisher-name>Pacific Gas &amp; Electric Company</publisher-name> -->
 	<xsl:template match="mixed-citation/publisher-name">
 		<xsl:text>span:publisher[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
 	</xsl:template>
 	
+	<!-- Example: <publisher-loc>Pittsburgh, PA</publisher-loc> -->
 	<xsl:template match="mixed-citation/publisher-loc">
 		<xsl:text>span:pubplace[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
 	</xsl:template>
 	
+	<!-- Example: <year>1993</year> -->
 	<xsl:template match="mixed-citation/year">
 		<xsl:text>span:pubyear[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
 	</xsl:template>
