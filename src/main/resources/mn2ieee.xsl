@@ -1058,6 +1058,10 @@
 	</xsl:template>
 	
 	<xsl:template match="bibitem" mode="IEEE_non_standard">
+		<xsl:variable name="mixed_citation_">
+			<xsl:apply-templates select="formattedref"/>
+		</xsl:variable>
+		<xsl:variable name="mixed_citation" select="xalan:nodeset($mixed_citation_)"/>
 		<mixed-citation>
 			<xsl:attribute name="publication-format">
 				<xsl:choose>
@@ -1065,9 +1069,16 @@
 					<xsl:otherwise>print</xsl:otherwise>
 				</xsl:choose>
 			</xsl:attribute>
-			<xsl:attribute name="publication-type"><xsl:value-of select="@type"/></xsl:attribute>
-			<xsl:apply-templates select="formattedref"/>
+			<xsl:attribute name="publication-type">
+				<xsl:choose>
+					<xsl:when test="@type = 'techreport'">report</xsl:when>
+					<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:copy-of select="$mixed_citation/node()[not(xref and fn)]"/>
 		</mixed-citation>
+		<!-- move xref and fn outside of mixed-citation -->
+		<xsl:copy-of select="$mixed_citation/node()[xref and fn]"/>
 	</xsl:template>
 	
 	<xsl:template match="figure/note" priority="2">
