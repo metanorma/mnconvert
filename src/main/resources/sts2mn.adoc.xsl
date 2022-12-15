@@ -3647,6 +3647,16 @@
 		<xsl:text>span:pubyear[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
 	</xsl:template>
 	
+	<!-- Example: <fpage>60</fpage> <lpage>175</lpage> -->
+	<xsl:template match="mixed-citation/fpage">
+		<xsl:text>span:pages[</xsl:text><xsl:value-of select="."/><xsl:apply-templates select="following-sibling::*[1][self::lpage]" mode="lpage"/><xsl:text>]</xsl:text>
+	</xsl:template>
+	<xsl:template match="mixed-citation/lpage" />
+	<xsl:template match="mixed-citation/lpage" mode="lpage">
+		<xsl:text>-</xsl:text><xsl:value-of select="."/>
+	</xsl:template>
+	<xsl:template match="mixed-citation/text()[preceding-sibling::*[1][self::fpage] and following-sibling::*[1][self::lpage]]"/>
+	
 	<!-- Example:
 	<person-group person-group-type="author">
 		<string-name>
