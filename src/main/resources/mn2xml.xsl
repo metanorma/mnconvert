@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
 			xmlns:mml="http://www.w3.org/1998/Math/MathML" 
+			xmlns:tbx="urn:iso:std:iso:30042:ed-1" 
 			xmlns:xlink="http://www.w3.org/1999/xlink" 
 			xmlns:xalan="http://xml.apache.org/xalan" 
 			xmlns:java="http://xml.apache.org/xalan/java" 
@@ -4362,15 +4363,63 @@
 	</xsl:template>
 	
 	<xsl:template match="concept">
-		<named-content content-type="term" xlink:href="#{xref/@target}">
-			<xsl:choose>
-				<xsl:when test="renderterm"><xsl:value-of select="renderterm"/></xsl:when>
-				<xsl:otherwise>
-					<xsl:attribute name="xlink:href">#<xsl:value-of select=".//tt[2]"/></xsl:attribute>
-					<xsl:value-of select=".//tt[1]"/>
-				</xsl:otherwise>
-			</xsl:choose>
-		</named-content>
+		<xsl:choose>
+			<xsl:when test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO'">
+				<!-- for ISO or IEC -->
+				<xsl:choose>
+					<xsl:when test="ancestor::terms and ancestor::definition">
+						<!-- Cross-references between terminological entries or terms within the Terms and definitions clause can be tagged as <tbx:entailedTerm>. This element should only be used in child elements of <tbx:termEntry>. -->
+						<tbx:entailedTerm target="{xref/@target}">
+							<xsl:choose>
+								<xsl:when test="renderterm">
+									<xsl:value-of select="renderterm"/>
+									
+									<xsl:variable name="xref_target" select="xref/@target"/>
+									<xsl:variable name="element_xref_" select="$elements//element[@source_id = $xref_target]"/>
+									<xsl:variable name="element_xref" select="xalan:nodeset($element_xref_)"/>
+									<xsl:variable name="section" select="$element_xref/@section"/>
+									<xsl:text> (</xsl:text><xsl:value-of select="$section"/><xsl:text>)</xsl:text>
+									
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:attribute name="target"><xsl:value-of select=".//tt[2]"/></xsl:attribute>
+									<xsl:value-of select=".//tt[1]"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</tbx:entailedTerm>
+					</xsl:when>
+					<xsl:otherwise>
+						<!-- Outside the terms and definitions section, references to terms contained within the document should be made using the id in the terminological entry. -->
+						<xref>
+							<xsl:attribute name="ref-type">
+								<xsl:if test="$metanorma_type = 'IEC'">other</xsl:if>
+								<xsl:if test="$metanorma_type = 'ISO'">sec</xsl:if>
+							</xsl:attribute>
+							<xsl:attribute name="rid"><xsl:value-of select="xref/@target"/></xsl:attribute>
+							<xsl:choose>
+								<xsl:when test="renderterm"><xsl:value-of select="renderterm"/></xsl:when>
+								<xsl:otherwise>
+									<xsl:attribute name="rid"><xsl:value-of select=".//tt[2]"/></xsl:attribute>
+									<xsl:value-of select=".//tt[1]"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xref>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:otherwise>
+				<!-- for BSI -->
+				<named-content content-type="term" xlink:href="#{xref/@target}">
+					<xsl:choose>
+						<xsl:when test="renderterm"><xsl:value-of select="renderterm"/></xsl:when>
+						<xsl:otherwise>
+							<xsl:attribute name="xlink:href">#<xsl:value-of select=".//tt[2]"/></xsl:attribute>
+							<xsl:value-of select=".//tt[1]"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</named-content>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="li/table" priority="2">
