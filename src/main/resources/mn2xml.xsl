@@ -3546,59 +3546,76 @@
 			-->
 			
 			<!-- <bibitems_URN><xsl:copy-of select="$bibitems_URN"/></bibitems_URN> -->
-			<std>
-				<std-id>
-					<xsl:attribute name="std-id-link-type">
-						<xsl:choose>
-							<xsl:when test="$docidentifier_URN != ''">urn</xsl:when>
-							<xsl:otherwise>internal-pub-id</xsl:otherwise>
-						</xsl:choose>
-					</xsl:attribute>
-					<xsl:attribute name="std-id-type">
-						<xsl:call-template name="setDatedUndatedType">
-							<xsl:with-param name="value" select="$value"/>
-						</xsl:call-template>
-					</xsl:attribute>
+			
+			<xsl:variable name="model_eref_locality">
+				<xsl:for-each select="$model_eref/locality">
+					<xsl:text>, </xsl:text>
 					<xsl:choose>
-						<xsl:when test="$docidentifier_URN != ''">
-							<xsl:value-of select="$docidentifier_URN"/>
-							<xsl:for-each select="localityStack/locality[1]">
-								<xsl:text>#</xsl:text>
-								<xsl:choose>
-									<xsl:when test="@type = 'clause'">sec</xsl:when>
-									<xsl:when test="@type = 'annex'">anx</xsl:when>
-									<xsl:otherwise><xsl:value-of select="substring(@type,1,3)"/></xsl:otherwise>
-								</xsl:choose>
-								<xsl:text>-</xsl:text>
-								<xsl:value-of select="referenceFrom"/>
-							</xsl:for-each>
-						</xsl:when>
+						<xsl:when test="@type = 'clause'"></xsl:when>
 						<xsl:otherwise>
-							<xsl:value-of select="$model_eref/reference"/>
+							<xsl:variable name="type" select="java:replaceAll(java:java.lang.String.new(@type),$regex_locality,'$2')"/>
+							<xsl:call-template name="capitalize">
+								<xsl:with-param name="str" select="$type"/>
+							</xsl:call-template>
+							<xsl:text> </xsl:text>
 						</xsl:otherwise>
 					</xsl:choose>
-					
-				</std-id>
-				<std-ref>
-					<xsl:value-of select="$model_eref/referenceText"/>
-					
-					<xsl:for-each select="$model_eref/locality">
-						<xsl:text>, </xsl:text>
-						<xsl:choose>
-							<xsl:when test="@type = 'clause'"></xsl:when>
-							<xsl:otherwise>
-								<xsl:variable name="type" select="java:replaceAll(java:java.lang.String.new(@type),$regex_locality,'$2')"/>
-								<xsl:call-template name="capitalize">
-									<xsl:with-param name="str" select="$type"/>
+					<xsl:value-of select="."/>
+				</xsl:for-each>
+			</xsl:variable>
+			
+			<xsl:choose>
+				<xsl:when test="self::eref and not($bibitem_URN/@hidden = 'true')">
+					<!-- References to items in the bibliography are coded with <xref>. -->
+					<xref ref-type="bibr" rid="{@bibitemid}">
+						<xsl:value-of select="$model_eref/referenceText"/>
+						<xsl:value-of select="$model_eref_locality"/>
+					</xref>
+				</xsl:when>
+				
+				<xsl:otherwise>
+					<std>
+						<std-id>
+							<xsl:attribute name="std-id-link-type">
+								<xsl:choose>
+									<xsl:when test="$docidentifier_URN != ''">urn</xsl:when>
+									<xsl:otherwise>internal-pub-id</xsl:otherwise>
+								</xsl:choose>
+							</xsl:attribute>
+							<xsl:attribute name="std-id-type">
+								<xsl:call-template name="setDatedUndatedType">
+									<xsl:with-param name="value" select="$value"/>
 								</xsl:call-template>
-								<xsl:text> </xsl:text>
-							</xsl:otherwise>
-						</xsl:choose>
-						<xsl:value-of select="."/>
-					</xsl:for-each>
-					
-				</std-ref>
-			</std>
+							</xsl:attribute>
+							<xsl:choose>
+								<xsl:when test="$docidentifier_URN != ''">
+									<xsl:value-of select="$docidentifier_URN"/>
+									<xsl:for-each select="localityStack/locality[1]">
+										<xsl:text>#</xsl:text>
+										<xsl:choose>
+											<xsl:when test="@type = 'clause'">sec</xsl:when>
+											<xsl:when test="@type = 'annex'">anx</xsl:when>
+											<xsl:otherwise><xsl:value-of select="substring(@type,1,3)"/></xsl:otherwise>
+										</xsl:choose>
+										<xsl:text>-</xsl:text>
+										<xsl:value-of select="referenceFrom"/>
+									</xsl:for-each>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="$model_eref/reference"/>
+								</xsl:otherwise>
+							</xsl:choose>
+							
+						</std-id>
+						<std-ref>
+							<xsl:value-of select="$model_eref/referenceText"/>
+							
+							<xsl:value-of select="$model_eref_locality"/>
+							
+						</std-ref>
+					</std>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:if> <!-- eref for $organization = 'IEC' -->
 	
 		<xsl:if test="$organization = 'BSI'">
@@ -3732,41 +3749,55 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
-			<std>
-				<xsl:attribute name="type">
-					<xsl:call-template name="setDatedUndatedType">
-						<xsl:with-param name="value" select="$citeas"/>
-					</xsl:call-template>
-				</xsl:attribute>
-				<xsl:variable name="reference" select="@bibitemid"/>
-				
-				<xsl:attribute name="std-id">
-					<xsl:choose>
-						<xsl:when test="$docidentifier_URN != ''">
-							<xsl:value-of select="$docidentifier_URN"/>
-							<!-- add localities -->
-							<xsl:for-each select="localityStack/locality">
-								<xsl:choose>
-									<xsl:when test="@type = 'annex' or @type = 'clause'">:clause:<xsl:value-of select="referenceFrom"/></xsl:when>
-									<!-- table
-									locality:definition -->
-								</xsl:choose>
-							</xsl:for-each>
-						</xsl:when>
-						<xsl:when test="$docidentifier != ''">
-							<xsl:value-of select="$docidentifier"/>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:value-of select="$reference"/>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:attribute>
-				
-				<std-ref>
-					<xsl:value-of select="$citeas"/>
-				</std-ref>
-				<xsl:apply-templates select="localityStack"/>
-			</std>
+			
+			<xsl:choose>
+				<xsl:when test="self::eref and not($bibitem_URN/@hidden = 'true')">
+					<!-- References to items in the bibliography are coded with <xref>. -->
+					<xref ref-type="bibr" rid="{@bibitemid}">
+						<xsl:value-of select="$citeas"/>
+						<xsl:apply-templates select="localityStack"/>
+					</xref>
+				</xsl:when>
+				<xsl:otherwise>
+					<std>
+						<xsl:attribute name="type">
+							<xsl:call-template name="setDatedUndatedType">
+								<xsl:with-param name="value" select="$citeas"/>
+							</xsl:call-template>
+						</xsl:attribute>
+						<xsl:variable name="reference" select="@bibitemid"/>
+						
+						<xsl:attribute name="std-id">
+							<xsl:choose>
+								<xsl:when test="$docidentifier_URN != ''">
+									<xsl:value-of select="$docidentifier_URN"/>
+									<!-- add localities -->
+									<xsl:for-each select="localityStack/locality">
+										<xsl:choose>
+											<xsl:when test="@type = 'annex' or @type = 'clause'">:clause:<xsl:value-of select="referenceFrom"/></xsl:when>
+											<!-- table
+											locality:definition -->
+										</xsl:choose>
+									</xsl:for-each>
+								</xsl:when>
+								<xsl:when test="$docidentifier != ''">
+									<xsl:value-of select="$docidentifier"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="$reference"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:attribute>
+						
+						<std-ref>
+							<xsl:value-of select="$citeas"/>
+						</std-ref>
+						<xsl:apply-templates select="localityStack"/>
+					</std>
+				</xsl:otherwise>
+			</xsl:choose>
+			
+			
 		</xsl:if>
 		
 	</xsl:template>
