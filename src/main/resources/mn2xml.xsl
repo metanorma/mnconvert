@@ -2670,7 +2670,7 @@
 		</mixed-citation>
 	</xsl:template>
 	
-	<xsl:template match="references/bibitem/*[self::docidentifier or self::docnumber or self::date or self::contributor or self::edition or self::language or self::script or self::copyright]" priority="2">
+	<xsl:template match="references/bibitem/*[self::docidentifier or self::docnumber or self::date or self::contributor or self::edition or self::language or self::script or self::copyright or self::relation]" priority="2">
 		<xsl:text disable-output-escaping="yes">&lt;!--</xsl:text>
 			<xsl:copy-of select="."/>
 		<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
