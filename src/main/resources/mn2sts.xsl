@@ -902,6 +902,8 @@
 		<term-sec id="sec_{$section}"><!-- id="{$current_id}" -->
 			<xsl:call-template name="addSectionAttribute"/>
 			
+			<xsl:apply-templates select="review"/>
+			
 			<xsl:call-template name="insert_label">
 				<xsl:with-param name="label" select="$section"/>
 				<xsl:with-param name="isAddition" select="count(title/node()[normalize-space() != ''][1][self::add]) = 1"/>
@@ -925,7 +927,7 @@
 					
 					<xsl:apply-templates select="node()[not(self::termexample or self::termnote or self::termsource or 
 																										self::preferred or self::admitted or self::deprecates or self::domain or 
-																										self::term)]"/>
+																										self::term or self::review)]"/>
 					
 					<xsl:apply-templates select="termexample"/>
 					
