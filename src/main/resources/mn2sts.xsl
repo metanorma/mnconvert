@@ -225,18 +225,29 @@
 	</xsl:template>
 	
 	<!-- Non-numbered table -->
-	<xsl:template match="table-wrap[not(label)]" mode="id_generate">
+	<xsl:template match="table-wrap[not(label)] | array" mode="id_generate">
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			
 			<xsl:variable name="section_parent" select="normalize-space(ancestor::sec[1]/@section)"/>
 			<xsl:variable name="id_parent" select="normalize-space(ancestor::sec[1]/@id)"/>
 			
-			<xsl:if test="$metanorma_type = 'IEC' and $section_parent != ''">
+			<xsl:if test="$metanorma_type = 'IEC'"> <!-- and $section_parent != '' -->
 				<xsl:attribute name="id_new">
 					<!-- Example: tab-informal-5.6-1 -->
-					<xsl:text>tab-informal-</xsl:text><xsl:value-of select="$section_parent"/><xsl:text>-</xsl:text>
-					<xsl:number level="any" count="table-wrap[not(label)][ancestor::sec[1]/@id = $id_parent]"/> <!-- number in the section -->
+					<xsl:text>tab-informal</xsl:text>
+					<xsl:if test="$section_parent != ''">
+						<xsl:text>-</xsl:text><xsl:value-of select="$section_parent"/>
+					</xsl:if>
+					<xsl:text>-</xsl:text>
+					<xsl:number level="any" count="table-wrap[not(label)][ancestor::sec[1]/@id = $id_parent] | array[ancestor::sec[1]/@id = $id_parent]"/> <!-- number in the section -->
+				</xsl:attribute>
+			</xsl:if>
+			
+			<xsl:if test="$metanorma_type = 'ISO'">
+				<xsl:attribute name="id_new">
+					<xsl:text>tab_</xsl:text>
+					<xsl:number level="any" format="a" count="array"/>
 				</xsl:attribute>
 			</xsl:if>
 			
