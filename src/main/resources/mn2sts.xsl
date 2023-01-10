@@ -246,8 +246,10 @@
 			
 			<xsl:if test="$metanorma_type = 'ISO'">
 				<xsl:attribute name="id_new">
-					<xsl:text>tab_</xsl:text>
-					<xsl:number level="any" format="a" count="array"/>
+					<xsl:if test="not(contains(@content-type , '-index'))"> <!-- no need id for formula-index and figure-index tables -->
+						<xsl:text>tab_</xsl:text>
+						<xsl:number level="any" format="a" count="array"/>
+					</xsl:if>
 				</xsl:attribute>
 			</xsl:if>
 			
@@ -851,8 +853,17 @@
 	
 	<xsl:template match="*[@id_new]" mode="id_replace" priority="2">
 		<xsl:copy>
-			<xsl:apply-templates select="@*[not(local-name() = 'id_new')]" mode="id_replace"/>
-			<xsl:attribute name="id"><xsl:value-of select="@id_new"/></xsl:attribute>
+			<xsl:choose>
+				<xsl:when test="normalize-space(@id_new) != ''">
+					<xsl:apply-templates select="@*[not(local-name() = 'id_new')]" mode="id_replace"/>
+					<xsl:attribute name="id"><xsl:value-of select="@id_new"/></xsl:attribute>
+				</xsl:when>
+				<xsl:otherwise>
+					  <!-- no need create id for 'Key' tables for figures, formulas -->
+					<xsl:apply-templates select="@*[not(local-name() = 'id_new' or local-name() = 'id')]" mode="id_replace"/>
+				</xsl:otherwise>
+			</xsl:choose>
+			
 			<xsl:apply-templates select="node()" mode="id_replace" />
 		</xsl:copy>
 	</xsl:template>
