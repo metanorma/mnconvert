@@ -491,7 +491,7 @@
 		</xsl:copy>
 	</xsl:template>
 	<!-- ===================================== -->
-	<!-- unique fn in text only -->
+	<!-- unique fn in text only, and in array (informal table) -->
 	<!-- ===================================== -->
 	<!-- element 'footnote' is special wrapper for xref and fn -->
 	<xsl:template match="footnote[not(ancestor::table-wrap or ancestor::fig)]" mode="id_generate"> <!-- footnotes_update -->
@@ -597,7 +597,9 @@
 		<xsl:param name="fn_number"/>
 		<xsl:choose>
 			<xsl:when test="$metanorma_type = 'IEC'">foo-<xsl:value-of select="$fn_number"/></xsl:when>
-			<xsl:when test="$metanorma_type = 'ISO'">fn_<xsl:value-of select="$fn_number"/></xsl:when>
+			<xsl:when test="$metanorma_type = 'ISO'">
+				<xsl:if test="ancestor::array">table-</xsl:if>
+				<xsl:text>fn_</xsl:text><xsl:value-of select="$fn_number"/></xsl:when>
 			<xsl:otherwise><xsl:value-of select="@id"/></xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
