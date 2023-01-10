@@ -225,18 +225,31 @@
 	</xsl:template>
 	
 	<!-- Non-numbered table -->
-	<xsl:template match="table-wrap[not(label)]" mode="id_generate">
+	<xsl:template match="table-wrap[not(label)] | array" mode="id_generate">
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			
 			<xsl:variable name="section_parent" select="normalize-space(ancestor::sec[1]/@section)"/>
 			<xsl:variable name="id_parent" select="normalize-space(ancestor::sec[1]/@id)"/>
 			
-			<xsl:if test="$metanorma_type = 'IEC' and $section_parent != ''">
+			<xsl:if test="$metanorma_type = 'IEC'"> <!-- and $section_parent != '' -->
 				<xsl:attribute name="id_new">
 					<!-- Example: tab-informal-5.6-1 -->
-					<xsl:text>tab-informal-</xsl:text><xsl:value-of select="$section_parent"/><xsl:text>-</xsl:text>
-					<xsl:number level="any" count="table-wrap[not(label)][ancestor::sec[1]/@id = $id_parent]"/> <!-- number in the section -->
+					<xsl:text>tab-informal</xsl:text>
+					<xsl:if test="$section_parent != ''">
+						<xsl:text>-</xsl:text><xsl:value-of select="$section_parent"/>
+					</xsl:if>
+					<xsl:text>-</xsl:text>
+					<xsl:number level="any" count="table-wrap[not(label)][ancestor::sec[1]/@id = $id_parent] | array[ancestor::sec[1]/@id = $id_parent]"/> <!-- number in the section -->
+				</xsl:attribute>
+			</xsl:if>
+			
+			<xsl:if test="$metanorma_type = 'ISO'">
+				<xsl:attribute name="id_new">
+					<xsl:if test="not(contains(@content-type , '-index'))"> <!-- no need id for formula-index and figure-index tables -->
+						<xsl:text>tab_</xsl:text>
+						<xsl:number level="any" format="a" count="array"/>
+					</xsl:if>
 				</xsl:attribute>
 			</xsl:if>
 			
@@ -480,7 +493,7 @@
 		</xsl:copy>
 	</xsl:template>
 	<!-- ===================================== -->
-	<!-- unique fn in text only -->
+	<!-- unique fn in text only, and in array (informal table) -->
 	<!-- ===================================== -->
 	<!-- element 'footnote' is special wrapper for xref and fn -->
 	<xsl:template match="footnote[not(ancestor::table-wrap or ancestor::fig)]" mode="id_generate"> <!-- footnotes_update -->
@@ -586,7 +599,9 @@
 		<xsl:param name="fn_number"/>
 		<xsl:choose>
 			<xsl:when test="$metanorma_type = 'IEC'">foo-<xsl:value-of select="$fn_number"/></xsl:when>
-			<xsl:when test="$metanorma_type = 'ISO'">fn_<xsl:value-of select="$fn_number"/></xsl:when>
+			<xsl:when test="$metanorma_type = 'ISO'">
+				<xsl:if test="ancestor::array">table-</xsl:if>
+				<xsl:text>fn_</xsl:text><xsl:value-of select="$fn_number"/></xsl:when>
 			<xsl:otherwise><xsl:value-of select="@id"/></xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -838,8 +853,17 @@
 	
 	<xsl:template match="*[@id_new]" mode="id_replace" priority="2">
 		<xsl:copy>
-			<xsl:apply-templates select="@*[not(local-name() = 'id_new')]" mode="id_replace"/>
-			<xsl:attribute name="id"><xsl:value-of select="@id_new"/></xsl:attribute>
+			<xsl:choose>
+				<xsl:when test="normalize-space(@id_new) != ''">
+					<xsl:apply-templates select="@*[not(local-name() = 'id_new')]" mode="id_replace"/>
+					<xsl:attribute name="id"><xsl:value-of select="@id_new"/></xsl:attribute>
+				</xsl:when>
+				<xsl:otherwise>
+					  <!-- no need create id for 'Key' tables for figures, formulas -->
+					<xsl:apply-templates select="@*[not(local-name() = 'id_new' or local-name() = 'id')]" mode="id_replace"/>
+				</xsl:otherwise>
+			</xsl:choose>
+			
 			<xsl:apply-templates select="node()" mode="id_replace" />
 		</xsl:copy>
 	</xsl:template>
