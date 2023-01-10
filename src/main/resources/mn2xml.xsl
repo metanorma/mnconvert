@@ -4474,8 +4474,12 @@
 			<xsl:variable name="number"><xsl:number level="any"/></xsl:variable>
 			
 			<xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
+			
+			<xsl:variable name="isInformalTable" select="normalize-space(not(name))"/> <!-- not(label) and not(caption) -->
+			
 			<xsl:variable name="wrap-element">
 				<xsl:choose>
+					<xsl:when test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and $isInformalTable = 'true'">array</xsl:when> <!-- 6.4: An informal table does not have a caption (label and title) and is captured as a <table> in <array>. -->
 					<xsl:when test="ancestor::figure">array</xsl:when>
 					<xsl:otherwise>table-wrap</xsl:otherwise>
 				</xsl:choose>
@@ -4503,7 +4507,7 @@
 							<xsl:when test="starts-with(preceding-sibling::*[self::title]/text(), 'Amendments')">
 								<xsl:attribute name="content-type">ace-table</xsl:attribute>
 							</xsl:when>
-							<xsl:when test="not(label) and not(caption)">
+							<xsl:when test="$isInformalTable = 'true'">
 								<xsl:attribute name="content-type">informal-table</xsl:attribute>
 							</xsl:when>
 						</xsl:choose>
