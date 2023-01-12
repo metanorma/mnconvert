@@ -3714,7 +3714,7 @@
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 		<xsl:choose>
-			<xsl:when test="count(table/col) + count(table/colgroup/col) = 2 and $organization != 'BSI' and $organization != 'PAS'">
+			<xsl:when test="count(table/col) + count(table/colgroup/col) = 2 and $organization != 'BSI' and $organization != 'PAS' and $organization != 'IEC' and $organization != 'ISO'"> <!-- if two columns array/table -->
 				<xsl:if test="@content-type = 'figure-index' and label">*<xsl:value-of select="label"/>*&#xa;&#xa;</xsl:if>
 				<xsl:apply-templates mode="dl"/>
 			</xsl:when>

@@ -4479,7 +4479,7 @@
 			
 			<xsl:variable name="wrap-element">
 				<xsl:choose>
-					<xsl:when test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and $isInformalTable = 'true'">array</xsl:when> <!-- 6.4: An informal table does not have a caption (label and title) and is captured as a <table> in <array>. -->
+					<xsl:when test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and ($isInformalTable = 'true' or starts-with(@id, 'array_'))">array</xsl:when> <!-- 6.4: An informal table does not have a caption (label and title) and is captured as a <table> in <array>. -->
 					<xsl:when test="ancestor::figure">array</xsl:when>
 					<xsl:otherwise>table-wrap</xsl:otherwise>
 				</xsl:choose>
