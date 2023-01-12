@@ -2334,8 +2334,6 @@
 			</xsl:otherwise>			
 		</xsl:choose>
 		
-		<xsl:apply-templates select="ancestor::tbx:langSet/tbx:subjectField" mode="term"/>
-		
 		<xsl:variable name="metadata">
 			<xsl:apply-templates select="ancestor::tbx:langSet/@xml:lang"/>
 			<xsl:apply-templates select="../tbx:termType" mode="term"/>
@@ -2347,6 +2345,9 @@
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:value-of select="$metadata"/>
 		</xsl:if>
+		
+		<xsl:apply-templates select="ancestor::tbx:langSet/tbx:subjectField" mode="term"/>
+		
 	</xsl:template>
 	
 	<xsl:template match="tbx:term[count(node()) = 1]/bold" priority="2">
