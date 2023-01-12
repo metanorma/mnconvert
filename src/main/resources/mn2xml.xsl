@@ -157,8 +157,7 @@
 								<xsl:value-of select="substring-before(., ',')"/>
 							</xsl:for-each>
 						</xsl:when>
-			
-						<xsl:when test="(self::table or self::requirement or self::figure) and contains(name, '&#8212; ')"> <!-- if table's or figure's name contains number -->
+						<xsl:when test="(self::table or self::requirement or self::figure) and contains(name, '&#8212; ') and $isSemanticXML = 'false'"> <!-- if table's or figure's name contains number -->
 							<xsl:variable name="_name" select="substring-before(name, '&#8212; ')"/>
 							<xsl:value-of select="substring-after(translate(normalize-space(translate($_name, '&#xa0;', ' ')), ' ', '&#xa0;'), '&#xa0;')"/>
 						</xsl:when>
@@ -285,7 +284,8 @@
 		<xsl:if test="not($xml/*/bibdata/relation[@type = 'adopted-from']) and $organization = 'BSI'">true</xsl:if>
 	</xsl:variable>
 	
-	<xsl:variable name="isSemanticXML" select="//*[contains(local-name(), '-standard')]/@type = 'semantic'"/>
+	<xsl:variable name="isSemanticXML_" select="//*[contains(local-name(), '-standard')]/@type = 'semantic'"/>
+	<xsl:variable name="isSemanticXML" select="normalize-space($isSemanticXML_)"/>
 	
 	<!-- ====================================================================== -->
 	<!-- array 'elements' stores section's numbers -->
@@ -1780,7 +1780,7 @@
 	
 	<xsl:template match="*[self::bibdata or self::bibitem]/relation[@type != 'adopted-from']/bibitem" mode="front">
 		<std-ref>
-			<xsl:copy-of select="@*[not(local-name() = 'section' or local-name() = 'section_prefix')]"/>
+			<xsl:copy-of select="@*[not(local-name() = 'section' or local-name() = 'section_prefix' or local-name() = 'schema-version')]"/>
 			<xsl:attribute name="type">
 				<xsl:call-template name="setDatedUndatedType">
 					<xsl:with-param name="value" select="docidentifier"/>
@@ -3152,7 +3152,7 @@
 	
 	<xsl:template match="p/@align">
 		<xsl:if test="not($organization = 'BSI' and . = 'center')">
-			<xsl:attribute name="align"><xsl:value-of select="."/></xsl:attribute>
+			<xsl:attribute name="style-type">align-center</xsl:attribute>
 		</xsl:if>
 	</xsl:template>
 	
@@ -4593,27 +4593,36 @@
 				<xsl:apply-templates select="following-sibling::*[1][self::table]" mode="table_wrap_multiple"/>
 				
 				<!-- move notes outside table -->
-				<xsl:if test="note">
+				<xsl:if test="note and $wrap-element != 'array'">
 					<table-wrap-foot>
-						<xsl:choose>
-							<xsl:when test="$outputformat = 'IEEE'">
-								<p>
-									<xsl:for-each select="note">
-										<xsl:call-template name="note"/>
-									</xsl:for-each>
-								</p>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:for-each select="note">
-									<xsl:call-template name="note"/>
-								</xsl:for-each>
-							</xsl:otherwise>
-						</xsl:choose>
+						<xsl:call-template name="insertTableFootNote"/>
 					</table-wrap-foot>
 				</xsl:if>
 			<!-- </table-wrap> -->
 			</xsl:element>
+			
+			<xsl:if test="note and $wrap-element = 'array'">
+				<xsl:call-template name="insertTableFootNote"/>
+			</xsl:if>
+			
 		</xsl:if>
+	</xsl:template>
+
+	<xsl:template name="insertTableFootNote">
+		<xsl:choose>
+			<xsl:when test="$outputformat = 'IEEE'">
+				<p>
+					<xsl:for-each select="note">
+						<xsl:call-template name="note"/>
+					</xsl:for-each>
+				</p>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:for-each select="note">
+					<xsl:call-template name="note"/>
+				</xsl:for-each>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template name="addEmpty_tbody">
@@ -5052,6 +5061,7 @@
 	
 	<xsl:template match="*[self::table or self::figure]/name/node()[1][self::text()]" priority="2">
 		<xsl:choose>
+			<xsl:when test="$isSemanticXML = 'true'"><xsl:value-of select="."/></xsl:when> <!-- there isn't 'Table N — ' in the Metanorma semantic XML -->
 			<xsl:when test="contains(., '—')">
 				<xsl:value-of select="normalize-space(substring-after(., '—'))"/>
 			</xsl:when>
