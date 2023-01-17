@@ -892,7 +892,7 @@
 	</xsl:template>
 	
 	<xsl:template name="processMetadata">
-		<xsl:variable name="misc-container">
+		<xsl:variable name="metanorma-extension">
 			<xsl:apply-templates select="custom-meta-group/custom-meta[meta-name = 'TOC Heading Level']/meta-value" mode="bibdata"/>
 			<xsl:apply-templates select="(//list-item[not(ancestor::non-normative-note)][1]/label/styled-content/@style[contains(., 'color:')])[1]" mode="bibdata"/>
 			<xsl:apply-templates select="doc-ident/proj-id" mode="bibdata"/>
@@ -906,10 +906,10 @@
 			<xsl:apply-templates select="custom-meta-group/custom-meta[not(meta-name = 'TOC Heading Level' or meta-name = 'ISBN' or meta-name = 'horizontal')]" mode="bibdata"/>
 			<xsl:apply-templates select="permissions/copyright-statement" mode="bibdata"/>
 		</xsl:variable>
-		<xsl:if test="xalan:nodeset($misc-container)/*">
-			<misc-container>
-				<xsl:copy-of select="$misc-container"/>
-			</misc-container>
+		<xsl:if test="xalan:nodeset($metanorma-extension)/*">
+			<metanorma-extension>
+				<xsl:copy-of select="$metanorma-extension"/>
+			</metanorma-extension>
 		</xsl:if>
 	</xsl:template>
 	

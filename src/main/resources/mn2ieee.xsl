@@ -45,7 +45,7 @@
 				
 				<xsl:attribute name="dtd-version">1.7</xsl:attribute>
 				
-				<xsl:variable name="open-access" select="normalize-space(misc-container/semantic-metadata/open-access)"/>
+				<xsl:variable name="open-access" select="normalize-space(metanorma-extension/semantic-metadata/open-access)"/>
 				<xsl:if test="$open-access != ''">
 					<xsl:attribute name="open-access"><xsl:value-of select="$open-access"/></xsl:attribute>
 				</xsl:if>
@@ -95,7 +95,7 @@
 			<xsl:variable name="number" select="docidentifier[@type = 'IEEE'][not(@scope)]"/>
 			<xsl:variable name="year" select="substring(normalize-space(date[@type = 'issued']),1,4)"/> <!-- approval date -->
 			
-			<std-id std-id-type="doi"><xsl:value-of select="../misc-container/semantic-metadata/std-id-doi"/></std-id>
+			<std-id std-id-type="doi"><xsl:value-of select="../metanorma-extension/semantic-metadata/std-id-doi"/></std-id>
 			
 			<std-designation content-type="full"><xsl:value-of select="concat($std_prefix,$number,'-',$year)"/></std-designation> <!-- Example: IEEE Std 1127-2013 -->
 			<std-designation content-type="full-tm"><xsl:value-of select="concat($std_prefix,$number,$trademark,'-',$year)"/></std-designation> <!-- Example: IEEE Std 1127&#x2122;-2013 -->
@@ -103,12 +103,12 @@
 			<std-designation content-type="std-num-tm"><xsl:value-of select="concat($number,$trademark,'-',$year)"/></std-designation> <!-- Example:  1127&#x2122;-2013-->
 			<std-designation content-type="norm"/>
 			
-			<xplore-article-id><xsl:value-of select="../misc-container/semantic-metadata/xplore-article-id"/></xplore-article-id>
-			<xsl:variable name="xplore-issue" select="normalize-space(../misc-container/semantic-metadata/xplore-issue)"/>
+			<xplore-article-id><xsl:value-of select="../metanorma-extension/semantic-metadata/xplore-article-id"/></xplore-article-id>
+			<xsl:variable name="xplore-issue" select="normalize-space(../metanorma-extension/semantic-metadata/xplore-issue)"/>
 			<xsl:if test="$xplore-issue != ''">
 				<xplore-issue><xsl:value-of select="$xplore-issue"/></xplore-issue>
 			</xsl:if>
-			<xplore-pub-id><xsl:value-of select="../misc-container/semantic-metadata/xplore-pub-id"/></xplore-pub-id>
+			<xplore-pub-id><xsl:value-of select="../metanorma-extension/semantic-metadata/xplore-pub-id"/></xplore-pub-id>
 			
 			<!-- <product-num publication-format="online"> -->
 			<xsl:apply-templates select="docidentifier[@type = 'IEEE' and @scope = 'PDF']" mode="front_ieee"/>
@@ -133,23 +133,23 @@
 			<std-title-group>
 				<std-main-title><xsl:copy-of select="$title"/></std-main-title>
 				<std-full-title><xsl:copy-of select="$title"/></std-full-title>
-				<xsl:if test="relation[@type = 'updates'] or ../misc-container/semantic-metadata/related-article-edition">
+				<xsl:if test="relation[@type = 'updates'] or ../metanorma-extension/semantic-metadata/related-article-edition">
 					<alt-title>
 						<!-- <related-article related-article-type="revision-of">(Revision of <std>IEEE Std 1127-1998</std>)</related-article> -->
 						<xsl:apply-templates select="relation[@type = 'updates']" mode="front_ieee"/>
 						<!-- <related-article related-article-type="edition"><edition>2012 Edition</edition></related-article> -->
-						<xsl:apply-templates select="../misc-container/semantic-metadata/related-article-edition"/>
+						<xsl:apply-templates select="../metanorma-extension/semantic-metadata/related-article-edition"/>
 					</alt-title>
 				</xsl:if>
 			</std-title-group>
 			
-			<xsl:if test="../misc-container/semantic-metadata/collab-type-logo or ../misc-container/semantic-metadata/collab or ../misc-container/semantic-metadata/collab-type-accredited-by">
+			<xsl:if test="../metanorma-extension/semantic-metadata/collab-type-logo or ../metanorma-extension/semantic-metadata/collab or ../metanorma-extension/semantic-metadata/collab-type-accredited-by">
 				<contrib-group>
 					<contrib id="contrib-collab1">
 						<collab-alternatives>
-							<xsl:apply-templates select="../misc-container/semantic-metadata/collab-type-logo"/>
-							<xsl:apply-templates select="../misc-container/semantic-metadata/collab"/>
-							<xsl:apply-templates select="../misc-container/semantic-metadata/collab-type-accredited-by"/>
+							<xsl:apply-templates select="../metanorma-extension/semantic-metadata/collab-type-logo"/>
+							<xsl:apply-templates select="../metanorma-extension/semantic-metadata/collab"/>
+							<xsl:apply-templates select="../metanorma-extension/semantic-metadata/collab-type-accredited-by"/>
 						</collab-alternatives>
 					</contrib>
 				</contrib-group>
@@ -186,7 +186,7 @@
 				</std-sponsor>
 			</xsl:if>
 			
-			<xsl:apply-templates select="../misc-container/semantic-metadata/partner-secretariat"/>
+			<xsl:apply-templates select="../metanorma-extension/semantic-metadata/partner-secretariat"/>
 			
 			<xsl:apply-templates select="date[@type = 'published'][1]" mode="front_ieee"/>
 			
@@ -206,17 +206,17 @@
 			
 			<xsl:apply-templates select="abstract" mode="front_ieee"/>
 			
-			<xsl:apply-templates select="../misc-container/semantic-metadata/*[starts-with(local-name(), 'keywords-')]"/>
+			<xsl:apply-templates select="../metanorma-extension/semantic-metadata/*[starts-with(local-name(), 'keywords-')]"/>
 			<xsl:apply-templates select="keyword[1]">
 				<xsl:with-param name="process">true</xsl:with-param>
 			</xsl:apply-templates>
 			
 			<!-- funding-group -->
 			<xsl:variable name="funding-group_">
-				<xsl:apply-templates select="../misc-container/semantic-metadata/funding-source-institution |
-									../misc-container/semantic-metadata/funding-source-institution-id |
-									../misc-container/semantic-metadata/award-group-id |
-									../misc-container/semantic-metadata/funding-statement"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/funding-source-institution |
+									../metanorma-extension/semantic-metadata/funding-source-institution-id |
+									../metanorma-extension/semantic-metadata/award-group-id |
+									../metanorma-extension/semantic-metadata/funding-statement"/>
 			</xsl:variable>
 			<xsl:variable name="funding-group" select="xalan:nodeset($funding-group_)"/>
 			<xsl:if test="$funding-group/*">

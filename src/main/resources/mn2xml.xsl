@@ -440,12 +440,12 @@
 				<xsl:when test="self::annex">
 					<xsl:number format="A" level="any" count="annex"/>
 				</xsl:when>
-				<xsl:when test="(self::table[not(ancestor::misc-container)] or self::requirement[not(ancestor::requirement)] or self::figure) and not(ancestor::annex)">
+				<xsl:when test="(self::table[not(ancestor::metanorma-extension)] or self::requirement[not(ancestor::requirement)] or self::figure) and not(ancestor::annex)">
 					<xsl:variable name="root_element_id" select="generate-id(ancestor::*[contains(local-name(), '-standard')])"/> <!-- prevent global numbering for metanorma-collection -->
 					<xsl:choose>
 						<xsl:when test="self::table or self::requirement">
 							<xsl:variable name="table_number_">
-								<xsl:number format="1" level="any" count="*[self::table or self::requirement][ancestor::*[generate-id() = $root_element_id] and not(ancestor::annex or ancestor::misc-container or ancestor::requirement) and not(@unnumbered = 'true')]"/>
+								<xsl:number format="1" level="any" count="*[self::table or self::requirement][ancestor::*[generate-id() = $root_element_id] and not(ancestor::annex or ancestor::metanorma-extension or ancestor::requirement) and not(@unnumbered = 'true')]"/>
 							</xsl:variable>
 							<xsl:variable name="table_number" select="normalize-space($table_number_)"/>
 							<xsl:if test="$table_number != '0'"><xsl:value-of select="$table_number"/></xsl:if>
@@ -503,7 +503,7 @@
 					<xsl:choose>
 						<xsl:when test="self::table or self::requirement[not(ancestor::requirement)]">
 							<xsl:number format="A" count="annex"/>
-							<xsl:number format=".1" level="any" count="*[self::table or self::requirement][ancestor::annex/@id = $curr_annexid and not(ancestor::misc-container or ancestor::requirement)]"/>
+							<xsl:number format=".1" level="any" count="*[self::table or self::requirement][ancestor::annex/@id = $curr_annexid and not(ancestor::metanorma-extension or ancestor::requirement)]"/>
 						</xsl:when>						
 						<xsl:when test="self::figure">
 							<xsl:number format="A" count="annex"/>
@@ -1098,7 +1098,7 @@
 					</sdo>
 					<proj-id>
 						<!-- <xsl:apply-templates select="ext/structuredidentifier/project-number" mode="front"/> -->
-						<xsl:apply-templates select="../misc-container/semantic-metadata/proj-id" mode="front"/>
+						<xsl:apply-templates select="../metanorma-extension/semantic-metadata/proj-id" mode="front"/>
 					</proj-id>
 					<language>
 						<xsl:apply-templates select="language" mode="front"/>
@@ -1172,9 +1172,9 @@
 
 				</xsl:if>
 				
-				<xsl:apply-templates select="../misc-container/semantic-metadata/suppl-type" mode="front"/>
-				<xsl:apply-templates select="../misc-container/semantic-metadata/suppl-number" mode="front"/>
-				<xsl:apply-templates select="../misc-container/semantic-metadata/suppl-version" mode="front"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/suppl-type" mode="front"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/suppl-number" mode="front"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/suppl-version" mode="front"/>
 				
 			</std-ident>
 			
@@ -1289,15 +1289,15 @@
 			<meta-date type="DOW">
 			<meta-date type="DOP">
 			<meta-date type="DOA"> -->
-			<xsl:apply-templates select="../misc-container/semantic-metadata/dor" mode="front"/>
-			<xsl:apply-templates select="../misc-container/semantic-metadata/dow" mode="front"/>
-			<xsl:apply-templates select="../misc-container/semantic-metadata/dop" mode="front"/>
-			<xsl:apply-templates select="../misc-container/semantic-metadata/doa" mode="front"/>
-			<xsl:apply-templates select="../misc-container/semantic-metadata/vote-start" mode="front"/>
-			<xsl:apply-templates select="../misc-container/semantic-metadata/vote-end" mode="front"/>
+			<xsl:apply-templates select="../metanorma-extension/semantic-metadata/dor" mode="front"/>
+			<xsl:apply-templates select="../metanorma-extension/semantic-metadata/dow" mode="front"/>
+			<xsl:apply-templates select="../metanorma-extension/semantic-metadata/dop" mode="front"/>
+			<xsl:apply-templates select="../metanorma-extension/semantic-metadata/doa" mode="front"/>
+			<xsl:apply-templates select="../metanorma-extension/semantic-metadata/vote-start" mode="front"/>
+			<xsl:apply-templates select="../metanorma-extension/semantic-metadata/vote-end" mode="front"/>
 			
 			<!-- <wi-number> -->
-			<xsl:apply-templates select="../misc-container/semantic-metadata/wi-number" mode="front"/>
+			<xsl:apply-templates select="../metanorma-extension/semantic-metadata/wi-number" mode="front"/>
 			
 			<xsl:variable name="related_comm_ref" select="relation[@type='related']/bibitem/docidentifier"/>
 			<xsl:variable name="related_comm_ref_text">Committee reference</xsl:variable>
@@ -1381,7 +1381,7 @@
 			<xsl:apply-templates select="ext/ics/code" mode="front"/>
 			
 			
-			<xsl:apply-templates select="../misc-container/semantic-metadata/page-count" mode="front"/>
+			<xsl:apply-templates select="../metanorma-extension/semantic-metadata/page-count" mode="front"/>
 			
 			
 			
@@ -1392,7 +1392,7 @@
 			<xsl:apply-templates select="relation[@type = 'related'][starts-with(bibitem/docidentifier, $draft_comment_text)]" mode="front" />
 			
 			<!-- <release-version-id> -->
-			<xsl:apply-templates select="../misc-container/semantic-metadata/release-version-id" mode="front"/>
+			<xsl:apply-templates select="../metanorma-extension/semantic-metadata/release-version-id" mode="front"/>
 			
 			<!-- <metanorma_type><xsl:value-of select="$metanorma_type"/></metanorma_type> -->
 			<xsl:choose>
@@ -1461,7 +1461,7 @@
 				</xsl:when>
 				<xsl:when test="$organization = 'BSI'">
 					<permissions>
-						<xsl:apply-templates select="../misc-container/semantic-metadata/copyright-statement"/>
+						<xsl:apply-templates select="../metanorma-extension/semantic-metadata/copyright-statement"/>
 						<xsl:call-template name="put_copyright_year"/>
 						<xsl:call-template name="put_copyright_holder">
 							<xsl:with-param name="from">name</xsl:with-param>
@@ -1515,26 +1515,26 @@
 				</xsl:choose>
 				
 				<xsl:choose>
-					<xsl:when test="../misc-container/presentation-metadata[name = 'HTML TOC Heading Levels']"><xsl:apply-templates select="../misc-container/presentation-metadata[name = 'HTML TOC Heading Levels']" mode="custom_meta"/></xsl:when>
-					<xsl:when test="../misc-container/presentation-metadata[name = 'DOC TOC Heading Levels']"><xsl:apply-templates select="../misc-container/presentation-metadata[name = 'DOC TOC Heading Levels']" mode="custom_meta"/></xsl:when>
-					<xsl:when test="../misc-container/presentation-metadata[name = 'TOC Heading Levels']"><xsl:apply-templates select="../misc-container/presentation-metadata[name = 'TOC Heading Levels']" mode="custom_meta"/></xsl:when>
+					<xsl:when test="../metanorma-extension/presentation-metadata[name = 'HTML TOC Heading Levels']"><xsl:apply-templates select="../metanorma-extension/presentation-metadata[name = 'HTML TOC Heading Levels']" mode="custom_meta"/></xsl:when>
+					<xsl:when test="../metanorma-extension/presentation-metadata[name = 'DOC TOC Heading Levels']"><xsl:apply-templates select="../metanorma-extension/presentation-metadata[name = 'DOC TOC Heading Levels']" mode="custom_meta"/></xsl:when>
+					<xsl:when test="../metanorma-extension/presentation-metadata[name = 'TOC Heading Levels']"><xsl:apply-templates select="../metanorma-extension/presentation-metadata[name = 'TOC Heading Levels']" mode="custom_meta"/></xsl:when>
 				</xsl:choose>
 				
-				<xsl:apply-templates select="../misc-container/semantic-metadata/upi" mode="custom_meta"/>
-				<xsl:apply-templates select="../misc-container/semantic-metadata/price-ref-pages" mode="custom_meta"/>
-				<xsl:apply-templates select="../misc-container/semantic-metadata/published-logo" mode="custom_meta"/>
-				<xsl:apply-templates select="../misc-container/semantic-metadata/generation-date" mode="custom_meta"/>
-				<xsl:apply-templates select="../misc-container/semantic-metadata/originator-identifier" mode="custom_meta"/>
-				<xsl:apply-templates select="../misc-container/semantic-metadata/colour-print" mode="custom_meta"/>
-				<xsl:apply-templates select="../misc-container/semantic-metadata/conversion-version" mode="custom_meta"/>
-				<xsl:apply-templates select="../misc-container/semantic-metadata/conversion-date" mode="custom_meta"/>
-				<xsl:apply-templates select="../misc-container/semantic-metadata/perinorm-id" mode="custom_meta"/>
-				<xsl:apply-templates select="../misc-container/semantic-metadata/version-history" mode="custom_meta"/>
-				<xsl:apply-templates select="../misc-container/semantic-metadata/wi-number" mode="custom_meta"/>
-				<xsl:apply-templates select="../misc-container/semantic-metadata/release-version-id" mode="custom_meta"/>
-				<xsl:apply-templates select="../misc-container/semantic-metadata/metadata-update" mode="custom_meta"/>
-				<xsl:apply-templates select="../misc-container/semantic-metadata/international" mode="custom_meta"/>
-				<xsl:apply-templates select="../misc-container/semantic-metadata/isoviennaagreement" mode="custom_meta"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/upi" mode="custom_meta"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/price-ref-pages" mode="custom_meta"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/published-logo" mode="custom_meta"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/generation-date" mode="custom_meta"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/originator-identifier" mode="custom_meta"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/colour-print" mode="custom_meta"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/conversion-version" mode="custom_meta"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/conversion-date" mode="custom_meta"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/perinorm-id" mode="custom_meta"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/version-history" mode="custom_meta"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/wi-number" mode="custom_meta"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/release-version-id" mode="custom_meta"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/metadata-update" mode="custom_meta"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/international" mode="custom_meta"/>
+				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/isoviennaagreement" mode="custom_meta"/>
 
 			</xsl:variable>
 			<xsl:variable name="custom-meta-group" select="xalan:nodeset($custom-meta-group_)"/>
@@ -1549,7 +1549,7 @@
 				<!-- check non-processed elements in bibdata -->
 				<xsl:variable name="front_check">
 					<xsl:apply-templates mode="front_check"/>
-					<xsl:apply-templates select="../misc-container" mode="front_check"/>
+					<xsl:apply-templates select="../metanorma-extension" mode="front_check"/>
 				</xsl:variable>
 
 				<xsl:if test="normalize-space($front_check) != '' or count(xalan:nodeset($front_check)/*) &gt; 0">
@@ -1842,68 +1842,68 @@
 		</custom-meta>
 	</xsl:template>
 	
-	<xsl:template match="misc-container/presentation-metadata[name = 'TOC Heading Levels'] |
-						misc-container/presentation-metadata[name = 'HTML TOC Heading Levels'] |
-						misc-container/presentation-metadata[name = 'DOC TOC Heading Levels']" mode="custom_meta">
+	<xsl:template match="metanorma-extension/presentation-metadata[name = 'TOC Heading Levels'] |
+						metanorma-extension/presentation-metadata[name = 'HTML TOC Heading Levels'] |
+						metanorma-extension/presentation-metadata[name = 'DOC TOC Heading Levels']" mode="custom_meta">
 		<custom-meta>
 			<meta-name>TOC Heading Level</meta-name>
 			<meta-value><xsl:value-of select="value"/></meta-value>
 		</custom-meta>
 	</xsl:template>
 	
-	<xsl:template match="misc-container/semantic-metadata/proj-id" mode="front">
+	<xsl:template match="metanorma-extension/semantic-metadata/proj-id" mode="front">
 		<xsl:value-of select="."/>
 	</xsl:template>
 	
-	<xsl:template match="misc-container/semantic-metadata/suppl-type" mode="front">
+	<xsl:template match="metanorma-extension/semantic-metadata/suppl-type" mode="front">
 		<suppl-type>
 			<xsl:value-of select="."/>
 		</suppl-type>
 	</xsl:template>
 	
-	<xsl:template match="misc-container/semantic-metadata/suppl-number" mode="front">
+	<xsl:template match="metanorma-extension/semantic-metadata/suppl-number" mode="front">
 		<suppl-number>
 			<xsl:value-of select="."/>
 		</suppl-number>
 	</xsl:template>
 	
-	<xsl:template match="misc-container/semantic-metadata/suppl-version" mode="front">
+	<xsl:template match="metanorma-extension/semantic-metadata/suppl-version" mode="front">
 		<suppl-version>
 			<xsl:value-of select="."/>
 		</suppl-version>
 	</xsl:template>
 	
-	<xsl:template match="misc-container/semantic-metadata/*[local-name() = 'dor' or local-name() = 'dow' or local-name() = 'dop' or local-name() = 'doa']" mode="front">
+	<xsl:template match="metanorma-extension/semantic-metadata/*[local-name() = 'dor' or local-name() = 'dow' or local-name() = 'dop' or local-name() = 'doa']" mode="front">
 		<meta-date type="{java:toUpperCase(java:java.lang.String.new(local-name()))}"><xsl:value-of select="."/></meta-date>
 	</xsl:template>
-	<xsl:template match="misc-container/semantic-metadata/*[local-name() = 'vote-start' or local-name() = 'vote-end']" mode="front">
+	<xsl:template match="metanorma-extension/semantic-metadata/*[local-name() = 'vote-start' or local-name() = 'vote-end']" mode="front">
 		<meta-date type="{local-name()}"><xsl:value-of select="."/></meta-date>
 	</xsl:template>
 	
-	<xsl:template match="misc-container/semantic-metadata/wi-number" mode="front">
+	<xsl:template match="metanorma-extension/semantic-metadata/wi-number" mode="front">
 		<wi-number>
 			<xsl:value-of select="."/>
 		</wi-number>
 	</xsl:template>
 	
-	<xsl:template match="misc-container/semantic-metadata/release-version-id" mode="front">
+	<xsl:template match="metanorma-extension/semantic-metadata/release-version-id" mode="front">
 		<release-version-id>
 			<xsl:value-of select="."/>
 		</release-version-id>
 	</xsl:template>
 	
-	<xsl:template match="misc-container/semantic-metadata/page-count" mode="front">
+	<xsl:template match="metanorma-extension/semantic-metadata/page-count" mode="front">
 		<page-count count="{.}" />
 	</xsl:template>
 	
-	<xsl:template match="misc-container/semantic-metadata/upi" mode="custom_meta">
+	<xsl:template match="metanorma-extension/semantic-metadata/upi" mode="custom_meta">
 		<custom-meta>
 			<meta-name>UPI</meta-name>
 			<meta-value><xsl:value-of select="."/></meta-value>
 		</custom-meta>
 	</xsl:template>
 	
-	<xsl:template match="misc-container/semantic-metadata/*[local-name() = 'price-ref-pages' or local-name() = 'published-logo' or 
+	<xsl:template match="metanorma-extension/semantic-metadata/*[local-name() = 'price-ref-pages' or local-name() = 'published-logo' or 
 	local-name() = 'generation-date' or local-name()='colour-print' or local-name()='version-history' or local-name() = 'wi-number' or 
 	local-name() = 'release-version-id' or local-name() = 'metadata-update' or local-name() = 'international']" mode="custom_meta">
 		<custom-meta>
@@ -1912,35 +1912,35 @@
 		</custom-meta>
 	</xsl:template>
 	
-	<xsl:template match="misc-container/semantic-metadata/originator-identifier" mode="custom_meta">
+	<xsl:template match="metanorma-extension/semantic-metadata/originator-identifier" mode="custom_meta">
 		<custom-meta>
 			<meta-name>Originator Identifier</meta-name>
 			<meta-value><xsl:value-of select="."/></meta-value>
 		</custom-meta>
 	</xsl:template>
 	
-	<xsl:template match="misc-container/semantic-metadata/conversion-version" mode="custom_meta">
+	<xsl:template match="metanorma-extension/semantic-metadata/conversion-version" mode="custom_meta">
 		<custom-meta>
 			<meta-name>conversion version</meta-name>
 			<meta-value><xsl:value-of select="."/></meta-value>
 		</custom-meta>
 	</xsl:template>
 	
-	<xsl:template match="misc-container/semantic-metadata/conversion-date" mode="custom_meta">
+	<xsl:template match="metanorma-extension/semantic-metadata/conversion-date" mode="custom_meta">
 		<custom-meta>
 			<meta-name>conversion date</meta-name>
 			<meta-value><xsl:value-of select="."/></meta-value>
 		</custom-meta>
 	</xsl:template>
 	
-	<xsl:template match="misc-container/semantic-metadata/perinorm-id" mode="custom_meta">
+	<xsl:template match="metanorma-extension/semantic-metadata/perinorm-id" mode="custom_meta">
 		<custom-meta>
 			<meta-name>Perinorm ID</meta-name>
 			<meta-value><xsl:value-of select="."/></meta-value>
 		</custom-meta>
 	</xsl:template>
 	
-	<xsl:template match="misc-container/semantic-metadata/isoviennaagreement" mode="custom_meta">
+	<xsl:template match="metanorma-extension/semantic-metadata/isoviennaagreement" mode="custom_meta">
 		<custom-meta>
 			<meta-name>ISOViennaAgreement</meta-name>
 			<meta-value><xsl:value-of select="."/></meta-value>
@@ -2007,36 +2007,36 @@
 																ext/horizontal |
 																ext/price-code |
 																bibdata/uri |
-																misc-container/semantic-metadata/proj-id |
-																misc-container/semantic-metadata/suppl-type |
-																misc-container/semantic-metadata/suppl-number |
-																misc-container/semantic-metadata/suppl-version |
-																misc-container/semantic-metadata/dor |
-																misc-container/semantic-metadata/dow |
-																misc-container/semantic-metadata/dop |
-																misc-container/semantic-metadata/doa |
-																misc-container/semantic-metadata/vote-start |
-																misc-container/semantic-metadata/vote-end |
-																misc-container/semantic-metadata/wi-number |
-																misc-container/semantic-metadata/release-version-id |
-																misc-container/semantic-metadata/page-count |
-																misc-container/semantic-metadata/upi |
-																misc-container/semantic-metadata/price-ref-pages |
-																misc-container/semantic-metadata/published-logo |
-																misc-container/semantic-metadata/generation-date |
-																misc-container/semantic-metadata/originator-identifier |
-																misc-container/semantic-metadata/colour-print |
-																misc-container/semantic-metadata/conversion-version |
-																misc-container/semantic-metadata/conversion-date |
-																misc-container/semantic-metadata/perinorm-id |
-																misc-container/semantic-metadata/version-history |
-																misc-container/semantic-metadata/metadata-update |
-																misc-container/semantic-metadata/international |
-																misc-container/semantic-metadata/isoviennaagreement |
-																misc-container/semantic-metadata/copyright-statement |
-																misc-container/semantic-metadata/color-preface-background |
-																misc-container/presentation-metadata/* |
-																misc-container/table[@id = '_misccontainer_anchor_aliases']"
+																metanorma-extension/semantic-metadata/proj-id |
+																metanorma-extension/semantic-metadata/suppl-type |
+																metanorma-extension/semantic-metadata/suppl-number |
+																metanorma-extension/semantic-metadata/suppl-version |
+																metanorma-extension/semantic-metadata/dor |
+																metanorma-extension/semantic-metadata/dow |
+																metanorma-extension/semantic-metadata/dop |
+																metanorma-extension/semantic-metadata/doa |
+																metanorma-extension/semantic-metadata/vote-start |
+																metanorma-extension/semantic-metadata/vote-end |
+																metanorma-extension/semantic-metadata/wi-number |
+																metanorma-extension/semantic-metadata/release-version-id |
+																metanorma-extension/semantic-metadata/page-count |
+																metanorma-extension/semantic-metadata/upi |
+																metanorma-extension/semantic-metadata/price-ref-pages |
+																metanorma-extension/semantic-metadata/published-logo |
+																metanorma-extension/semantic-metadata/generation-date |
+																metanorma-extension/semantic-metadata/originator-identifier |
+																metanorma-extension/semantic-metadata/colour-print |
+																metanorma-extension/semantic-metadata/conversion-version |
+																metanorma-extension/semantic-metadata/conversion-date |
+																metanorma-extension/semantic-metadata/perinorm-id |
+																metanorma-extension/semantic-metadata/version-history |
+																metanorma-extension/semantic-metadata/metadata-update |
+																metanorma-extension/semantic-metadata/international |
+																metanorma-extension/semantic-metadata/isoviennaagreement |
+																metanorma-extension/semantic-metadata/copyright-statement |
+																metanorma-extension/semantic-metadata/color-preface-background |
+																metanorma-extension/presentation-metadata/* |
+																metanorma-extension/table[@id = '_misccontainer_anchor_aliases']"
 																mode="front_check"/>
 
 	<!-- skip processed structure and deep down -->
@@ -2054,7 +2054,7 @@
 																ext/editorialgroup |
 																ext/ics |
 																ext |
-																misc-container |
+																metanorma-extension |
 																semantic-metadata |
 																presentation-metadata
 																" mode="front_check">
