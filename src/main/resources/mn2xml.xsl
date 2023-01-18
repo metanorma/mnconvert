@@ -2274,7 +2274,7 @@
 					</xsl:if>
 				</xsl:when>
 				
-				<xsl:when test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO'">
+				<xsl:when test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO' or $organization = 'BSI'">
 					<xsl:choose>
 						<!-- title contains '(This annex does not form an integral part of this Recommendation | International Standard)' -->
 						<xsl:when test="title//text()[contains(., $annex_not_integral_part_text)]"><!-- no indication of "informative" or "normative" in --></xsl:when>
@@ -2289,7 +2289,7 @@
 										</xsl:choose>
 									</xsl:attribute>
 								</xsl:when>
-								<xsl:when test="$metanorma_type = 'ISO'">
+								<xsl:when test="$metanorma_type = 'ISO' or $organization = 'BSI'">
 									<xsl:attribute name="content-type">
 										<xsl:choose>
 											<xsl:when test="@obligation  = 'informative'">inform-annex</xsl:when>
@@ -2313,9 +2313,6 @@
 								<xsl:otherwise><xsl:value-of select="@obligation"/></xsl:otherwise>
 							</xsl:choose>
 						</xsl:attribute>
-					</xsl:if>
-					<xsl:if test="$organization = 'BSI' and normalize-space(@obligation) = ''">
-						<xsl:attribute name="content-type">norm-annex</xsl:attribute>
 					</xsl:if>
 				</xsl:otherwise>
 			</xsl:choose>
