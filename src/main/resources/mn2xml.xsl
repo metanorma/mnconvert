@@ -3073,14 +3073,6 @@
 								</italic>
 							</p>
 						</xsl:when>
-						<xsl:when test="$organization = 'BSI' and @align = 'center'">
-							<p>
-								<xsl:apply-templates select="@*[not(local-name() = 'align')]"/>
-								<styled-content style="text-alignment: center">
-									<xsl:apply-templates />
-								</styled-content>
-							</p>
-						</xsl:when>
 						<xsl:otherwise>
 							<p>
 								<xsl:if test="$organization != 'BSI'">
@@ -3148,9 +3140,14 @@
 	<xsl:template match="p/@align[. = 'left']" priority="2"/>
 	
 	<xsl:template match="p/@align">
-		<xsl:if test="not($organization = 'BSI' and . = 'center')">
-			<xsl:attribute name="style-type">align-center</xsl:attribute>
-		</xsl:if>
+		<xsl:choose>
+			<xsl:when test=". = 'center'">
+				<xsl:attribute name="style-type">align-center</xsl:attribute>
+			</xsl:when>
+			<xsl:when test=". = 'right'">
+				<xsl:attribute name="style-type">align-right</xsl:attribute>
+			</xsl:when>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="*[self::p or self::ul or self::ol]/@id">
