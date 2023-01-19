@@ -272,6 +272,16 @@
 		</xsl:copy>
 	</xsl:template>
 	
+	<xsl:template match="fig[label][count(graphic) &gt; 1]/graphic" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			<xsl:if test="$organization = 'BSI' or $metanorma_type = 'ISO'">
+				<xsl:attribute name="id_new">fig_<xsl:value-of select="ancestor::fig[1]/@section"/>.<xsl:number/></xsl:attribute>
+			</xsl:if>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
 	<!-- Numbered formula -->
 	<xsl:template match="disp-formula[label]" mode="id_generate">
 		<xsl:copy>

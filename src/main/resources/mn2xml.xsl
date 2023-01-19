@@ -4971,9 +4971,10 @@
 		
 		<xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
 		
+		<!-- parent element for figure group -->
 		<xsl:variable name="element_name">
 			<xsl:choose>
-				<xsl:when test="$organization = 'BSI'">fig</xsl:when>
+				<xsl:when test="$organization = 'BSI' or $metanorma_type = 'ISO'">fig</xsl:when>
 				<xsl:otherwise>fig-group</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -4984,7 +4985,7 @@
 			</xsl:if>
 			<xsl:call-template name="addSectionAttribute"/>
 			
-			<label><xsl:value-of select="@section"/></label>
+			<label><xsl:value-of select="@section_prefix"/><xsl:value-of select="@section"/></label>
 			<xsl:apply-templates />
 		</xsl:element>
 	</xsl:template>
@@ -5000,8 +5001,8 @@
 		<xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
 		
 		<xsl:choose>
-			<xsl:when test="$organization = 'BSI' and parent::figure">
-				<graphic xlink:href="{image/@src}">
+			<xsl:when test="($organization = 'BSI' or $metanorma_type = 'ISO') and parent::figure">
+				<graphic xlink:href="{image/@src}" id="{$id}">
 					<xsl:apply-templates select="*[not(self::image)]"/>
 				</graphic>
 			</xsl:when>
@@ -5033,9 +5034,10 @@
 	
 	
 	<xsl:template match="figure/name" priority="2">
-		<xsl:variable name="label" select="substring-before(node()[1][self::text()], '&#xa0;')"/>
-		<xsl:if test="../parent::figure and $organization = 'BSI' and normalize-space($label) != ''">
-			<label><xsl:value-of select="$label"/></label>
+		<!-- <xsl:variable name="label" select="substring-before(node()[1][self::text()], '&#xa0;')"/> -->
+		<xsl:variable name="label" select="../@section"/>
+		<xsl:if test="../parent::figure and ($organization = 'BSI' or $metanorma_type = 'ISO') and normalize-space($label) != ''">
+			<label><xsl:value-of select="../@section_prefix"/><xsl:value-of select="$label"/></label>
 		</xsl:if>
 		<caption>
 			<xsl:choose>
@@ -5873,7 +5875,7 @@
 	</xsl:template> <!-- split -->
 	
 	<xsl:template name="addSectionAttribute">
-		<xsl:if test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and $outputformat != 'IEEE'">
+		<xsl:if test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO' or $organization = 'BSI') and $outputformat != 'IEEE'">
 			<xsl:copy-of select="@section"/>
 		</xsl:if>
 	</xsl:template>
