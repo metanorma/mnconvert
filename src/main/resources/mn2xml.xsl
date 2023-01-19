@@ -3612,7 +3612,7 @@
 			</xsl:choose>
 		</xsl:if> <!-- eref for $organization = 'IEC' -->
 	
-		<xsl:if test="$organization = 'BSI'">
+		<xsl:if test="$organization = 'BSI' or $organization = 'ISO'">
 			<!-- <xsl:copy-of select="$model_eref"/> -->
 			<std>
 				<xsl:attribute name="type">
@@ -3729,7 +3729,7 @@
 			</xsl:if>
 		</xsl:if>
 		
-		<xsl:if test="$metanorma_type != 'IEC' and $organization != 'BSI' and $outputformat != 'IEEE'">
+		<xsl:if test="$metanorma_type != 'IEC' and $metanorma_type != 'ISO' and $organization != 'BSI' and $outputformat != 'IEEE'">
 	
 			<xsl:variable name="citeas_" select="java:replaceAll(java:java.lang.String.new(@citeas),'--','—')"/>
 			<xsl:variable name="citeas">
