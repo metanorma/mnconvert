@@ -2274,7 +2274,7 @@
 					</xsl:if>
 				</xsl:when>
 				
-				<xsl:when test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO' or $organization = 'BSI'">
+				<xsl:when test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO' or $metanorma_type = 'BSI'">
 					<xsl:choose>
 						<!-- title contains '(This annex does not form an integral part of this Recommendation | International Standard)' -->
 						<xsl:when test="title//text()[contains(., $annex_not_integral_part_text)]"><!-- no indication of "informative" or "normative" in --></xsl:when>
@@ -2289,7 +2289,7 @@
 										</xsl:choose>
 									</xsl:attribute>
 								</xsl:when>
-								<xsl:when test="$metanorma_type = 'ISO' or $organization = 'BSI'">
+								<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">
 									<xsl:attribute name="content-type">
 										<xsl:choose>
 											<xsl:when test="@obligation  = 'informative'">inform-annex</xsl:when>
@@ -2339,7 +2339,7 @@
 						<xsl:text>)</xsl:text>
 					</annex-type>
 				</xsl:when>
-				<xsl:when test="$metanorma_type = 'ISO'">
+				<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">
 					<annex-type>
 						<xsl:text>(</xsl:text>
 						<xsl:value-of select="@obligation"/>
@@ -2416,7 +2416,7 @@
 	<xsl:template match="bibliography/clause/references[not(@normative='true')]">
 		<ref-list>
 			<xsl:choose>
-				<xsl:when test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO'">
+				<xsl:when test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO' or $metanorma_type = 'BSI'">
 					<xsl:attribute name="content-type">bibl</xsl:attribute>
 				</xsl:when>
 				<xsl:otherwise>
@@ -3075,7 +3075,7 @@
 						</xsl:when>
 						<xsl:otherwise>
 							<p>
-								<xsl:if test="not($organization = 'BSI' or $metanorma_type = 'ISO')">
+								<xsl:if test="not($metanorma_type = 'BSI' or $metanorma_type = 'ISO')">
 									<xsl:copy-of select="@id"/>
 								</xsl:if>
 								<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
@@ -3088,7 +3088,7 @@
 		</xsl:variable>
 		<xsl:variable name="paragraph" select="xalan:nodeset($paragraph_)"/>
 		<xsl:choose>
-			<xsl:when test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and $paragraph/p/list"> <!-- move list(s) outside of p -->
+			<xsl:when test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO' or $metanorma_type = 'BSI') and $paragraph/p/list"> <!-- move list(s) outside of p -->
 				<xsl:for-each select="$paragraph/p/list">
 					<xsl:variable name="curr_list_id" select="generate-id()"/>
 					<p>
@@ -3290,7 +3290,7 @@
 				<xsl:when test="local-name(..) = 'ul' and ancestor::indexsect"><!-- no label for index item --></xsl:when>
 				<xsl:when test="local-name(..) = 'ul' and (../@type = 'bullet' or normalize-space(../@type) = '')">
 					<xsl:choose>
-						<xsl:when test="$metanorma_type = 'ISO'">
+						<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">
 							<label>—</label>
 						</xsl:when>
 						<xsl:when test="$list-type = 'simple'"></xsl:when>
@@ -3729,7 +3729,7 @@
 			</xsl:if>
 		</xsl:if>
 		
-		<xsl:if test="$metanorma_type != 'IEC' and $metanorma_type != 'ISO' and $organization != 'BSI' and $outputformat != 'IEEE'">
+		<xsl:if test="$metanorma_type != 'IEC' and $metanorma_type != 'ISO' and $metanorma_type != 'BSI' and $outputformat != 'IEEE'">
 	
 			<xsl:variable name="citeas_" select="java:replaceAll(java:java.lang.String.new(@citeas),'--','—')"/>
 			<xsl:variable name="citeas">
@@ -4974,7 +4974,7 @@
 		<!-- parent element for figure group -->
 		<xsl:variable name="element_name">
 			<xsl:choose>
-				<xsl:when test="$organization = 'BSI' or $metanorma_type = 'ISO'">fig</xsl:when>
+				<xsl:when test="$metanorma_type = 'BSI' or $metanorma_type = 'ISO'">fig</xsl:when>
 				<xsl:otherwise>fig-group</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -5001,7 +5001,7 @@
 		<xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
 		
 		<xsl:choose>
-			<xsl:when test="($organization = 'BSI' or $metanorma_type = 'ISO') and parent::figure">
+			<xsl:when test="($metanorma_type = 'BSI' or $metanorma_type = 'ISO') and parent::figure">
 				<graphic xlink:href="{image/@src}" id="{$id}">
 					<xsl:apply-templates select="*[not(self::image)]"/>
 				</graphic>
@@ -5036,7 +5036,7 @@
 	<xsl:template match="figure/name" priority="2">
 		<!-- <xsl:variable name="label" select="substring-before(node()[1][self::text()], '&#xa0;')"/> -->
 		<xsl:variable name="label" select="../@section"/>
-		<xsl:if test="../parent::figure and ($organization = 'BSI' or $metanorma_type = 'ISO') and normalize-space($label) != ''">
+		<xsl:if test="../parent::figure and ($metanorma_type = 'BSI' or $metanorma_type = 'ISO') and normalize-space($label) != ''">
 			<label><xsl:value-of select="../@section_prefix"/><xsl:value-of select="$label"/></label>
 		</xsl:if>
 		<caption>
@@ -5875,7 +5875,7 @@
 	</xsl:template> <!-- split -->
 	
 	<xsl:template name="addSectionAttribute">
-		<xsl:if test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO' or $organization = 'BSI') and $outputformat != 'IEEE'">
+		<xsl:if test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO' or $metanorma_type = 'BSI') and $outputformat != 'IEEE'">
 			<xsl:copy-of select="@section"/>
 		</xsl:if>
 	</xsl:template>
