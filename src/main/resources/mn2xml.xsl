@@ -70,7 +70,9 @@
 		<xsl:variable name="sectionNum_">
 		
 			<xsl:choose>
-			
+        
+				<xsl:when test="ancestor::foreword">foreword</xsl:when>
+      
 				<!-- Introduction in sections -->
 				<xsl:when test="parent::sections and self::clause and @type='intro'">0</xsl:when>
 				
@@ -534,6 +536,12 @@
 				</xsl:when>
 				<xsl:when test="ancestor::preface"> <!-- if preface and there is clause(s) -->
 					<xsl:choose>
+						<xsl:when test="ancestor::foreword">
+							<xsl:variable name="num">
+								<xsl:number format="_1" level="multiple" count="clause"/>
+							</xsl:variable>
+							<xsl:value-of select="concat($sectionNum,$num)"/>
+						</xsl:when>
 						<xsl:when test="$level = 1 and  ..//clause">0</xsl:when>
 						<xsl:when test="$level &gt;= 2">
 							<xsl:variable name="num">
@@ -2853,7 +2861,20 @@
 									starts-with($title_text, 'termes, définitions') or
 									$title_text = 'тérminos y definiciones' or
 									$title_text = 'термины и определения'">terms</xsl:when>
-				<xsl:when test="ancestor::foreword"><xsl:value-of select="@type"/></xsl:when>
+				<xsl:when test="ancestor::foreword">
+					<xsl:choose>
+						<xsl:when test="normalize-space(@type) != ''"><xsl:value-of select="@type"/></xsl:when>
+						<xsl:when test="$title_text = 'publishing information'">foreword_publishing</xsl:when>
+						<xsl:when test="$title_text = 'supersession'">foreword_supersession</xsl:when>
+						<xsl:when test="$title_text = 'relationship with other publications'">foreword_relationship</xsl:when>
+						<xsl:when test="$title_text = 'information about this document'">foreword_doc_info</xsl:when>
+						<xsl:when test="$title_text = 'hazard warnings'">foreword_hazard</xsl:when>
+						<xsl:when test="$title_text = 'use of this document'">foreword_doc_use</xsl:when>
+						<xsl:when test="$title_text = 'presentational conventions'">foreword_presentational</xsl:when>
+						<xsl:when test="$title_text = 'contractual and legal considerations'">foreword_legal</xsl:when>
+					</xsl:choose>
+				</xsl:when>
+				<xsl:when test="ancestor::preface and $title_text = 'Endorsement notice'">endorsement</xsl:when>
 				<xsl:otherwise><!-- <xsl:value-of select="@id"/> --></xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
