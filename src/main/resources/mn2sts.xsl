@@ -35,7 +35,7 @@
 		</xsl:variable>
 		
 		<xsl:choose>
-			<xsl:when test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO'">
+			<xsl:when test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO' or $metanorma_type = 'BSI'">
 				<!-- id generation for IEC and ISO with Guidelines rules -->
 				<xsl:variable name="xml_with_id_new">
 					<xsl:apply-templates select="xalan:nodeset($xml)" mode="id_generate"/>
@@ -104,7 +104,7 @@
 			<xsl:attribute name="id_new">
 				<xsl:choose>
 					<xsl:when test="$metanorma_type = 'IEC'">sec-foreword</xsl:when>
-					<xsl:when test="$metanorma_type = 'ISO'">sec_foreword</xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">sec_foreword</xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -117,8 +117,8 @@
 			<xsl:attribute name="id_new">
 				<xsl:choose>
 					<xsl:when test="$metanorma_type = 'IEC'">sec-introduction</xsl:when>
-					<xsl:when test="$metanorma_type = 'ISO' and .//sec">sec_0</xsl:when>
-					<xsl:when test="$metanorma_type = 'ISO'">sec_intro</xsl:when>
+					<xsl:when test="($metanorma_type = 'ISO' or $metanorma_type = 'BSI') and .//sec">sec_0</xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">sec_intro</xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -132,7 +132,7 @@
 			<xsl:attribute name="id_new">
 				<xsl:choose>
 					<xsl:when test="$metanorma_type = 'IEC'">sec-scope</xsl:when>
-					<xsl:when test="$metanorma_type = 'ISO'">sec_scope</xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">sec_scope</xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -145,7 +145,9 @@
 			<xsl:attribute name="id_new">
 				<xsl:choose>
 					<xsl:when test="$metanorma_type = 'IEC'">sec-<xsl:value-of select="@section"/></xsl:when>
-					<xsl:when test="$metanorma_type = 'ISO'">sec_<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="($metanorma_type = 'ISO' or $metanorma_type = 'BSI') and @sec-type = 'publication_info'">sec_pub_info_nat</xsl:when>
+					<xsl:when test="($metanorma_type = 'ISO' or $metanorma_type = 'BSI') and (starts-with(@sec-type, 'foreword') or ancestor::sec[@sec-type = 'publication_info'])"><xsl:value-of select="@id"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">sec_<xsl:value-of select="@section"/></xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -158,7 +160,7 @@
 			<xsl:attribute name="id_new">
 				<xsl:choose>
 					<xsl:when test="$metanorma_type = 'IEC'">sec-bibliography</xsl:when>
-					<xsl:when test="$metanorma_type = 'ISO'">sec_bibl</xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">sec_bibl</xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -177,7 +179,7 @@
 							<xsl:otherwise>bib-<xsl:value-of select="@section"/></xsl:otherwise>
 						</xsl:choose>
 					</xsl:when>
-					<xsl:when test="$metanorma_type = 'ISO'">biblref_<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">biblref_<xsl:value-of select="@section"/></xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -190,7 +192,7 @@
 			<xsl:attribute name="id_new">
 				<xsl:choose>
 					<xsl:when test="$metanorma_type = 'IEC'">sec-index</xsl:when>
-					<xsl:when test="$metanorma_type = 'ISO'">sec_index</xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">sec_index</xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -203,7 +205,7 @@
 			<xsl:attribute name="id_new">
 				<xsl:choose>
 					<xsl:when test="$metanorma_type = 'IEC'">anx-<xsl:value-of select="@section"/></xsl:when>
-					<xsl:when test="$metanorma_type = 'ISO'">sec_<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">sec_<xsl:value-of select="@section"/></xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -217,7 +219,7 @@
 			<xsl:attribute name="id_new">
 				<xsl:choose>
 					<xsl:when test="$metanorma_type = 'IEC'">tab-<xsl:value-of select="@section"/></xsl:when>
-					<xsl:when test="$metanorma_type = 'ISO'">tab_<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">tab_<xsl:value-of select="@section"/></xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -244,12 +246,15 @@
 				</xsl:attribute>
 			</xsl:if>
 			
-			<xsl:if test="$metanorma_type = 'ISO'">
+			<xsl:if test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">
 				<xsl:attribute name="id_new">
-					<xsl:if test="not(contains(@content-type , '-index'))"> <!-- no need id for formula-index and figure-index tables -->
-						<xsl:text>tab_</xsl:text>
-						<xsl:number level="any" format="a" count="array"/>
-					</xsl:if>
+					<xsl:choose>
+						<xsl:when test="@content-type = 'ace-table' and ancestor::sec[@sec-type = 'publication_info']"><xsl:value-of select="@id"/></xsl:when>
+						<xsl:when test="not(contains(@content-type , '-index'))"> <!-- no need id for formula-index and figure-index tables -->
+							<xsl:text>tab_</xsl:text>
+							<xsl:number level="any" format="a" count="array"/>
+						</xsl:when>
+					</xsl:choose>
 				</xsl:attribute>
 			</xsl:if>
 			
@@ -265,9 +270,19 @@
 			<xsl:attribute name="id_new">
 				<xsl:choose>
 					<xsl:when test="$metanorma_type = 'IEC'">fig-<xsl:value-of select="@section"/></xsl:when>
-					<xsl:when test="$metanorma_type = 'ISO'">fig_<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">fig_<xsl:value-of select="@section"/></xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="id_generate" />
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="fig[label][count(graphic) &gt; 1]/graphic" mode="id_generate">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="id_generate" />
+			<xsl:if test="$metanorma_type = 'BSI' or $metanorma_type = 'ISO'">
+				<xsl:attribute name="id_new">fig_<xsl:value-of select="ancestor::fig[1]/@section"/>.<xsl:number/></xsl:attribute>
+			</xsl:if>
 			<xsl:apply-templates select="node()" mode="id_generate" />
 		</xsl:copy>
 	</xsl:template>
@@ -279,7 +294,7 @@
 			<xsl:attribute name="id_new">
 				<xsl:choose>
 					<xsl:when test="$metanorma_type = 'IEC'">for-<xsl:value-of select="translate(@section,'()','')"/></xsl:when> <!-- (1) to 1 -->
-					<xsl:when test="$metanorma_type = 'ISO'">formula_<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">formula_<xsl:value-of select="@section"/></xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -372,7 +387,7 @@
 			<xsl:attribute name="id_new">
 				<xsl:choose>
 					<xsl:when test="$metanorma_type = 'IEC'">con-<xsl:value-of select="@section"/></xsl:when>
-					<xsl:when test="$metanorma_type = 'ISO'">sec_<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">sec_<xsl:value-of select="@section"/></xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -390,7 +405,7 @@
 			<xsl:attribute name="id_new">
 				<xsl:choose>
 					<xsl:when test="$metanorma_type = 'IEC'"><xsl:text>te-</xsl:text><xsl:value-of select="$section_parent"/></xsl:when> <!-- Example: te-3.1.3 -->
-					<xsl:when test="$metanorma_type = 'ISO'"><xsl:text>term_</xsl:text><xsl:value-of select="$section_parent"/></xsl:when> <!-- Example: term_3.1 -->
+					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'"><xsl:text>term_</xsl:text><xsl:value-of select="$section_parent"/></xsl:when> <!-- Example: term_3.1 -->
 				</xsl:choose>
 			</xsl:attribute>
 			
@@ -583,7 +598,7 @@
 	<xsl:template name="insert_fn_label">
 		<xsl:param name="fn_number"/>
 		<xsl:choose>
-			<xsl:when test="$metanorma_type = 'ISO'">
+			<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">
 				<sup><xsl:value-of select="$fn_number"/>)</sup>
 			</xsl:when>
 			<xsl:when test="$metanorma_type = 'IEC'">
@@ -599,7 +614,7 @@
 		<xsl:param name="fn_number"/>
 		<xsl:choose>
 			<xsl:when test="$metanorma_type = 'IEC'">foo-<xsl:value-of select="$fn_number"/></xsl:when>
-			<xsl:when test="$metanorma_type = 'ISO'">
+			<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">
 				<xsl:if test="ancestor::array">table-</xsl:if>
 				<xsl:text>fn_</xsl:text><xsl:value-of select="$fn_number"/></xsl:when>
 			<xsl:otherwise><xsl:value-of select="@id"/></xsl:otherwise>
@@ -684,7 +699,7 @@
 		<xsl:param name="table_number"/>
 		<xsl:param name="fn_number"/>
 		<xref ref-type="fn">
-			<xsl:if test="$metanorma_type = 'ISO'"> <!-- $metanorma_type = 'IEC' or  -->
+			<xsl:if test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'"> <!-- $metanorma_type = 'IEC' or  -->
 				<xsl:attribute name="ref-type">table-fn</xsl:attribute>
 			</xsl:if>
 			<xsl:attribute name="rid">
@@ -717,7 +732,7 @@
 		<xsl:param name="fn_number"/>
 		<xsl:choose>
 			<xsl:when test="$metanorma_type = 'IEC'">tfn-<xsl:value-of select="$table_number"/>-<xsl:value-of select="$fn_number"/></xsl:when>
-			<xsl:when test="$metanorma_type = 'ISO'">table-fn_<xsl:value-of select="$table_number"/>.<xsl:value-of select="$fn_number"/></xsl:when>
+			<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">table-fn_<xsl:value-of select="$table_number"/>.<xsl:value-of select="$fn_number"/></xsl:when>
 			<xsl:otherwise><xsl:value-of select="@id"/></xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -830,7 +845,7 @@
 		<xsl:param name="fn_number"/>
 		<xsl:choose>
 			<xsl:when test="$metanorma_type = 'IEC'">figfn-<xsl:value-of select="$figure_number"/>-<xsl:value-of select="$fn_number"/></xsl:when>
-			<xsl:when test="$metanorma_type = 'ISO'">figure-fn_<xsl:value-of select="$figure_number"/>.<xsl:value-of select="$fn_number"/></xsl:when>
+			<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">figure-fn_<xsl:value-of select="$figure_number"/>.<xsl:value-of select="$fn_number"/></xsl:when>
 			<xsl:otherwise><xsl:value-of select="@id"/></xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -1064,7 +1079,7 @@
 				<xsl:apply-templates />
 			</xsl:variable>
 			<xsl:choose>
-				<xsl:when test="$metanorma_type = 'ISO'">
+				<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">
 					<!-- 'std' inside tbx:source should be omitted for ISO. -->
 					<xsl:value-of select="$source"/> <!-- just text -->
 				</xsl:when>
@@ -1139,7 +1154,7 @@
 					<xsl:when test="letter-symbol">symbol</xsl:when>
 					<xsl:when test=".//abbreviation-type = 'acronym'">acronym</xsl:when>
 					<xsl:when test=".//expression/@type = 'abbreviation'">abbreviation</xsl:when>
-					<xsl:when test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and .//expression/@type = 'full'">fullForm</xsl:when> <!-- or normalize-space(.//expression/@type) = '') -->
+					<xsl:when test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO' or $metanorma_type = 'BSI') and .//expression/@type = 'full'">fullForm</xsl:when> <!-- or normalize-space(.//expression/@type) = '') -->
 					<xsl:when test="@type = 'full'">variant</xsl:when>
 					<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
 				</xsl:choose>
