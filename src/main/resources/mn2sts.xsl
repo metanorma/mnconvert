@@ -99,12 +99,27 @@
 	</xsl:template>
 	
 	<xsl:template match="sec[@sec-type = 'foreword']" mode="id_generate">
+		<xsl:variable name="title">
+			<xsl:apply-templates select="title"/>
+		</xsl:variable>
+		<xsl:variable name="title_text" select="normalize-space(java:toLowerCase(java:java.lang.String.new($title)))"/>
+		<xsl:variable name="title_prev">
+			<xsl:apply-templates select="preceding-sibling::sec[@sec-type = 'foreword'][1]/title"/>
+		</xsl:variable>
+		<xsl:variable name="title_prev_text" select="normalize-space(java:toLowerCase(java:java.lang.String.new($title_prev)))"/>
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:attribute name="id_new">
 				<xsl:choose>
 					<xsl:when test="$metanorma_type = 'IEC'">sec-foreword</xsl:when>
-					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">sec_foreword</xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">
+						<xsl:choose>
+							<xsl:when test="$title_text = 'national foreword'">sec_foreword_nat</xsl:when>
+							<xsl:when test="$title_prev_text = 'national foreword'">sec_foreword_euro</xsl:when>
+							<xsl:when test="$title_text = 'european foreword to amendment a11'">sec_forewordA11_euro</xsl:when>
+							<xsl:otherwise>sec_foreword</xsl:otherwise>
+						</xsl:choose>
+					</xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
@@ -145,9 +160,15 @@
 			<xsl:attribute name="id_new">
 				<xsl:choose>
 					<xsl:when test="$metanorma_type = 'IEC'">sec-<xsl:value-of select="@section"/></xsl:when>
-					<xsl:when test="($metanorma_type = 'ISO' or $metanorma_type = 'BSI') and @sec-type = 'publication_info'">sec_pub_info_nat</xsl:when>
-					<xsl:when test="($metanorma_type = 'ISO' or $metanorma_type = 'BSI') and (starts-with(@sec-type, 'foreword') or ancestor::sec[@sec-type = 'publication_info'])"><xsl:value-of select="@id"/></xsl:when>
-					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">sec_<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">
+						<xsl:choose>
+							<xsl:when test="@sec-type = 'publication_info'">sec_pub_info_nat</xsl:when>
+							<xsl:when test="@sec-type = 'endorsement'">sec_endorse_euro</xsl:when>
+							<xsl:when test="@sec-type = 'foreword' or ancestor::sec[@sec-type = 'publication_info']"><xsl:value-of select="@id"/></xsl:when>
+							<xsl:when test="starts-with(normalize-space(), 'This European Standard was approved by')">sec_titlepage_euro</xsl:when>
+							<xsl:otherwise>sec_<xsl:value-of select="@section"/></xsl:otherwise>
+						</xsl:choose>
+					</xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
