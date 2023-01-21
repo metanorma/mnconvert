@@ -35,6 +35,20 @@
 	<xsl:template match="mml:* | *[local-name() = 'svg']" mode="remove_namespace" priority="3">
 		<xsl:copy-of select="."/>
 	</xsl:template>
+	<!-- if XML contains semantic XML in metanorma-extension/metanorma/source/semantic__..., then process it instead of main XML -->
+	<xsl:template match="/*[*[local-name() = 'metanorma-extension']/*[local-name() = 'metanorma']/*[local-name() = 'source']/*[starts-with(local-name(), 'semantic__')]]" mode="remove_namespace" priority="3">
+		<xsl:apply-templates select="*[local-name() = 'metanorma-extension']/*[local-name() = 'metanorma']/*[local-name() = 'source']/*[starts-with(local-name(), 'semantic__')]" mode="remove_namespace"/>
+	</xsl:template>
+	<xsl:template match="*[starts-with(local-name(), 'semantic__')]" mode="remove_namespace" priority="2">
+		<xsl:element name="{substring-after(local-name(), 'semantic__')}">
+			<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
+		</xsl:element>
+	</xsl:template>
+	<xsl:template match="@*[name() = 'id' or name() = 'target' or name() = 'bibitemid'][starts-with(normalize-space(), 'semantic__')]" mode="remove_namespace" priority="3"> <!--  -->
+		<xsl:attribute name="{name()}">
+			<xsl:value-of select="substring-after(., 'semantic__')"/>
+		</xsl:attribute>
+	</xsl:template>
 	<!-- ===================== -->
 	<!-- END remove namespace -->
 	<!-- ===================== -->
