@@ -5855,7 +5855,11 @@
 	<!-- ======================= -->
 	<!-- requirement processing  -->
 	<!-- ======================= -->
-	<xsl:include href="mn2xml_req.xsl"/>
+	<xsl:template match="requirement">
+		<xsl:variable name="id" select="@id"/>
+		<!-- process table from presentation XML -->
+		<xsl:apply-templates select="$xml_presentation_catalog//*[@id = $id]"/>	
+	</xsl:template>
 	<!-- ======================= -->
 	<!-- END: requirement processing -->
 	<!-- ======================= -->
