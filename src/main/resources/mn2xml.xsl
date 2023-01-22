@@ -4045,7 +4045,18 @@
 		<reference><xsl:value-of select="@bibitemid"/></reference>
 		<referenceText>
 			<xsl:choose>
-				<xsl:when test="count(node()[not(self::localityStack)]) &gt; 0"><xsl:apply-templates select="node()[not(self::localityStack)][1]"/></xsl:when> <!-- for presentation xml -->
+				<xsl:when test="count(node()[not(self::localityStack)]) &gt; 0">
+					<xsl:choose>
+						<xsl:when test="span">
+							<!-- Example:
+							<eref type="inline" style="short" bibitemid="ISO_19115-1_2014" citeas="ISO 19115-1:2014"><localityStack><locality type="clause"><referenceFrom>6.5.2</referenceFrom></locality></localityStack><span class="stdpublisher">ISO</span> <span class="stddocNumber">19115</span>-<span class="stddocPartNumber">1</span>:<span class="stdyear">2014</span>,  <span class="citesec">6.5.2</span></eref> -->
+							<xsl:apply-templates select="node()[not(self::localityStack) and not(preceding-sibling::text()[normalize-space(.) = ',']) and not(normalize-space() = ',')]"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:apply-templates select="node()[not(self::localityStack)][1]"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when> <!-- for presentation xml -->
 				<xsl:otherwise> <!-- for semantic xml - build string with localities -->
 					<xsl:value-of select="@citeas"/>
 				</xsl:otherwise>
