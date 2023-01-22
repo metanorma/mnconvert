@@ -110,7 +110,7 @@
 	</xsl:template>
 	
 	<xsl:template match="requirement">
-		<table-wrap>
+		<!-- <table-wrap>
 			<xsl:copy-of select="@id"/>
 			<xsl:copy-of select="@section"/>
 			<xsl:attribute name="content-type">
@@ -128,7 +128,13 @@
 					<xsl:apply-templates select="node()[not(self::title)]"/>
 				</tbody>
 			</table>
-		</table-wrap>
+		</table-wrap> -->
+		
+		<xsl:variable name="id" select="@id"/>
+		
+		<!-- process table from presentation XML -->
+		<xsl:apply-templates select="$xml_presentation_catalog//*[@id = $id]"/>
+		
 	</xsl:template>
 	
 	
