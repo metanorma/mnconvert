@@ -305,7 +305,7 @@
 											*[local-name() = 'tab']" mode="xml_presentation_catalog">
 		<xsl:variable name="element">
 			<xsl:element name="{local-name()}">
-				<xsl:if test="local-name() = 'table' or local-name() = 'figure'">
+				<xsl:if test="local-name() = 'table' or local-name() = 'figure' or local-name() = 'xref' or local-name() = 'eref'">
 					<xsl:attribute name="presentation">true</xsl:attribute>
 				</xsl:if>
 				<xsl:apply-templates select="@*|node()" mode="xml_presentation_catalog"/>
@@ -4263,7 +4263,7 @@
 		<xsl:variable name="ref_type">
 			<xsl:choose>
         <xsl:when test="$parent = 'figure'">fig</xsl:when>
-				<xsl:when test="$parent = 'table'">table</xsl:when>
+				<xsl:when test="$parent = 'table' or $parent = 'requirement'">table</xsl:when>
 				<xsl:when test="$parent = 'annex'">app</xsl:when>
 				<xsl:when test="$parent = 'fn'">fn</xsl:when>
 				<xsl:when test="$parent = 'bibitem'">bibr</xsl:when>
@@ -4295,8 +4295,18 @@
 					<xsl:otherwise><xsl:value-of select="$id"/></xsl:otherwise>
 				</xsl:choose>
 			</xsl:attribute> -->
+			
+			<xsl:variable name="xref_presentation_">
+				<xsl:variable name="target" select="@target"/>
+				<xsl:apply-templates select="($xml_presentation_catalog//xref[@target = $target and @presentation = 'true'])[1]/node()[not(local-name() = 'stem')]"/>
+			</xsl:variable>
+			<xsl:variable name="xref_presentation" select="xalan:nodeset($xref_presentation_)"/>
+			
 			<xsl:choose>
-				<xsl:when test="$isSemanticXML = 'true'"> <!-- semantic xml -->
+				<xsl:when test="$xref_presentation/node()">
+					<xsl:copy-of select="$xref_presentation"/>
+				</xsl:when>
+				<xsl:when test="$isSemanticXML = 'true' and not(@presentation = 'true')"> <!-- semantic xml -->
 					<xsl:variable name="text_">
 						<xsl:value-of select="$section_prefix"/>
 						<xsl:choose>
