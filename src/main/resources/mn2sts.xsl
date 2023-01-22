@@ -528,6 +528,7 @@
 			<xsl:apply-templates select="node()" mode="id_generate" />
 		</xsl:copy>
 	</xsl:template>
+	
 	<!-- ===================================== -->
 	<!-- unique fn in text only, and in array (informal table) -->
 	<!-- ===================================== -->
