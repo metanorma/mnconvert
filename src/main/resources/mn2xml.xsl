@@ -236,6 +236,52 @@
 	<!-- ===================== -->
 
 	
+	<!-- ================================== -->
+	<!-- Presentation XML Catalog -->
+	<!-- contains linear list of clauses with labels, xref, requirement tables, etc. elements with pre-rendered values -->
+	<!-- ================================== -->
+	<xsl:variable name="xml_presentation_catalog_">
+		<xsl:choose>
+			<xsl:when test="/*[*[local-name() = 'metanorma-extension']/*[local-name() = 'metanorma']/*[local-name() = 'source']/*[starts-with(local-name(), 'semantic__')]]">
+				<xsl:apply-templates mode="xml_presentation_catalog"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy-of select="$xml_step1"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	
+	<xsl:template match="@*|node()" mode="xml_presentation_catalog">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="xml_presentation_catalog"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="*" mode="xml_presentation_catalog">
+		<xsl:apply-templates select="*" mode="xml_presentation_catalog"/>
+	</xsl:template>
+	
+	<xsl:template match="*[local-name() = 'preface' or local-name() = 'sections' or local-name() = 'annex']/* | 
+											*[*[local-name() = 'title' or local-name() = 'name']] | 
+											*[local-name() = 'title'] |
+											*[local-name() = 'title']//* |
+											*[local-name() = 'name'] | 
+											*[local-name() = 'name']//* | 
+											*[local-name() = 'xref'] | 
+											*[local-name() = 'xref']//* | 
+											*[local-name() = 'eref'] |
+											*[local-name() = 'eref']//* |
+											*[local-name() = 'tab']" mode="xml_presentation_catalog">
+		<xsl:element name="{local-name()}">
+			<xsl:apply-templates select="@*|node()" mode="xml_presentation_catalog"/>
+		</xsl:element>
+	</xsl:template>
+	
+	<xsl:variable name="xml_presentation_catalog" select="xalan:nodeset($xml_presentation_catalog_)"/>
+	<!-- ================================== -->
+	<!-- END Presentation XML Catalog -->
+	<!-- ================================== -->
+	
 	<xsl:variable name="xml" select="xalan:nodeset($xml_)"/>
 	
 	<xsl:variable name="format" select="normalize-space($outputformat)"/>
