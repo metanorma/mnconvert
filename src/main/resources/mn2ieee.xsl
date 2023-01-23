@@ -1057,6 +1057,24 @@
 		</xsl:choose>		
 	</xsl:template>
 	
+	<xsl:template name="insert_entailedTerm">
+		<xsl:choose>
+			<xsl:when test="renderterm">
+				<xsl:value-of select="renderterm"/>
+				
+				<xsl:variable name="xref_target" select="xref/@target"/>
+				<xsl:variable name="element_xref_" select="$elements//element[@source_id = $xref_target]"/>
+				<xsl:variable name="element_xref" select="xalan:nodeset($element_xref_)"/>
+				<xsl:variable name="section" select="$element_xref/@section"/>
+				<xsl:text> (</xsl:text><xsl:value-of select="$section"/><xsl:text>)</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select=".//tt[1]"/>
+			</xsl:otherwise>
+		</xsl:choose>
+		
+	</xsl:template>
+	
 	<xsl:template match="bibitem" mode="IEEE_non_standard">
 		<xsl:variable name="mixed_citation_">
 			<xsl:apply-templates select="formattedref"/>

@@ -949,8 +949,14 @@
 			<xsl:call-template name="getId"/>
 		</xsl:variable>
 		
+		<xsl:variable name="term_presentation_" select="$xml_presentation_catalog//term[@id = current()/@id]"/>
+		<xsl:variable name="term_presentation" select="xalan:nodeset($term_presentation_)"/>
+		
 		<xsl:variable name="section">
 			<xsl:choose>
+				<xsl:when test="$term_presentation/node()">
+					<xsl:value-of select="$term_presentation/@section"/>
+				</xsl:when>
 				<xsl:when test="normalize-space(name) != '' and  normalize-space(translate(name, '0123456789.', '')) = ''">
 					<xsl:value-of select="name"/>
 				</xsl:when>
@@ -1234,6 +1240,28 @@
 	
 	<xsl:template match="concept[eref[@bibitemid]]">
 		<tbx:entailedTerm xtarget="{eref/@bibitemid}"><xsl:apply-templates select="renderterm/node()"/></tbx:entailedTerm>
+	</xsl:template>
+	
+	<!-- Cross-references between terminological entries or terms within the Terms and definitions clause can be tagged as <tbx:entailedTerm>. This element should only be used in child elements of <tbx:termEntry>. -->
+	<xsl:template name="insert_entailedTerm">
+		<tbx:entailedTerm target="{xref/@target}">
+			<xsl:choose>
+				<xsl:when test="renderterm">
+					<xsl:value-of select="renderterm"/>
+					
+					<xsl:variable name="xref_target" select="xref/@target"/>
+					<xsl:variable name="element_xref_" select="$elements//element[@source_id = $xref_target]"/>
+					<xsl:variable name="element_xref" select="xalan:nodeset($element_xref_)"/>
+					<xsl:variable name="section" select="$element_xref/@section"/>
+					<xsl:text> (</xsl:text><xsl:value-of select="$section"/><xsl:text>)</xsl:text>
+					
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:attribute name="target"><xsl:value-of select=".//tt[2]"/></xsl:attribute>
+					<xsl:value-of select=".//tt[1]"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</tbx:entailedTerm>
 	</xsl:template>
 	
 	<!-- ===================== -->
