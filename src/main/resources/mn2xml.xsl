@@ -268,14 +268,9 @@
 	<!-- contains linear list of clauses with labels, xref, requirement tables, etc. elements with pre-rendered values -->
 	<!-- ================================== -->
 	<xsl:variable name="xml_presentation_catalog_">
-		<xsl:choose>
-			<xsl:when test="/*[*[local-name() = 'metanorma-extension']/*[local-name() = 'metanorma']/*[local-name() = 'source']/*[starts-with(local-name(), 'semantic__')]]">
-				<xsl:apply-templates mode="xml_presentation_catalog"/>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:copy-of select="$xml_step1"/>
-			</xsl:otherwise>
-		</xsl:choose>
+		<xsl:if test="/*[*[local-name() = 'metanorma-extension']/*[local-name() = 'metanorma']/*[local-name() = 'source']/*[starts-with(local-name(), 'semantic__')]]">
+			<xsl:apply-templates mode="xml_presentation_catalog"/>
+		</xsl:if>
 	</xsl:variable>
 	
 	<xsl:template match="@*|node()" mode="xml_presentation_catalog">
