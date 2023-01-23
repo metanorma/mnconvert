@@ -4706,8 +4706,15 @@
 					</xsl:if>
 					
 				</xsl:if>
+				
+				<xsl:variable name="table_presentation_" select="$xml_presentation_catalog//table[@id = current()/@id]"/>
+				<xsl:variable name="table_presentation" select="xalan:nodeset($table_presentation_)"/>
+				
 				<xsl:variable name="label">
 					<xsl:choose>
+						<xsl:when test="$table_presentation/node()">
+							<xsl:value-of select="$table_presentation/@section_prefix"/><xsl:value-of select="$table_presentation/@section"/>
+						</xsl:when>
 						<xsl:when test="ancestor::amend/autonumber[@type = 'table']">
 							<xsl:value-of select="ancestor::amend/autonumber[@type = 'table']/text()"/>
 						</xsl:when>
@@ -5151,7 +5158,20 @@
 			</xsl:if>
 			<xsl:call-template name="addSectionAttribute"/>
 			
-			<label><xsl:value-of select="@section_prefix"/><xsl:value-of select="@section"/></label>
+			
+			<xsl:variable name="figure_presentation_" select="$xml_presentation_catalog//figure[@id = current()/@id]"/>
+			<xsl:variable name="figure_presentation" select="xalan:nodeset($figure_presentation_)"/>
+				
+			<label>
+				<xsl:choose>
+					<xsl:when test="$figure_presentation/node()">
+						<xsl:value-of select="$figure_presentation/@section_prefix"/><xsl:value-of select="$figure_presentation/@section"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="@section_prefix"/><xsl:value-of select="@section"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</label>
 			<xsl:apply-templates />
 		</xsl:element>
 	</xsl:template>
@@ -5182,8 +5202,14 @@
 					</xsl:if>
 					<xsl:call-template name="addSectionAttribute"/>
 					
+					<xsl:variable name="figure_presentation_" select="$xml_presentation_catalog//figure[@id = current()/@id]"/>
+					<xsl:variable name="figure_presentation" select="xalan:nodeset($figure_presentation_)"/>					
+					
 					<label>
 						<xsl:choose>
+							<xsl:when test="$figure_presentation/node()">
+								<xsl:value-of select="$figure_presentation/@section_prefix"/><xsl:value-of select="$figure_presentation/@section"/>
+							</xsl:when>
 							<xsl:when test="ancestor::amend/autonumber[@type = 'figure']">
 								<xsl:value-of select="ancestor::amend/autonumber[@type = 'figure']/text()"/>
 							</xsl:when>
