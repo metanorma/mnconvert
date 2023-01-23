@@ -176,13 +176,20 @@
 							
 			<xsl:variable name="section_with_prefix_">
 				<xsl:if test="$isSemanticXML = 'false' or @presentation = 'true'"> <!-- for presentation XML -->
-				<xsl:choose>
-					<xsl:when test="(self::table or self::requirement or self::figure) and contains(name, '&#8212; ')"> <!-- if table's or figure's name contains number -->
-						<xsl:variable name="_name" select="substring-before(name, '&#8212; ')"/>
-						<!-- Example: Table&#xa0;5 -->
-						<xsl:value-of select="translate(normalize-space(translate($_name, '&#xa0;', ' ')), ' ', '&#xa0;')"/>
-					</xsl:when>
-				</xsl:choose>
+					<xsl:choose>
+						<xsl:when test="(self::table or self::requirement or self::figure) and contains(name, '&#8212; ')"> <!-- if table's or figure's name contains number -->
+							<xsl:variable name="_name" select="substring-before(name, '&#8212; ')"/>
+							<!-- Example: Table&#xa0;5 -->
+							<xsl:value-of select="translate(normalize-space(translate($_name, '&#xa0;', ' ')), ' ', '&#xa0;')"/>
+						</xsl:when>
+						<xsl:when test="self::annex and title/br"> <!-- Example: <title><strong>Annex A</strong><br/> ... -->
+							<xsl:value-of select="translate(title/br/preceding-sibling::node(), ' ', '&#xa0;')"/>
+						</xsl:when>
+						<xsl:when test="self::annex and contains(title, '&#8212; ')">
+							<xsl:variable name="_title" select="substring-before(title, '&#8212; ')"/>
+							<xsl:value-of select="translate(normalize-space(translate($_title, '&#xa0;', ' ')), ' ', '&#xa0;')"/>
+						</xsl:when>
+					</xsl:choose>
 				</xsl:if>
 			</xsl:variable>
 			<xsl:variable name="section_with_prefix" select="normalize-space($section_with_prefix_)"/>
@@ -283,7 +290,8 @@
 		<xsl:apply-templates select="*" mode="xml_presentation_catalog"/>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'preface' or local-name() = 'sections' or local-name() = 'annex']/* | 
+	<xsl:template match="*[local-name() = 'preface' or local-name() = 'sections']/* | 
+											*[local-name() = 'annex'] |
 											*[*[local-name() = 'title' or local-name() = 'name']] | 
 											*[local-name() = 'title'] |
 											*[local-name() = 'title']//* |
@@ -300,7 +308,7 @@
 											*[local-name() = 'tab']" mode="xml_presentation_catalog">
 		<xsl:variable name="element">
 			<xsl:element name="{local-name()}">
-				<xsl:if test="local-name() = 'table' or local-name() = 'figure' or local-name() = 'xref' or local-name() = 'eref'">
+				<xsl:if test="local-name() = 'clause' or local-name() = 'annex' or local-name() = 'table' or local-name() = 'figure' or local-name() = 'xref' or local-name() = 'eref'">
 					<xsl:attribute name="presentation">true</xsl:attribute>
 				</xsl:if>
 				<xsl:apply-templates select="@*|node()" mode="xml_presentation_catalog"/>
@@ -2318,8 +2326,22 @@
 					<xsl:if test="$outputformat != 'IEEE'">
 						<xsl:attribute name="sec-type"><xsl:value-of select="$sec_type"/></xsl:attribute>
 					
-						<xsl:variable name="section" select="normalize-space(@section)"/>
-						<xsl:if test="$section != ''">
+						<xsl:variable name="element_name" select="local-name()"/>
+						<xsl:variable name="element_presentation_" select="$xml_presentation_catalog//*[local-name() = $element_name][@id = current()/@id]"/>
+						<xsl:variable name="element_presentation" select="xalan:nodeset($element_presentation_)"/>
+						
+						<xsl:variable name="section">
+							<xsl:choose>
+								<xsl:when test="$element_presentation/node()">
+									<xsl:value-of select="$element_presentation/@section"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="normalize-space(@section)"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:variable>
+					
+						<xsl:if test="normalize-space($section) != ''">
 							<xsl:call-template name="insert_label">
 								<xsl:with-param name="label" select="@section"/>
 								<xsl:with-param name="isAddition" select="count(title/node()[normalize-space() != ''][1][self::add]) = 1"/>
@@ -2418,8 +2440,14 @@
 			</xsl:choose>
 			<xsl:call-template name="addSectionAttribute"/>
 			
+			<xsl:variable name="annex_presentation_" select="$xml_presentation_catalog//annex[@id = current()/@id]"/>
+			<xsl:variable name="annex_presentation" select="xalan:nodeset($annex_presentation_)"/>
+			
 			<label>
 				<xsl:choose>
+					<xsl:when test="$annex_presentation/node()">
+						<xsl:value-of select="$annex_presentation/@section_prefix"/><xsl:value-of select="$annex_presentation/@section"/>
+					</xsl:when>
 					<xsl:when test="ancestor::amend/autonumber[@type = 'annex']">
 						<xsl:value-of select="ancestor::amend/autonumber[@type = 'annex']/text()"/>
 					</xsl:when>
@@ -2977,7 +3005,20 @@
 		
 		<xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
 		
-		<xsl:variable name="section" select="@section"/>
+		<xsl:variable name="element_name" select="local-name()"/>
+		<xsl:variable name="element_presentation_" select="$xml_presentation_catalog//*[local-name() = $element_name][@id = current()/@id]"/>
+		<xsl:variable name="element_presentation" select="xalan:nodeset($element_presentation_)"/>
+		
+		<xsl:variable name="section">
+			<xsl:choose>
+				<xsl:when test="$element_presentation/node()">
+					<xsl:value-of select="$element_presentation/@section"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="@section"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
 		
 		<xsl:choose>
 			<xsl:when test="$processFloatingTitle = 'false' and preceding-sibling::p[1][@type = 'floating-title']"><!-- skip processing, see template for 'p' --></xsl:when> <!--  or @type = 'section-title' -->
@@ -4488,7 +4529,21 @@
 	<xsl:template match="appendix">
 		<sec id="{@id}" sec-type="appendix">
 			
-			<xsl:variable name="section" select="normalize-space(@section)"/>
+			<xsl:variable name="appendix_presentation_" select="$xml_presentation_catalog//appendix[@id = current()/@id]"/>
+			<xsl:variable name="appendix_presentation" select="xalan:nodeset($appendix_presentation_)"/>
+			
+			<xsl:variable name="section_">
+				<xsl:choose>
+					<xsl:when test="$appendix_presentation/node()">
+						<xsl:value-of select="$appendix_presentation/@section"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="normalize-space(@section)"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
+		
+			<xsl:variable name="section" select="normalize-space($section_)"/>
 			
 			<xsl:if test="$section != ''">
 			
