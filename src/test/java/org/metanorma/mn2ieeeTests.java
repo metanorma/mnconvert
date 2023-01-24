@@ -69,6 +69,7 @@ public class mn2ieeeTests {
 
     @Test
     public void successConvert_IEEE() throws ParseException, Exception {
+        assumeNotNull(DTD_IEEE);
         System.out.println(name.getMethodName());
 
         ClassLoader classLoader = getClass().getClassLoader();
