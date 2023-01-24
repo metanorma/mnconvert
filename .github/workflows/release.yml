@@ -6,7 +6,13 @@ on:
     tags:
     - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
+
 jobs:
+  prepare-ieee:
+    uses: ./.github/workflows/prepare.yml
+    secrets:
+      pat_token: ${{ secrets.METANORMA_CI_PAT_TOKEN }}
+
   build:
     name: Release to Maven and GitHub
     runs-on: ubuntu-latest
@@ -35,6 +41,8 @@ jobs:
       - run: make testMN2STS
 
       - run: make testSTS2MN
+
+      - run: make testMN2IEEE
 
       - run: make all
 

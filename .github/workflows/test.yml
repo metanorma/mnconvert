@@ -9,6 +9,11 @@ on:
       - .github/workflows/release.yml
 
 jobs:
+  prepare-ieee:
+    uses: ./.github/workflows/prepare.yml
+    secrets:
+      pat_token: ${{ secrets.METANORMA_CI_PAT_TOKEN }}
+
   build:
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
@@ -67,6 +72,8 @@ jobs:
       - run: make testMN2STS
 
       - run: make testSTS2MN
+
+      - run: make testMN2IEEE
 
       - if: matrix.os == 'ubuntu-latest'
         name: Notify mn-samples-bsi

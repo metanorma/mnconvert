@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ieee-standard xmlns="https://www.metanorma.org/ns/ieee" type="semantic" version="1.0.4">
+	<bibdata type="standard">
+		<title language="en" format="text/plain">IEEE Standards Draft</title>
+		<docidentifier type="IEEE">123.4</docidentifier>
+		<docidentifier type="IEEE" scope="PDF">STDXXXXX</docidentifier>
+		<docidentifier type="IEEE" scope="print">STDPDXXXXX</docidentifier>
+		<docidentifier type="ISBN" scope="PDF">978-0-XXXX-XXXX-X</docidentifier>
+		<docidentifier type="ISBN" scope="print">978-0-XXXX-XXXX-X</docidentifier>
+		<docnumber>123.4</docnumber>
+		<contributor>
+			<role type="publisher"/>
+			<organization>
+				<name>Institute of Electrical and Electronic Engineers</name>
+				<abbreviation>IEEE</abbreviation>
+			</organization>
+		</contributor>
+		<version>
+			<revision-date>2021-01-01</revision-date>
+			<draft>3</draft>
+		</version>
+		<language>en</language>
+		<script>Latn</script>
+		<abstract>
+			<p>Abstract text.</p>
+		</abstract>
+		<status>
+			<stage>draft</stage>
+		</status>
+		<copyright>
+			<from>2020</from>
+			<owner>
+				<organization>
+					<name>Institute of Electrical and Electronic Engineers</name>
+					<abbreviation>IEEE</abbreviation>
+				</organization>
+			</owner>
+		</copyright>
+		<keyword>keyword1</keyword>
+		<keyword>keyword2</keyword>
+		<keyword>keyword3</keyword>
+		<ext>
+			<doctype>standard</doctype>
+			<subdoctype>document</subdoctype>
+			<editorialgroup>
+				<society>Society</society>
+				<balloting-group type="individual">Balloting Group Name</balloting-group>
+				<working-group>Working Group Name</working-group>
+				<committee>Standards Staff Engineering Committee</committee>
+			</editorialgroup>
+			<structuredidentifier>
+				<docnumber>123.4</docnumber>
+				<agency>IEEE</agency>
+				<class>standard</class>
+				<version>3</version>
+				<year>2020</year>
+			</structuredidentifier>
+		</ext>
+	</bibdata>
+	<boilerplate>
+		<copyright-statement>
+			<clause>
+				<p id="copyright" align="left">Copyright © 2020 by The Institute of Electrical and Electronics Engineers, Inc.</p>
+				<p id="_aa4d99e2-4d2a-9ba9-0873-15c134ef3e9b">All rights reserved.</p>
+			</clause>
+		</copyright-statement>
+		<license-statement>
+			<clause>
+				<p id="_0e840a39-4799-feca-e27e-add3c1608ecc">This document is an unapproved draft of a proposed IEEE Standard.</p>
+			</clause>
+		</license-statement>
+		<legal-statement>
+			<clause id="boilerplate-disclaimers">
+				<title>Important Notices and Disclaimers Concerning IEEE Standards Documents</title>
+				<p id="_DV_M4">IEEE Standards
+      documents are made available for use subject to important notices and legal
+      disclaimers. These notices and disclaimers, or a reference to this page (<link target="https://standards.ieee.org/ipr/disclaimers.html"/>),
+      appear in all standards and may be found under the heading “Important Notices
+        and Disclaimers Concerning IEEE Standards Documents.”</p>
+			</clause>
+			<clause id="boilerplate-participants">
+				<title>Participants</title>
+				<clause id="boilerplate-participants-wg">
+					<p id="_68ae938c-6d61-8d0b-8f81-2b5405e8efa5">At the time this draft Standard was completed, the Working Group Name Working Group had the following membership:</p>
+					<ul id="_2e6a6bb1-582d-df6b-c72a-7e09d7015ee3">
+						<li>
+							<dl id="_1bd78cef-f8b9-1978-9fc6-0a313424d157">
+								<dt>role</dt>
+								<dd>
+									<p id="_b1c35867-4a05-d714-e3e7-fc79d832d5c7">Chair</p>
+								</dd>
+								<dt>name</dt>
+								<dd>
+									<p id="_d04018b5-fc03-74bb-2f9f-79e5d5fa0de6">First name, Last name</p>
+								</dd>
+							</dl>
+						</li>
+						<li>
+							<dl id="_2c6be813-ca0f-1349-5480-e32320c9c81c">
+								<dt>role</dt>
+								<dd>
+									<p id="_8f752070-2a49-bb40-eb62-8f1c56b61a0a">Vice Chair</p>
+								</dd>
+								<dt>name</dt>
+								<dd>
+									<p id="_73667195-0eb2-3fde-2a83-1f6a30cccf2f">First name, Last name</p>
+								</dd>
+							</dl>
+						</li>
+						<li>
+							<dl id="_e6dce846-c061-bc5b-73a6-b76db1ca79f6">
+								<dt>name</dt>
+								<dd>
+									<p id="_69cbd258-abdd-733a-791e-1e7d901252f1">Participant1</p>
+								</dd>
+								<dt>role</dt>
+								<dd>
+									<p id="_771625fc-08c1-6c70-9b71-e71eb6711175">member</p>
+								</dd>
+							</dl>
+						</li>
+						<li>
+							<dl id="_ab7c7edd-4b32-a178-2708-20ef53ce2d4d">
+								<dt>name</dt>
+								<dd>
+									<p id="_ac8eab1a-9b7c-8797-efdf-8f61ab396a22">Participant2</p>
+								</dd>
+								<dt>role</dt>
+								<dd>
+									<p id="_85b33de5-6640-a145-b050-13fb3ea52393">member</p>
+								</dd>
+							</dl>
+						</li>
+						<li>
+							<dl id="_73211b3e-c0eb-e160-7107-da1e27e8cfbd">
+								<dt>name</dt>
+								<dd>
+									<p id="_c9b40934-b094-2a2e-4418-963973b12031">Participant3</p>
+								</dd>
+								<dt>role</dt>
+								<dd>
+									<p id="_e985ccb9-c0dd-cb23-9ec5-919419c13d21">member</p>
+								</dd>
+							</dl>
+						</li>
+						<li>
+							<dl id="_768fbd69-8222-5ef1-437f-ad407d94d6b3">
+								<dt>name</dt>
+								<dd>
+									<p id="_90355577-8974-b28b-9946-42940288a5e5">Participant4</p>
+								</dd>
+								<dt>role</dt>
+								<dd>
+									<p id="_0a2a34cc-91e8-ed9a-edb3-19d3594050f3">member</p>
+								</dd>
+							</dl>
+						</li>
+						<li>
+							<dl id="_22053343-db2d-0f3c-6622-bf2b294bb0c8">
+								<dt>name</dt>
+								<dd>
+									<p id="_65f36625-398c-0c05-c2cb-9f2174d884d6">Participant5</p>
+								</dd>
+								<dt>role</dt>
+								<dd>
+									<p id="_dc8ac6c6-d918-deb1-e46d-abc75c9c817f">member</p>
+								</dd>
+							</dl>
+						</li>
+						<li>
+							<dl id="_c3831c2b-3c16-d4ff-5c9d-11b526a79d01">
+								<dt>name</dt>
+								<dd>
+									<p id="_059b1788-ad88-b0b9-2b0a-a556208e830b">Participant6</p>
+								</dd>
+								<dt>role</dt>
+								<dd>
+									<p id="_bae30680-9daa-6d9f-4273-fb3ca5ce3ee7">member</p>
+								</dd>
+							</dl>
+						</li>
+						<li>
+							<dl id="_e6e072b5-cbc3-2908-1e90-775cb1b1174d">
+								<dt>name</dt>
+								<dd>
+									<p id="_c68adcda-c3b5-00f4-8e78-1669d2f7f4fd">Participant7</p>
+								</dd>
+								<dt>role</dt>
+								<dd>
+									<p id="_d17da38a-2362-61fc-50bd-287d701f1cb5">member</p>
+								</dd>
+							</dl>
+						</li>
+						<li>
+							<dl id="_3a9c6e18-c6b7-0152-484c-f5688ffdfdf8">
+								<dt>name</dt>
+								<dd>
+									<p id="_d26576cc-cb4a-1f6e-6157-d898bbb117fe">Participant8</p>
+								</dd>
+								<dt>role</dt>
+								<dd>
+									<p id="_72daf5ce-f05f-f3ff-f156-21f10d104737">member</p>
+								</dd>
+							</dl>
+						</li>
+						<li>
+							<dl id="_739aead2-b7ae-4578-f610-568394afc5f7">
+								<dt>name</dt>
+								<dd>
+									<p id="_008f8bbd-16be-bb6d-9fdf-7cb352c4be64">Participant9</p>
+								</dd>
+								<dt>role</dt>
+								<dd>
+									<p id="_622b40a0-2d8c-2c7f-a0fc-727e9f1b938f">member</p>
+								</dd>
+							</dl>
+						</li>
+					</ul>
+				</clause>
+			</clause>
+		</legal-statement>
+		<feedback-statement>
+			<clause>
+					<p align="left" id="_e934c824-e425-4780-49ab-b5b213d3ad03">The Institute of Electrical and Electronics Engineers, Inc.</p>
+			</clause>
+			<clause>
+					<p id="_1280740b-ec07-0037-f9c6-68c990b29cf7">Copyright © 2020 by The Institute of Electrical and Electronics Engineers, Inc.</p>
+			</clause>
+			<clause>
+					<p id="_3db6f550-190c-379c-93b3-c26e27566acd">IEEE is a registered trademark.</p>
+			</clause>
+			<clause>
+				<table unnumbered="true" id="_isbn_pdf_print">
+					<tbody>
+						<tr>
+							<td>PDF:</td>
+							<td>ISBN 978-0-XXXX-XXXX-X</td>
+							<td>STDXXXXX</td>
+						</tr>
+						<tr>
+							<td>Print:</td>
+							<td>ISBN 978-0-XXXX-XXXX-X</td>
+							<td>STDPDXXXXX</td>
+						</tr>
+					</tbody>
+				</table>
+			</clause>
+		</feedback-statement>
+	</boilerplate>
+	<preface>
+		<abstract id="_abstract">
+			<title>Abstract</title>
+			<p id="_bf3e5908-4085-6bbb-20c1-111844523376">Abstract text.</p>
+		</abstract>
+		<introduction id="_introduction" obligation="informative">
+			<title>Introduction</title>
+			<admonition>This introduction is not part of P123.4/D3, Draft Standard</admonition>
+			<p id="_1bfec4bf-7292-9dcc-c27f-aa76b5d042ea">The introduction of the frontmatter is informative. It serves to give
+readers context, including background, key themes, history, etc.</p>
+		</introduction>
+		<acknowledgements id="_acknowledgments" obligation="informative">
+			<title>Acknowledgements</title>
+			<p id="_f3a7bc85-4b53-4a63-c05e-5a792e31fd6e">Permissions have been granted as follows:</p>
+		</acknowledgements>
+	</preface>
+	<sections>
+		<clause id="_overview" type="overview" inline-header="false" obligation="normative">
+			<title>Overview</title>
+			<clause id="_scope" type="scope" inline-header="false" obligation="normative">
+				<title>Scope</title>
+				<p id="_f031077c-37d1-fbdf-21e7-63e06694bf5e">The scope shall be within the technical boundaries...</p>
+			</clause>
+			<clause id="_purpose" type="purpose" inline-header="false" obligation="normative">
+				<title>Purpose</title>
+				<p id="_7e2fe9ef-df16-5b23-a197-1eff5cc42a3d">The purpose shall be within the technical boundaries...</p>
+			</clause>
+		</clause>
+		<clause id="_terms_and_definitions" obligation="normative">
+			<title>Definitions, acronyms and abbreviations</title>
+			<terms id="_definitions" obligation="normative">
+				<title>Definitions</title>
+				<p id="_82153a44-e020-01b8-064c-58aeb97838ee">For the purposes of this document, the following terms and definitions apply. </p>
+				<term id="term-1">
+					<preferred>
+						<expression>
+							<name>term name</name>
+						</expression>
+					</preferred>
+					<related type="seealso">
+						<preferred>
+							<expression>
+								<name>term name 1</name>
+							</expression>
+						</preferred>
+						<xref target="term-2">term name 2</xref>
+					</related>
+					<definition>
+						<verbal-definition>
+							<p id="_0f13b9e7-a6b0-15b3-f771-4f962c957b9e">The component of…​</p>
+						</verbal-definition>
+					</definition>
+				</term>
+				<term id="term-2">
+					<preferred>
+						<expression>
+							<name>term name 2</name>
+						</expression>
+					</preferred>
+					<definition>
+						<verbal-definition>
+							<p id="_0f13b9e7-a6b0-15b3-f771-4f962c957b9e2">The component of…​</p>
+						</verbal-definition>
+					</definition>
+				</term>
+			</terms>
+			<definitions id="_acronyms_and_abbreviations" obligation="normative">
+				<title>Acronyms and abbreviations</title>
+				<dl id="_50c9d3f2-31d6-d3e4-fb9c-a1672b34bc8b">
+					<dt id="symbol-ABC">ABC</dt>
+					<dd>
+						<p id="_304e3cf9-76ad-36f0-1008-2010462d054c">description ABC</p>
+					</dd>
+				</dl>
+			</definitions>
+		</clause>
+		
+		
+			<clause id="_tables" inline-header="false" obligation="normative">
+				<title>Tables</title>
+				<p id="_4d597757-2c2d-e411-8ec0-3d85730f81b3">Tables should be cited in text.</p>
+				<table id="table_1">
+					<name>Table formatting</name>
+					<tbody>
+						<tr>
+							<th valign="middle" rowspan="2" align="center">Column heading</th>
+							<th valign="middle" rowspan="2" align="center">Column heading</th>
+							<th colspan="2" valign="middle" align="center">Column heading<fn reference="a">
+									<p id="_3f3b1368-8f99-2f30-e5b4-ecfa200abe34">Table footnotes</p>
+								</fn>
+							</th>
+						</tr>
+						<tr>
+							<th valign="middle" align="center">Column heading</th>
+							<th valign="middle" align="center">Column heading</th>
+						</tr>
+						<tr>
+							<td valign="top" align="left">
+								<p id="_67931f00-4b22-82f9-dd31-0b5a1fdfe846">Line heading</p>
+								<p id="_bfadd207-f26e-b054-c7be-fa3cfc69d820">Subheading</p>
+								<p id="_e0e245ad-8e49-d8b5-8f2d-147dddc35b34">Subheading</p>
+							</td>
+							<td valign="top" align="left">
+								<p id="_a95f5a28-47b8-9b97-6010-4ee373db464a">Tabulated data </p>
+							</td>
+							<td valign="top" rowspan="2" align="left"/>
+							<td valign="top" rowspan="2" align="left"/>
+						</tr>
+						<tr>
+							<td valign="top" align="left">
+								<p id="_4877918c-7662-0b8d-e6eb-8c9d49e5bd0b">Line heading</p>
+							</td>
+							<td valign="top" align="left"/>
+						</tr>
+					</tbody>
+					<note id="_150d2c0d-afa4-cffd-a997-9de2883addad">
+						<p id="_8fb7f207-9bf0-e962-867d-55335284bc68">This table is provided as an example. </p>
+					</note>
+				</table>
+			
+			</clause>
+		
+	</sections>
+	<annex id="_sample_bibliography" inline-header="false" obligation="informative">
+		<title>Sample bibliography</title>
+		<p>Text</p>
+	</annex>
+	
+	<bibliography>
+		<references id="_normative_references" normative="true" obligation="informative">
+			<title>Normative references</title>
+			<bibitem id="IEEE_ASTM">
+				<formattedref format="application/x-isodoc+xml">IEEE/ASTM SI 10<sup>™</sup>, American National Standard for Metric Practice.</formattedref>
+				<docidentifier type="IEEE">IEEE/ASTM SI</docidentifier>
+			</bibitem>
+			<bibitem id="IEEE_Std_260.1" type="standard" schema-version="v1.2.1">
+				<fetched>2023-01-23</fetched>
+				<title type="main" format="text/plain">IEEE Standard Letter Symbols for Units of Measurement (SI Customary Inch-Pound Units, and Certain Other Units)</title>
+				<uri type="src">https://ieeexplore.ieee.org/document/1337729</uri>
+				<docidentifier type="IEEE" primary="true">IEEE 260.1-2004</docidentifier>
+				<docidentifier type="IEEE" scope="trademark" primary="true">IEEE 260.1™-2004</docidentifier>
+				<docidentifier type="ISBN">978-0-7381-3998-2</docidentifier>
+				<docidentifier type="DOI">10.1109/IEEESTD.2004.94618</docidentifier>
+				<docnumber>IEEE 260.1-2004</docnumber>
+				<date type="created">
+					<on>2004</on>
+				</date>
+				<date type="published">
+					<on>2019-10-30</on>
+				</date>
+				<date type="issued">
+					<on>2004-03-25</on>
+				</date>
+				<contributor>
+					<role type="publisher"/>
+					<organization>
+						<name>Institute of Electrical and Electronics Engineers</name>
+						<abbreviation>IEEE</abbreviation>
+						<uri>http://www.ieee.org</uri>
+						<address>
+							<city>New York</city>
+							<country>USA</country>
+						</address>
+					</organization>
+				</contributor>
+				<language>en</language>
+				<script>Latn</script>
+				<abstract format="text/plain" language="en" script="Latn">Revision of IEEE Std 260.1-1993, Letter symbols for units of measurement are covered in this standard.</abstract>
+				<status>
+					<stage>withdrawn</stage>
+				</status>
+				<copyright>
+					<from>2004</from>
+					<owner>
+						<organization>
+							<name>Institute of Electrical and Electronics Engineers</name>
+							<abbreviation>IEEE</abbreviation>
+							<uri>http://www.ieee.org</uri>
+						</organization>
+					</owner>
+				</copyright>
+				<keyword>IEEE Standards</keyword>
+				<keyword>Patents</keyword>
+				<keyword>Measurement units</keyword>
+				<keyword>Licenses</keyword>
+				<keyword>Trademarks</keyword>
+				<keyword>letter symbols</keyword>
+				<keyword>limited typography</keyword>
+				<keyword>metric</keyword>
+				<keyword>quantities</keyword>
+				<keyword>SI</keyword>
+				<keyword>units of measurement</keyword>
+			</bibitem>
+		</references>
+	</bibliography>
+</ieee-standard>
