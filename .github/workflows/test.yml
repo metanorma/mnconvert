@@ -16,6 +16,7 @@ jobs:
 
   build:
     runs-on: ${{ matrix.os }}
+    needs: [ prepare-ieee ]
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
@@ -28,6 +29,11 @@ jobs:
         with:
           submodules: true
           token: ${{ secrets.METANORMA_CI_PAT_TOKEN }}
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: ieee-test-input
+          path: ieee
 
       - uses: ruby/setup-ruby@v1
         with:
