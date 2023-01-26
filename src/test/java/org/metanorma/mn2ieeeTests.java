@@ -82,7 +82,7 @@ public class mn2ieeeTests {
 
         assertTrue(Files.exists(xmlout));
         String capturedLog = getTestCapturedLog();
-        assertTrue(capturedLog.contains("Validation skipped"));
+        assertTrue(capturedLog.contains("is valid"));
         
     }
 
