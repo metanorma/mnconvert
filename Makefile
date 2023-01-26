@@ -68,6 +68,8 @@ testMN2STS: tests/mn-samples-iso/documents/international-standard/rice-en.cd.xml
 testSTS2MN:
 	mvn -DinputSTSXML=$(SRCFILESTS) --settings settings.xml test surefire-report:report
 
+testMN2IEEE:
+	mvn -DinputIEEEDTD=ieee/standards.dtd --settings settings.xml test surefire-report:report
 
 deploy:
 	mvn --settings settings.xml -Dmaven.test.skip=true clean deploy shade:shade
