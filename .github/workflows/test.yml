@@ -22,7 +22,8 @@ jobs:
       fail-fast: false
       matrix:
         java: [ 1.8 ]
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ ubuntu-latest ]
+#        os: [ ubuntu-latest, windows-latest, macos-latest ]
         experimental: [ false ]
     steps:
       - uses: actions/checkout@v3
@@ -34,6 +35,8 @@ jobs:
         with:
           name: ieee-test-input
           path: ieee
+
+      - run: ls -lR /home/runner/work/mnconvert/mnconvert/ieee
 
       - uses: ruby/setup-ruby@v1
         with:
