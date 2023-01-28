@@ -207,7 +207,7 @@
 		</xsl:copy>
 	</xsl:template>
 	
-	<xsl:template match="back/index" mode="id_generate">
+	<xsl:template match="back/index | back/sec[@sec-type = 'index']" mode="id_generate">
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:attribute name="id_new">
