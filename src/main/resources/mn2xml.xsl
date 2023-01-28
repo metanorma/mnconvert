@@ -312,6 +312,8 @@
 											*[local-name() = 'example']//* |
 											*[local-name() = 'termexample'] |
 											*[local-name() = 'termexample']//* |
+											*[local-name() = 'indexsect'] |
+											*[local-name() = 'indexsect']//* |
 											*[local-name() = 'tab']" mode="xml_presentation_catalog">
 		<xsl:variable name="element">
 			<xsl:element name="{local-name()}">
@@ -5695,8 +5697,8 @@
 	<!-- Index processing    -->
 	<!-- =================== -->
 	<xsl:template name="insertIndex">
-		<xsl:apply-templates select="indexsect"/>
-		<xsl:if test=".//index">
+		<xsl:apply-templates select="indexsect"/> <!-- for presentation XML -->
+		<xsl:if test=".//index"> <!-- for semantic XML -->
 			<xsl:choose>
 				<xsl:when test="$format = 'NISO' and not($organization = 'BSI')">
 					<index>
@@ -5832,7 +5834,7 @@
 					</xsl:if>
 					<xsl:copy-of select="$term"/>
 					<xsl:choose>
-						<xsl:when test="$metanorma_type = 'IEC'">
+						<xsl:when test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO'">
 							<see-entry><xsl:value-of select="$element_target/@section"/></see-entry>
 						</xsl:when>
 						<xsl:otherwise>
@@ -5865,7 +5867,7 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	<xsl:template match="indexsect">
+	<xsl:template match="indexsect" priority="2">
 		<sec sec-type="index">
 			<xsl:copy-of select="@id"/>
 			<xsl:apply-templates />
