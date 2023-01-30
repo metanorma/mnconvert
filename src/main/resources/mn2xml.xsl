@@ -207,6 +207,9 @@
 						<!-- presentation xml data -->
 						<xsl:value-of select="title/tab[1]/preceding-sibling::node()"/>
 					</xsl:when>
+					<xsl:when test="@presentation = 'true' and @inline-header = 'true' and title and not(title/tab)"> <!-- example: <title>B.5.2</title> -->
+						<xsl:value-of select="title"/>
+					</xsl:when>
 					<xsl:when test="self::term and normalize-space(name) != '' and  normalize-space(translate(name, '0123456789.', '')) = ''"> <!-- if term's name contains digits and dots only, for instance, '3.2' -->
 						<xsl:value-of select="name"/>
 					</xsl:when>
