@@ -16,6 +16,9 @@
 	<!-- remove namespace -->
 	<!-- for simplify templates: use '<xsl:template match="element">' instead of '<xsl:template match="*[local-name() = 'element']"> -->
 	<!-- ===================== -->
+	
+	<xsl:variable name="documentNS" select="namespace-uri(/*)"/>
+	
 	<xsl:variable name="xml_step1_">
 		<xsl:apply-templates mode="remove_namespace"/>
 	</xsl:variable>
@@ -35,19 +38,23 @@
 		<xsl:copy-of select="."/>
 	</xsl:template>
 	<!-- if XML contains semantic XML in metanorma-extension/metanorma/source/semantic__..., then process it instead of main XML -->
-	<xsl:template match="/*[*[local-name() = 'metanorma-extension']/*[local-name() = 'metanorma']/*[local-name() = 'source']/*[starts-with(local-name(), 'semantic__')]]" mode="remove_namespace" priority="3">
+	<xsl:template match="/*[*[local-name() = 'metanorma-extension']/*[local-name() = 'metanorma']/*[local-name() = 'source']/*[starts-with(local-name(), 'semantic__')]]" mode="remove_namespace" priority="4">
 		<xsl:apply-templates select="*[local-name() = 'metanorma-extension']/*[local-name() = 'metanorma']/*[local-name() = 'source']/*[starts-with(local-name(), 'semantic__')]" mode="remove_namespace"/>
 	</xsl:template>
-	<xsl:template match="*[starts-with(local-name(), 'semantic__')]" mode="remove_namespace" priority="2">
-		<xsl:element name="{substring-after(local-name(), 'semantic__')}">
-			<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
-		</xsl:element>
-	</xsl:template>
-		
-	<xsl:template match="mml:*[starts-with(local-name(), 'semantic__')]" mode="remove_namespace" priority="3">
-		<xsl:element name="{substring-after(local-name(), 'semantic__')}" namespace="{namespace-uri()}">
-			<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
-		</xsl:element>
+	<xsl:template match="*[starts-with(local-name(), 'semantic__')]" mode="remove_namespace" priority="3">
+		<xsl:variable name="elementNS" select="namespace-uri()"/>
+		<xsl:choose>
+			<xsl:when test="$elementNS != $documentNS">
+				<xsl:element name="{substring-after(local-name(), 'semantic__')}" namespace="{$elementNS}">
+					<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
+				</xsl:element>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:element name="{substring-after(local-name(), 'semantic__')}">
+					<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
+				</xsl:element>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template match="@*[name() = 'id' or name() = 'target' or name() = 'bibitemid'][starts-with(normalize-space(), 'semantic__')]" mode="remove_namespace" priority="3"> <!--  -->
