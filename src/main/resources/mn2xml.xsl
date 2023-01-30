@@ -16,6 +16,9 @@
 	<!-- remove namespace -->
 	<!-- for simplify templates: use '<xsl:template match="element">' instead of '<xsl:template match="*[local-name() = 'element']"> -->
 	<!-- ===================== -->
+	
+	<xsl:variable name="documentNS" select="namespace-uri(/*)"/>
+	
 	<xsl:variable name="xml_step1_">
 		<xsl:apply-templates mode="remove_namespace"/>
 	</xsl:variable>
@@ -35,14 +38,25 @@
 		<xsl:copy-of select="."/>
 	</xsl:template>
 	<!-- if XML contains semantic XML in metanorma-extension/metanorma/source/semantic__..., then process it instead of main XML -->
-	<xsl:template match="/*[*[local-name() = 'metanorma-extension']/*[local-name() = 'metanorma']/*[local-name() = 'source']/*[starts-with(local-name(), 'semantic__')]]" mode="remove_namespace" priority="3">
+	<xsl:template match="/*[*[local-name() = 'metanorma-extension']/*[local-name() = 'metanorma']/*[local-name() = 'source']/*[starts-with(local-name(), 'semantic__')]]" mode="remove_namespace" priority="4">
 		<xsl:apply-templates select="*[local-name() = 'metanorma-extension']/*[local-name() = 'metanorma']/*[local-name() = 'source']/*[starts-with(local-name(), 'semantic__')]" mode="remove_namespace"/>
 	</xsl:template>
-	<xsl:template match="*[starts-with(local-name(), 'semantic__')]" mode="remove_namespace" priority="2">
-		<xsl:element name="{substring-after(local-name(), 'semantic__')}">
-			<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
-		</xsl:element>
+	<xsl:template match="*[starts-with(local-name(), 'semantic__')]" mode="remove_namespace" priority="3">
+		<xsl:variable name="elementNS" select="namespace-uri()"/>
+		<xsl:choose>
+			<xsl:when test="$elementNS != $documentNS">
+				<xsl:element name="{substring-after(local-name(), 'semantic__')}" namespace="{$elementNS}">
+					<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
+				</xsl:element>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:element name="{substring-after(local-name(), 'semantic__')}">
+					<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
+				</xsl:element>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
+
 	<xsl:template match="@*[name() = 'id' or name() = 'target' or name() = 'bibitemid'][starts-with(normalize-space(), 'semantic__')]" mode="remove_namespace" priority="3"> <!--  -->
 		<xsl:attribute name="{name()}">
 			<xsl:value-of select="substring-after(., 'semantic__')"/>
@@ -199,6 +213,9 @@
 					<xsl:when test="normalize-space(title/tab[1]/preceding-sibling::node()) != ''">
 						<!-- presentation xml data -->
 						<xsl:value-of select="title/tab[1]/preceding-sibling::node()"/>
+					</xsl:when>
+					<xsl:when test="@presentation = 'true' and @inline-header = 'true' and title and not(title/tab)"> <!-- example: <title>B.5.2</title> -->
+						<xsl:value-of select="title"/>
 					</xsl:when>
 					<xsl:when test="self::term and normalize-space(name) != '' and  normalize-space(translate(name, '0123456789.', '')) = ''"> <!-- if term's name contains digits and dots only, for instance, '3.2' -->
 						<xsl:value-of select="name"/>
@@ -3563,7 +3580,7 @@
 				<xsl:when test="$example_presentation/name">
 					<xsl:apply-templates select="$example_presentation/name"/>
 				</xsl:when>
-				<xsl:when test="not(name)"> <!-- in semantic metanorma xml there isn't element '<name>NOTE 1</name> -->
+				<xsl:when test="not(name) or $isSemanticXML = 'true'"> <!-- in semantic metanorma xml there isn't element '<name>NOTE 1</name> -->
 					<label>
 						<xsl:text>EXAMPLE</xsl:text>
 						<xsl:choose>
@@ -3579,15 +3596,43 @@
 						</xsl:choose>
 					</label>
 				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates select="name"/>
+				</xsl:otherwise>
 			</xsl:choose>
 
-			<xsl:apply-templates/>
+			<xsl:apply-templates select="node()[not(self::name)]"/>
 		</non-normative-example>
 	</xsl:template>
 	
 	<xsl:template match="example/name" priority="2">
-		<xsl:variable name="label"><xsl:apply-templates /></xsl:variable>
-		<label><xsl:value-of select="translate(normalize-space($label), ' ', '&#xa0;')"/></label>
+		<xsl:variable name="label" select="."/>
+		<xsl:choose>
+			<xsl:when test="contains($label, '—')">
+				<label>
+					<xsl:value-of select="translate(normalize-space(translate(substring-before($label, '—'), '&#xa0;', ' ')), ' ', '&#xa0;')"/>
+				</label>
+				<title>
+					<xsl:apply-templates />
+				</title>
+			</xsl:when>
+			<xsl:otherwise>
+				<label>
+					<xsl:value-of select="translate(normalize-space($label), ' ', '&#xa0;')"/>
+				</label>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template match="example/name/node()[1][self::text()]" priority="2">
+		<xsl:choose>
+			<xsl:when test="contains(., '—')">
+				<xsl:value-of select="normalize-space(substring-after(., '—'))"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="."/>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="note" name="note">
