@@ -333,6 +333,7 @@
 											*[local-name() = 'example']//* |
 											*[local-name() = 'termexample'] |
 											*[local-name() = 'termexample']//* |
+											*[local-name() = 'ol'] |
 											*[local-name() = 'indexsect'] |
 											*[local-name() = 'indexsect']//* |
 											*[local-name() = 'tab']" mode="xml_presentation_catalog">
@@ -3457,33 +3458,34 @@
 					</xsl:otherwise>
 				</xsl:choose>
 				
+				<xsl:variable name="ol_presentation_" select="$xml_presentation_catalog//ol[@id = current()/@id]"/>
+				<xsl:variable name="ol_presentation" select="xalan:nodeset($ol_presentation_)"/>
+				<xsl:variable name="ol_presentation_type" select="normalize-space($ol_presentation/@type)"/>
+				
 				<!-- Example: <?list-type loweralpha?> -->
 				<xsl:variable name="processing_instruction_type" select="normalize-space(preceding-sibling::*[1]/processing-instruction('list-type'))"/>
 				
-				<xsl:variable name="type">
+				<xsl:variable name="type_">
 					<xsl:choose>
 						<xsl:when test="normalize-space($processing_instruction_type) != ''"><xsl:value-of select="$processing_instruction_type"/></xsl:when>
+						<xsl:when test="$ol_presentation_type != ''"><xsl:value-of select="$ol_presentation_type"/></xsl:when>
 						<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
+				<xsl:variable name="type" select="normalize-space($ol_presentation_type)"/>
 				
 				<xsl:variable name="list-type">
 					<xsl:choose>
-						<!-- <xsl:when test="@type = 'arabic'">alpha-lower</xsl:when> -->
-						<!-- <xsl:when test="$type = 'arabic' and $organization = 'IEEE'">ordered</xsl:when> -->
-						<xsl:when test="$type = 'arabic' and not($metanorma_type = 'IEC')">order</xsl:when>
-						<xsl:otherwise>
-							<xsl:choose>
-								<xsl:when test="$metanorma_type = 'IEC' and normalize-space($type) = ''">arabic</xsl:when>
-								<xsl:when test="normalize-space($type) = ''">alpha-lower</xsl:when>
-								<xsl:when test="$type = 'alphabet'">alpha-lower</xsl:when>
-								<xsl:when test="$type = 'alphabet_upper'">alpha-upper</xsl:when>
-								<xsl:when test="$type = 'roman'">roman-lower</xsl:when>
-								<xsl:when test="$type = 'roman_upper'">roman-upper</xsl:when>
-								<xsl:when test="$type = 'arabic'">arabic</xsl:when>
-								<xsl:otherwise><xsl:value-of select="$type"/></xsl:otherwise>
-							</xsl:choose>
-						</xsl:otherwise>
+						<xsl:when test="($type = 'arabic' or $type = '') and ($metanorma_type = 'ISO' or $metanorma_type = 'BSI')">order</xsl:when>
+						<xsl:when test="($type = 'arabic' or $type = '') and $metanorma_type = 'IEC'">arabic</xsl:when>
+						<xsl:when test="$type = 'arabic'">order</xsl:when>
+						<xsl:when test="$type = 'alphabet'">alpha-lower</xsl:when>
+						<xsl:when test="$type = 'alphabet_upper'">alpha-upper</xsl:when>
+						<xsl:when test="$type = 'roman'">roman-lower</xsl:when>
+						<xsl:when test="$type = 'roman_upper'">roman-upper</xsl:when>
+						<xsl:when test="$type = 'arabic'">arabic</xsl:when>
+						<xsl:when test="$type = ''">alpha-lower</xsl:when>
+						<xsl:otherwise><xsl:value-of select="$type"/></xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
 				<xsl:attribute name="list-type">
@@ -3601,32 +3603,30 @@
 						<xsl:number/>
 					</xsl:variable>
 					
+					<xsl:variable name="list_item_value" select="$start_value + $curr_value"/>
+					
 					<xsl:variable name="list-item-label">
 						<xsl:choose>
 							<xsl:when test="$type = 'order' and not($metanorma_type = 'IEC')">
-								<xsl:number value="$start_value + $curr_value" format="1)"/>
+								<xsl:number value="$list_item_value" format="1)"/>
 							</xsl:when>
 							<xsl:when test="$type = 'arabic'">
-								<xsl:number value="$start_value + $curr_value" format="1)"/>
+								<xsl:number value="$list_item_value" format="1)"/>
 							</xsl:when>
-							<!-- <xsl:when test="$type = 'alphabet'"> -->
 							<xsl:when test="$type = 'alpha-lower'">
-								<xsl:number value="$start_value + $curr_value" format="a)" lang="en"/>
+								<xsl:number value="$list_item_value" format="a)" lang="en"/>
 							</xsl:when>
-							<!-- <xsl:when test="$type = 'alphabet_upper'"> -->
 							<xsl:when test="$type = 'alpha-upper'">
-								<xsl:number value="$start_value + $curr_value" format="A)" lang="en"/>
+								<xsl:number value="$list_item_value" format="A)" lang="en"/>
 							</xsl:when>
-							<!-- <xsl:when test="$type = 'roman'"> -->
 							<xsl:when test="$type = 'roman-lower'">
-								<xsl:number value="$start_value + $curr_value" format="i)" lang="en"/>
+								<xsl:number value="$list_item_value" format="i)" lang="en"/>
 							</xsl:when>
-							<!-- <xsl:when test="$type = 'roman_upper'"> -->
 							<xsl:when test="$type = 'roman-upper'">
-								<xsl:number value="$start_value + $curr_value" format="I)" lang="en"/>
+								<xsl:number value="$list_item_value" format="I)" lang="en"/>
 							</xsl:when>
 							<xsl:otherwise>
-								<xsl:number value="$start_value + $curr_value" format="a)" lang="en"/>
+								<xsl:number value="$list_item_value" format="a)" lang="en"/>
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:variable>
