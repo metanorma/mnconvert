@@ -12,6 +12,10 @@
 
 	<xsl:variable name="metanorma_type" select="java:toUpperCase(java:java.lang.String.new(substring-before(local-name(//*[contains(local-name(), '-standard')]), '-')))"/> <!-- ISO, IEC, ... -->
 
+	<xsl:variable name="CHAR_EM_DASH">—</xsl:variable> <!-- &#x2014; -->
+	<xsl:variable name="CHAR_BULLET">•</xsl:variable> <!-- &#x2022; -->
+	<xsl:variable name="CHAR_WHITE_CIRCLE">○</xsl:variable> <!-- &#x25CB; -->
+
 	<!-- ===================== -->
 	<!-- remove namespace -->
 	<!-- for simplify templates: use '<xsl:template match="element">' instead of '<xsl:template match="*[local-name() = 'element']"> -->
@@ -407,6 +411,14 @@
 			<xsl:when test="$organization_name != ''"><xsl:value-of select="$organization_name"/></xsl:when>
 		</xsl:choose>
 	</xsl:variable>
+	
+	<xsl:variable name="isBSIPAS_">
+		<xsl:choose>
+			<xsl:when test="$xml_step1/metanorma-collection/doc-container[1]/*/bibdata/docidentifier[starts-with(., 'PAS')]">true</xsl:when>
+			<xsl:when test="$xml_step1/*/bibdata/docidentifier[starts-with(., 'PAS')]">true</xsl:when>
+		</xsl:choose>
+	</xsl:variable>
+	<xsl:variable name="isBSIPAS" select="normalize-space($isBSIPAS_)"/>
 	
 	<xsl:variable name="nat_meta_only">
 		<xsl:if test="not($xml/*/bibdata/relation[@type = 'adopted-from']) and $organization = 'BSI'">true</xsl:if>
@@ -3341,6 +3353,9 @@
 	</xsl:template>
 	
 	
+	<!-- =============================== -->
+	<!-- list processing -->
+	<!-- =============================== -->
 	<xsl:template match="ul" name="ul">
 		<xsl:param name="skip">true</xsl:param>
 		
@@ -3362,25 +3377,63 @@
 					</xsl:otherwise>
 				</xsl:choose>
 				<xsl:variable name="processing_instruction_type" select="normalize-space(preceding-sibling::*[1]/processing-instruction('list-type'))"/>
+				
+				<xsl:variable name="list_level_" select="count(ancestor::ul) + 1" />
+				<xsl:variable name="list_level">
+					<xsl:choose>
+						<xsl:when test="$list_level_ &lt;= 3"><xsl:value-of select="$list_level_"/></xsl:when>
+						<xsl:otherwise><xsl:value-of select="$list_level_ mod 3"/></xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				
+				<xsl:variable name="ul_label_">
+					<xsl:choose>
+						<xsl:when test="$ul_labels/label[not(@level)]"> <!-- one label for all levels -->
+							<xsl:copy-of select="$ul_labels/label[not(@level)]" />
+						</xsl:when>
+						<xsl:when test="$list_level mod 3 = 0">
+							<xsl:copy-of select="$ul_labels/label[@level = 3]" />
+						</xsl:when>
+						<xsl:when test="$list_level mod 2 = 0">
+							<xsl:copy-of select="$ul_labels/label[@level = 2]" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:copy-of select="$ul_labels/label[@level = 1]" />
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:variable name="ul_label" select="xalan:nodeset($ul_label_)"/>
+				
 				<xsl:variable name="list-type">
 					<xsl:choose>
 							<xsl:when test="normalize-space($processing_instruction_type) = 'simple'">simple</xsl:when>
+
+							<xsl:when test="($metanorma_type = 'ISO' or $metanorma_type = 'IEC' or $metanorma_type = 'BSI') and $ul_label/label">
+								<xsl:value-of select="$ul_label/label/@list-type"/>
+							</xsl:when>
+							
+							<xsl:when test="normalize-space(@type) != ''"><xsl:value-of select="@type"/></xsl:when>
+							
 							<xsl:when test="normalize-space(@type) = ''">bullet</xsl:when> <!-- even when <label>—</label> ! -->
+							
 							<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
 						</xsl:choose>
 				</xsl:variable>
+				
 				<xsl:attribute name="list-type">
 					<xsl:value-of select="$list-type"/>
 				</xsl:attribute>
+				
 				<xsl:apply-templates>
 					<xsl:with-param name="list-type" select="$list-type"/>
+					<xsl:with-param name="ul_label" select="$ul_label"/>
 				</xsl:apply-templates>
 			</list>
 			<xsl:for-each select="note">
 				<xsl:call-template name="note"/>
 			</xsl:for-each>
 		</xsl:if>
-	</xsl:template>
+	</xsl:template> <!-- ul -->
 	<xsl:template match="ul/@type"/>
 	
 	<xsl:template match="ol" name="ol">
@@ -3447,7 +3500,7 @@
 				<xsl:call-template name="note"/>
 			</xsl:for-each>
 		</xsl:if>
-	</xsl:template>
+	</xsl:template> <!-- ol -->
 	<xsl:template match="ol/@type"/>
 	<xsl:template match="ol/@start"/>
 	<xsl:template match="ol/text()[normalize-space() = '']"/> <!-- linearization -->
@@ -3458,8 +3511,36 @@
 	<xsl:variable name="color-title" select="//*[local-name() = 'presentation-metadata']/*[local-name() = 'color-title']"/>
 	<xsl:variable name="color-list-label" select="//*[local-name() = 'presentation-metadata']/*[local-name() = 'color-list-label']"/>
 	
+	<xsl:variable name="ul_labels_">
+		<xsl:choose>
+			<xsl:when test="$metanorma_type = 'BSI'">
+				<label>
+					<xsl:choose>
+						<xsl:when test="$isBSIPAS = 'true'"><xsl:value-of select="$CHAR_BULLET"/></xsl:when>
+						<xsl:otherwise><xsl:value-of select="$CHAR_EM_DASH"/></xsl:otherwise>
+					</xsl:choose>
+				</label>
+			</xsl:when>
+			<xsl:when test="$metanorma_type = 'IEC'">
+				<label level="1" list-type="bullet"><xsl:value-of select="$CHAR_BULLET"/></label>
+				<label level="2" list-type="dash"><xsl:value-of select="$CHAR_EM_DASH"/></label>
+				<label level="3" list-type="symbol"><xsl:value-of select="$CHAR_WHITE_CIRCLE"/></label>
+			</xsl:when>
+			<xsl:when test="$metanorma_type = 'ISO'">
+				<label list-type="dash"><xsl:value-of select="$CHAR_EM_DASH"/></label>
+			</xsl:when>
+			<xsl:otherwise>
+				<label level="1" list-type="dash"><xsl:value-of select="$CHAR_EM_DASH"/></label>
+				<label level="2" list-type="bullet"><xsl:value-of select="$CHAR_BULLET"/></label>
+				<label level="3" list-type="symbol"><xsl:value-of select="$CHAR_WHITE_CIRCLE"/></label>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	<xsl:variable name="ul_labels" select="xalan:nodeset($ul_labels_)"/>
+	
 	<xsl:template match="li">
 		<xsl:param name="list-type"/>
+		<xsl:param name="ul_label"/>
 		<xsl:variable name="isNotePAS" select="(ancestor::note or ancestor::termnote) and $color-title != ''"/>
 		<list-item>
 			<!-- <xsl:if test="@id">
@@ -3467,33 +3548,37 @@
 			</xsl:if> -->
 			<xsl:copy-of select="@id"/>
 			<xsl:choose>
-				<xsl:when test="local-name(..) = 'ul' and ancestor::indexsect"><!-- no label for index item --></xsl:when>
-				<xsl:when test="local-name(..) = 'ul' and (../@type = 'bullet' or normalize-space(../@type) = '')">
+				<xsl:when test="local-name(..) = 'ul'">
 					<xsl:choose>
-						<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">
-							<label>—</label>
-						</xsl:when>
+						<xsl:when test="ancestor::indexsect"><!-- no label for index item --></xsl:when>
 						<xsl:when test="$list-type = 'simple'"></xsl:when>
-						<xsl:otherwise>
+						<xsl:when test="../@type = 'bullet' or $list-type = 'bullet' or normalize-space(../@type) = ''">
+							<xsl:choose>
+								<xsl:when test="($metanorma_type = 'ISO' or $metanorma_type = 'IEC' or $metanorma_type = 'BSI') and $ul_label/label">
+									<label><xsl:value-of select="$ul_label/label"/></label>
+								</xsl:when>
+								
+								<xsl:otherwise>
+									<xsl:call-template name="insert_label">
+										<xsl:with-param name="label" select="$CHAR_BULLET"/>
+										<xsl:with-param name="color" select="$color-list-label"/>
+										<xsl:with-param name="isNotePAS" select="$isNotePAS"/>
+										<xsl:with-param name="colorNote" select="$color-title"/>
+									</xsl:call-template>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+						<xsl:when test="../@type != 'simple'">
 							<xsl:call-template name="insert_label">
-								<xsl:with-param name="label">•</xsl:with-param>
+								<xsl:with-param name="label" select="$CHAR_EM_DASH"/>
 								<xsl:with-param name="color" select="$color-list-label"/>
 								<xsl:with-param name="isNotePAS" select="$isNotePAS"/>
 								<xsl:with-param name="colorNote" select="$color-title"/>
 							</xsl:call-template>
-						</xsl:otherwise>
+							<!-- <label>—</label> -->
+						</xsl:when>
 					</xsl:choose>
 				</xsl:when>
-				<xsl:when test="local-name(..) = 'ul' and ../@type != 'simple'">
-					<xsl:call-template name="insert_label">
-						<xsl:with-param name="label">—</xsl:with-param>
-						<xsl:with-param name="color" select="$color-list-label"/>
-						<xsl:with-param name="isNotePAS" select="$isNotePAS"/>
-						<xsl:with-param name="colorNote" select="$color-title"/>
-					</xsl:call-template>
-					<!-- <label>—</label> -->
-				</xsl:when>
-				
 				<xsl:when test="local-name(..) = 'ol'">
 					<!-- <xsl:variable name="type" select="parent::*/@type"/> -->
 					<xsl:variable name="type" select="$list-type"/>
@@ -3565,7 +3650,10 @@
 			</xsl:choose>
 			
 		</list-item>
-	</xsl:template>
+	</xsl:template> <!-- li -->
+	<!-- =============================== -->
+	<!-- list processing -->
+	<!-- =============================== -->
 	
 	<xsl:template match="example">
 		<xsl:variable name="ancestor_clause_id" select="ancestor::clause[1]/@id"/>
@@ -3608,9 +3696,9 @@
 	<xsl:template match="example/name" priority="2">
 		<xsl:variable name="label" select="."/>
 		<xsl:choose>
-			<xsl:when test="contains($label, '—')">
+			<xsl:when test="contains($label, $CHAR_EM_DASH)">
 				<label>
-					<xsl:value-of select="translate(normalize-space(translate(substring-before($label, '—'), '&#xa0;', ' ')), ' ', '&#xa0;')"/>
+					<xsl:value-of select="translate(normalize-space(translate(substring-before($label, $CHAR_EM_DASH), '&#xa0;', ' ')), ' ', '&#xa0;')"/>
 				</label>
 				<title>
 					<xsl:apply-templates />
@@ -3626,8 +3714,8 @@
 	
 	<xsl:template match="example/name/node()[1][self::text()]" priority="2">
 		<xsl:choose>
-			<xsl:when test="contains(., '—')">
-				<xsl:value-of select="normalize-space(substring-after(., '—'))"/>
+			<xsl:when test="contains(., $CHAR_EM_DASH)">
+				<xsl:value-of select="normalize-space(substring-after(., $CHAR_EM_DASH))"/>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="."/>
@@ -5362,8 +5450,8 @@
 	<xsl:template match="*[self::table or self::figure]/name/node()[1][self::text()]" priority="2">
 		<xsl:choose>
 			<xsl:when test="$isSemanticXML = 'true' and not(ancestor::*[self::table or self::figure][@presentation = 'true'])"><xsl:value-of select="."/></xsl:when> <!-- there isn't 'Table N — ' in the Metanorma semantic XML -->
-			<xsl:when test="contains(., '—')">
-				<xsl:value-of select="normalize-space(substring-after(., '—'))"/>
+			<xsl:when test="contains(., $CHAR_EM_DASH)">
+				<xsl:value-of select="normalize-space(substring-after(., $CHAR_EM_DASH))"/>
 			</xsl:when>
 			<xsl:when test="../parent::figure and contains(., '&#xa0;')"><!-- move text like 'a)' to label, see above -->
 				<xsl:value-of select="normalize-space(substring-after(., '&#xa0;'))"/>
