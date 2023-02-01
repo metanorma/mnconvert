@@ -937,6 +937,14 @@
 	<!-- remove @id from 'list' and 'p' if starts with '_' -->
 	<xsl:template match="*[self::list or self::p or self::non-normative-note]/@id[starts-with(., '_')]" mode="id_replace"/>
 	
+	<!-- additional action in 'id_replace' task (for time saving): add non-break space -->
+	<xsl:template match="text()[normalize-space() != '']" mode="id_replace">
+		<!-- ([0-9])[space](%) -->
+		<xsl:variable name="regex_digit_percent">([0-9]) (%)</xsl:variable>
+		<xsl:variable name="text1" select="java:replaceAll(java:java.lang.String.new(.), $regex_digit_percent, concat('$1', $CHAR_NBSP, '$2'))"/>
+		
+		<xsl:value-of select="$text1"/>
+	</xsl:template>
 	<!-- ================================== -->
 	<!-- END: id replacement for IEC/ISO ID scheme -->
 	<!-- ================================== -->
