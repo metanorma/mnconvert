@@ -938,18 +938,32 @@
 	<xsl:template match="*[self::list or self::p or self::non-normative-note]/@id[starts-with(., '_')]" mode="id_replace"/>
 	
 	<!-- additional action in 'id_replace' task (for time saving): add non-break space -->
-	<xsl:template match="text()[normalize-space() != '']" mode="id_replace">
-		<!-- ([0-9])[space](%) -->
-		<xsl:variable name="regex_digit_percent">([0-9]) (%)</xsl:variable>
-		<xsl:variable name="text1" select="java:replaceAll(java:java.lang.String.new(.), $regex_digit_percent, concat('$1', $CHAR_NBSP, '$2'))"/>
-		
-		<xsl:value-of select="$text1"/>
+	<xsl:variable name="regex_nbsp_">
+		<regex name="regex_part_digit">(Part) ([0-9])</regex> <!-- (Part)[space]([0-9]) -->
+		<regex name="regex_digit_percent">([0-9]) (%)</regex> <!-- ([0-9])[space](%) -->
+		<regex name="regex_ISO_digit">(ISO) ([0-9])</regex> <!-- (ISO)[space]([0-9]) -->
+	</xsl:variable>
+	<xsl:variable name="regex_nbsp" select="xalan:nodeset($regex_nbsp_)"/>
+	<xsl:template match="text()[not(ancestor::iso-meta or ancestor::nat-meta or ancestor::std-meta or ancestor::reg-meta)][normalize-space() != '']" mode="id_replace">
+		<xsl:call-template name="replace_by_nbsp"/>
+	</xsl:template>
+	<xsl:template name="replace_by_nbsp">
+		<xsl:param name="text" select="."/>
+		<xsl:param name="regex_num">1</xsl:param>
+		<xsl:choose>
+			<xsl:when test="$regex_nbsp/regex[$regex_num]">
+				<xsl:variable name="text_" select="java:replaceAll(java:java.lang.String.new($text), $regex_nbsp/regex[$regex_num], concat('$1', $CHAR_NBSP, '$2'))"/>
+				<xsl:call-template name="replace_by_nbsp">
+					<xsl:with-param name="text" select="$text_"/>
+					<xsl:with-param name="regex_num" select="$regex_num + 1"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise><xsl:value-of select="$text"/></xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	<!-- ================================== -->
 	<!-- END: id replacement for IEC/ISO ID scheme -->
 	<!-- ================================== -->
-	
-	
 	
 	
 	<xsl:template match="term">
