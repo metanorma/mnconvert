@@ -942,6 +942,10 @@
 		<regex name="regex_part_digit">(Part) ([0-9])</regex> <!-- (Part)[space]([0-9]) -->
 		<regex name="regex_digit_percent">([0-9]) (%)</regex> <!-- ([0-9])[space](%) -->
 		<regex name="regex_ISO_digit">(ISO) ([0-9])</regex> <!-- (ISO)[space]([0-9]) -->
+		<regex name="regex_ISO_TC_digit">(ISO/TC) ([0-9])</regex> <!-- (ISO/TC)[space]([0-9]) -->
+		<regex name="regex_NOTE_digit">(NOTE) ([0-9])</regex> <!-- (NOTE)[space]([0-9]) -->
+		<regex name="regex_NOTE_digit_to_entry" replace_to="$1{$CHAR_NBSP}$3{$CHAR_NBSP}$5">(Note)(\s|\h)([0-9])(\s|\h)(to entry)</regex> <!-- (Note)[space]([0-9][space]to entry:) -->
+		<regex name="regex_Table_digit">(Table) ([A-Z|a-z]\.|[0-9])</regex> <!-- (Table)[space]([0-9]) -->
 	</xsl:variable>
 	<xsl:variable name="regex_nbsp" select="xalan:nodeset($regex_nbsp_)"/>
 	<xsl:template match="text()[not(ancestor::iso-meta or ancestor::nat-meta or ancestor::std-meta or ancestor::reg-meta)][normalize-space() != '']" mode="id_replace">
@@ -949,10 +953,18 @@
 	</xsl:template>
 	<xsl:template name="replace_by_nbsp">
 		<xsl:param name="text" select="."/>
-		<xsl:param name="regex_num">1</xsl:param>
+		<xsl:param name="regex_num" select="1"/>
 		<xsl:choose>
 			<xsl:when test="$regex_nbsp/regex[$regex_num]">
-				<xsl:variable name="text_" select="java:replaceAll(java:java.lang.String.new($text), $regex_nbsp/regex[$regex_num], concat('$1', $CHAR_NBSP, '$2'))"/>
+				<xsl:variable name="replace_to__" select="normalize-space($regex_nbsp/regex[$regex_num]/@replace_to)"/>
+				<xsl:variable name="replace_to_">
+					<xsl:choose>
+						<xsl:when test="$replace_to__ != ''"><xsl:value-of select="$replace_to__"/></xsl:when>
+						<xsl:otherwise><xsl:value-of select="concat('$1', $CHAR_NBSP, '$2')"/></xsl:otherwise> <!-- default replacement $1&#xA0;$2-->
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:variable name="replace_to" select="normalize-space($replace_to_)"/>
+				<xsl:variable name="text_" select="java:replaceAll(java:java.lang.String.new($text), $regex_nbsp/regex[$regex_num], $replace_to)"/>
 				<xsl:call-template name="replace_by_nbsp">
 					<xsl:with-param name="text" select="$text_"/>
 					<xsl:with-param name="regex_num" select="$regex_num + 1"/>
