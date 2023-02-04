@@ -937,11 +937,56 @@
 	<!-- remove @id from 'list' and 'p' if starts with '_' -->
 	<xsl:template match="*[self::list or self::p or self::non-normative-note]/@id[starts-with(., '_')]" mode="id_replace"/>
 	
+	<!-- additional action in 'id_replace' task (for time saving): add non-break space -->
+	<xsl:variable name="regex_nbsp_">
+		<regex name="regex_number_SI_Unit_name">([0-9]) (second|meter|kilogram|ampere|kelvin|mole|candela)</regex> <!-- [number] [SI Unit] -->
+		<regex name="regex_number_SI_Unit_symbol">([0-9]) ((s|m|kg|A|K|mol|cd)( |\.|\)|$))</regex> <!-- [number] [SI Unit symbol] -->
+		<regex name="regex_part_digit">(Part) ([0-9])</regex> <!-- (Part)[space]([0-9]) -->
+		<regex name="regex_digit_percent">([0-9]) (%)</regex> <!-- ([0-9])[space](%) -->
+		<regex name="regex_ISO_digit">(ISO) ([0-9])</regex> <!-- (ISO)[space]([0-9]) -->
+		<regex name="regex_ISO_TC_digit">(ISO/TC) ([0-9])</regex> <!-- (ISO/TC)[space]([0-9]) -->
+		<regex name="regex_NOTE_digit">(NOTE) ([0-9])</regex> <!-- (NOTE)[space]([0-9]) -->
+		<regex name="regex_NOTE_digit_to_entry" replace_to="$1{$CHAR_NBSP}$3{$CHAR_NBSP}$5">(Note)(\s|\h)([0-9])(\s|\h)(to entry)</regex> <!-- (Note)[space]([0-9][space]to entry:) -->
+		<regex name="regex_Table_Figure_Clause_Volume">(Table|Figure|Clause|Volume) (([A-Z|a-z]\.)?[0-9])</regex> <!-- (Table)[space]([0-9]) or (Figure)[space]([0-9]) or (Clause)[space]([0-9]) or (Volume)[space]([0-9])-->
+		<regex name="regex_Formula_digit">(Formula) (\(([A-Z|a-z]\.)?[0-9])</regex> <!-- (Formula)[space]([\((0-9)*\)]) -->
+		<regex name="regex_subcommittee_digit">(SC) ([0-9])</regex> <!-- (SC)[space]([0-9]) -->
+		<regex name="regex_Article_digit">(Article) ([A-Z|a-z][ |\.|\)])</regex> <!-- (Article)[space]([A-Z|a-z][ |\.|\)]) -->
+		<regex name="regex_Step_digit">(Step) ([0-9])</regex> <!-- (Step)[space]([0-9]) -->
+		<regex name="regex_OIML_D">(OIML) (D)</regex> <!-- (OIML)[space](D) -->
+		<regex name="regex_Annex">(Annex) ([A-Z|a-z](\.[0-9]+)*( |\.|\)|$))</regex> <!-- (Annex)[space]([A-Z|a-z][ |\.|\)]) -->
+		<regex name="regex_Space_dash" replace_to="{$CHAR_NBSP}$1"> (— [A-Z])</regex> <!-- [space](— [A-Z]) -->
+		<regex name="regex_digit_sign_digits" replace_to="$1{$CHAR_NBSP}$3{$CHAR_NBSP}$5">([0-9])(\s|\h)(\+|\-|/|\*|≠|&lt;|&gt;|≤|≥|±|×|÷|∙|mod|%|^)(\s|\h)([0-9])</regex> <!-- [0-9] [mathematical signs] [0-9]  -->
+		<regex name="regex_digits_digits">([0-9]) ([0-9])</regex><!-- Numbers formatted with spaces, e.g. 1 000: -->
+	</xsl:variable>
+	<xsl:variable name="regex_nbsp" select="xalan:nodeset($regex_nbsp_)"/>
+	<xsl:template match="text()[not(ancestor::iso-meta or ancestor::nat-meta or ancestor::std-meta or ancestor::reg-meta) or ancestor::title-wrap][normalize-space() != '']" mode="id_replace">
+		<xsl:call-template name="replace_by_nbsp"/>
+	</xsl:template>
+	<xsl:template name="replace_by_nbsp">
+		<xsl:param name="text" select="."/>
+		<xsl:param name="regex_num" select="1"/>
+		<xsl:choose>
+			<xsl:when test="$regex_nbsp/regex[$regex_num]">
+				<xsl:variable name="replace_to__" select="normalize-space($regex_nbsp/regex[$regex_num]/@replace_to)"/>
+				<xsl:variable name="replace_to_">
+					<xsl:choose>
+						<xsl:when test="$replace_to__ != ''"><xsl:value-of select="$replace_to__"/></xsl:when>
+						<xsl:otherwise><xsl:value-of select="concat('$1', $CHAR_NBSP, '$2')"/></xsl:otherwise> <!-- default replacement $1&#xA0;$2-->
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:variable name="replace_to" select="normalize-space($replace_to_)"/>
+				<xsl:variable name="text_" select="java:replaceAll(java:java.lang.String.new($text), $regex_nbsp/regex[$regex_num], $replace_to)"/>
+				<xsl:call-template name="replace_by_nbsp">
+					<xsl:with-param name="text" select="$text_"/>
+					<xsl:with-param name="regex_num" select="$regex_num + 1"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise><xsl:value-of select="$text"/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 	<!-- ================================== -->
 	<!-- END: id replacement for IEC/ISO ID scheme -->
 	<!-- ================================== -->
-	
-	
 	
 	
 	<xsl:template match="term">

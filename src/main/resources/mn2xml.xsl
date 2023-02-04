@@ -12,6 +12,7 @@
 
 	<xsl:variable name="metanorma_type" select="java:toUpperCase(java:java.lang.String.new(substring-before(local-name(//*[contains(local-name(), '-standard')]), '-')))"/> <!-- ISO, IEC, ... -->
 
+	<xsl:variable name="CHAR_NBSP">&#xa0;</xsl:variable> <!-- &#xA0; -->
 	<xsl:variable name="CHAR_EM_DASH">—</xsl:variable> <!-- &#x2014; -->
 	<xsl:variable name="CHAR_BULLET">•</xsl:variable> <!-- &#x2022; -->
 	<xsl:variable name="CHAR_WHITE_CIRCLE">○</xsl:variable> <!-- &#x25CB; -->
@@ -61,7 +62,7 @@
 		</xsl:choose>
 	</xsl:template>
 
-	<xsl:template match="@*[name() = 'id' or name() = 'target' or name() = 'bibitemid'][starts-with(normalize-space(), 'semantic__')]" mode="remove_namespace" priority="3"> <!--  -->
+	<xsl:template match="@*[name() = 'id' or name() = 'target' or name() = 'bibitemid'][starts-with(normalize-space(), 'semantic__')]" mode="remove_namespace" priority="3">
 		<xsl:attribute name="{name()}">
 			<xsl:value-of select="substring-after(., 'semantic__')"/>
 		</xsl:attribute>
