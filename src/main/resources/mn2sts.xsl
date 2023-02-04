@@ -945,10 +945,20 @@
 		<regex name="regex_ISO_TC_digit">(ISO/TC) ([0-9])</regex> <!-- (ISO/TC)[space]([0-9]) -->
 		<regex name="regex_NOTE_digit">(NOTE) ([0-9])</regex> <!-- (NOTE)[space]([0-9]) -->
 		<regex name="regex_NOTE_digit_to_entry" replace_to="$1{$CHAR_NBSP}$3{$CHAR_NBSP}$5">(Note)(\s|\h)([0-9])(\s|\h)(to entry)</regex> <!-- (Note)[space]([0-9][space]to entry:) -->
-		<regex name="regex_Table_digit">(Table) ([A-Z|a-z]\.|[0-9])</regex> <!-- (Table)[space]([0-9]) -->
+		<regex name="regex_Table_Figure_Clause_Volume">(Table|Figure|Clause|Volume) (([A-Z|a-z]\.)?[0-9])</regex> <!-- (Table)[space]([0-9]) or (Figure)[space]([0-9]) or (Clause)[space]([0-9]) or (Volume)[space]([0-9])-->
+		<regex name="regex_Formula_digit">(Formula) (\(([A-Z|a-z]\.)?[0-9])</regex> <!-- (Formula)[space]([\((0-9)*\)]) -->
+		<regex name="regex_subcommittee_digit">(SC) ([0-9])</regex> <!-- (SC)[space]([0-9]) -->
+		<regex name="regex_Article_digit">(Article) ([A-Z|a-z][ |\.|\)])</regex> <!-- (Article)[space]([A-Z|a-z][ |\.|\)]) -->
+		<regex name="regex_Step_digit">(Step) ([0-9])</regex> <!-- (Step)[space]([0-9]) -->
+		<regex name="regex_OIML_D">(OIML) (D)</regex> <!-- (OIML)[space](D) -->
+		<regex name="regex_Annex">(Annex) ([A-Z|a-z](\.[0-9]+)*( |\.|\)|$))</regex> <!-- (Annex)[space]([A-Z|a-z][ |\.|\)]) -->
+		<regex name="regex_Space_dash" replace_to="{$CHAR_NBSP}$1"> (— [A-Z])</regex> <!-- [space](— [A-Z]) -->
+		<regex name="regex_digit_sign_digits" replace_to="$1{$CHAR_NBSP}$3{$CHAR_NBSP}$5">([0-9])(\s|\h)(\+|\-|/|\*|≠|&lt;|&gt;|≤|≥|±|×|÷|∙|mod|%|^)(\s|\h)([0-9])</regex> <!-- [0-9] [mathematical signs] [0-9]  -->
+		<regex name="regex_digits_digits">([0-9]) ([0-9])</regex><!-- Numbers formatted with spaces, e.g. 1 000: -->
+		
 	</xsl:variable>
 	<xsl:variable name="regex_nbsp" select="xalan:nodeset($regex_nbsp_)"/>
-	<xsl:template match="text()[not(ancestor::iso-meta or ancestor::nat-meta or ancestor::std-meta or ancestor::reg-meta)][normalize-space() != '']" mode="id_replace">
+	<xsl:template match="text()[not(ancestor::iso-meta or ancestor::nat-meta or ancestor::std-meta or ancestor::reg-meta) or ancestor::title-wrap][normalize-space() != '']" mode="id_replace">
 		<xsl:call-template name="replace_by_nbsp"/>
 	</xsl:template>
 	<xsl:template name="replace_by_nbsp">
