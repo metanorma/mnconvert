@@ -939,6 +939,8 @@
 	
 	<!-- additional action in 'id_replace' task (for time saving): add non-break space -->
 	<xsl:variable name="regex_nbsp_">
+		<regex name="regex_number_SI_Unit_name">([0-9]) (second|meter|kilogram|ampere|kelvin|mole|candela)</regex> <!-- [number] [SI Unit] -->
+		<regex name="regex_number_SI_Unit_symbol">([0-9]) ((s|m|kg|A|K|mol|cd)( |\.|\)|$))</regex> <!-- [number] [SI Unit symbol] -->
 		<regex name="regex_part_digit">(Part) ([0-9])</regex> <!-- (Part)[space]([0-9]) -->
 		<regex name="regex_digit_percent">([0-9]) (%)</regex> <!-- ([0-9])[space](%) -->
 		<regex name="regex_ISO_digit">(ISO) ([0-9])</regex> <!-- (ISO)[space]([0-9]) -->
@@ -955,7 +957,6 @@
 		<regex name="regex_Space_dash" replace_to="{$CHAR_NBSP}$1"> (— [A-Z])</regex> <!-- [space](— [A-Z]) -->
 		<regex name="regex_digit_sign_digits" replace_to="$1{$CHAR_NBSP}$3{$CHAR_NBSP}$5">([0-9])(\s|\h)(\+|\-|/|\*|≠|&lt;|&gt;|≤|≥|±|×|÷|∙|mod|%|^)(\s|\h)([0-9])</regex> <!-- [0-9] [mathematical signs] [0-9]  -->
 		<regex name="regex_digits_digits">([0-9]) ([0-9])</regex><!-- Numbers formatted with spaces, e.g. 1 000: -->
-		
 	</xsl:variable>
 	<xsl:variable name="regex_nbsp" select="xalan:nodeset($regex_nbsp_)"/>
 	<xsl:template match="text()[not(ancestor::iso-meta or ancestor::nat-meta or ancestor::std-meta or ancestor::reg-meta) or ancestor::title-wrap][normalize-space() != '']" mode="id_replace">
