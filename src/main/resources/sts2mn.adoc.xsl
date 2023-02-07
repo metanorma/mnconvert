@@ -3626,11 +3626,13 @@
 	<!--Example: publication-type="report" -->
 	<xsl:template match="mixed-citation/@publication-type">
 		<!-- available types see in '<define name="BibItemType" combine="choice">' https://github.com/metanorma/metanorma-ieee/blob/main/lib/metanorma/ieee/biblio.rng -->
+		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>span:type[</xsl:text>
 			<xsl:choose>
 				<xsl:when test=". = 'government'">misc</xsl:when>
 				<xsl:when test=". = 'confpaper'">misc</xsl:when>
 				<xsl:when test=". = 'periodical'">misc</xsl:when>
+				<xsl:when test=". = 'other'">misc</xsl:when>
 				<xsl:when test=". = 'report'">techreport</xsl:when>
 				<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
 			</xsl:choose>
@@ -3638,9 +3640,67 @@
 	</xsl:template>
 	
 	<!-- Example: <article-title>&#x201c;Sound Barrier Walls for Transformers,&#x201d; AIEE Committee	Report</article-title> -->
-	<xsl:template match="mixed-citation/article-title | mixed-citation[@publication-type != 'standard']/source | mixed-citation/conf-name">
+	<xsl:template match="mixed-citation2/article-title | mixed-citation2[@publication-type != 'standard']/source | mixed-citation2/conf-name">
 		<!-- <xsl:text>span:title[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text> -->
 		<xsl:text>_</xsl:text><xsl:apply-templates /><xsl:text>_</xsl:text>
+	</xsl:template>
+	
+	<!-- Example:
+		<person-group person-group-type="author">
+			<collab>ISO/IEC Directives</collab>
+		</person-group>
+	-->
+	<xsl:template match="mixed-citation/person-group[@person-group-type = 'author']/collab">
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>span:organization[</xsl:text>
+		<xsl:value-of select="."/>
+		<xsl:text>]&#xa;</xsl:text>
+	</xsl:template>
+	
+	<!-- Example:
+		<person-group person-group-type="author">
+			 <name>
+					<surname>Manual</surname>
+					<given-names>SNA</given-names>
+			 </name>
+		</person-group>
+	-->
+	<xsl:template match="mixed-citation/person-group[@person-group-type = 'author']/name/surname">
+		<!-- <xsl:variable name="type_" select="ancestor::person-group/@person-group-type"/> -->
+		<!-- <xsl:variable name="type"> -->
+			<!-- <xsl:if test="$type_ != '' and $type_ != 'author'">.<xsl:value-of select="$type_"/></xsl:if> -->
+		<!-- </xsl:variable> -->
+		<!-- <xsl:text>span:surname</xsl:text><xsl:value-of select="$type"/><xsl:text>[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text> -->
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>span:surname[</xsl:text>
+		<xsl:value-of select="."/>
+		<xsl:text>]&#xa;</xsl:text>
+	</xsl:template>
+	<xsl:template match="mixed-citation/person-group[@person-group-type = 'author']/name/given-names">
+		<!-- <xsl:if test="not(preceding-sibling::node()[normalize-space() != ''][1][self::*])"> -->
+			<xsl:text>&#xa;</xsl:text>
+		<!-- </xsl:if> -->
+		<xsl:text>span:givenname[</xsl:text>
+		<xsl:value-of select="."/>
+		<xsl:text>]&#xa;</xsl:text>
+	</xsl:template>
+	
+	<!-- Example:
+		<year>2013</year>
+	-->
+	<xsl:template match="mixed-citation/year">
+		<!-- <xsl:if test="not(preceding-sibling::node()[normalize-space() != ''][1][self::*])"> -->
+			<xsl:text>&#xa;</xsl:text>
+		<!-- </xsl:if> -->
+		<xsl:text>span:year[</xsl:text><xsl:value-of select="."/>
+		<xsl:text>]&#xa;</xsl:text>
+	</xsl:template>
+	
+	<!-- Example: <italic>Part 1, Consolidated ISO Supplement, Annex L</italic> -->
+	<xsl:template match="mixed-citation[@publication-type != 'standard']/italic">
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>span:title[</xsl:text><xsl:value-of select="."/>
+		<xsl:text>]&#xa;</xsl:text>
 	</xsl:template>
 	
 	<!-- Example: <publisher-name>Pacific Gas &amp; Electric Company</publisher-name> -->
@@ -3653,10 +3713,7 @@
 		<xsl:text>span:pubplace[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
 	</xsl:template> -->
 	
-	<!-- Example: <year>1993</year> -->
-	<!-- <xsl:template match="mixed-citation/year">
-		<xsl:text>span:pubyear[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
-	</xsl:template> -->
+
 	
 	<!-- Example: <fpage>60</fpage> <lpage>175</lpage> -->
 	<!-- <xsl:template match="mixed-citation/fpage">
@@ -3676,11 +3733,7 @@
 		</person-group>
 	-->
 	<!-- <xsl:template match="mixed-citation//surname">
-		<xsl:variable name="type_" select="ancestor::person-group/@person-group-type"/>
-		<xsl:variable name="type">
-			<xsl:if test="$type_ != '' and $type_ != 'author'">.<xsl:value-of select="$type_"/></xsl:if>
-		</xsl:variable>
-		<xsl:text>span:surname</xsl:text><xsl:value-of select="$type"/><xsl:text>[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
+		
 	</xsl:template>
 	<xsl:template match="mixed-citation//given-names">
 		<xsl:variable name="type_" select="ancestor::person-group/@person-group-type"/>
@@ -4713,17 +4766,23 @@
 			<xsl:if test="normalize-space($unique) = 'false'">// </xsl:if>
 			<xsl:if test="not(@content-type and @content-type = 'standard_other')">* </xsl:if>
 			<!-- <xsl:value-of select="$reference"/> -->
-			<xsl:choose>
-				<xsl:when test="normalize-space($unique) = 'false'">
-					<!-- add comment // before each line in the $reference -->
-					<xsl:value-of select="java:replaceAll(java:java.lang.String.new($reference),'&#xa;','&#xa;// ')"/> 
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="$reference"/>
-				</xsl:otherwise>
-			</xsl:choose>
 			
-			<xsl:apply-templates select="mixed-citation/@publication-type[. != 'standard']"/>
+			<xsl:variable name="reference_item">
+				<xsl:choose>
+					<xsl:when test="normalize-space($unique) = 'false'">
+						<!-- add comment // before each line in the $reference -->
+						<xsl:value-of select="java:replaceAll(java:java.lang.String.new($reference),'&#xa;','&#xa;// ')"/> 
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="$reference"/>
+					</xsl:otherwise>
+				</xsl:choose>
+				
+				<xsl:apply-templates select="mixed-citation/@publication-type[. != 'standard']"/>
+			</xsl:variable>
+			
+			<!-- remove multiple new line characters -->
+			<xsl:value-of select="java:replaceAll(java:java.lang.String.new($reference_item),'(&#xa;){2,}','&#xa;')"/>
 			
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</xsl:if>
@@ -4742,7 +4801,7 @@
 			<xsl:message>WARNING: Repeated reference - <xsl:copy-of select="."/></xsl:message>
 		</xsl:if>
 		
-	</xsl:template>
+	</xsl:template> <!-- ref -->
 	
 	<xsl:template match="ref/std">
 		<xsl:apply-templates/>
