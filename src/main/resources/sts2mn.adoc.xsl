@@ -3578,6 +3578,10 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	
+	<!-- =============== -->
+	<!-- mixed-citation -->
+	<!-- =============== -->
 	<xsl:template match="mixed-citation">
 		<xsl:if test="$inputformat = 'IEEE' and (ancestor::ref-list or ancestor::list[@list-content = 'normative-references'])"><xsl:text>, </xsl:text></xsl:if>
 		<xsl:if test="preceding-sibling::node()">
@@ -3629,12 +3633,13 @@
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>span:type[</xsl:text>
 			<xsl:choose>
-				<xsl:when test=". = 'government'">misc</xsl:when>
-				<xsl:when test=". = 'confpaper'">misc</xsl:when>
-				<xsl:when test=". = 'periodical'">misc</xsl:when>
-				<xsl:when test=". = 'other'">misc</xsl:when>
+				<xsl:when test=". = 'book' or . = 'journal'">
+					<xsl:value-of select="."/>
+				</xsl:when>
 				<xsl:when test=". = 'report'">techreport</xsl:when>
-				<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+				<xsl:when test=". = 'web'">website</xsl:when>
+				<!-- government confpaper periodical other -->
+				<xsl:otherwise>misc</xsl:otherwise>
 			</xsl:choose>
 		<xsl:text>]</xsl:text>
 	</xsl:template>
@@ -3699,6 +3704,45 @@
 	<!-- Example: <italic>Part 1, Consolidated ISO Supplement, Annex L</italic> -->
 	<xsl:template match="mixed-citation[@publication-type != 'standard']/italic">
 		<xsl:text>&#xa;</xsl:text>
+		<xsl:variable name="span_element">
+			<xsl:choose>
+				<xsl:when test="ancestor::mixed-citation/article-title">in_title</xsl:when>
+				<xsl:otherwise>title</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:text>span:</xsl:text><xsl:value-of select="$span_element"/><xsl:text>[</xsl:text><xsl:value-of select="."/>
+		<xsl:text>]&#xa;</xsl:text>
+	</xsl:template>
+	
+	<!-- Example: <ext-link xlink:type="simple" xlink:href="http://www.ietf.org/rfc/rfc3548.txt">www.ietf.org/rfc/rfc3548.txt</ext-link> -->
+	<xsl:template match="mixed-citation/ext-link">
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>span:uri[</xsl:text><xsl:value-of select="."/>
+		<xsl:text>]&#xa;</xsl:text>
+	</xsl:template>
+	
+	<!-- Example: <volume>10</volume> -->
+	<xsl:template match="mixed-citation/volume">
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>span:volume[</xsl:text><xsl:value-of select="."/>
+		<xsl:text>]&#xa;</xsl:text>
+	</xsl:template>
+	
+	<!-- Example: <fpage>60</fpage> <lpage>175</lpage> -->
+	<xsl:template match="mixed-citation/fpage">
+		<xsl:text>span:pages[</xsl:text><xsl:value-of select="."/><xsl:apply-templates select="following-sibling::*[1][self::lpage]" mode="lpage"/><xsl:text>]</xsl:text>
+	</xsl:template>
+	<xsl:template match="mixed-citation/lpage" />
+	<xsl:template match="mixed-citation/lpage" mode="lpage">
+		<xsl:text>-</xsl:text><xsl:value-of select="."/>
+	</xsl:template>
+	<xsl:template match="mixed-citation/text()[preceding-sibling::*[1][self::fpage] and following-sibling::*[1][self::lpage]]"/>
+	
+	<!-- Example:
+		<article-title>The Dutch review process for evaluating the quality of psychological tests: History, procedure and results.</article-title>
+	-->
+	<xsl:template match="mixed-citation/article-title">
+		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>span:title[</xsl:text><xsl:value-of select="."/>
 		<xsl:text>]&#xa;</xsl:text>
 	</xsl:template>
@@ -3714,17 +3758,6 @@
 	</xsl:template> -->
 	
 
-	
-	<!-- Example: <fpage>60</fpage> <lpage>175</lpage> -->
-	<!-- <xsl:template match="mixed-citation/fpage">
-		<xsl:text>span:pages[</xsl:text><xsl:value-of select="."/><xsl:apply-templates select="following-sibling::*[1][self::lpage]" mode="lpage"/><xsl:text>]</xsl:text>
-	</xsl:template>
-	<xsl:template match="mixed-citation/lpage" />
-	<xsl:template match="mixed-citation/lpage" mode="lpage">
-		<xsl:text>-</xsl:text><xsl:value-of select="."/>
-	</xsl:template>
-	<xsl:template match="mixed-citation/text()[preceding-sibling::*[1][self::fpage] and following-sibling::*[1][self::lpage]]"/> -->
-	
 	<!-- Example:
 	<person-group person-group-type="author">
 		<string-name>
@@ -3755,6 +3788,10 @@
 	<!-- <xsl:template match="mixed-citation/uri">
 		<xsl:text>span:uri[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
 	</xsl:template> -->
+	
+	<!-- =============== -->
+	<!-- END: mixed-citation -->
+	<!-- =============== -->
 	
 	<!-- =============== -->
 	<!-- Definitions list (dl) -->
@@ -4782,7 +4819,10 @@
 			</xsl:variable>
 			
 			<!-- remove multiple new line characters -->
-			<xsl:value-of select="java:replaceAll(java:java.lang.String.new($reference_item),'(&#xa;){2,}','&#xa;')"/>
+			<xsl:variable name="reference_item_1" select="java:replaceAll(java:java.lang.String.new($reference_item),'(&#xa;){2,}','&#xa;')"/>
+			<!-- remove new line before comma or dot or space -->
+			<xsl:variable name="reference_item_2" select="java:replaceAll(java:java.lang.String.new($reference_item_1),'(&#xa;)(\.|,| )','$2')"/>
+			<xsl:value-of select="$reference_item_2"/>
 			
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</xsl:if>
