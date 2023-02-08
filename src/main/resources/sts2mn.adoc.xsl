@@ -3644,7 +3644,7 @@
 		<xsl:text>]</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="mixed-citation2[@publication-type != 'standard']/source | mixed-citation2/conf-name">
+	<xsl:template match="mixed-citation2/conf-name">
 		<!-- <xsl:text>span:title[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text> -->
 		<xsl:text>_</xsl:text><xsl:apply-templates /><xsl:text>_</xsl:text>
 	</xsl:template>
@@ -3654,9 +3654,11 @@
 			<collab>ISO/IEC Directives</collab>
 		</person-group>
 	-->
-	<xsl:template match="mixed-citation/person-group[@person-group-type = 'author']/collab">
+	<xsl:template match="mixed-citation/person-group/collab">
+		<xsl:variable name="type_" select="ancestor::person-group/@person-group-type"/>
+		<xsl:variable name="type"><xsl:if test="$type_ != '' and $type_ != 'author'">.<xsl:value-of select="$type_"/></xsl:if></xsl:variable>
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>span:organization[</xsl:text>
+		<xsl:text>span:organization</xsl:text><xsl:value-of select="$type"/><xsl:text>[</xsl:text>
 		<xsl:value-of select="."/>
 		<xsl:text>]&#xa;</xsl:text>
 	</xsl:template>
@@ -3714,8 +3716,10 @@
 		<xsl:value-of select="."/>
 	</xsl:template>
 	
-	<!-- Example: <ext-link xlink:type="simple" xlink:href="http://www.ietf.org/rfc/rfc3548.txt">www.ietf.org/rfc/rfc3548.txt</ext-link> -->
-	<xsl:template match="mixed-citation/ext-link">
+	<!-- Examples: 
+		<ext-link xlink:type="simple" xlink:href="http://www.ietf.org/rfc/rfc3548.txt">www.ietf.org/rfc/rfc3548.txt</ext-link>
+		<uri>https://bookshop.europa.eu/en/value-management-pbCDNA16096/</uri> -->
+	<xsl:template match="mixed-citation/ext-link | mixed-citation/uri">
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>span:uri[</xsl:text><xsl:value-of select="."/>
 		<xsl:text>]&#xa;</xsl:text>
@@ -3725,6 +3729,13 @@
 	<xsl:template match="mixed-citation/volume">
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>span:volume[</xsl:text><xsl:value-of select="."/>
+		<xsl:text>]&#xa;</xsl:text>
+	</xsl:template>
+	
+	<!-- Example: <issue>2</issue> -->
+	<xsl:template match="mixed-citation/volume">
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>span:issue[</xsl:text><xsl:value-of select="."/>
 		<xsl:text>]&#xa;</xsl:text>
 	</xsl:template>
 	
@@ -3768,10 +3779,6 @@
 			<xsl:if test="$type_ != ''">.<xsl:value-of select="$type_"/></xsl:if>
 		</xsl:variable>
 		<xsl:text>span:docid</xsl:text><xsl:value-of select="$type"/><xsl:text>[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
-	</xsl:template> -->
-	
-	<!-- <xsl:template match="mixed-citation/uri">
-		<xsl:text>span:uri[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
 	</xsl:template> -->
 	
 	<!-- =============== -->
