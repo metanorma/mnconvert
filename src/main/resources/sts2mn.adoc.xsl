@@ -3644,8 +3644,7 @@
 		<xsl:text>]</xsl:text>
 	</xsl:template>
 	
-	<!-- Example: <article-title>&#x201c;Sound Barrier Walls for Transformers,&#x201d; AIEE Committee	Report</article-title> -->
-	<xsl:template match="mixed-citation2/article-title | mixed-citation2[@publication-type != 'standard']/source | mixed-citation2/conf-name">
+	<xsl:template match="mixed-citation2[@publication-type != 'standard']/source | mixed-citation2/conf-name">
 		<!-- <xsl:text>span:title[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text> -->
 		<xsl:text>_</xsl:text><xsl:apply-templates /><xsl:text>_</xsl:text>
 	</xsl:template>
@@ -3670,22 +3669,19 @@
 			 </name>
 		</person-group>
 	-->
-	<xsl:template match="mixed-citation/person-group[@person-group-type = 'author']/name/surname">
-		<!-- <xsl:variable name="type_" select="ancestor::person-group/@person-group-type"/> -->
-		<!-- <xsl:variable name="type"> -->
-			<!-- <xsl:if test="$type_ != '' and $type_ != 'author'">.<xsl:value-of select="$type_"/></xsl:if> -->
-		<!-- </xsl:variable> -->
-		<!-- <xsl:text>span:surname</xsl:text><xsl:value-of select="$type"/><xsl:text>[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text> -->
+	<xsl:template match="mixed-citation/person-group/name/surname"> <!-- [@person-group-type = 'author'] -->
+		<xsl:variable name="type_" select="ancestor::person-group/@person-group-type"/>
+		<xsl:variable name="type"><xsl:if test="$type_ != '' and $type_ != 'author'">.<xsl:value-of select="$type_"/></xsl:if></xsl:variable>
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>span:surname[</xsl:text>
+		<xsl:text>span:surname</xsl:text><xsl:value-of select="$type"/><xsl:text>[</xsl:text>
 		<xsl:value-of select="."/>
 		<xsl:text>]&#xa;</xsl:text>
 	</xsl:template>
-	<xsl:template match="mixed-citation/person-group[@person-group-type = 'author']/name/given-names">
-		<!-- <xsl:if test="not(preceding-sibling::node()[normalize-space() != ''][1][self::*])"> -->
-			<xsl:text>&#xa;</xsl:text>
-		<!-- </xsl:if> -->
-		<xsl:text>span:givenname[</xsl:text>
+	<xsl:template match="mixed-citation/person-group/name/given-names"> <!-- [@person-group-type = 'author'] -->
+		<xsl:variable name="type_" select="ancestor::person-group/@person-group-type"/>
+		<xsl:variable name="type"><xsl:if test="$type_ != '' and $type_ != 'author'">.<xsl:value-of select="$type_"/></xsl:if></xsl:variable>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>span:givenname</xsl:text><xsl:value-of select="$type"/><xsl:text>[</xsl:text>
 		<xsl:value-of select="."/>
 		<xsl:text>]&#xa;</xsl:text>
 	</xsl:template>
@@ -3702,16 +3698,20 @@
 	</xsl:template>
 	
 	<!-- Example: <italic>Part 1, Consolidated ISO Supplement, Annex L</italic> -->
-	<xsl:template match="mixed-citation[@publication-type != 'standard']/italic">
+	<xsl:template match="mixed-citation[@publication-type != 'standard']/*[self::italic or self::italic2]">
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:variable name="span_element">
 			<xsl:choose>
-				<xsl:when test="ancestor::mixed-citation/article-title">in_title</xsl:when>
+				<xsl:when test="ancestor::mixed-citation/article-title">series</xsl:when>
 				<xsl:otherwise>title</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
 		<xsl:text>span:</xsl:text><xsl:value-of select="$span_element"/><xsl:text>[</xsl:text><xsl:value-of select="."/>
 		<xsl:text>]&#xa;</xsl:text>
+	</xsl:template>
+	<!-- special case <italic>.</italic> -->
+	<xsl:template match="mixed-citation[@publication-type != 'standard']/*[self::italic or self::italic2][normalize-space() = '.']">
+		<xsl:value-of select="."/>
 	</xsl:template>
 	
 	<!-- Example: <ext-link xlink:type="simple" xlink:href="http://www.ietf.org/rfc/rfc3548.txt">www.ietf.org/rfc/rfc3548.txt</ext-link> -->
@@ -3741,40 +3741,25 @@
 	<!-- Example:
 		<article-title>The Dutch review process for evaluating the quality of psychological tests: History, procedure and results.</article-title>
 	-->
-	<xsl:template match="mixed-citation/article-title">
+	<xsl:template match="mixed-citation/article-title | mixed-citation/source">
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>span:title[</xsl:text><xsl:value-of select="."/>
 		<xsl:text>]&#xa;</xsl:text>
 	</xsl:template>
 	
 	<!-- Example: <publisher-name>Pacific Gas &amp; Electric Company</publisher-name> -->
-	<!-- <xsl:template match="mixed-citation/publisher-name">
-		<xsl:text>span:publisher[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
-	</xsl:template> -->
+	<xsl:template match="mixed-citation/publisher-name">
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>span:publisher[</xsl:text><xsl:value-of select="."/><xsl:text>]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
 	
 	<!-- Example: <publisher-loc>Pittsburgh, PA</publisher-loc> -->
-	<!-- <xsl:template match="mixed-citation/publisher-loc">
-		<xsl:text>span:pubplace[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
-	</xsl:template> -->
-	
-
-	<!-- Example:
-	<person-group person-group-type="author">
-		<string-name>
-		<surname>Pedersen</surname>, <given-names>R. S.</given-names>
-		</string-name>
-		</person-group>
-	-->
-	<!-- <xsl:template match="mixed-citation//surname">
-		
+	<xsl:template match="mixed-citation/publisher-loc">
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>span:pubplace[</xsl:text><xsl:value-of select="."/><xsl:text>]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
-	<xsl:template match="mixed-citation//given-names">
-		<xsl:variable name="type_" select="ancestor::person-group/@person-group-type"/>
-		<xsl:variable name="type">
-			<xsl:if test="$type_ != '' and $type_ != 'author'">.<xsl:value-of select="$type_"/></xsl:if>
-		</xsl:variable>
-		<xsl:text>span:givenname</xsl:text><xsl:value-of select="$type"/><xsl:text>[</xsl:text><xsl:apply-templates/><xsl:text>]</xsl:text>
-	</xsl:template> -->
 	
 	<!-- Example: <pub-id specific-use="repno">GET 2500</pub-id> -->
 	<!-- <xsl:template match="mixed-citation[@publication-type != 'standard']/pub-id">
@@ -4820,8 +4805,8 @@
 			
 			<!-- remove multiple new line characters -->
 			<xsl:variable name="reference_item_1" select="java:replaceAll(java:java.lang.String.new($reference_item),'(&#xa;){2,}','&#xa;')"/>
-			<!-- remove new line before comma or dot or space -->
-			<xsl:variable name="reference_item_2" select="java:replaceAll(java:java.lang.String.new($reference_item_1),'(&#xa;)(\.|,| )','$2')"/>
+			<!-- remove new line before comma or dot or space or : or ) -->
+			<xsl:variable name="reference_item_2" select="java:replaceAll(java:java.lang.String.new($reference_item_1),'(&#xa;)(\.|,| |:|\))','$2')"/>
 			<xsl:value-of select="$reference_item_2"/>
 			
 			<xsl:text>&#xa;&#xa;</xsl:text>
