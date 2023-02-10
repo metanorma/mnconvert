@@ -3523,7 +3523,8 @@
 	<xsl:template match="fn[preceding-sibling::*[1][self::code][xref[@ref-type = 'fn']]]" priority="2"/>
 	
 	<xsl:template match="fn" name="fn">
-		<xsl:if test="preceding-sibling::node()[normalize-space() != ''][1][self::fn]">
+		<xsl:if test="preceding-sibling::node()[normalize-space() != ''][1][self::fn] and not(parent::fn-group)">
+			<!-- add comma between footnotes sequence -->
 			<xsl:text>,</xsl:text>
 		</xsl:if>
 		<xsl:text> footnote:[</xsl:text>
