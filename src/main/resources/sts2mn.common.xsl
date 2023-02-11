@@ -860,7 +860,7 @@
 		<xsl:variable name="id_normalized1" select="java:replaceAll(java:java.lang.String.new($id), $regex_refid_replacement, '_')"/> <!-- replace space, non-break space, colon, plus, slash to _ -->
 		
 		<xsl:variable name="id_normalized2" select="translate($id_normalized1, '&#x2011;', '-')"/> <!-- replace non-breaking hyphen minus to simple minus-->
-		<xsl:variable name="first_char" select="substring(id_normalized2,1,1)"/>
+		<xsl:variable name="first_char" select="substring($id_normalized2,1,1)"/>
 		<xsl:if test="$first_char != '' and translate($first_char, '0123456789', '') = ''">_</xsl:if> <!-- if first char is digit, then add _ -->
 		<xsl:value-of select="normalize-space($id_normalized2)"/>
 	</xsl:template>
