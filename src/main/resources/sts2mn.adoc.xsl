@@ -734,7 +734,7 @@
 					<xsl:if test="position() = 1">
 						<xsl:text>:bsi-related: </xsl:text>
 					</xsl:if>
-					<xsl:value-of select="."/>
+					<xsl:value-of select="normalize-space(.)"/>
 					<xsl:if test="position() != last()">; </xsl:if>
 					<xsl:if test="position() = last()"><xsl:text>&#xa;</xsl:text></xsl:if>
 				</xsl:for-each>
@@ -954,20 +954,23 @@
 	
 	
 	<xsl:template match="std-ident[ancestor::front or ancestor::adoption-front]">
-		<xsl:text>= </xsl:text>
-		<xsl:value-of select="originator"/>
-		<xsl:text> </xsl:text>
-		<xsl:variable name="docnumber">
-			<xsl:call-template name="getDocNumber">
-				<xsl:with-param name="value" select="doc-number"/>
-			</xsl:call-template>
+		<xsl:variable name="adoc_title">
+			<xsl:text>= </xsl:text>
+			<xsl:value-of select="originator"/>
+			<xsl:text> </xsl:text>
+			<xsl:variable name="docnumber">
+				<xsl:call-template name="getDocNumber">
+					<xsl:with-param name="value" select="doc-number"/>
+				</xsl:call-template>
+			</xsl:variable>
+			<xsl:value-of select="$docnumber"/>
+			
+			<xsl:if test="part-number != '' and not(contains($docnumber, concat('-', part-number)))">
+				<xsl:text>-</xsl:text>
+				<xsl:value-of select="part-number"/>
+			</xsl:if>
 		</xsl:variable>
-		<xsl:value-of select="$docnumber"/>
-		
-		<xsl:if test="part-number != '' and not(contains($docnumber, concat('-', part-number)))">
-			<xsl:text>-</xsl:text>
-			<xsl:value-of select="part-number"/>
-		</xsl:if>
+		<xsl:value-of select="normalize-space($adoc_title)"/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
@@ -1056,7 +1059,7 @@
 		<xsl:variable name="date">
 			<xsl:choose>
 				<xsl:when test="normalize-space(@iso-8601-date) != ''"><xsl:value-of select="@iso-8601-date"/></xsl:when>
-				<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+				<xsl:otherwise><xsl:value-of select="normalize-space(.)"/></xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
 		<xsl:if test="normalize-space($date) != ''">
@@ -1129,7 +1132,7 @@
 				
 				<xsl:variable name="lang" select="@xml:lang"/>
 				<xsl:for-each select="xalan:nodeset($title_components)/*">
-					<xsl:text>:</xsl:text><xsl:value-of select="@type"/><xsl:text>-</xsl:text><xsl:value-of select="$lang"/><xsl:text>: </xsl:text><xsl:value-of select="."/>
+					<xsl:text>:</xsl:text><xsl:value-of select="@type"/><xsl:text>-</xsl:text><xsl:value-of select="$lang"/><xsl:text>: </xsl:text><xsl:value-of select="normalize-space(.)"/>
 					<xsl:text>&#xa;</xsl:text>
 				</xsl:for-each>
 				
@@ -1304,9 +1307,9 @@
 				<xsl:text>:docsubstage: 60</xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:text>:docstage: </xsl:text>
+				<xsl:text>:docstage:</xsl:text>
 				<xsl:text>&#xa;</xsl:text>
-				<xsl:text>:docsubstage: </xsl:text>
+				<xsl:text>:docsubstage:</xsl:text>
 			</xsl:otherwise>
 		</xsl:choose>
 		<xsl:text>&#xa;</xsl:text>
@@ -1388,7 +1391,7 @@
 	
 	<xsl:template match="custom-meta-group/custom-meta[not(meta-name = 'ISBN' or meta-name = 'TOC Heading Level')]">
 		<xsl:if test="not(preceding-sibling::custom-meta[meta-name = current()/meta-name])">
-			<xsl:text>:semantic-metadata-</xsl:text><xsl:value-of select="translate(java:toLowerCase(java:java.lang.String.new(meta-name)), ' ', '-')"/><xsl:text>: </xsl:text><xsl:value-of select="meta-value"/>
+			<xsl:text>:semantic-metadata-</xsl:text><xsl:value-of select="translate(java:toLowerCase(java:java.lang.String.new(meta-name)), ' ', '-')"/><xsl:text>: </xsl:text><xsl:value-of select="normalize-space(meta-value)"/>
 			<xsl:for-each select="following-sibling::custom-meta[meta-name = current()/meta-name]">
 			<xsl:text>, </xsl:text>
 			<xsl:if test="contains(meta-value, ',')">"</xsl:if>
@@ -1429,7 +1432,7 @@
 	</xsl:template>
 	
 	<xsl:template match="meta-date[normalize-space(@type) != '']">
-		<xsl:text>:semantic-metadata-</xsl:text><xsl:value-of select="java:toLowerCase(java:java.lang.String.new(@type))"/><xsl:text>: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>:semantic-metadata-</xsl:text><xsl:value-of select="java:toLowerCase(java:java.lang.String.new(@type))"/><xsl:text>: </xsl:text><xsl:value-of select="normalize-space(.)"/>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
@@ -1452,7 +1455,7 @@
 		<xsl:choose>
 			<xsl:when test="$inputformat = 'IEEE'"><!-- skip --></xsl:when>
 			<xsl:otherwise>
-				<xsl:text>:semantic-metadata-copyright-statement: </xsl:text><xsl:value-of select="."/>
+				<xsl:text>:semantic-metadata-copyright-statement: </xsl:text><xsl:value-of select="normalize-space(.)"/>
 				<xsl:text>&#xa;</xsl:text>
 			</xsl:otherwise>
 		</xsl:choose>
@@ -2280,24 +2283,28 @@
 				<xsl:text>&#xa;&#xa;</xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:variable name="calculated_level">
-					<xsl:choose>
-						<xsl:when test="parent::sec/@sec_depth"><xsl:value-of select="parent::sec/@sec_depth"/></xsl:when>
-						<xsl:otherwise>0</xsl:otherwise>
-					</xsl:choose>
+				<xsl:variable name="title_text">
+					<xsl:variable name="calculated_level">
+						<xsl:choose>
+							<xsl:when test="parent::sec/@sec_depth"><xsl:value-of select="parent::sec/@sec_depth"/></xsl:when>
+							<xsl:otherwise>0</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+					<xsl:variable name="level">
+						<xsl:call-template name="getLevel">
+							<xsl:with-param name="calculated_level" select="$calculated_level"/>
+						</xsl:call-template>
+					</xsl:variable>				
+					<xsl:value-of select="$level"/>
+					<xsl:text> </xsl:text>
+					<xsl:value-of select="$ace_tag"/>
+					<xsl:apply-templates />
+					<xsl:if test="not(ancestor::sec[@sec-type = 'norm-refs'])">
+						<xsl:call-template name="addIndexTerms"/>
+					</xsl:if>
 				</xsl:variable>
-				<xsl:variable name="level">
-					<xsl:call-template name="getLevel">
-						<xsl:with-param name="calculated_level" select="$calculated_level"/>
-					</xsl:call-template>
-				</xsl:variable>				
-				<xsl:value-of select="$level"/>
-				<xsl:text> </xsl:text>
-				<xsl:value-of select="$ace_tag"/>
-				<xsl:apply-templates />
-				<xsl:if test="not(ancestor::sec[@sec-type = 'norm-refs'])">
-					<xsl:call-template name="addIndexTerms"/>
-				</xsl:if>
+				<xsl:value-of select="normalize-space($title_text)"/>
+				
 				<xsl:text>&#xa;</xsl:text>
 				<xsl:text>&#xa;</xsl:text>
 			</xsl:otherwise>
@@ -2550,7 +2557,9 @@
 				<xsl:if test="not($inputformat = 'IEEE' and contains($p_text,'Bibliographical references are') and parent::app and following-sibling::ref-list)">
 					<xsl:value-of select="$operator"/><xsl:if test="$operator != ''"><xsl:text>:[</xsl:text></xsl:if>
 					
-					<xsl:value-of select="$p_text"/>
+					<!-- <xsl:value-of select="$p_text"/> -->
+					<!-- remove space at the end if paragraph (occurs due pretty-print view in the source XML) -->
+					<xsl:value-of select="java:replaceAll(java:java.lang.String.new($p_text),' $','')"/>
 					
 					<xsl:if test="$operator != ''"><xsl:text>]</xsl:text></xsl:if>
 					
