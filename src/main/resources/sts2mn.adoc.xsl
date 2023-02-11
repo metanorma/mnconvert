@@ -3721,7 +3721,14 @@
 		<uri>https://bookshop.europa.eu/en/value-management-pbCDNA16096/</uri> -->
 	<xsl:template match="mixed-citation/ext-link | mixed-citation/uri">
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>span:uri[</xsl:text><xsl:value-of select="."/>
+		<xsl:variable name="link">
+			<xsl:choose>
+				<xsl:when test="normalize-space(@xlink:href) != ''"><xsl:value-of select="normalize-space(@xlink:href)"/></xsl:when>
+				<xsl:otherwise><xsl:value-of select="normalize-space(.)"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<!-- remove space from link -->
+		<xsl:text>span:uri[</xsl:text><xsl:value-of select="translate($link, ' ', '')"/>
 		<xsl:text>]&#xa;</xsl:text>
 	</xsl:template>
 	
