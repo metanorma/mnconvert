@@ -550,7 +550,13 @@
 	<xsl:template name="insertCommonAttributes">
 		<xsl:text>:mn-document-class: </xsl:text><xsl:value-of select="$sdo"/>
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>:mn-output-extensions: xml,html,doc,pdf,rxl</xsl:text> <!-- ,doc,html_alt -->
+		<xsl:variable name="mn_output_extensions">
+			<xsl:choose>
+				<xsl:when test="$organization = 'BSI' or $organization = 'PAS'">xml,html,pdf,rxl</xsl:when>
+				<xsl:otherwise>xml,html,doc,pdf,rxl</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:text>:mn-output-extensions: </xsl:text><xsl:value-of select="$mn_output_extensions"/> <!-- ,doc,html_alt -->
 		<xsl:text>&#xa;</xsl:text>
 		
 		<xsl:text>:local-cache-only:</xsl:text>
