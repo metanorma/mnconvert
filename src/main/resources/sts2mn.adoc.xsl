@@ -3695,7 +3695,7 @@
 		<!-- <xsl:if test="not(preceding-sibling::node()[normalize-space() != ''][1][self::*])"> -->
 			<xsl:text>&#xa;</xsl:text>
 		<!-- </xsl:if> -->
-		<xsl:text>span:year[</xsl:text><xsl:value-of select="."/>
+		<xsl:text>span:date[</xsl:text><xsl:value-of select="."/>
 		<xsl:text>]&#xa;</xsl:text>
 	</xsl:template>
 	
