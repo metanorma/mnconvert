@@ -1059,7 +1059,13 @@
 	<xsl:template match="preface/clause[@type = 'corrigenda']"  mode="publication_info">
 		<sec>
 			<xsl:copy-of select="@id"/>
-			<xsl:apply-templates />
+			<xsl:variable name="data_corrigenda">
+				<xsl:apply-templates />
+			</xsl:variable>
+			<xsl:if test="not(xalan:nodeset($data_corrigenda)/label)">
+				<label/>
+			</xsl:if>
+			<xsl:copy-of select="$data_corrigenda"/>
 		</sec>
 	</xsl:template>
 	<!-- ================================== -->
@@ -2184,7 +2190,8 @@
 																metanorma-extension/semantic-metadata/copyright-statement |
 																metanorma-extension/semantic-metadata/color-preface-background |
 																metanorma-extension/presentation-metadata/* |
-																metanorma-extension/table[@id = '_misccontainer_anchor_aliases']"
+																metanorma-extension/table[@id = '_misccontainer_anchor_aliases'] |
+																metanorma-extension/*[local-name() = 'UnitsML']"
 																mode="front_check"/>
 
 	<!-- skip processed structure and deep down -->
