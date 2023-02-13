@@ -2398,6 +2398,7 @@
 					
 					<!-- <xsl:apply-templates select="title"/> -->
 					<xsl:copy-of select="$title"/>
+					<xsl:if test="normalize-space($title) = ''"><label/></xsl:if>
 					
 					<xsl:if test="$metanorma_type = 'IEC' and $name = 'foreword'">
 						<!-- put legal-statement in Foreword -->
@@ -6079,6 +6080,10 @@
 			</xsl:choose>
 			<xsl:apply-templates/>
 		</styled-content>
+	</xsl:template>
+
+	<xsl:template match="add[contains(., 'ace-tag')]">
+		<named-content content-type="ace-tag" specific-use="{substring-after(., 'ace-tag_')}"/>
 	</xsl:template>
 
 	<!-- ======================= -->
