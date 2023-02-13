@@ -3294,7 +3294,7 @@
 		
 		<!-- move internal spaces from bold to around it -->
 		<xsl:variable name="text_preceding" select="preceding-sibling::node()[1]"/>
-		<xsl:if test="starts-with($text, ' ') and not(java:endsWith(java:java.lang.String.new($text_preceding),' '))"><xsl:text> </xsl:text></xsl:if>
+		<xsl:if test="starts-with($text, ' ') and not(java:endsWith(java:java.lang.String.new($text_preceding),' ')) and $text_preceding != ''"><xsl:text> </xsl:text></xsl:if>
 		
 		<xsl:if test="self::bold2"><xsl:text>*</xsl:text></xsl:if>
 		<xsl:text>*</xsl:text><xsl:value-of select="normalize-space($text)"/><xsl:text>*</xsl:text>
@@ -3302,7 +3302,7 @@
 		
 		<!-- move internal spaces from italic to around it -->
 		<xsl:variable name="text_following" select="following-sibling::node()[1]"/>
-		<xsl:if test="java:endsWith(java:java.lang.String.new($text),' ') and not(starts-with($text_following, ' '))"><xsl:text> </xsl:text></xsl:if>
+		<xsl:if test="java:endsWith(java:java.lang.String.new($text),' ') and not(starts-with($text_following, ' ')) and $text_following != ''"><xsl:text> </xsl:text></xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="italic | italic2">
