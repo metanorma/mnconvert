@@ -2283,28 +2283,28 @@
 				<xsl:text>&#xa;&#xa;</xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
+
+				<xsl:variable name="calculated_level">
+					<xsl:choose>
+						<xsl:when test="parent::sec/@sec_depth"><xsl:value-of select="parent::sec/@sec_depth"/></xsl:when>
+						<xsl:otherwise>0</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:variable name="level">
+					<xsl:call-template name="getLevel">
+						<xsl:with-param name="calculated_level" select="$calculated_level"/>
+					</xsl:call-template>
+				</xsl:variable>				
+				<xsl:value-of select="$level"/>
+				<xsl:text> </xsl:text>
+				<xsl:value-of select="$ace_tag"/>
 				<xsl:variable name="title_text">
-					<xsl:variable name="calculated_level">
-						<xsl:choose>
-							<xsl:when test="parent::sec/@sec_depth"><xsl:value-of select="parent::sec/@sec_depth"/></xsl:when>
-							<xsl:otherwise>0</xsl:otherwise>
-						</xsl:choose>
-					</xsl:variable>
-					<xsl:variable name="level">
-						<xsl:call-template name="getLevel">
-							<xsl:with-param name="calculated_level" select="$calculated_level"/>
-						</xsl:call-template>
-					</xsl:variable>				
-					<xsl:value-of select="$level"/>
-					<xsl:text> </xsl:text>
-					<xsl:value-of select="$ace_tag"/>
 					<xsl:apply-templates />
-					<xsl:if test="not(ancestor::sec[@sec-type = 'norm-refs'])">
-						<xsl:call-template name="addIndexTerms"/>
-					</xsl:if>
 				</xsl:variable>
 				<xsl:value-of select="normalize-space($title_text)"/>
-				
+				<xsl:if test="not(ancestor::sec[@sec-type = 'norm-refs'])">
+					<xsl:call-template name="addIndexTerms"/>
+				</xsl:if>
 				<xsl:text>&#xa;</xsl:text>
 				<xsl:text>&#xa;</xsl:text>
 			</xsl:otherwise>
