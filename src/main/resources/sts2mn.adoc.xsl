@@ -2277,9 +2277,17 @@
 		<xsl:choose>
 			<xsl:when test="parent::sec/@sec-type = 'foreword'">
 				<xsl:text>== </xsl:text>
-				<xsl:value-of select="$ace_tag"/>
-				<xsl:apply-templates />
-				<xsl:call-template name="addIndexTerms"/>
+				
+				<xsl:variable name="title_text">
+					<xsl:value-of select="$ace_tag"/>
+					<xsl:apply-templates />
+					<xsl:call-template name="addIndexTerms"/>
+				</xsl:variable>
+				<xsl:value-of select="$title_text"/>
+				<xsl:if test="$title_text = ''">
+					<xsl:text>{blank}</xsl:text>
+				</xsl:if>
+				
 				<xsl:text>&#xa;&#xa;</xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
@@ -2294,17 +2302,25 @@
 					<xsl:call-template name="getLevel">
 						<xsl:with-param name="calculated_level" select="$calculated_level"/>
 					</xsl:call-template>
-				</xsl:variable>				
+				</xsl:variable>
 				<xsl:value-of select="$level"/>
 				<xsl:text> </xsl:text>
-				<xsl:value-of select="$ace_tag"/>
+				
 				<xsl:variable name="title_text">
-					<xsl:apply-templates />
+					<xsl:value-of select="$ace_tag"/>
+					<xsl:variable name="title_text_">
+						<xsl:apply-templates />
+					</xsl:variable>
+					<xsl:value-of select="normalize-space($title_text_)"/>
+					<xsl:if test="not(ancestor::sec[@sec-type = 'norm-refs'])">
+						<xsl:call-template name="addIndexTerms"/>
+					</xsl:if>
 				</xsl:variable>
-				<xsl:value-of select="normalize-space($title_text)"/>
-				<xsl:if test="not(ancestor::sec[@sec-type = 'norm-refs'])">
-					<xsl:call-template name="addIndexTerms"/>
+				<xsl:value-of select="$title_text"/>
+				<xsl:if test="$title_text = ''">
+					<xsl:text>{blank}</xsl:text>
 				</xsl:if>
+				
 				<xsl:text>&#xa;</xsl:text>
 				<xsl:text>&#xa;</xsl:text>
 			</xsl:otherwise>
