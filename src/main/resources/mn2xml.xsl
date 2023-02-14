@@ -1012,6 +1012,8 @@
 				<label/>
 			</xsl:if>
 			<xsl:copy-of select="$data"/>
+			
+			<!-- 
 			<xsl:apply-templates select="bibdata/docidentifier[@type = 'ISBN']" mode="publication_info"/>
 			
 			<xsl:if test="bibdata/ext/ics">
@@ -1022,11 +1024,11 @@
 						<xsl:if test="position() != last()">; </xsl:if>
 					</xsl:for-each>
 				</p>
-			</xsl:if>
+			</xsl:if> -->
 			
 			<xsl:apply-templates select="preface/clause[@type = 'related-refs']"  mode="publication_info"/>
 			
-			<xsl:apply-templates select="preface/clause[@type = 'corrigenda']"  mode="publication_info"/>
+			<!-- <xsl:apply-templates select="clause[@type = 'corrigenda' or @type = 'publication-history']"  mode="publication_info"/> --> <!-- preface/ -->
 			
 		</sec>
 	</xsl:template>
@@ -1055,8 +1057,8 @@
 		<xsl:apply-templates />
 	</xsl:template>
 	
-	<xsl:template match="preface/clause[@type = 'corrigenda']" priority="2" mode="front_preface"/>
-	<xsl:template match="preface/clause[@type = 'corrigenda']"  mode="publication_info">
+	<xsl:template match="clause[@type = 'corrigenda' or @type = 'publication-history']" priority="2" mode="front_preface"/> <!-- preface/ -->
+	<xsl:template match="clause[@type = 'corrigenda' or @type = 'publication-history']"  mode="publication_info"> <!-- preface/ -->
 		<sec>
 			<xsl:copy-of select="@id"/>
 			<xsl:variable name="data_corrigenda">
@@ -2229,15 +2231,15 @@
 	<xsl:template match="boilerplate/copyright-statement">
 		<xsl:apply-templates/>
 	</xsl:template>
-	<xsl:template match="boilerplate/copyright-statement/clause" priority="1">
+	<xsl:template match="boilerplate/copyright-statement/clause[not(@type = 'publication-history')]" priority="1">
 		<xsl:apply-templates/>
 	</xsl:template>
-	<xsl:template match="boilerplate/copyright-statement//title"  priority="1">
+	<xsl:template match="boilerplate/copyright-statement//title[not(ancestor::clause/@type = 'publication-history')]"  priority="1">
 		<copyright-statement>
 			<xsl:apply-templates/>
 		</copyright-statement>
 	</xsl:template>
-	<xsl:template match="boilerplate/copyright-statement//p"  priority="1">
+	<xsl:template match="boilerplate/copyright-statement//p[not(ancestor::clause/@type = 'publication-history')]"  priority="1">
 		<xsl:variable name="id" select="normalize-space(@id)"/>
 		<xsl:if test="$id != 'boilerplate-year' or $organization != 'BSI'">
 			<copyright-statement>
