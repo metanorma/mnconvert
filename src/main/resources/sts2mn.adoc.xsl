@@ -39,6 +39,11 @@
 	
 	<xsl:variable name="OUTPUT_FORMAT">adoc</xsl:variable> <!-- don't change it -->
 	
+	<xsl:variable name="FILENAME_NATIONAL_FOREWORD">national-foreword.adoc</xsl:variable>
+	<xsl:variable name="FILENAME_EUROPEAN_PREFACE">en-preface.adoc</xsl:variable>
+	<xsl:variable name="FILENAME_FOREWORD">00-foreword.adoc</xsl:variable>
+	<xsl:variable name="FILENAME_INTRODUCTION">00-introduction.adoc</xsl:variable>
+	
 	<!-- false --> <!-- true, for new features -->
 	<!-- <xsl:variable name="demomode">
 		<xsl:choose>
@@ -335,7 +340,19 @@
 								
 								<xsl:text>&#xa;&#xa;</xsl:text>
 								
-								<xsl:apply-templates select="ancestor::front/sec[contains(@id, '_nat') or title = 'National foreword']"/>
+								<!-- National foreword -->
+								<xsl:variable name="national_foreword">
+									<xsl:apply-templates select="ancestor::front/sec[contains(@id, '_nat') or title = 'National foreword']"/>
+								</xsl:variable>
+								<xsl:if test="normalize-space($national_foreword) != ''">
+									<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
+									<redirect:write file="{$outpath}/{$sectionsFolder}/{$FILENAME_NATIONAL_FOREWORD}">
+										<xsl:value-of select="$national_foreword"/>
+									</redirect:write>
+									
+									<xsl:text>include::</xsl:text><xsl:value-of select="concat($sectionsFolder, '/', $FILENAME_NATIONAL_FOREWORD, '[]')"/>
+									<xsl:text>&#xa;&#xa;</xsl:text>
+								</xsl:if>
 								
 								<xsl:variable name="embed_file_">
 									<xsl:choose>
@@ -356,6 +373,17 @@
 									<xsl:with-param name="embed_file"  select="normalize-space($embed_file_)"/>
 								</xsl:call-template>
 								
+								<!-- National Annex NZ -->
+								<xsl:for-each select="ancestor::standard//app[starts-with(@id, 'sec_NZ')]">
+									<xsl:variable name="annex_label_" select="translate(label, ' &#xa0;', '--')" />
+									<xsl:variable name="annex_label" select="java:toLowerCase(java:java.lang.String.new($annex_label_))" />
+									<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
+									<xsl:text>&#xa;</xsl:text>
+									<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/</xsl:text><xsl:value-of select="$annex_label"/><xsl:text>.adoc[]</xsl:text>
+									<xsl:text>&#xa;&#xa;</xsl:text>
+
+								</xsl:for-each>
+								
 							</xsl:if>
 							<!-- ========================= -->
 							<!-- END nat-meta processing -->
@@ -372,7 +400,19 @@
 								
 								<xsl:text>&#xa;&#xa;</xsl:text>
 								
-								<xsl:apply-templates select="ancestor::front/sec[contains(@id, '_euro') or title = 'European foreword']"/>
+								<!-- European foreword -->
+								<xsl:variable name="european_foreword">
+									<xsl:apply-templates select="ancestor::front/sec[contains(@id, '_euro') or title = 'European foreword']"/>
+								</xsl:variable>
+								<xsl:if test="normalize-space($european_foreword) != ''">
+									<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
+									<redirect:write file="{$outpath}/{$sectionsFolder}/{$FILENAME_EUROPEAN_PREFACE}">
+										<xsl:value-of select="$european_foreword"/>
+									</redirect:write>
+									
+									<xsl:text>include::</xsl:text><xsl:value-of select="concat($sectionsFolder, '/', $FILENAME_EUROPEAN_PREFACE, '[]')"/>
+									<xsl:text>&#xa;&#xa;</xsl:text>
+								</xsl:if>
 								
 								<xsl:variable name="embed_file_">
 									<xsl:choose>
@@ -386,7 +426,7 @@
 								
 								<xsl:for-each select="ancestor::standard//app[starts-with(@id, 'sec_Z')]">
 									<xsl:variable name="annex_label_" select="translate(label, ' &#xa0;', '--')" />
-									<xsl:variable name="annex_label" select="java:toLowerCase(java:java.lang.String.new($annex_label_))" />
+									<xsl:variable name="annex_label" select="concat('en-', java:toLowerCase(java:java.lang.String.new($annex_label_)))" />
 									<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 									
 									<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/</xsl:text><xsl:value-of select="$annex_label"/><xsl:text>.adoc[]</xsl:text>
@@ -412,9 +452,26 @@
 								
 								<xsl:text>&#xa;&#xa;</xsl:text>
 								
-								<xsl:apply-templates select="ancestor::front/sec[not(contains(@id, '_nat') or title = 'National foreword' or contains(@id, '_euro') or title = 'European foreword')]"/>
-								
-								<xsl:text>&#xa;&#xa;</xsl:text>
+								<!-- Foreword and another front sections, except National foreword and European foreword -->
+								<xsl:for-each select="ancestor::front/sec[not(contains(@id, '_nat') or title = 'National foreword' or contains(@id, '_euro') or title = 'European foreword')]">
+									<xsl:variable name="preface_section">
+										<xsl:apply-templates select="."/>
+									</xsl:variable>
+									<xsl:variable name="preface_section_filename">
+										<xsl:variable name="section_label_" select="translate(title, ' &#xa0;', '--')" />
+										<xsl:variable name="section_label" select="concat('00-', java:toLowerCase(java:java.lang.String.new($section_label_)), '.adoc')" />
+										<xsl:value-of select="$section_label"/>
+									</xsl:variable>
+									<xsl:if test="normalize-space($preface_section) != ''">
+										<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
+										<redirect:write file="{$outpath}/{$sectionsFolder}/{$preface_section_filename}">
+											<xsl:value-of select="$preface_section"/>
+										</redirect:write>
+										
+										<xsl:text>include::</xsl:text><xsl:value-of select="concat($sectionsFolder, '/', $preface_section_filename, '[]')"/>
+										<xsl:text>&#xa;&#xa;</xsl:text>
+									</xsl:if>
+								</xsl:for-each>
 								
 							</xsl:if>
 							
@@ -422,7 +479,7 @@
 							<!-- END iso-meta processing -->
 							<!-- ========================= -->
 
-						</xsl:if>
+						</xsl:if> <!-- END: $one_document = 'false' -->
 												
 					</redirect:write>
 					
@@ -1918,10 +1975,11 @@
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:apply-templates />
 	</xsl:template>
-	
+
+	<!-- Introduction -->
 	<xsl:template match="body/sec[@sec-type = 'intro']" priority="2">
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
-		<redirect:write file="{$outpath}/{$sectionsFolder}/00-introduction.adoc">
+		<redirect:write file="{$outpath}/{$sectionsFolder}/{$FILENAME_INTRODUCTION}">
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:text>[[introduction]]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
@@ -1930,11 +1988,12 @@
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$docfile}">
-			<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/00-introduction.adoc[]</xsl:text>
+			<xsl:text>include::</xsl:text><xsl:value-of select="concat($sectionsFolder, '/', $FILENAME_INTRODUCTION, '[]')"/>
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</redirect:write>
 	</xsl:template>
 	
+	<!-- Scope -->
 	<xsl:template match="body/sec[@sec-type = 'scope'] | front/sec[@sec-type = 'scope']" priority="2">
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$sectionsFolder}/01-scope.adoc">
@@ -4317,8 +4376,9 @@
 	<xsl:template match="app">
 		<xsl:variable name="annex_label_" select="translate(label, ' &#xa0;', '--')" />
 		<xsl:variable name="annex_label" select="java:toLowerCase(java:java.lang.String.new($annex_label_))" />
+		<xsl:variable name="annex_label_prefix"><xsl:if test="$one_document = 'false' and starts-with(@id, 'sec_Z')">en-</xsl:if></xsl:variable>
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
-		<redirect:write file="{$outpath}/{$sectionsFolder}/{$annex_label}.adoc">
+		<redirect:write file="{$outpath}/{$sectionsFolder}/{$annex_label_prefix}{$annex_label}.adoc">
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:if test="not($inputformat = 'IEEE' and ref-list)"><!-- special case for IEEE, ref-list inside app -->
 				<xsl:call-template name="setId"/>
@@ -4332,10 +4392,11 @@
 		
 		<xsl:choose>
 			<xsl:when test="$one_document = 'false' and starts-with(@id, 'sec_Z')"/> <!-- include:: created in national doc --> <!-- $demomode = 'true' and  -->
+			<xsl:when test="$one_document = 'false' and starts-with(@id, 'sec_NZ')"/> <!-- include:: created in national doc --> <!-- $demomode = 'true' and  -->
 			<xsl:otherwise>
 				<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
 				<redirect:write file="{$outpath}/{$docfile}">
-					<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/</xsl:text><xsl:value-of select="$annex_label"/><xsl:text>.adoc[]</xsl:text>
+					<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/</xsl:text><xsl:value-of select="$annex_label_prefix"/><xsl:value-of select="$annex_label"/><xsl:text>.adoc[]</xsl:text>
 					<xsl:text>&#xa;&#xa;</xsl:text>
 				</redirect:write>
 			</xsl:otherwise>
