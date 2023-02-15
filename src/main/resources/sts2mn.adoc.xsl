@@ -43,6 +43,7 @@
 	<xsl:variable name="FILENAME_EUROPEAN_PREFACE">en-preface.adoc</xsl:variable>
 	<xsl:variable name="FILENAME_FOREWORD">00-foreword.adoc</xsl:variable>
 	<xsl:variable name="FILENAME_INTRODUCTION">00-introduction.adoc</xsl:variable>
+	<xsl:variable name="FILENAME_COLLECTION">metanorma.yml</xsl:variable>
 	
 	<!-- false --> <!-- true, for new features -->
 	<!-- <xsl:variable name="demomode">
@@ -308,6 +309,9 @@
 			</xsl:when>
 			<xsl:otherwise> --> <!-- demo mode -->
 				
+				
+				<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
+			
 				<xsl:for-each select="*[contains(local-name(), '-meta')]">
 					<xsl:variable name="docfile_bib">
 						<xsl:choose>
@@ -345,7 +349,7 @@
 									<xsl:apply-templates select="ancestor::front/sec[contains(@id, '_nat') or title = 'National foreword']"/>
 								</xsl:variable>
 								<xsl:if test="normalize-space($national_foreword) != ''">
-									<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
+									
 									<redirect:write file="{$outpath}/{$sectionsFolder}/{$FILENAME_NATIONAL_FOREWORD}">
 										<xsl:value-of select="$national_foreword"/>
 									</redirect:write>
@@ -377,7 +381,7 @@
 								<xsl:for-each select="ancestor::standard//app[starts-with(@id, 'sec_NZ')]">
 									<xsl:variable name="annex_label_" select="translate(label, ' &#xa0;', '--')" />
 									<xsl:variable name="annex_label" select="java:toLowerCase(java:java.lang.String.new($annex_label_))" />
-									<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
+									
 									<xsl:text>&#xa;</xsl:text>
 									<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/</xsl:text><xsl:value-of select="$annex_label"/><xsl:text>.adoc[]</xsl:text>
 									<xsl:text>&#xa;&#xa;</xsl:text>
@@ -405,7 +409,7 @@
 									<xsl:apply-templates select="ancestor::front/sec[contains(@id, '_euro') or title = 'European foreword']"/>
 								</xsl:variable>
 								<xsl:if test="normalize-space($european_foreword) != ''">
-									<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
+									
 									<redirect:write file="{$outpath}/{$sectionsFolder}/{$FILENAME_EUROPEAN_PREFACE}">
 										<xsl:value-of select="$european_foreword"/>
 									</redirect:write>
@@ -427,7 +431,6 @@
 								<xsl:for-each select="ancestor::standard//app[starts-with(@id, 'sec_Z')]">
 									<xsl:variable name="annex_label_" select="translate(label, ' &#xa0;', '--')" />
 									<xsl:variable name="annex_label" select="concat('en-', java:toLowerCase(java:java.lang.String.new($annex_label_)))" />
-									<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 									
 									<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/</xsl:text><xsl:value-of select="$annex_label"/><xsl:text>.adoc[]</xsl:text>
 									<xsl:text>&#xa;&#xa;</xsl:text>
@@ -463,7 +466,7 @@
 										<xsl:value-of select="$section_label"/>
 									</xsl:variable>
 									<xsl:if test="normalize-space($preface_section) != ''">
-										<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
+
 										<redirect:write file="{$outpath}/{$sectionsFolder}/{$preface_section_filename}">
 											<xsl:value-of select="$preface_section"/>
 										</redirect:write>
@@ -485,12 +488,57 @@
 					
 				</xsl:for-each>
 					
+				<xsl:if test="$one_document = 'false'">
+					<!-- metanorma.yml collection:
+					- - -
+					metanorma:
+						source:
+							files:
+								- iso-13485.adoc
+								- en-iso-13485.adoc
+								- bs-en-iso-13485.adoc
+
+						collection:
+							name: BS EN ISO 13485
+							organization: The British Standards Institution
+					-->
+					<redirect:write file="{$outpath}/{$FILENAME_COLLECTION}">
+						<xsl:text>---&#xa;</xsl:text>
+						<xsl:text>metanorma:&#xa;</xsl:text>
+						<xsl:text>  source:&#xa;</xsl:text>
+						<xsl:text>    files:&#xa;</xsl:text>
+						
+						<xsl:for-each select="*[contains(local-name(), '-meta')]">
+							<xsl:variable name="docfile_bib">
+								<xsl:call-template name="getMetaBibFilename"/>
+							</xsl:variable>
+								
+							<xsl:text>      - </xsl:text><xsl:value-of select="$docfile_bib"/>
+							<xsl:text>&#xa;</xsl:text>
+							
+						</xsl:for-each>
+						<xsl:text>&#xa;</xsl:text>
+						<xsl:text>  collection:&#xa;</xsl:text>
+						<xsl:text>    name: </xsl:text>
+						<xsl:variable name="doc_name">
+							<xsl:apply-templates select="*[contains(local-name(), '-meta')][last()]/std-ident[ancestor::front or ancestor::adoption-front]"/>
+						</xsl:variable>
+						<xsl:value-of select="normalize-space(substring-after($doc_name,'='))"/>
+						<xsl:text>&#xa;</xsl:text>
+						<xsl:text>    organization: </xsl:text>
+						<xsl:choose>
+							<xsl:when test="$organization = 'BSI'">The British Standards Institution</xsl:when>
+							<xsl:otherwise></xsl:otherwise>
+						</xsl:choose>
+						<xsl:text>&#xa;</xsl:text>
+					</redirect:write>
+				</xsl:if>
+			
 			<!-- </xsl:otherwise>
 		</xsl:choose> -->
 	
-		
-		
-
+	
+	
 		<xsl:if test="$split-bibdata != 'true'">
 			
 			
@@ -1986,7 +2034,6 @@
 			<xsl:apply-templates />
 		</redirect:write>
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
-		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$docfile}">
 			<xsl:text>include::</xsl:text><xsl:value-of select="concat($sectionsFolder, '/', $FILENAME_INTRODUCTION, '[]')"/>
 			<xsl:text>&#xa;&#xa;</xsl:text>
