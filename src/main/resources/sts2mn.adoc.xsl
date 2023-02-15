@@ -630,8 +630,12 @@
 						<xsl:if test="normalize-space($section_text) != ''">
 							<redirect:write file="{$outpath}/{$filename}">
 								<xsl:text>&#xa;</xsl:text>
-								<xsl:if test="title = 'National foreword' or title = 'European foreword'">
-									<xsl:text>[.preface]</xsl:text>
+								<xsl:if test="title = 'National foreword'">
+									<xsl:text>[.preface,type=national-foreword]</xsl:text>
+									<xsl:text>&#xa;</xsl:text>
+								</xsl:if>
+								<xsl:if test="title = 'European foreword' or title = 'Regional foreword' ">
+									<xsl:text>[.preface,type=regional-foreword]</xsl:text>
 									<xsl:text>&#xa;</xsl:text>
 								</xsl:if>
 								<xsl:value-of select="$section_text"/>
@@ -6012,7 +6016,16 @@
 				</xsl:if>
 				
 				<xsl:if test="@sec-type = 'foreword' and (contains(@id, '_nat') or contains(@id, '_euro')) and not(title = 'Foreword')">
-					<xsl:text>[.preface]</xsl:text>
+					<xsl:text>[.preface</xsl:text>
+					<xsl:choose>
+						<xsl:when test="contains(@id, '_nat') or  title = 'National foreword'">
+							<xsl:text>,type=national-foreword</xsl:text>
+						</xsl:when>
+						<xsl:when test="contains(@id, '_euro') or title = 'European foreword' or title = 'Regional foreword'">
+							<xsl:text>,type=regional-foreword</xsl:text>
+						</xsl:when>
+					</xsl:choose>
+					<xsl:text>]</xsl:text>
 					<xsl:text>&#xa;</xsl:text>
 				</xsl:if>
 				
