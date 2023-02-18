@@ -3535,14 +3535,20 @@
 	
 	<xsl:template match="ext-link | supplementary-material">
 		
+		<xsl:variable name="href">
+			<xsl:choose>
+				<xsl:when test="$organization = 'BSI' or $organization = 'PAS'">
+					<xsl:value-of select="translate(@xlink:href, '&#x2011;', '-')"/> <!-- non-breaking hyphen minus -->
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:if test="self::supplementary-material"><xsl:text>file://</xsl:text></xsl:if>
+					<xsl:value-of select="@xlink:href"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
 		<xsl:choose>
-			<xsl:when test="$organization = 'BSI' or $organization = 'PAS'">
-				<xsl:value-of select="translate(@xlink:href, '&#x2011;', '-')"/> <!-- non-breaking hyphen minus -->
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:if test="self::supplementary-material"><xsl:text>file://</xsl:text></xsl:if>
-				<xsl:value-of select="@xlink:href"/>
-			</xsl:otherwise>
+			<xsl:when test="starts-with($href, 'http://http://')"><xsl:value-of select="substring-after($href, 'http://')"/></xsl:when>
+			<xsl:otherwise><xsl:value-of select="$href"/></xsl:otherwise>
 		</xsl:choose>
 		
 		<xsl:text>[</xsl:text><xsl:apply-templates /><xsl:text>]</xsl:text>
@@ -4313,7 +4319,10 @@
 		<xsl:call-template name="insertCellSeparator"/>
 		<xsl:call-template name="alignmentProcessingP"/>
 		<xsl:apply-templates />
-		<xsl:text>&#xa;</xsl:text>
+		<xsl:choose>
+			<xsl:when test="following-sibling::*"><xsl:text> </xsl:text></xsl:when>
+			<xsl:otherwise><xsl:text>&#xa;</xsl:text></xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="td">
@@ -5632,8 +5641,14 @@
 	<xsl:template match="fig/p/named-content[@content-type = 'ace-tag']" priority="3"/>
 	<xsl:template match="named-content[@content-type = 'ace-tag'][contains(@specific-use, '_start') or contains(@specific-use, '_end')]" priority="2" name="ace-tag"><!-- start/end tag for corrections -->
 		<xsl:variable name="preceding-sibling_local-name" select="local-name(preceding-sibling::node()[1])"/>
+		
+		<xsl:variable name="preceding-sibling_text" select="preceding-sibling::node()[1][self::text()]"/>
+		<xsl:variable name="preceding-sibling_text_last_char" select="substring($preceding-sibling_text, string-length($preceding-sibling_text))"/>
+		
 		<xsl:variable name="following-sibling_local-name" select="local-name(following-sibling::node()[1])"/>
-		<xsl:variable name="space_before"><xsl:if test="($preceding-sibling_local-name != '' and $preceding-sibling_local-name != 'break' and $preceding-sibling_local-name != 'list') or parent::std"><xsl:text> </xsl:text></xsl:if></xsl:variable>
+		
+		<xsl:variable name="space_before"><xsl:if test="($preceding-sibling_local-name != '' and $preceding-sibling_local-name != 'break' and $preceding-sibling_local-name != 'list') or parent::std or 
+			($preceding-sibling_text_last_char != ' ' and $preceding-sibling_text_last_char != '' and $preceding-sibling_text_last_char != '.' and $preceding-sibling_text_last_char != ',' and $preceding-sibling_text_last_char != ';')"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		<xsl:variable name="space_after"><xsl:if test="$following-sibling_local-name != '' and $following-sibling_local-name != 'break' and $following-sibling_local-name != 'list'"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		<xsl:value-of select="$space_before"/>
 		<!--Example: add:[ace-tag_label_C1_start] -->
@@ -5769,7 +5784,12 @@
 											
 		<xsl:variable name="preceding-sibling_local-name" select="local-name(preceding-sibling::node()[1])"/>
 		<xsl:variable name="following-sibling_local-name" select="local-name(following-sibling::node()[1])"/>
-		<xsl:variable name="space_before"><xsl:if test="($preceding-sibling_local-name != '' and $preceding-sibling_local-name != 'break' and $preceding-sibling_local-name != 'list') or parent::std"><xsl:text> </xsl:text></xsl:if></xsl:variable>
+		
+		<xsl:variable name="preceding-sibling_text" select="preceding-sibling::node()[1][self::text()]"/>
+		<xsl:variable name="preceding-sibling_text_last_char" select="substring($preceding-sibling_text, string-length($preceding-sibling_text))"/>
+		
+		<xsl:variable name="space_before"><xsl:if test="($preceding-sibling_local-name != '' and $preceding-sibling_local-name != 'break' and $preceding-sibling_local-name != 'list') or parent::std or 
+			($preceding-sibling_text_last_char != ' ' and $preceding-sibling_text_last_char != '' and $preceding-sibling_text_last_char != '.' and $preceding-sibling_text_last_char != ',' and $preceding-sibling_text_last_char != ';')"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		<xsl:variable name="space_after"><xsl:if test="$following-sibling_local-name != '' and $following-sibling_local-name != 'break' and $following-sibling_local-name != 'list'"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		
 		<xsl:variable name="operator">
@@ -5826,6 +5846,9 @@
 							</xsl:call-template>
 						</xsl:when>
 						<xsl:when test="ancestor::app-group">
+							<xsl:value-of select="$level_total - $level_standard - 2"/>
+						</xsl:when>
+						<xsl:when test="ancestor::ref-list[not(title)] and ancestor::ref-list[title]"> <!-- special case for ref-list[not(title)]/ref-list -->
 							<xsl:value-of select="$level_total - $level_standard - 2"/>
 						</xsl:when>
 						<xsl:otherwise>
