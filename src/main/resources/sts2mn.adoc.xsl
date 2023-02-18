@@ -4313,7 +4313,10 @@
 		<xsl:call-template name="insertCellSeparator"/>
 		<xsl:call-template name="alignmentProcessingP"/>
 		<xsl:apply-templates />
-		<xsl:text>&#xa;</xsl:text>
+		<xsl:choose>
+			<xsl:when test="following-sibling::*"><xsl:text> </xsl:text></xsl:when>
+			<xsl:otherwise><xsl:text>&#xa;</xsl:text></xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="td">
