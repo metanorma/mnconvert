@@ -5831,6 +5831,9 @@
 						<xsl:when test="ancestor::app-group">
 							<xsl:value-of select="$level_total - $level_standard - 2"/>
 						</xsl:when>
+						<xsl:when test="ancestor::ref-list[not(title)] and ancestor::ref-list[title]"> <!-- special case for ref-list[not(title)]/ref-list -->
+							<xsl:value-of select="$level_total - $level_standard - 2"/>
+						</xsl:when>
 						<xsl:otherwise>
 							<xsl:value-of select="$level_total - $level_standard - 1"/>
 						</xsl:otherwise>
