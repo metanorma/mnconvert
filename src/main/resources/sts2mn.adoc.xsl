@@ -6558,7 +6558,17 @@
 					</xsl:choose>
 				</xsl:variable>
 				
-				<xsl:value-of select="$str40"/>
+				<!-- font ligatures resolving -->
+				<xsl:variable name="str50" select="java:replaceAll(java:java.lang.String.new($str40),'ﬀ','ff')"/> <!-- U+FB00 -->
+				<xsl:variable name="str51" select="java:replaceAll(java:java.lang.String.new($str50),'ﬁ','fi')"/> <!-- U+FB01 -->
+				<xsl:variable name="str52" select="java:replaceAll(java:java.lang.String.new($str51),'ﬂ','fl')"/> <!-- U+FB02 -->
+				<xsl:variable name="str53" select="java:replaceAll(java:java.lang.String.new($str52),'ﬃ','ffi')"/> <!-- U+FB03 -->
+				<xsl:variable name="str54" select="java:replaceAll(java:java.lang.String.new($str53),'ﬄ','ffl')"/> <!-- U+FB04 -->
+				<xsl:variable name="str55" select="java:replaceAll(java:java.lang.String.new($str54),'ﬅ','ft')"/> <!-- U+FB05 -->
+				<xsl:variable name="str56" select="java:replaceAll(java:java.lang.String.new($str55),'ﬆ','st')"/> <!-- U+FB06 -->
+				<xsl:variable name="str60" select="$str56"/>
+				
+				<xsl:value-of select="$str60"/>
 			</xsl:otherwise>
 			
 		</xsl:choose>		
