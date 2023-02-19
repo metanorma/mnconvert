@@ -4040,6 +4040,40 @@
 		<xsl:apply-templates />
 	</xsl:template>
 
+	<!-- special case: if table contains one tr, one td , and text starts with WARNING, then process it as admonition. -->
+	<xsl:template match="array[table[count(.//tr) = 1 and .//tr[count(.//td) = 1] and starts-with(normalize-space(), 'WARNING')]]" priority="2">
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:if test="parent::p">
+			<xsl:text>+</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+		<xsl:text>--</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:apply-templates select=".//tr/td/node()"/>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>--</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:if test="not(following-sibling::*)">
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	<xsl:template match="array[table[count(.//tr) = 1 and .//tr[count(.//td) = 1] and starts-with(normalize-space(), 'WARNING')]]//td/node()[normalize-space() != ''][1]" priority="3">
+		<xsl:choose>
+			<xsl:when test="self::text()">
+				<xsl:call-template name="admonition_warning"/>
+			</xsl:when>
+			<xsl:otherwise> <!-- bold, for instance -->
+				<xsl:apply-templates />
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	<xsl:template match="array[table[count(.//tr) = 1 and .//tr[count(.//td) = 1] and starts-with(normalize-space(), 'WARNING')]]//td/node()[normalize-space() != ''][1]/text()" name="admonition_warning" priority="3">
+		<xsl:variable name="text_" select="substring-after(., 'WARNING')"/>
+		<xsl:variable name="text" select="java:replaceAll(java:java.lang.String.new($text_),'^\p{Punct}*(\s|\h)*','')"/> <!-- remove punctuation and spaces at start -->
+		<xsl:value-of select="$text"/><xsl:text>WARNING:</xsl:text>
+	</xsl:template>
+	<!-- EMD: special case: if table contains one tr, one td , and text starts with WARNING, then process it as admonition. -->
+	
 	<!-- =============== -->
 	<!-- End Definitions list (dl) -->
 	<!-- =============== -->
