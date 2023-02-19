@@ -4040,6 +4040,40 @@
 		<xsl:apply-templates />
 	</xsl:template>
 
+	<!-- special case: if table contains one tr, one td , and text starts with WARNING, then process it as admonition. -->
+	<xsl:template match="array[table[count(.//tr) = 1 and .//tr[count(.//td) = 1] and starts-with(normalize-space(), 'WARNING')]]" priority="2">
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:if test="parent::p">
+			<xsl:text>+</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+		<xsl:text>--</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:apply-templates select=".//tr/td/node()"/>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>--</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:if test="not(following-sibling::*)">
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	<xsl:template match="array[table[count(.//tr) = 1 and .//tr[count(.//td) = 1] and starts-with(normalize-space(), 'WARNING')]]//td/node()[normalize-space() != ''][1]" priority="3">
+		<xsl:choose>
+			<xsl:when test="self::text()">
+				<xsl:call-template name="admonition_warning"/>
+			</xsl:when>
+			<xsl:otherwise> <!-- bold, for instance -->
+				<xsl:apply-templates />
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	<xsl:template match="array[table[count(.//tr) = 1 and .//tr[count(.//td) = 1] and starts-with(normalize-space(), 'WARNING')]]//td/node()[normalize-space() != ''][1]/text()" name="admonition_warning" priority="3">
+		<xsl:variable name="text_" select="substring-after(., 'WARNING')"/>
+		<xsl:variable name="text" select="java:replaceAll(java:java.lang.String.new($text_),'^\p{Punct}*(\s|\h)*','')"/> <!-- remove punctuation and spaces at start -->
+		<xsl:value-of select="$text"/><xsl:text>WARNING:</xsl:text>
+	</xsl:template>
+	<!-- EMD: special case: if table contains one tr, one td , and text starts with WARNING, then process it as admonition. -->
+	
 	<!-- =============== -->
 	<!-- End Definitions list (dl) -->
 	<!-- =============== -->
@@ -6558,7 +6592,17 @@
 					</xsl:choose>
 				</xsl:variable>
 				
-				<xsl:value-of select="$str40"/>
+				<!-- font ligatures resolving -->
+				<xsl:variable name="str50" select="java:replaceAll(java:java.lang.String.new($str40),'ﬀ','ff')"/> <!-- U+FB00 -->
+				<xsl:variable name="str51" select="java:replaceAll(java:java.lang.String.new($str50),'ﬁ','fi')"/> <!-- U+FB01 -->
+				<xsl:variable name="str52" select="java:replaceAll(java:java.lang.String.new($str51),'ﬂ','fl')"/> <!-- U+FB02 -->
+				<xsl:variable name="str53" select="java:replaceAll(java:java.lang.String.new($str52),'ﬃ','ffi')"/> <!-- U+FB03 -->
+				<xsl:variable name="str54" select="java:replaceAll(java:java.lang.String.new($str53),'ﬄ','ffl')"/> <!-- U+FB04 -->
+				<xsl:variable name="str55" select="java:replaceAll(java:java.lang.String.new($str54),'ﬅ','ft')"/> <!-- U+FB05 -->
+				<xsl:variable name="str56" select="java:replaceAll(java:java.lang.String.new($str55),'ﬆ','st')"/> <!-- U+FB06 -->
+				<xsl:variable name="str60" select="$str56"/>
+				
+				<xsl:value-of select="$str60"/>
 			</xsl:otherwise>
 			
 		</xsl:choose>		
