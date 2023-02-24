@@ -2382,7 +2382,8 @@
 	
 	<xsl:template match="title" name="title">
 		<xsl:variable name="ace_tag">
-			<xsl:apply-templates select="preceding-sibling::label/node()[1][self::named-content[@content-type = 'ace-tag']]"/>
+			<!-- <xsl:apply-templates select="preceding-sibling::label/node()[1][self::named-content[@content-type = 'ace-tag']]"/> -->
+			<xsl:apply-templates select="preceding-sibling::label/*[self::named-content[@content-type = 'ace-tag']]"/>
 		</xsl:variable>
 		<xsl:choose>
 			<xsl:when test="parent::sec/@sec-type = 'foreword'">
@@ -5681,8 +5682,8 @@
 		
 		<xsl:variable name="following-sibling_local-name" select="local-name(following-sibling::node()[1])"/>
 		
-		<xsl:variable name="space_before"><xsl:if test="($preceding-sibling_local-name != '' and $preceding-sibling_local-name != 'break' and $preceding-sibling_local-name != 'list') or parent::std or 
-			($preceding-sibling_text_last_char != ' ' and $preceding-sibling_text_last_char != '' and $preceding-sibling_text_last_char != '.' and $preceding-sibling_text_last_char != ',' and $preceding-sibling_text_last_char != ';')"><xsl:text> </xsl:text></xsl:if></xsl:variable>
+		<xsl:variable name="space_before"><xsl:if test="(($preceding-sibling_local-name != '' and $preceding-sibling_local-name != 'break' and $preceding-sibling_local-name != 'list') or parent::std or 
+			($preceding-sibling_text_last_char != ' ' and $preceding-sibling_text_last_char != '' and $preceding-sibling_text_last_char != '.' and $preceding-sibling_text_last_char != ',' and $preceding-sibling_text_last_char != ';')) and not(parent::label)"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		<xsl:variable name="space_after"><xsl:if test="$following-sibling_local-name != '' and $following-sibling_local-name != 'break' and $following-sibling_local-name != 'list'"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 		<xsl:value-of select="$space_before"/>
 		<!--Example: add:[ace-tag_label_C1_start] -->
