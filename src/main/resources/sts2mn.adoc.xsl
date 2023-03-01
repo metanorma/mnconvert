@@ -3462,6 +3462,12 @@
 				<!-- no italic -->
 				<xsl:apply-templates />
 			</xsl:when>
+			<!-- if italic in BSI non-normative-note, text starts and ends with 'italic' -->
+			<xsl:when test="($organization = 'BSI' or $organization = 'PAS') and 
+			(ancestor::non-normative-note[*[2][self::p][node()[normalize-space() != ''][1][self::italic or self::italic2]][node()[normalize-space() != '' and (normalize-space() != '.' and (self::italic or self::italic2)) and not(self::xref)][last()][self::italic or self::italic2]]] or
+			 ancestor::tbx:note[node()[normalize-space() != ''][1][self::italic or self::italic2]][node()[normalize-space() != '' and (normalize-space() != '.' and (self::italic or self::italic2)) and not(self::xref)][last()][self::italic or self::italic2]])">
+				<xsl:apply-templates />
+			</xsl:when>
 			<xsl:otherwise>
 				<xsl:variable name="text"><xsl:apply-templates /></xsl:variable>
 				<xsl:choose>
