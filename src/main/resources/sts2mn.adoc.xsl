@@ -2282,6 +2282,20 @@
 		<xsl:value-of select="normalize-space(.)"/>
 	</xsl:template>
 	
+	<!-- special case: text starts with space, after block element -->
+	<xsl:template match="text()[normalize-space() != ''][starts-with(., ' ')][preceding-sibling::*[1][
+					local-name() = 'p' or
+					local-name() = 'non-normative-note' or
+					local-name() = 'list' or
+					local-name() = 'non-normative-example' or
+					local-name() = 'table-wrap' or
+					local-name() = 'array' or
+					local-name() = 'def-list' or
+					local-name() = 'boxed-text']]" priority="3">
+		<!-- remove leading space(s) -->
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),'^\s+','')"/>
+	</xsl:template>
+	
 	<!-- put index terms with 'see', 'see also' -->
 	<xsl:template match="sec[@sec-type = 'index'] | back/sec[@id = 'ind' or @id = 'sec_ind']" priority="2">
 		<xsl:if test="$index//reference[@type]">
