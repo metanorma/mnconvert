@@ -1976,6 +1976,7 @@
 				<xsl:text>&#xa;</xsl:text>
 				<xsl:text>== {blank}</xsl:text>
 				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
 				<xsl:apply-templates />
 			</xsl:otherwise>
 		</xsl:choose>
@@ -2279,6 +2280,20 @@
 	
 	<xsl:template match="sec/text() | list-item/text() | list/text()">
 		<xsl:value-of select="normalize-space(.)"/>
+	</xsl:template>
+	
+	<!-- special case: text starts with space, after block element -->
+	<xsl:template match="text()[normalize-space() != ''][starts-with(., ' ')][preceding-sibling::*[1][
+					local-name() = 'p' or
+					local-name() = 'non-normative-note' or
+					local-name() = 'list' or
+					local-name() = 'non-normative-example' or
+					local-name() = 'table-wrap' or
+					local-name() = 'array' or
+					local-name() = 'def-list' or
+					local-name() = 'boxed-text']]" priority="3">
+		<!-- remove leading space(s) -->
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),'^\s+','')"/>
 	</xsl:template>
 	
 	<!-- put index terms with 'see', 'see also' -->
@@ -3445,6 +3460,12 @@
 			<xsl:when test="ancestor::list/preceding-sibling::p[starts-with(normalize-space(), $commentary_on) and 
 							(starts-with(normalize-space(.//italic/text()), $commentary_on) or starts-with(normalize-space(.//italic2/text()), $commentary_on))]">
 				<!-- no italic -->
+				<xsl:apply-templates />
+			</xsl:when>
+			<!-- if italic in BSI non-normative-note, text starts and ends with 'italic' -->
+			<xsl:when test="($organization = 'BSI' or $organization = 'PAS') and 
+			(ancestor::non-normative-note[*[2][self::p][node()[normalize-space() != ''][1][self::italic or self::italic2]][node()[normalize-space() != '' and (normalize-space() != '.' and (self::italic or self::italic2)) and not(self::xref)][last()][self::italic or self::italic2]]] or
+			 ancestor::tbx:note[node()[normalize-space() != ''][1][self::italic or self::italic2]][node()[normalize-space() != '' and (normalize-space() != '.' and (self::italic or self::italic2)) and not(self::xref)][last()][self::italic or self::italic2]])">
 				<xsl:apply-templates />
 			</xsl:when>
 			<xsl:otherwise>
@@ -6241,6 +6262,7 @@
 					</xsl:variable>
 					<xsl:value-of select="$level"/>
 					<xsl:text> {blank}</xsl:text>
+					<xsl:text>&#xa;</xsl:text>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:if>
