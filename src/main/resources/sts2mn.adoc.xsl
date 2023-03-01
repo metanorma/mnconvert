@@ -1976,6 +1976,7 @@
 				<xsl:text>&#xa;</xsl:text>
 				<xsl:text>== {blank}</xsl:text>
 				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>&#xa;</xsl:text>
 				<xsl:apply-templates />
 			</xsl:otherwise>
 		</xsl:choose>
@@ -6241,6 +6242,7 @@
 					</xsl:variable>
 					<xsl:value-of select="$level"/>
 					<xsl:text> {blank}</xsl:text>
+					<xsl:text>&#xa;</xsl:text>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:if>
