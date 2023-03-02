@@ -6625,10 +6625,72 @@
 				<xsl:variable name="str56" select="java:replaceAll(java:java.lang.String.new($str55),'ﬆ','st')"/> <!-- U+FB06 -->
 				<xsl:variable name="str60" select="$str56"/>
 				
-				<xsl:value-of select="$str60"/>
+				<!-- [1] and [N1] references resolving -->
+				<xsl:variable name="str70" select="java:replaceAll(java:java.lang.String.new($str60), '(\[N\d+\])', concat($interspers_ref_bibitem_open,'$1',$interspers_ref_bibitem_close))"/>
+				<xsl:variable name="str80_">
+					<xsl:call-template name="replace_tag_interspers">
+						<xsl:with-param name="text" select="$str70"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:variable name="str80" select="xalan:nodeset($str80_)"/>
+				
+				
+				<xsl:variable name="doc_refs_">
+					<xsl:if test="$str80/interspers">
+						<xsl:for-each select="//ref">
+							<xsl:copy>
+								<xsl:copy-of select="@*"/>
+								<xsl:copy-of select="label"/>
+							</xsl:copy>
+						</xsl:for-each>
+					</xsl:if>
+				</xsl:variable>
+				<xsl:variable name="doc_refs" select="xalan:nodeset($doc_refs_)"/>
+				
+				<xsl:for-each select="$str80/node()">
+					<xsl:choose>
+						<xsl:when test="self::*[local-name() = 'interspers']">
+							<xsl:variable name="curr_text" select="normalize-space()"/>
+							<xsl:variable name="ref_id" select="normalize-space($doc_refs//ref[label = $curr_text]/@id)"/>
+							<xsl:choose>
+								<!-- Example: [N6] to <<biblref_sp-N6>> -->
+								<xsl:when test="$ref_id != ''">
+									<xsl:text>&lt;&lt;</xsl:text>
+									<xsl:value-of select="$ref_id"/>
+									<xsl:text>&gt;&gt;</xsl:text>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="."/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+						<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+					</xsl:choose>
+				</xsl:for-each>
+				
+				<!-- <xsl:value-of select="$str80"/> -->
 			</xsl:otherwise>
 			
 		</xsl:choose>		
+	</xsl:template>
+	
+	<xsl:variable name="interspers_ref_bibitem_open">###ref_bibitem###</xsl:variable>
+	<xsl:variable name="interspers_ref_bibitem_close">###/ref_bibitem###</xsl:variable>
+	<xsl:template name="replace_tag_interspers">
+		<xsl:param name="text"/>
+		<xsl:choose>
+			<xsl:when test="contains($text, $interspers_ref_bibitem_open)">
+				<xsl:value-of select="substring-before($text, $interspers_ref_bibitem_open)"/>
+				<xsl:variable name="text_after" select="substring-after($text, $interspers_ref_bibitem_open)"/>
+				<interspers>
+					<xsl:value-of select="substring-before($text_after, $interspers_ref_bibitem_close)"/>
+				</interspers>
+				<xsl:call-template name="replace_tag_interspers">
+					<xsl:with-param name="text" select="substring-after($text_after, $interspers_ref_bibitem_close)"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise><xsl:value-of select="$text"/></xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<!-- transform p with section number to sec and title -->
