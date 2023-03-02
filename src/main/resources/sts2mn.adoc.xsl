@@ -6595,8 +6595,8 @@
 				<!-- remove leading spaces in the paragraph -->
 				<xsl:variable name="str30">
 					<xsl:choose>
-						<xsl:when test="parent::p and not(preceding-sibling::node()) and starts-with($str20, ' ')">
-							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($str20),'^\s+','')"/>
+						<xsl:when test="(parent::p or parent::td) and not(preceding-sibling::node()) and (starts-with($str20, ' ') or starts-with($str20, '&#xa0;'))">
+							<xsl:value-of select="java:replaceAll(java:java.lang.String.new($str20),'^(\s|&#xa0;)+','')"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:value-of select="$str20"/>
