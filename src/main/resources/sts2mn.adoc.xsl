@@ -1983,6 +1983,9 @@
 	</xsl:template>
 	
 	<xsl:template match="front/sec[@sec-type = 'publication_info']" priority="2">
+		<!-- process Publication history -->
+		<xsl:apply-templates select="p[normalize-space() = 'Release history' or normalize-space() = 'Publication history']"/>
+		
 		<!-- process only Amendments/corrigenda table, because other data implemented in metanorma gem -->
 		<xsl:if test="*[@content-type = 'ace-table']">
 			<xsl:text>&#xa;</xsl:text>
@@ -1992,6 +1995,15 @@
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:apply-templates select="*[@content-type = 'ace-table']"/>
 		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="front/sec[@sec-type = 'publication_info']//p[normalize-space() = 'Release history' or normalize-space() = 'Publication history']">
+		<xsl:text>[.preface,type="publication-history"]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>== </xsl:text><xsl:value-of select="."/>
+		<xsl:text>&#xa;</xsl:text>
+		<!-- process all next elements except ace-table -->
+		<xsl:apply-templates select="following-sibling::*[not(preceding-sibling::*[@content-type = 'ace-table']) and not(@content-type = 'ace-table')]"/>
 	</xsl:template>
 	
 	<xsl:template match="front/sec[@sec-type = 'publication_info']//*[@content-type = 'ace-table']/caption/title[1]" priority="2"/>
