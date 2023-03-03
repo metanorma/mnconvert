@@ -2002,7 +2002,8 @@
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>== </xsl:text><xsl:value-of select="."/>
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:apply-templates select="following-sibling::*[not(preceding-sibling::*[@content-type = 'ace-table'])]"/>
+		<!-- process all next elements except ace-table -->
+		<xsl:apply-templates select="following-sibling::*[not(preceding-sibling::*[@content-type = 'ace-table']) and not(@content-type = 'ace-table')]"/>
 	</xsl:template>
 	
 	<xsl:template match="front/sec[@sec-type = 'publication_info']//*[@content-type = 'ace-table']/caption/title[1]" priority="2"/>
