@@ -3518,6 +3518,19 @@
 		<xsl:text>^</xsl:text><xsl:apply-templates /><xsl:text>^</xsl:text>
 	</xsl:template>
 	
+	<!-- <sup><<ref_21>></sup> -->
+	<xsl:template match="sup[java:org.metanorma.utils.RegExHelper.matches('^&lt;&lt;.*&gt;&gt;$', normalize-space(.)) = 'true']" priority="2">
+		<xsl:text> </xsl:text><xsl:apply-templates />
+	</xsl:template>
+	
+	<!-- skip sup with bracket 
+	^[^<<ref_21>>^]^ 
+	<sup>[</sup><xref ref-type="bibr" rid="ref_21"><sup>15</sup></xref><sup>]</sup> -->
+	<xsl:template match="sup[. = '['][following-sibling::*[1][self::xref]][following-sibling::*[2][self::sup and . = ']']]">
+		<xsl:text> </xsl:text>
+	</xsl:template>
+	<xsl:template match="sup[. = ']'][preceding-sibling::*[1][self::xref]][preceding-sibling::*[2][self::sup and . = '[']]"/>
+	
 	<!-- <xsl:template match="sup2">
 		<xsl:text>^^</xsl:text><xsl:apply-templates /><xsl:text>^^</xsl:text>
 	</xsl:template> -->
@@ -6627,9 +6640,9 @@
 				
 				
 				<xsl:choose>
-					<xsl:when test="not(ancestor::label)">
+					<xsl:when test="not(ancestor::label) and not(ancestor::xref)">
 						<!-- [1] and [N1] references resolving -->
-						<xsl:variable name="str70" select="java:replaceAll(java:java.lang.String.new($str60), '(\[N\d+\])', concat($interspers_ref_bibitem_open,'$1',$interspers_ref_bibitem_close))"/>
+						<xsl:variable name="str70" select="java:replaceAll(java:java.lang.String.new($str60), '(\[N?\d+\])', concat($interspers_ref_bibitem_open,'$1',$interspers_ref_bibitem_close))"/>
 						<xsl:variable name="str80_">
 							<xsl:call-template name="replace_tag_interspers">
 								<xsl:with-param name="text" select="$str70"/>
