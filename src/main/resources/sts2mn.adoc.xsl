@@ -4420,7 +4420,7 @@
 	
 	<!-- if in the table header there are cells with bold and without -->
 	<!-- then cell without bold enclose in span:units[] -->
-	<xsl:template match="thead[.//th[bold] and .//th[not(bold)]]//th[not(bold)][normalize-space(translate(., '&#xa0;', ' ')) != '']">
+	<xsl:template match="thead[.//th[bold or bold2] and .//th[not(bold) and not(bold2)]]//th[not(bold) and not(bold2)][normalize-space(translate(., '&#xa0;', ' ')) != '']">
 		<xsl:call-template name="insertTableCellProperties"/>
 		<xsl:text>span:units[</xsl:text>
 		<xsl:apply-templates />
