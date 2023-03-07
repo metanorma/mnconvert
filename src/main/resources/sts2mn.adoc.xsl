@@ -3459,6 +3459,10 @@
 		<xsl:if test="java:endsWith(java:java.lang.String.new($text),' ') and not(starts-with($text_following, ' ')) and $text_following != ''"><xsl:text> </xsl:text></xsl:if>
 	</xsl:template>
 	
+	<xsl:template match="th/bold | th/bold2" priority="2">
+		<xsl:apply-templates />
+	</xsl:template>
+	
 	<xsl:template match="italic | italic2">
 		<xsl:choose>
 			<!-- if italic in paragraph that relates to COMMENTARY -->
@@ -4394,16 +4398,34 @@
 	</xsl:template>
 	
 	<xsl:template match="th">
+		<xsl:call-template name="insertTableCellProperties"/>
+		<xsl:apply-templates />
+		<xsl:call-template name="insertTableHeaderCellEnd"/>
+	</xsl:template>
+	
+	<xsl:template name="insertTableCellProperties">
 		<xsl:call-template name="spanProcessing"/>
 		<xsl:call-template name="alignmentProcessing"/>
 		<xsl:call-template name="complexFormatProcessing"/>
 		<xsl:call-template name="insertCellSeparator"/>
 		<xsl:call-template name="alignmentProcessingP"/>
-		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template name="insertTableHeaderCellEnd">
 		<xsl:choose>
 			<xsl:when test="following-sibling::*"><xsl:text> </xsl:text></xsl:when>
 			<xsl:otherwise><xsl:text>&#xa;</xsl:text></xsl:otherwise>
 		</xsl:choose>
+	</xsl:template>
+	
+	<!-- if in the table header there are cells with bold and without -->
+	<!-- then cell without bold enclose in span:units[] -->
+	<xsl:template match="thead[.//th[bold] and .//th[not(bold)]]//th[not(bold)][normalize-space(translate(., '&#xa0;', ' ')) != '']">
+		<xsl:call-template name="insertTableCellProperties"/>
+		<xsl:text>span:units[</xsl:text>
+		<xsl:apply-templates />
+		<xsl:text>]</xsl:text>
+		<xsl:call-template name="insertTableHeaderCellEnd"/>
 	</xsl:template>
 	
 	<xsl:template match="td">
