@@ -1210,11 +1210,21 @@
 					<xsl:apply-templates mode="model_fig"/>
 				</title_main>
 			</xsl:when>
+			<xsl:when test="@content-type = 'Dimension' or @content-type = 'dimension'">
+				<xsl:call-template name="insertNoteUnits"/>
+			</xsl:when>
 			<xsl:otherwise>
-				<non-normative-note><xsl:apply-templates mode="model_fig"/></non-normative-note>
+				<non-normative-note>
+					<xsl:apply-templates mode="model_fig"/>
+				</non-normative-note>
 			</xsl:otherwise>
 		</xsl:choose>
-		
+	</xsl:template>
+	
+	<xsl:template name="insertNoteUnits">
+		<non-normative-note type="units">
+			<xsl:apply-templates mode="model_fig"/>
+		</non-normative-note>
 	</xsl:template>
 	
 	<xsl:template match="fig/*[self::table-wrap or self::array][count(table/col) + count(table/colgroup/col) = 1 and .//graphic]" mode="model_fig">
@@ -1240,12 +1250,19 @@
 	</xsl:template>
 	
 	<xsl:template match="fig/p" mode="model_fig">
-		<non-normative-note>
-			<xsl:copy>
-				<xsl:copy-of select="@*"/>
-				<xsl:apply-templates mode="model_fig"/>
-			</xsl:copy>
-		</non-normative-note>
+		<xsl:choose>
+			<xsl:when test="@content-type = 'Dimension' or @content-type = 'dimension'">
+				<xsl:call-template name="insertNoteUnits"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<non-normative-note>
+					<xsl:copy>
+						<xsl:copy-of select="@*"/>
+						<xsl:apply-templates mode="model_fig"/>
+					</xsl:copy>
+				</non-normative-note>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="fig/*[self::table-wrap or self::array][count(table/col) + count(table/colgroup/col) = 1 and .//graphic]/table" mode="model_fig">

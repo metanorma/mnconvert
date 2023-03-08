@@ -2902,6 +2902,13 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<xsl:template match="non-normative-note[@type = 'units']">
+		<xsl:text>[NOTE,type=units]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:apply-templates/>
+		<xsl:text>&#xa;&#xa;&#xa;</xsl:text>
+	</xsl:template>
+	
 	<xsl:template match="editing-instruction" name="editing-instruction">
 		<xsl:text>EDITOR: </xsl:text>
 		<xsl:apply-templates/>
@@ -3459,7 +3466,17 @@
 		<xsl:if test="java:endsWith(java:java.lang.String.new($text),' ') and not(starts-with($text_following, ' ')) and $text_following != ''"><xsl:text> </xsl:text></xsl:if>
 	</xsl:template>
 	
+	<xsl:template match="thead//th/bold | thead//th/bold2 | thead//th//p/bold | thead//th//p/bold2" priority="2">
+		<xsl:apply-templates />
+	</xsl:template>
+	
 	<xsl:template match="italic | italic2">
+	
+		<xsl:variable name="add_span_units" select="normalize-space(($organization = 'BSI' or $organization = 'PAS') and ancestor::th[bold or bold2] and not(ancestor::bold) and not(ancestor::bold2))"/> <!--    -->
+		<xsl:if test="$add_span_units = 'true'">
+			<xsl:text>span:units[</xsl:text>
+		</xsl:if>
+		
 		<xsl:choose>
 			<!-- if italic in paragraph that relates to COMMENTARY -->
 			<xsl:when test="parent::p[*[1][self::italic or self::italic2] and normalize-space(translate(./text(),'&#xa0;.','  ')) = ''] and 
@@ -3500,6 +3517,9 @@
 				</xsl:choose>
 			</xsl:otherwise>
 		</xsl:choose>
+		<xsl:if test="$add_span_units = 'true'">
+			<xsl:text>]</xsl:text>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="*[local-name() = 'italic' or local-name() = 'italic2'][parent::p[*[1][self::italic or self::italic2] and normalize-space(translate(./text(),'&#xa0;.','  ')) = ''] and 
@@ -3519,7 +3539,17 @@
 	</xsl:template>
 	
 	<xsl:template match="sub">
+	
+		<xsl:variable name="add_span_units" select="normalize-space(($organization = 'BSI' or $organization = 'PAS') and ancestor::th[bold or bold2] and not(ancestor::bold) and not(ancestor::bold2))"/> <!--    -->
+		<xsl:if test="$add_span_units = 'true'">
+			<xsl:text>span:units[</xsl:text>
+		</xsl:if>
+	
 		<xsl:text>~</xsl:text><xsl:apply-templates /><xsl:text>~</xsl:text>
+		
+		<xsl:if test="$add_span_units = 'true'">
+			<xsl:text>]</xsl:text>
+		</xsl:if>
 	</xsl:template>
 	
 	<!-- <xsl:template match="sub2">
@@ -3527,7 +3557,17 @@
 	</xsl:template> -->
 	
 	<xsl:template match="sup">
+		
+		<xsl:variable name="add_span_units" select="normalize-space(($organization = 'BSI' or $organization = 'PAS') and ancestor::th[bold or bold2] and not(ancestor::bold) and not(ancestor::bold2))"/> <!--    -->
+		<xsl:if test="$add_span_units = 'true'">
+			<xsl:text>span:units[</xsl:text>
+		</xsl:if>
+		
 		<xsl:text>^</xsl:text><xsl:apply-templates /><xsl:text>^</xsl:text>
+		
+		<xsl:if test="$add_span_units = 'true'">
+			<xsl:text>]</xsl:text>
+		</xsl:if>
 	</xsl:template>
 	
 	<!-- <sup><<ref_21>></sup> -->
@@ -4394,15 +4434,49 @@
 	</xsl:template>
 	
 	<xsl:template match="th">
+		<xsl:call-template name="insertTableCellProperties"/>
+		<xsl:apply-templates />
+		<xsl:call-template name="insertTableHeaderCellEnd"/>
+	</xsl:template>
+	
+	<xsl:template name="insertTableCellProperties">
 		<xsl:call-template name="spanProcessing"/>
 		<xsl:call-template name="alignmentProcessing"/>
 		<xsl:call-template name="complexFormatProcessing"/>
 		<xsl:call-template name="insertCellSeparator"/>
 		<xsl:call-template name="alignmentProcessingP"/>
-		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template name="insertTableHeaderCellEnd">
 		<xsl:choose>
 			<xsl:when test="following-sibling::*"><xsl:text> </xsl:text></xsl:when>
 			<xsl:otherwise><xsl:text>&#xa;</xsl:text></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<!-- if in the table header there are cells with bold and without -->
+	<!-- then cell without bold enclose in span:units[] -->
+	<xsl:template match="thead[.//th[bold or bold2] and .//th[not(bold) and not(bold2)]]//th[not(bold) and not(bold2)][normalize-space(translate(., '&#xa0;', ' ')) != '']">
+		<xsl:call-template name="insertTableCellProperties"/>
+		<xsl:choose>
+			<xsl:when test ="$organization = 'BSI' or $organization = 'PAS'">
+				<xsl:text>span:units[</xsl:text><xsl:apply-templates /><xsl:text>]</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:apply-templates />
+			</xsl:otherwise>
+		</xsl:choose>
+		<xsl:call-template name="insertTableHeaderCellEnd"/>
+	</xsl:template>
+	
+	<xsl:template match="thead//th/text()[. = 'Dimensions in millimetres']" priority="2">
+		<xsl:choose>
+			<xsl:when test ="$organization = 'BSI' or $organization = 'PAS'">
+				<xsl:text>span:units[</xsl:text><xsl:value-of select="."/><xsl:text>]</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="."/>
+			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
 	
@@ -5313,7 +5387,9 @@
 		</xsl:choose>
 		
 		<!-- process another elements (key, note, ... ) -->
-		<xsl:apply-templates select="$fig/fig/*[not(self::label or self::title or self::title_main or self::graphic or self::graphic_text)]"/>
+		<xsl:apply-templates select="$fig/fig/*[not(self::label or self::title or self::title_main or self::graphic or self::graphic_text)]"/> <!-- or self::p or self::non-normative-note -->
+		
+		<!-- <xsl:apply-templates select="$fig/fig/*[self::p or self::non-normative-note]"/> -->
 		
 		<xsl:apply-templates select="$fig/fig/@orientation" mode="after_fig"/>
 		
