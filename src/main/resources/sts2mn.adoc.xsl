@@ -3459,7 +3459,7 @@
 		<xsl:if test="java:endsWith(java:java.lang.String.new($text),' ') and not(starts-with($text_following, ' ')) and $text_following != ''"><xsl:text> </xsl:text></xsl:if>
 	</xsl:template>
 	
-	<xsl:template match="th/bold | th/bold2 | th//p/bold | th//p/bold2" priority="2">
+	<xsl:template match="thead//th/bold | thead//th/bold2 | thead//th//p/bold | thead//th//p/bold2" priority="2">
 		<xsl:apply-templates />
 	</xsl:template>
 	
