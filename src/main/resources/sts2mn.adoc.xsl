@@ -5387,9 +5387,9 @@
 		</xsl:choose>
 		
 		<!-- process another elements (key, note, ... ) -->
-		<xsl:apply-templates select="$fig/fig/*[not(self::label or self::title or self::title_main or self::graphic or self::graphic_text or self::p or self::non-normative-note)]"/>
+		<xsl:apply-templates select="$fig/fig/*[not(self::label or self::title or self::title_main or self::graphic or self::graphic_text)]"/> <!-- or self::p or self::non-normative-note -->
 		
-		<xsl:apply-templates select="$fig/fig/*[self::p or self::non-normative-note]"/>
+		<!-- <xsl:apply-templates select="$fig/fig/*[self::p or self::non-normative-note]"/> -->
 		
 		<xsl:apply-templates select="$fig/fig/@orientation" mode="after_fig"/>
 		
