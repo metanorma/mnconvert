@@ -2902,6 +2902,13 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<xsl:template match="non-normative-note[@type = 'units']">
+		<xsl:text>[NOTE,type=units]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:apply-templates/>
+		<xsl:text>&#xa;&#xa;&#xa;</xsl:text>
+	</xsl:template>
+	
 	<xsl:template match="editing-instruction" name="editing-instruction">
 		<xsl:text>EDITOR: </xsl:text>
 		<xsl:apply-templates/>
@@ -5380,7 +5387,9 @@
 		</xsl:choose>
 		
 		<!-- process another elements (key, note, ... ) -->
-		<xsl:apply-templates select="$fig/fig/*[not(self::label or self::title or self::title_main or self::graphic or self::graphic_text)]"/>
+		<xsl:apply-templates select="$fig/fig/*[not(self::label or self::title or self::title_main or self::graphic or self::graphic_text or self::p or self::non-normative-note)]"/>
+		
+		<xsl:apply-templates select="$fig/fig/*[self::p or self::non-normative-note]"/>
 		
 		<xsl:apply-templates select="$fig/fig/@orientation" mode="after_fig"/>
 		
