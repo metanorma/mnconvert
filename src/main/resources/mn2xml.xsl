@@ -5456,6 +5456,11 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</caption>
+		
+		<!-- put Unit statements -->
+		<xsl:apply-templates select="../note[@type = 'units']">
+			<xsl:with-param name="process">true</xsl:with-param>
+		</xsl:apply-templates>
 	</xsl:template>
 	
 	<xsl:template match="*[self::table or self::figure]/name/node()[1][self::text()]" priority="2">
@@ -5499,6 +5504,21 @@
 			</xsl:processing-instruction> -->
 			
 		</graphic>
+	</xsl:template>
+	
+	<xsl:template match="figure/note[@type = 'units']">
+		<xsl:param name="process">false</xsl:param>
+		<xsl:if test="$process = 'true'">
+			<xsl:apply-templates/>
+		</xsl:if>
+	</xsl:template>
+	<xsl:template match="figure/note[@type = 'units']/p">
+		<p content-type="dimension">
+			<xsl:if test="$isBSIPAS = 'true'">
+				<xsl:attribute name="content-type">Dimension</xsl:attribute>
+			</xsl:if>
+			<xsl:apply-templates/>
+		</p>
 	</xsl:template>
 	
   <xsl:template match="image[not(parent::figure)]">
