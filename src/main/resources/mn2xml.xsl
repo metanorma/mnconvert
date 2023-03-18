@@ -405,7 +405,7 @@
 	
 	<xsl:variable name="organization">
 		<xsl:choose>
-			<xsl:when test="contains($organization_abbreviation,'BSI') or $organization_name = 'The British Standards Institution' or $organization_name = 'British Standards Institution'">BSI</xsl:when>
+			<xsl:when test="contains($organization_abbreviation,'BSI') or $organization_name = 'The British Standards Institution' or $organization_name = 'British Standards Institution' or $organization_name = 'BSI Standards Limited'">BSI</xsl:when>
 			<xsl:when test="contains($organization_abbreviation,'ISO')">ISO</xsl:when>
 			<xsl:when test="contains($organization_abbreviation,'IEC')">IEC</xsl:when>
 			<xsl:when test="$organization_abbreviation = 'IEEE' or $publisher_abbreviation = 'IEEE'">IEEE</xsl:when>
@@ -2724,8 +2724,9 @@
 							</xsl:if>
 						</xsl:if>
 						
-						<xsl:if test="docidentifier[not(@type = 'metanorma' or @type = 'metanorma-ordinal' or @type = 'URN')]">
-							<std-ref><xsl:value-of select="docidentifier[not(@type = 'metanorma' or @type = 'metanorma-ordinal' or @type = 'URN')]"/></std-ref>
+						<xsl:variable name="std_ref_docidentifier" select="docidentifier[not(@type = 'metanorma' or @type = 'metanorma-ordinal' or @type = 'URN')]"/>
+						<xsl:if test="$std_ref_docidentifier != ''">
+							<std-ref><xsl:value-of select="$std_ref_docidentifier"/><xsl:apply-templates select="docidentifier[@type = 'DOI']"/></std-ref>
 						</xsl:if>
 						
 						<xsl:choose>
@@ -2775,6 +2776,12 @@
 			
 		</ref>
 
+	</xsl:template>
+	
+	<xsl:template match="docidentifier[@type = 'DOI']" priority="3">
+		<xsl:processing-instruction name="doi">
+			<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.),'^(DOI )(.*)','$2')"/>
+		</xsl:processing-instruction>
 	</xsl:template>
 	
 	<xsl:template name="bibitem_norm_ref_IEEE">
@@ -3821,6 +3828,8 @@
 				<xsl:if test="$outputformat = 'IEEE'">
 					<xsl:copy-of select="formattedref"/>
 				</xsl:if>
+				
+				<xsl:copy-of select="docidentifier[@type = 'DOI']"/>
 			</bibitem>
 		</xsl:for-each>
 	</xsl:variable>
@@ -3991,7 +4000,11 @@
 							<xsl:value-of select="$model_eref/referenceText"/>
 						</xsl:otherwise>
 					</xsl:choose>
-					<xsl:copy-of select="following-sibling::node()[1][self::processing-instruction('doi')]"/>
+					<!-- <xsl:copy-of select="following-sibling::node()[1][self::processing-instruction('doi')]"/> -->
+					
+					<!-- <?doi ... ?> -->
+					<xsl:apply-templates select="$bibitem_URN/docidentifier[@type = 'DOI']"/>
+					
 				</std-ref>
 				
 				<xsl:if test="$model_eref/locality">

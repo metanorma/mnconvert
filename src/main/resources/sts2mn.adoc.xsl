@@ -3081,12 +3081,12 @@
 		<xsl:if test="bold2[std-ref]">**</xsl:if>
 		
 		<!-- add Digital Object Identifier link -->
-		<xsl:if test=".//processing-instruction('doi')">
+		<!-- <xsl:if test=".//processing-instruction('doi')">
 			<xsl:call-template name="insertPI">
 				<xsl:with-param name="name">doi</xsl:with-param>
 				<xsl:with-param name="value" select=".//processing-instruction('doi')"/>
 			</xsl:call-template>
-		</xsl:if>
+		</xsl:if> -->
 		
 		<xsl:value-of select="$space_after"/>
 	</xsl:template>
@@ -4800,6 +4800,9 @@
 							
 							
 							<xsl:text>)]]]</xsl:text>
+							
+							<xsl:apply-templates select="@doi"/>
+							
 						</item>
 					</xsl:if>
 				</xsl:for-each>
@@ -4867,8 +4870,21 @@
 				</xsl:for-each>
 				<!-- END term source iteration -->
 				
+			</xsl:variable> <!-- hidden_bibitems -->
+			
+			<!-- select most long strings with the same id (they contains 'doi')--> 
+			<xsl:variable name="hidden_bibitems_updated">
+				<xsl:for-each select="xalan:nodeset($hidden_bibitems)//item">
+					<xsl:variable name="curr_length" select="string-length()"/>
+					<xsl:choose>
+						<!-- if there is item with great length than current, then skip current -->
+						<xsl:when test="xalan:nodeset($hidden_bibitems)//item[@id = current()/@id and string-length() &gt; $curr_length]"><!-- skip --></xsl:when>
+						<xsl:otherwise><xsl:copy-of select="."/></xsl:otherwise>
+					</xsl:choose>
+				</xsl:for-each>
 			</xsl:variable>
-			<xsl:for-each select="xalan:nodeset($hidden_bibitems)//item">
+			
+			<xsl:for-each select="xalan:nodeset($hidden_bibitems_updated)//item">
 				<xsl:if test="not(preceding-sibling::item[@id = current()/@id])"> <!-- unique bibitems -->
 					<xsl:value-of select="."/>
 					<xsl:text>&#xa;</xsl:text>
@@ -5116,6 +5132,9 @@
 						</xsl:otherwise>
 					</xsl:choose>
 					
+					<!-- add DOI -->
+					<xsl:apply-templates select=".//processing-instruction('doi')"/>
+					
 				</xsl:otherwise>
 			</xsl:choose>
 		
@@ -5165,6 +5184,15 @@
 		</xsl:if>
 		
 	</xsl:template> <!-- ref -->
+	
+	<!-- span:docid.DOI[https://doi.org/10.3403/30248249U] -->
+	<xsl:template match="processing-instruction('doi') | @doi">
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>span:docid.DOI[</xsl:text>
+		<xsl:value-of select="."/>
+		<xsl:text>]</xsl:text>
+	</xsl:template>
+	
 	
 	<xsl:template match="ref/std">
 		<xsl:apply-templates/>
