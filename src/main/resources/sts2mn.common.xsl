@@ -1043,6 +1043,10 @@
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="ref_fix"/>
 			
+			<xsl:if test=".//processing-instruction('doi')">
+				<xsl:attribute name="doi"><xsl:value-of select=".//processing-instruction('doi')"/></xsl:attribute>
+			</xsl:if>
+			
 			<xsl:if test="normalize-space(@std-id) != ''"> <!-- if there is attribute @std-id -->
 				<xsl:attribute name="std-id2">
 					<xsl:variable name="std_id">

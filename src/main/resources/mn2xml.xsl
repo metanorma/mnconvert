@@ -4001,7 +4001,10 @@
 						</xsl:otherwise>
 					</xsl:choose>
 					<!-- <xsl:copy-of select="following-sibling::node()[1][self::processing-instruction('doi')]"/> -->
+					
+					<!-- <?doi ... ?> -->
 					<xsl:apply-templates select="$bibitem_URN/docidentifier[@type = 'DOI']"/>
+					
 				</std-ref>
 				
 				<xsl:if test="$model_eref/locality">
