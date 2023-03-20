@@ -2190,7 +2190,6 @@
 																metanorma-extension/semantic-metadata/international |
 																metanorma-extension/semantic-metadata/isoviennaagreement |
 																metanorma-extension/semantic-metadata/copyright-statement |
-																metanorma-extension/semantic-metadata/color-preface-background |
 																metanorma-extension/presentation-metadata/* |
 																metanorma-extension/table[@id = '_misccontainer_anchor_aliases'] |
 																metanorma-extension/*[local-name() = 'UnitsML']"
@@ -3321,6 +3320,8 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<xsl:template match="p/@columns"/>
+	
 	<xsl:template match="sections//*[@type = 'section-title' or local-name() = 'section-title']" priority="2">
 		<xsl:apply-templates select="." mode="section-title"/>
 	</xsl:template>
@@ -3528,7 +3529,7 @@
 	<xsl:template match="ul/note | ol/note" priority="2"/>
 	
 	
-	<xsl:variable name="color-title" select="//*[local-name() = 'presentation-metadata']/*[local-name() = 'color-title']"/>
+	<xsl:variable name="color-title" select="//*[local-name() = 'presentation-metadata']/*[local-name() = 'color-secondary-shade-1']"/>
 	<xsl:variable name="color-list-label" select="//*[local-name() = 'presentation-metadata']/*[local-name() = 'color-list-label']"/>
 	
 	<xsl:variable name="ul_labels_">
