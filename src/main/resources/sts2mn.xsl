@@ -2163,6 +2163,14 @@
 		</xsl:for-each>
 	</xsl:template>
 	
+	<xsl:template match="table-wrap-foot/p[@content-type = 'Dimension' or @content-type = 'dimension']">
+		<note type="units">
+			<p>
+				<xsl:apply-templates/>
+			</p>
+		</note>
+	 </xsl:template>
+	
 	<xsl:template match="title">
 		<xsl:element name="{local-name()}">
 			<xsl:apply-templates select="@*"/>

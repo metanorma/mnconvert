@@ -4300,6 +4300,7 @@
 		<xsl:text>&#xa;</xsl:text>
 		<!-- move notes outside table -->
 		<xsl:apply-templates select="../table-wrap-foot/non-normative-note" />
+		<xsl:apply-templates select="../table-wrap-foot/p[@content-type = 'Dimension' or @content-type = 'dimension']" />
 		
 	</xsl:template>
 	
@@ -4376,7 +4377,8 @@
 			<xsl:if test="thead">
 				<option>header</option>
 			</xsl:if>
-			<xsl:if test="ancestor::table-wrap/table-wrap-foot[count(*[local-name() != 'fn-group' and local-name() != 'fn' and local-name() != 'non-normative-note']) != 0] or tfoot">
+			<xsl:if test="ancestor::table-wrap/table-wrap-foot[count(*[local-name() != 'fn-group' and local-name() != 'fn' and local-name() != 'non-normative-note' and 
+						not(local-name() = 'p' and (@content-type = 'Dimension' or @content-type = 'dimension'))]) != 0] or tfoot">
 				<option>footer</option>
 			</xsl:if>
 			<!-- <xsl:if test="ancestor::table-wrap/@content-type = 'ace-table' or 
@@ -4613,7 +4615,7 @@
 		<xsl:param name="cols-count"/>
 		
 		<xsl:variable name="table_footer">
-			<xsl:apply-templates select="*[not(self::fn[@id] or self::non-normative-note)]"/> <!-- except fn[@id] and non-normative-note -->
+			<xsl:apply-templates select="*[not(self::fn[@id] or self::non-normative-note or self::p[@content-type = 'Dimension' or @content-type = 'dimension'])]"/> <!-- except fn[@id] and non-normative-note -->
 		</xsl:variable>
 		
 		<xsl:if test="normalize-space($table_footer) != ''">
@@ -4670,6 +4672,15 @@
 		<xsl:value-of select="."/><xsl:text>| </xsl:text>
 	</xsl:template>	
 	 -->
+	 
+	 
+	 <xsl:template match="table-wrap-foot/p[@content-type = 'Dimension' or @content-type = 'dimension']">
+			<xsl:text>[NOTE,type=units]</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:apply-templates/>
+			<xsl:text>&#xa;&#xa;&#xa;</xsl:text>
+	 </xsl:template>
+	 
 	<!-- =============== -->
 	<!-- END Table -->
 	<!-- =============== -->
