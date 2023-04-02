@@ -3743,39 +3743,49 @@
 	</xsl:template>
 	
 	<xsl:template match="note" name="note">
-		<!-- <xsl:if test="$debug = 'true'">
-			<xsl:message>DEBUG: note processing <xsl:number level="any" count="*[local-name() = 'note']"/></xsl:message>
-		</xsl:if> -->
-		<xsl:variable name="ancestor_clause_id" select="ancestor::clause[1]/@id"/>
-		<xsl:variable name="ancestor_table_id" select="ancestor::table[1]/@id"/>
-		
-		<xsl:variable name="note_presentation_" select="$xml_presentation_catalog//note[@id = current()/@id]"/>
-		<xsl:variable name="note_presentation" select="xalan:nodeset($note_presentation_)"/>
-		
-		<non-normative-note>
-			<xsl:choose>
-				<xsl:when test="$note_presentation/name">
-					<xsl:apply-templates select="$note_presentation/name"/>
-				</xsl:when>
-				<xsl:when test="not(name)"> <!-- in semantic metanorma xml there isn't element '<name>NOTE 1</name> -->
-					<label>
-						<xsl:text>NOTE</xsl:text>
-						<xsl:choose>
-							<xsl:when test="ancestor::amend/autonumber[@type = 'note']">
-								<xsl:text>&#xA0;</xsl:text><xsl:value-of select="ancestor::amend/autonumber[@type = 'note']/text()"/>
-							</xsl:when>
-							<xsl:when test="count(ancestor::table[1]//note) &gt; 1">
-								<xsl:text>&#xA0;</xsl:text><xsl:number level="any" count="note[ancestor::table[@id = $ancestor_table_id]]"/>
-							</xsl:when>
-							<xsl:when test="count(ancestor::clause[1]//note) &gt; 1">
-								<xsl:text>&#xA0;</xsl:text><xsl:number level="any" count="note[ancestor::clause[@id = $ancestor_clause_id]]"/>
-							</xsl:when>
-						</xsl:choose>
-					</label>
-				</xsl:when>
-			</xsl:choose>
-			<xsl:apply-templates/>
-		</non-normative-note>
+	
+		<xsl:choose>
+			<xsl:when test="parent::table and @type = 'units'">
+				<p content-type="Dimension">
+					<xsl:apply-templates/>
+				</p>
+			</xsl:when>
+			<xsl:otherwise>
+				<!-- <xsl:if test="$debug = 'true'">
+					<xsl:message>DEBUG: note processing <xsl:number level="any" count="*[local-name() = 'note']"/></xsl:message>
+				</xsl:if> -->
+				<xsl:variable name="ancestor_clause_id" select="ancestor::clause[1]/@id"/>
+				<xsl:variable name="ancestor_table_id" select="ancestor::table[1]/@id"/>
+				
+				<xsl:variable name="note_presentation_" select="$xml_presentation_catalog//note[@id = current()/@id]"/>
+				<xsl:variable name="note_presentation" select="xalan:nodeset($note_presentation_)"/>
+				
+				<non-normative-note>
+					<xsl:choose>
+						<xsl:when test="$note_presentation/name">
+							<xsl:apply-templates select="$note_presentation/name"/>
+						</xsl:when>
+						<xsl:when test="not(name)"> <!-- in semantic metanorma xml there isn't element '<name>NOTE 1</name> -->
+							<label>
+								<xsl:text>NOTE</xsl:text>
+								<xsl:choose>
+									<xsl:when test="ancestor::amend/autonumber[@type = 'note']">
+										<xsl:text>&#xA0;</xsl:text><xsl:value-of select="ancestor::amend/autonumber[@type = 'note']/text()"/>
+									</xsl:when>
+									<xsl:when test="count(ancestor::table[1]//note) &gt; 1">
+										<xsl:text>&#xA0;</xsl:text><xsl:number level="any" count="note[ancestor::table[@id = $ancestor_table_id]]"/>
+									</xsl:when>
+									<xsl:when test="count(ancestor::clause[1]//note) &gt; 1">
+										<xsl:text>&#xA0;</xsl:text><xsl:number level="any" count="note[ancestor::clause[@id = $ancestor_clause_id]]"/>
+									</xsl:when>
+								</xsl:choose>
+							</label>
+						</xsl:when>
+					</xsl:choose>
+					<xsl:apply-templates/>
+				</non-normative-note>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="note/name" priority="2">

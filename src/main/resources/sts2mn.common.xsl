@@ -1244,6 +1244,10 @@
 		</non-normative-note>
 	</xsl:template>
 	
+	<xsl:template match="fig/*[self::table-wrap or self::array][count(table/col) + count(table/colgroup/col) = 1 and .//graphic]/caption[p[@content-type = 'Dimension' or @content-type = 'dimension']]" mode="model_fig">
+		<xsl:apply-templates mode="model_fig"/>
+	</xsl:template>
+	
 	<xsl:template match="fig/p[preceding-sibling::*[not(self::p)][1][self::graphic]]" mode="model_fig" priority="2">
 		<graphic_text>
 			<xsl:copy>
@@ -1253,7 +1257,7 @@
 		</graphic_text>
 	</xsl:template>
 	
-	<xsl:template match="fig/p" mode="model_fig">
+	<xsl:template match="fig/p | fig//p[@content-type = 'Dimension' or @content-type = 'dimension']" mode="model_fig">
 		<xsl:choose>
 			<xsl:when test="@content-type = 'Dimension' or @content-type = 'dimension'">
 				<xsl:call-template name="insertNoteUnits"/>
