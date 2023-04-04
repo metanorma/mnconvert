@@ -3769,6 +3769,14 @@
 				string-length(normalize-space(.)) = 1)"> <!-- if text isn't `Annex X`, i.e. 'Annexes A', or 'C' -->
 				<xsl:text>&lt;&lt;</xsl:text><xsl:value-of select="$rid"/>,<xsl:value-of select="."/><xsl:text>&gt;&gt;</xsl:text>
 			</xsl:when>
+			<xsl:when test="@ref-type = 'fig'">
+				<xsl:text>&lt;&lt;</xsl:text><xsl:value-of select="$rid"/>
+				<xsl:variable name="regex_subfigure">^Figure.*([a-z])$</xsl:variable>
+				<xsl:if test="java:org.metanorma.utils.RegExHelper.matches($regex_subfigure, normalize-space(.)) = 'true'">
+					<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.), $regex_subfigure, '$1')"/>
+				</xsl:if>
+				<xsl:text>&gt;&gt;</xsl:text>
+			</xsl:when>
 			<xsl:otherwise> <!-- example: ref-type="sec" "table" "app" -->
 				<xsl:text>&lt;&lt;</xsl:text><xsl:value-of select="$rid"/><xsl:text>&gt;&gt;</xsl:text>
 			</xsl:otherwise>
@@ -5477,6 +5485,12 @@
 		
 		<!-- Example: [[fig_1]] -->
 		<xsl:call-template name="setId"/>
+		<xsl:variable name="id">
+			<xsl:choose>
+				<xsl:when test="@id"><xsl:value-of select="@id"/></xsl:when>
+				<xsl:otherwise><xsl:value-of select="generate-id()"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
 
 		<xsl:apply-templates select="$fig/fig/label"/>
 		
@@ -5500,6 +5514,11 @@
 				
 				<xsl:variable name="title_before_graphic" select="normalize-space($fig/fig/graphic[1][preceding-sibling::title] and 1 = 1)"/>
 				<xsl:for-each select="$fig/fig/graphic">
+					<xsl:text>[[</xsl:text>
+					<xsl:value-of select="$id"/>
+					<xsl:number format="a"/>
+					<xsl:text>]]</xsl:text>
+					<xsl:text>&#xa;</xsl:text>
 					<xsl:if test="$title_before_graphic = 'true'">
 						<xsl:apply-templates select="preceding-sibling::title[1]"/>
 					</xsl:if>
