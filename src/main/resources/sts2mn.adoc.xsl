@@ -3728,18 +3728,40 @@
 					</xsl:for-each>
 				</xsl:variable>
 				
+				<xsl:variable name="preceding_text" select="normalize-space(preceding-sibling::node()[1][self::text()])"/>
+				<!-- <xsl:text>&#xa;'DEBUG preceding_text=</xsl:text><xsl:value-of select="$preceding_text"/><xsl:text>'</xsl:text> -->
+				<xsl:variable name="regexBefore" select="concat('(^|.* )', $term_name, ' \($')"/>
+				<!-- <xsl:text>&#xa;,DEBUG regexBefore='</xsl:text><xsl:value-of select="$regexBefore"/><xsl:text>'</xsl:text> -->
+				<xsl:variable name="is_term_in_text_before_xref" select="normalize-space(java:org.metanorma.utils.RegExHelper.matches($regexBefore, $preceding_text))"/>
+				<!-- <xsl:variable name="is_term_in_text_before_xref" select="normalize-space(java:org.metanorma.utils.RegExHelper.matches('.* door closer \($', 'the open position against the action of a door closer ('))"/> -->
+				<!-- <xsl:text>&#xa;,DEBUG  is_term_in_text_before_xref='</xsl:text><xsl:value-of select="$is_term_in_text_before_xref"/><xsl:text>'&#xa;</xsl:text> -->
 				
-				<!-- <xsl:variable name="term_name" select="java:toLowerCase(java:java.lang.String.new(translate($term_name_, ' ', '-')_))"/>				 -->
-				<!-- <xsl:text>&lt;&lt;</xsl:text>term-<xsl:value-of select="$term_name"/><xsl:text>&gt;&gt;</xsl:text> -->
-				<!-- <xsl:text>term:[</xsl:text><xsl:value-of select="$term_name"/><xsl:text>]</xsl:text> -->
-				<xsl:variable name="rendering"><xsl:apply-templates /></xsl:variable>
+				<xsl:variable name="following_text" select="normalize-space(following-sibling::node()[1][self::text()])"/>
 				
-				<!-- Example: {{process,*3.21*,options="noref,noital,linkmention"}} -->
-				<xsl:call-template name="insertTermReference">
-					<xsl:with-param name="term" select="$term_name"/>
-					<xsl:with-param name="rendering" select="$rendering"/>
-					<xsl:with-param name="options" select="'noref,noital,linkmention'"/>
-				</xsl:call-template>
+				<xsl:choose>
+					
+					<!-- for https://github.com/metanorma/mnconvert/issues/359, the case 'When terms equal' -->
+					<xsl:when test="$is_term_in_text_before_xref = 'true' and starts-with($following_text, ')')">
+						<xsl:call-template name="insertTermReference">
+							<xsl:with-param name="term" select="$term_name"/>
+						</xsl:call-template>
+					</xsl:when>
+					
+					<xsl:otherwise>
+						<!-- <xsl:variable name="term_name" select="java:toLowerCase(java:java.lang.String.new(translate($term_name_, ' ', '-')_))"/>				 -->
+						<!-- <xsl:text>&lt;&lt;</xsl:text>term-<xsl:value-of select="$term_name"/><xsl:text>&gt;&gt;</xsl:text> -->
+						<!-- <xsl:text>term:[</xsl:text><xsl:value-of select="$term_name"/><xsl:text>]</xsl:text> -->
+						<xsl:variable name="rendering"><xsl:apply-templates /></xsl:variable>
+						
+						<!-- Example: {{process,*3.21*,options="noref,noital,linkmention"}} -->
+						<xsl:call-template name="insertTermReference">
+							<xsl:with-param name="term" select="$term_name"/>
+							<xsl:with-param name="rendering" select="$rendering"/>
+							<xsl:with-param name="options" select="'noref,noital,linkmention'"/>
+						</xsl:call-template>
+					</xsl:otherwise>
+				</xsl:choose>
+				
 			</xsl:when>
 			<xsl:when test="@ref-type = 'app' and ( 
 				(java:org.metanorma.utils.RegExHelper.matches('^Annex.*$', normalize-space(.)) = 'true' and
@@ -3752,6 +3774,99 @@
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
+	
+	<!-- =================================================== -->
+	<!-- =================================================== -->
+	<!-- Special case: for https://github.com/metanorma/mnconvert/issues/359, case 'when terms equal' -->
+	<!-- =================================================== -->
+	<!-- text before xref with link to term,  -->
+	<xsl:template match="text()[following-sibling::node()[1][self::xref and @ref-type='sec']][normalize-space(java:org.metanorma.utils.RegExHelper.matches('(^|.* )\(', .)) = 'true']" name="text_before_xref" priority="2">
+		<xsl:param name="input_text"/>
+		<xsl:param name="from_after_template">false</xsl:param>
+		
+		<xsl:variable name="rid" select="following-sibling::node()[1][self::xref and @ref-type='sec']/@rid"/>
+		<xsl:variable name="isTerm">
+			<xsl:for-each select="$updated_xml"> <!-- change context -->
+				<xsl:value-of select="local-name(key('ids', $rid)) = 'term-sec'"/>
+			</xsl:for-each>
+		</xsl:variable>
+		
+		<xsl:variable name="text">
+			<xsl:choose>
+				<xsl:when test="$from_after_template = 'false'"><xsl:value-of select="."/></xsl:when>
+				<xsl:otherwise><xsl:value-of select="$input_text"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:choose>
+			<xsl:when test="normalize-space($isTerm) = 'true'">
+				<!-- remove latest 'term + (" -->
+				<xsl:variable name="term_name">
+					<xsl:for-each select="$updated_xml">
+						<xsl:value-of select="key('ids', $rid)//tbx:term[1]"/>
+					</xsl:for-each>
+				</xsl:variable>
+				<xsl:variable name="regexTextBeforeTerm" select="concat('(^|.* )', $term_name, ' \($')"/>
+				
+				<xsl:value-of select="java:replaceAll(java:java.lang.String.new($text), $regexTextBeforeTerm, '$1')"/>
+				
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$text"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<!-- text after xref with link to term, for https://github.com/metanorma/mnconvert/issues/359, case 'when terms equal' -->
+	<xsl:template match="text()[preceding-sibling::node()[1][self::xref and @ref-type='sec']][starts-with(., ')')]" priority="2">
+		<xsl:variable name="rid" select="preceding-sibling::xref[1]/@rid"/>
+		<xsl:variable name="isTerm">
+			<xsl:for-each select="$updated_xml"> <!-- change context -->
+				<xsl:value-of select="local-name(key('ids', $rid)) = 'term-sec'"/>
+			</xsl:for-each>
+		</xsl:variable>
+
+		<xsl:variable name="term_name">
+			<xsl:for-each select="$updated_xml">
+				<xsl:value-of select="key('ids', $rid)//tbx:term[1]"/>
+			</xsl:for-each>
+		</xsl:variable>
+		
+		<xsl:variable name="regexTextBeforeTerm" select="concat('(^|.* )', $term_name, ' \($')"/>
+		
+		<xsl:variable name="text_after_xref">
+			<xsl:choose>
+				<xsl:when test="normalize-space($isTerm) = 'true'">
+					<!-- remove first ')" if preceding text contains term -->
+					<xsl:variable name="preceding_text" select="normalize-space(preceding-sibling::node()[2][self::text()])"/>
+					<xsl:variable name="is_term_in_text_before_xref" select="normalize-space(java:org.metanorma.utils.RegExHelper.matches($regexTextBeforeTerm, $preceding_text))"/>
+					
+					<xsl:choose>
+						<xsl:when test="$is_term_in_text_before_xref = 'true'">
+							<xsl:variable name="regexTextAfterTerm">^\)(.*)</xsl:variable>
+							<xsl:value-of select="java:replaceAll(java:java.lang.String.new(.), $regexTextAfterTerm, '$1')"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="."/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="."/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:call-template name="text_before_xref">
+			<xsl:with-param name="input_text" select="$text_after_xref"/>
+			<xsl:with-param name="from_after_template">true</xsl:with-param>
+		</xsl:call-template>
+		
+	</xsl:template>
+	<!-- =================================================== -->
+	<!-- END: Special case: for https://github.com/metanorma/mnconvert/issues/359, case 'when terms equal' -->
+	<!-- =================================================== -->
+	<!-- =================================================== -->
 	
 	<xsl:template match="sup[xref[@ref-type='fn' or @ref-type='table-fn']]">
 		<xsl:apply-templates />
