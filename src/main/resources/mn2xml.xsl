@@ -2944,6 +2944,13 @@
 		<xsl:apply-templates/>
 	</xsl:template>
 	
+	<xsl:template match="bibitem/extent/locality[@type = 'issue']">
+		<xsl:if test="preceding-sibling::*[1][local-name() = 'locality'][@type = 'volume']">(</xsl:if>
+		<issue><xsl:apply-templates/></issue>
+		<xsl:if test="preceding-sibling::*[1][local-name() = 'locality'][@type = 'volume']">)</xsl:if>
+		<xsl:if test="following-sibling::*[1][local-name() = 'locality'][@type = 'page']">, </xsl:if>
+	</xsl:template>
+	
 	<xsl:template match="bibitem/extent/locality[@type = 'page']/referenceFrom" priority="2">
 		<fpage><xsl:apply-templates/></fpage>
 		<xsl:if test="following-sibling::*[1][local-name() = 'referenceTo']">-</xsl:if>
