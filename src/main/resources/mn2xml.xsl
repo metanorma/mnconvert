@@ -2768,13 +2768,35 @@
 				</xsl:when>
 				<xsl:otherwise> <!-- reference to non-standard (article, book, etc. ) -->
 					<mixed-citation>
-						<xsl:apply-templates />
+						<!-- <xsl:copy-of select="."/> -->
+						<xsl:choose>
+							<xsl:when test="@type != '' and @type != 'standard'">
+							
+								<xsl:attribute name="publication-type">
+									<xsl:choose>
+										<xsl:when test="@type = 'xyz'"></xsl:when>
+										<xsl:otherwise>other</xsl:otherwise>
+									</xsl:choose>
+								</xsl:attribute>
+							
+								<xsl:variable name="parts">
+									<part><xsl:apply-templates select="contributor"/></part>
+									<part><xsl:apply-templates select="title"/></part>
+								</xsl:variable>
+								<!-- DEBUG: <xsl:copy-of select="$parts"/> -->
+								<xsl:for-each select="xalan:nodeset($parts)/part[normalize-space() != '']">
+									<xsl:if test="position() != 1 and not(italic)">, </xsl:if>
+									<xsl:copy-of select="./node()"/>
+								</xsl:for-each>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:apply-templates />
+							</xsl:otherwise>
+						</xsl:choose>
 					</mixed-citation>
 				</xsl:otherwise>
 			</xsl:choose>
-			
 		</ref>
-
 	</xsl:template>
 	
 	<xsl:template match="docidentifier[@type = 'DOI']" priority="3">
@@ -2851,17 +2873,32 @@
 		</mixed-citation>
 	</xsl:template>
 	
-	<xsl:template match="references/bibitem/*[self::docidentifier or self::docnumber or self::date or self::contributor or self::edition or self::language or self::script or self::copyright or self::relation]" priority="2">
+	<xsl:template match="references/bibitem/*[self::docidentifier or self::docnumber or self::date or self::edition or self::language or self::script or self::copyright or self::relation]" priority="2">
 		<xsl:text disable-output-escaping="yes">&lt;!--</xsl:text>
 			<xsl:copy-of select="."/>
 		<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
 	</xsl:template>
+	
+	<xsl:template match="bibitem/contributor" priority="2">
+		<person-group person-group-type="{role/@type}">
+			<collab><xsl:apply-templates /></collab>
+		</person-group>
+	</xsl:template>
+	<xsl:template match="bibitem/contributor/role" priority="2"/>
+	<xsl:template match="bibitem/contributor/organization | bibitem/contributor/organization/name" priority="2">
+		<xsl:apply-templates />
+	</xsl:template>
+	<xsl:template match="bibitem/contributor//text()[normalize-space() = '']" priority="2"/>
 	
 	<xsl:template match="bibitem/title" priority="2">	
 		<xsl:if test="$metanorma_type != 'IEC'">
 			<xsl:text>, </xsl:text>
 		</xsl:if>
 		<title><xsl:apply-templates/></title>
+	</xsl:template>
+	
+	<xsl:template match="bibitem[@type != '' and @type != 'standard']/title" priority="2">
+		<italic><xsl:apply-templates/></italic>
 	</xsl:template>
 	
 	<xsl:template match="bibitem/title" mode="mixed_citation">
