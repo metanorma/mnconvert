@@ -4161,6 +4161,11 @@
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
+	<xsl:template match="mixed-citation/comment">
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>span:note[</xsl:text><xsl:value-of select="."/><xsl:text>]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
 	
 	<!-- Example: <pub-id specific-use="repno">GET 2500</pub-id> -->
 	<!-- <xsl:template match="mixed-citation[@publication-type != 'standard']/pub-id">

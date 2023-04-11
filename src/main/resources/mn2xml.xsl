@@ -2785,6 +2785,7 @@
 									<part><xsl:apply-templates select="contributor[role/@type = 'author']"/></part>
 									<part><xsl:apply-templates select="date[@type = 'published']"/></part>
 									<part><xsl:apply-templates select="title"/></part>
+									<part><xsl:apply-templates select="note"/></part>
 									<part><xsl:apply-templates select="series"/></part>
 									<part><xsl:apply-templates select="extent"/></part>
 									<part><xsl:apply-templates select="place"/></part>
@@ -2993,6 +2994,10 @@
 			<xsl:text>, </xsl:text>
 		</xsl:if>
 		<title><xsl:apply-templates/></title>
+	</xsl:template>
+	
+	<xsl:template match="bibitem[@type != '' and @type != 'standard']/note" priority="3">
+		<comment><xsl:apply-templates/></comment>
 	</xsl:template>
 	
 	<xsl:template match="bibitem/series">
