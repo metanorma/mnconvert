@@ -2768,13 +2768,49 @@
 				</xsl:when>
 				<xsl:otherwise> <!-- reference to non-standard (article, book, etc. ) -->
 					<mixed-citation>
-						<xsl:apply-templates />
+						<!-- <xsl:copy-of select="."/> -->
+						<xsl:choose>
+							<xsl:when test="@type != '' and @type != 'standard'">
+							
+								<xsl:attribute name="publication-type">
+									<xsl:choose>
+										<xsl:when test="@type = 'book' or @type = 'journal'"><xsl:value-of select="@type"/></xsl:when>
+										<xsl:when test="@type = 'techreport'">report</xsl:when>
+										<xsl:when test="@type = 'website'">web</xsl:when>
+										<xsl:otherwise>other</xsl:otherwise>
+									</xsl:choose>
+								</xsl:attribute>
+							
+								<xsl:variable name="parts">
+									<part><xsl:apply-templates select="contributor[role/@type = 'author']"/></part>
+									<part><xsl:apply-templates select="date[@type = 'published']"/></part>
+									<part><xsl:apply-templates select="title"/></part>
+									<part><xsl:apply-templates select="note"/></part>
+									<part><xsl:apply-templates select="series"/></part>
+									<part><xsl:apply-templates select="extent"/></part>
+									<part><xsl:apply-templates select="place"/></part>
+									<part><xsl:apply-templates select="contributor[role/@type = 'publisher']"/></part>
+									<part><xsl:apply-templates select="edition"/></part>
+								</xsl:variable>
+								<!-- DEBUG: <xsl:copy-of select="$parts"/> -->
+								<xsl:for-each select="xalan:nodeset($parts)/part[normalize-space() != '']">
+									<xsl:copy-of select="./node()"/>
+									<xsl:choose>
+										<xsl:when test="publisher-loc and following-sibling::*[normalize-space() != ''][1][publisher-name]">: </xsl:when>
+										<xsl:when test="following-sibling::*[normalize-space() != ''][1][publisher-name or publisher-loc]">. </xsl:when>
+										<xsl:when test="position() != last() and not(person-group)"><xsl:text>, </xsl:text></xsl:when>
+									</xsl:choose>
+									
+								</xsl:for-each>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:apply-templates />
+							</xsl:otherwise>
+						</xsl:choose>
 					</mixed-citation>
 				</xsl:otherwise>
 			</xsl:choose>
-			
 		</ref>
-
 	</xsl:template>
 	
 	<xsl:template match="docidentifier[@type = 'DOI']" priority="3">
@@ -2851,10 +2887,106 @@
 		</mixed-citation>
 	</xsl:template>
 	
-	<xsl:template match="references/bibitem/*[self::docidentifier or self::docnumber or self::date or self::contributor or self::edition or self::language or self::script or self::copyright or self::relation]" priority="2">
+	<xsl:template match="references/bibitem/*[self::docidentifier or self::docnumber or self::language or self::script or self::copyright or self::relation]" priority="2">
 		<xsl:text disable-output-escaping="yes">&lt;!--</xsl:text>
 			<xsl:copy-of select="."/>
 		<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/contributor[role/@type = 'author']" priority="2">
+		<xsl:if test="not(preceding-sibling::contributor[role/@type = 'author'])"> <!-- only for first contributor --> 
+			<person-group person-group-type="{role/@type}">
+				<xsl:apply-templates/>
+				<xsl:apply-templates select="following-sibling::contributor[role/@type = 'author']/node()"/>
+			</person-group>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/contributor/role" priority="2"/>
+	
+	<xsl:template match="bibitem/contributor[role/@type = 'author']/organization" priority="2">
+		<collab><xsl:apply-templates /></collab>
+	</xsl:template>
+	<xsl:template match="bibitem/contributor/organization/name" priority="2">
+		<xsl:apply-templates />
+	</xsl:template>
+	<xsl:template match="bibitem/contributor//text()[normalize-space() = '']" priority="2"/>
+	
+	<xsl:template match="bibitem/contributor/person">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="bibitem/contributor/person/name">
+		<name>
+			<xsl:apply-templates select="surname"/>
+			<xsl:apply-templates select="node()[local-name() != 'surname']"/>
+		</name>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/contributor/person/name/surname">
+		<surname><xsl:apply-templates/></surname>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/contributor/person/name/forename">
+		<given-names><xsl:apply-templates/></given-names>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/extent">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="bibitem/extent/locality[@type = 'volume']">
+		<volume><xsl:apply-templates/></volume>
+		<xsl:if test="following-sibling::*[1][local-name() = 'locality'][@type = 'page']">, </xsl:if>
+	</xsl:template>
+	<xsl:template match="bibitem/extent/locality/text()[normalize-space() = '']" priority="2"/>
+	
+	<xsl:template match="bibitem/extent/locality[@type = 'page']">
+		<xsl:apply-templates/>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/extent/locality[@type = 'issue']">
+		<xsl:if test="preceding-sibling::*[1][local-name() = 'locality'][@type = 'volume']">(</xsl:if>
+		<issue><xsl:apply-templates/></issue>
+		<xsl:if test="preceding-sibling::*[1][local-name() = 'locality'][@type = 'volume']">)</xsl:if>
+		<xsl:if test="following-sibling::*[1][local-name() = 'locality'][@type = 'page']">, </xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/extent/locality[@type = 'page']/referenceFrom" priority="2">
+		<fpage><xsl:apply-templates/></fpage>
+		<xsl:if test="following-sibling::*[1][local-name() = 'referenceTo']">-</xsl:if>
+	</xsl:template>
+	<xsl:template match="bibitem/extent/locality[@type = 'page']/referenceTo" priority="2">
+		<lpage><xsl:apply-templates/></lpage>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/extent//referenceFrom | bibitem/extent//referenceTo">
+		<xsl:apply-templates/>
+	</xsl:template>
+	<xsl:template match="bibitem/extent//referenceFrom/text()[normalize-space() = '']" priority="2"/>
+	<xsl:template match="bibitem/extent//referenceTo/text()[normalize-space() = '']" priority="2"/>
+	
+	<xsl:template match="bibitem/place">
+		<publisher-loc><xsl:apply-templates/></publisher-loc>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/contributor[role/@type = 'publisher']" priority="2">
+		<publisher-name><xsl:apply-templates/></publisher-name>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/contributor[role/@type = 'publisher']/organization" priority="2">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	
+	<xsl:template match="bibitem/date[@type = 'published']">
+		<year><xsl:apply-templates/></year>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/date[@type = 'published']/text()[normalize-space() = '']" priority="2"/>
+	
+	<xsl:template match="bibitem/date[@type = 'published']/on">
+		<xsl:apply-templates/>
 	</xsl:template>
 	
 	<xsl:template match="bibitem/title" priority="2">	
@@ -2862,6 +2994,32 @@
 			<xsl:text>, </xsl:text>
 		</xsl:if>
 		<title><xsl:apply-templates/></title>
+	</xsl:template>
+	
+	<xsl:template match="bibitem[@type != '' and @type != 'standard']/note" priority="3">
+		<comment><xsl:apply-templates/></comment>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/series">
+		<italic><xsl:apply-templates/></italic>
+	</xsl:template>
+	<xsl:template match="bibitem/series/title">
+		<xsl:apply-templates/>
+	</xsl:template>
+	
+	<xsl:template match="bibitem[@type != '' and @type != 'standard']/title" priority="2">
+		<xsl:choose>
+			<xsl:when test="../series">
+				<article-title><xsl:apply-templates/></article-title>
+			</xsl:when>
+			<xsl:otherwise>
+				<italic><xsl:apply-templates/></italic>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/edition">
+		<edition><xsl:apply-templates/></edition>
 	</xsl:template>
 	
 	<xsl:template match="bibitem/title" mode="mixed_citation">

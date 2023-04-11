@@ -4082,8 +4082,10 @@
 				<xsl:otherwise>title</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-		<xsl:text>span:</xsl:text><xsl:value-of select="$span_element"/><xsl:text>[</xsl:text><xsl:value-of select="."/>
-		<xsl:text>]&#xa;</xsl:text>
+		<xsl:if test="not(normalize-space() = ',')"> <!-- skip comma <italic>,</italic> -->
+			<xsl:text>span:</xsl:text><xsl:value-of select="$span_element"/><xsl:text>[</xsl:text><xsl:value-of select="."/>
+			<xsl:text>]&#xa;</xsl:text>
+		</xsl:if>
 	</xsl:template>
 	<!-- special case <italic>.</italic> -->
 	<xsl:template match="mixed-citation[@publication-type != 'standard']/*[self::italic or self::italic2][normalize-space() = '.']">
@@ -4114,7 +4116,7 @@
 	</xsl:template>
 	
 	<!-- Example: <issue>2</issue> -->
-	<xsl:template match="mixed-citation/volume">
+	<xsl:template match="mixed-citation/issue">
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>span:issue[</xsl:text><xsl:value-of select="."/>
 		<xsl:text>]&#xa;</xsl:text>
@@ -4150,6 +4152,18 @@
 	<xsl:template match="mixed-citation/publisher-loc">
 		<xsl:text>&#xa;</xsl:text>
 		<xsl:text>span:pubplace[</xsl:text><xsl:value-of select="."/><xsl:text>]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="mixed-citation/edition">
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>span:edition[</xsl:text><xsl:value-of select="."/><xsl:text>]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="mixed-citation/comment">
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:text>span:note[</xsl:text><xsl:value-of select="."/><xsl:text>]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
