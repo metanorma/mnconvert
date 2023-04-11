@@ -2781,12 +2781,13 @@
 							
 								<xsl:variable name="parts">
 									<part><xsl:apply-templates select="contributor"/></part>
+									<part><xsl:apply-templates select="date[@type = 'published']"/></part>
 									<part><xsl:apply-templates select="title"/></part>
 								</xsl:variable>
 								<!-- DEBUG: <xsl:copy-of select="$parts"/> -->
 								<xsl:for-each select="xalan:nodeset($parts)/part[normalize-space() != '']">
-									<xsl:if test="position() != 1 and not(italic)">, </xsl:if>
 									<xsl:copy-of select="./node()"/>
+									<xsl:if test="position() != last() and not(person-group)">, </xsl:if>
 								</xsl:for-each>
 							</xsl:when>
 							<xsl:otherwise>
@@ -2873,7 +2874,7 @@
 		</mixed-citation>
 	</xsl:template>
 	
-	<xsl:template match="references/bibitem/*[self::docidentifier or self::docnumber or self::date or self::edition or self::language or self::script or self::copyright or self::relation]" priority="2">
+	<xsl:template match="references/bibitem/*[self::docidentifier or self::docnumber or self::edition or self::language or self::script or self::copyright or self::relation]" priority="2">
 		<xsl:text disable-output-escaping="yes">&lt;!--</xsl:text>
 			<xsl:copy-of select="."/>
 		<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
@@ -2881,14 +2882,46 @@
 	
 	<xsl:template match="bibitem/contributor" priority="2">
 		<person-group person-group-type="{role/@type}">
-			<collab><xsl:apply-templates /></collab>
+			<xsl:apply-templates/>
 		</person-group>
 	</xsl:template>
+	
 	<xsl:template match="bibitem/contributor/role" priority="2"/>
-	<xsl:template match="bibitem/contributor/organization | bibitem/contributor/organization/name" priority="2">
+	
+	<xsl:template match="bibitem/contributor/organization" priority="2">
+		<collab><xsl:apply-templates /></collab>
+	</xsl:template>
+	<xsl:template match="bibitem/contributor/organization/name" priority="2">
 		<xsl:apply-templates />
 	</xsl:template>
 	<xsl:template match="bibitem/contributor//text()[normalize-space() = '']" priority="2"/>
+	
+	<xsl:template match="bibitem/contributor/person">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="bibitem/contributor/person/name">
+		<name>
+			<xsl:apply-templates select="surname"/>
+			<xsl:apply-templates select="node()[local-name() != 'surname']"/>
+		</name>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/contributor/person/name/surname">
+		<surname><xsl:apply-templates/></surname>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/contributor/person/name/forename">
+		<given-names><xsl:apply-templates/></given-names>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/date[@type = 'published']">
+		<year><xsl:apply-templates/></year>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/date[@type = 'published']/on">
+		<xsl:apply-templates/>
+	</xsl:template>
 	
 	<xsl:template match="bibitem/title" priority="2">	
 		<xsl:if test="$metanorma_type != 'IEC'">
