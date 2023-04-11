@@ -2785,13 +2785,19 @@
 									<part><xsl:apply-templates select="contributor[role/@type = 'author']"/></part>
 									<part><xsl:apply-templates select="date[@type = 'published']"/></part>
 									<part><xsl:apply-templates select="title"/></part>
+									<part><xsl:apply-templates select="place"/></part>
 									<part><xsl:apply-templates select="contributor[role/@type = 'publisher']"/></part>
 									<part><xsl:apply-templates select="edition"/></part>
 								</xsl:variable>
 								<!-- DEBUG: <xsl:copy-of select="$parts"/> -->
 								<xsl:for-each select="xalan:nodeset($parts)/part[normalize-space() != '']">
 									<xsl:copy-of select="./node()"/>
-									<xsl:if test="position() != last() and not(person-group)"><xsl:text>, </xsl:text></xsl:if>
+									<xsl:choose>
+										<xsl:when test="publisher-loc and following-sibling::*[normalize-space() != ''][1][publisher-name]">: </xsl:when>
+										<xsl:when test="following-sibling::*[normalize-space() != ''][1][publisher-name or publisher-loc]">. </xsl:when>
+										<xsl:when test="position() != last() and not(person-group)"><xsl:text>, </xsl:text></xsl:when>
+									</xsl:choose>
+									
 								</xsl:for-each>
 							</xsl:when>
 							<xsl:otherwise>
@@ -2917,6 +2923,10 @@
 	
 	<xsl:template match="bibitem/contributor/person/name/forename">
 		<given-names><xsl:apply-templates/></given-names>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/place">
+		<publisher-loc><xsl:apply-templates/></publisher-loc>
 	</xsl:template>
 	
 	<xsl:template match="bibitem/contributor[role/@type = 'publisher']" priority="2">
