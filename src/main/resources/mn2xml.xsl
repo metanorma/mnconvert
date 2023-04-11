@@ -2774,20 +2774,24 @@
 							
 								<xsl:attribute name="publication-type">
 									<xsl:choose>
-										<xsl:when test="@type = 'xyz'"></xsl:when>
+										<xsl:when test="@type = 'book' or @type = 'journal'"><xsl:value-of select="@type"/></xsl:when>
+										<xsl:when test="@type = 'techreport'">report</xsl:when>
+										<xsl:when test="@type = 'website'">web</xsl:when>
 										<xsl:otherwise>other</xsl:otherwise>
 									</xsl:choose>
 								</xsl:attribute>
 							
 								<xsl:variable name="parts">
-									<part><xsl:apply-templates select="contributor"/></part>
+									<part><xsl:apply-templates select="contributor[role/@type = 'author']"/></part>
 									<part><xsl:apply-templates select="date[@type = 'published']"/></part>
 									<part><xsl:apply-templates select="title"/></part>
+									<part><xsl:apply-templates select="contributor[role/@type = 'publisher']"/></part>
+									<part><xsl:apply-templates select="edition"/></part>
 								</xsl:variable>
 								<!-- DEBUG: <xsl:copy-of select="$parts"/> -->
 								<xsl:for-each select="xalan:nodeset($parts)/part[normalize-space() != '']">
 									<xsl:copy-of select="./node()"/>
-									<xsl:if test="position() != last() and not(person-group)">, </xsl:if>
+									<xsl:if test="position() != last() and not(person-group)"><xsl:text>, </xsl:text></xsl:if>
 								</xsl:for-each>
 							</xsl:when>
 							<xsl:otherwise>
@@ -2874,13 +2878,13 @@
 		</mixed-citation>
 	</xsl:template>
 	
-	<xsl:template match="references/bibitem/*[self::docidentifier or self::docnumber or self::edition or self::language or self::script or self::copyright or self::relation]" priority="2">
+	<xsl:template match="references/bibitem/*[self::docidentifier or self::docnumber or self::language or self::script or self::copyright or self::relation]" priority="2">
 		<xsl:text disable-output-escaping="yes">&lt;!--</xsl:text>
 			<xsl:copy-of select="."/>
 		<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="bibitem/contributor" priority="2">
+	<xsl:template match="bibitem/contributor[role/@type = 'author']" priority="2">
 		<person-group person-group-type="{role/@type}">
 			<xsl:apply-templates/>
 		</person-group>
@@ -2888,7 +2892,7 @@
 	
 	<xsl:template match="bibitem/contributor/role" priority="2"/>
 	
-	<xsl:template match="bibitem/contributor/organization" priority="2">
+	<xsl:template match="bibitem/contributor[role/@type = 'author']/organization" priority="2">
 		<collab><xsl:apply-templates /></collab>
 	</xsl:template>
 	<xsl:template match="bibitem/contributor/organization/name" priority="2">
@@ -2915,9 +2919,20 @@
 		<given-names><xsl:apply-templates/></given-names>
 	</xsl:template>
 	
+	<xsl:template match="bibitem/contributor[role/@type = 'publisher']" priority="2">
+		<publisher-name><xsl:apply-templates/></publisher-name>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/contributor[role/@type = 'publisher']/organization" priority="2">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	
 	<xsl:template match="bibitem/date[@type = 'published']">
 		<year><xsl:apply-templates/></year>
 	</xsl:template>
+	
+	<xsl:template match="bibitem/date[@type = 'published']/text()[normalize-space() = '']" priority="2"/>
 	
 	<xsl:template match="bibitem/date[@type = 'published']/on">
 		<xsl:apply-templates/>
@@ -2932,6 +2947,10 @@
 	
 	<xsl:template match="bibitem[@type != '' and @type != 'standard']/title" priority="2">
 		<italic><xsl:apply-templates/></italic>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/edition">
+		<edition><xsl:apply-templates/></edition>
 	</xsl:template>
 	
 	<xsl:template match="bibitem/title" mode="mixed_citation">
