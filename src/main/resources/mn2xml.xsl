@@ -2785,6 +2785,8 @@
 									<part><xsl:apply-templates select="contributor[role/@type = 'author']"/></part>
 									<part><xsl:apply-templates select="date[@type = 'published']"/></part>
 									<part><xsl:apply-templates select="title"/></part>
+									<part><xsl:apply-templates select="series"/></part>
+									<part><xsl:apply-templates select="extent"/></part>
 									<part><xsl:apply-templates select="place"/></part>
 									<part><xsl:apply-templates select="contributor[role/@type = 'publisher']"/></part>
 									<part><xsl:apply-templates select="edition"/></part>
@@ -2891,9 +2893,12 @@
 	</xsl:template>
 	
 	<xsl:template match="bibitem/contributor[role/@type = 'author']" priority="2">
-		<person-group person-group-type="{role/@type}">
-			<xsl:apply-templates/>
-		</person-group>
+		<xsl:if test="not(preceding-sibling::contributor[role/@type = 'author'])"> <!-- only for first contributor --> 
+			<person-group person-group-type="{role/@type}">
+				<xsl:apply-templates/>
+				<xsl:apply-templates select="following-sibling::contributor[role/@type = 'author']/node()"/>
+			</person-group>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="bibitem/contributor/role" priority="2"/>
@@ -2925,6 +2930,34 @@
 		<given-names><xsl:apply-templates/></given-names>
 	</xsl:template>
 	
+	<xsl:template match="bibitem/extent">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="bibitem/extent/locality[@type = 'volume']">
+		<volume><xsl:apply-templates/></volume>
+		<xsl:if test="following-sibling::*[1][local-name() = 'locality'][@type = 'page']">, </xsl:if>
+	</xsl:template>
+	<xsl:template match="bibitem/extent/locality/text()[normalize-space() = '']" priority="2"/>
+	
+	<xsl:template match="bibitem/extent/locality[@type = 'page']">
+		<xsl:apply-templates/>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/extent/locality[@type = 'page']/referenceFrom" priority="2">
+		<fpage><xsl:apply-templates/></fpage>
+		<xsl:if test="following-sibling::*[1][local-name() = 'referenceTo']">-</xsl:if>
+	</xsl:template>
+	<xsl:template match="bibitem/extent/locality[@type = 'page']/referenceTo" priority="2">
+		<lpage><xsl:apply-templates/></lpage>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/extent//referenceFrom | bibitem/extent//referenceTo">
+		<xsl:apply-templates/>
+	</xsl:template>
+	<xsl:template match="bibitem/extent//referenceFrom/text()[normalize-space() = '']" priority="2"/>
+	<xsl:template match="bibitem/extent//referenceTo/text()[normalize-space() = '']" priority="2"/>
+	
 	<xsl:template match="bibitem/place">
 		<publisher-loc><xsl:apply-templates/></publisher-loc>
 	</xsl:template>
@@ -2955,8 +2988,22 @@
 		<title><xsl:apply-templates/></title>
 	</xsl:template>
 	
-	<xsl:template match="bibitem[@type != '' and @type != 'standard']/title" priority="2">
+	<xsl:template match="bibitem/series">
 		<italic><xsl:apply-templates/></italic>
+	</xsl:template>
+	<xsl:template match="bibitem/series/title">
+		<xsl:apply-templates/>
+	</xsl:template>
+	
+	<xsl:template match="bibitem[@type != '' and @type != 'standard']/title" priority="2">
+		<xsl:choose>
+			<xsl:when test="../series">
+				<article-title><xsl:apply-templates/></article-title>
+			</xsl:when>
+			<xsl:otherwise>
+				<italic><xsl:apply-templates/></italic>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="bibitem/edition">
