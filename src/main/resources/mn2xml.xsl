@@ -2735,7 +2735,7 @@
 								<xsl:apply-templates select="formattedref"/>
 							</xsl:when>
 							<xsl:otherwise>
-								<xsl:apply-templates />
+								<xsl:apply-templates select="node()[not(self::date) and not(self::contributor)]"/>
 							</xsl:otherwise>
 						</xsl:choose>
 					</std>
@@ -2887,7 +2887,9 @@
 		</mixed-citation>
 	</xsl:template>
 	
-	<xsl:template match="references/bibitem/*[self::docidentifier or self::docnumber or self::language or self::script or self::copyright or self::relation]" priority="2">
+	<xsl:template match="references/bibitem/*[self::docidentifier or self::docnumber or self::language or self::script]" priority="2"/>
+	
+	<xsl:template match="references/bibitem/*[self::copyright or self::relation]" priority="2">
 		<xsl:text disable-output-escaping="yes">&lt;!--</xsl:text>
 			<xsl:copy-of select="."/>
 		<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
