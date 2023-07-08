@@ -313,9 +313,10 @@
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="id_generate" />
 			<xsl:attribute name="id_new">
+				<xsl:variable name="section_" select="translate(@section,'()','')"/> <!-- (1) to 1 -->
 				<xsl:choose>
-					<xsl:when test="$metanorma_type = 'IEC'">for-<xsl:value-of select="translate(@section,'()','')"/></xsl:when> <!-- (1) to 1 -->
-					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">formula_<xsl:value-of select="@section"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'IEC'">for-<xsl:value-of select="$section_"/></xsl:when>
+					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">formula_<xsl:value-of select="$section_"/></xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 			<xsl:apply-templates select="node()" mode="id_generate" />
