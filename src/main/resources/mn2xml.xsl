@@ -5870,14 +5870,23 @@
 			</xsl:choose>
 		</xsl:variable>
 		
+		<xsl:variable name="element_name">
+			<xsl:choose>
+				<xsl:when test="not(@lang)">preformat</xsl:when>
+				<xsl:otherwise>code</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
 		<xsl:if test="$process = 'true'">
 	
 			<xsl:choose>
 				<xsl:when test="$format = 'NISO' and $outputformat != 'IEEE'">
-					<code>
+					<!-- <code> -->
+					<xsl:element name="{$element_name}">
 						<xsl:apply-templates select="@*"/>
 						<xsl:apply-templates/>
-					</code>
+					</xsl:element>
+					<!-- </code> -->
 				</xsl:when>
 				<!-- ISO -->
 				<xsl:otherwise>
