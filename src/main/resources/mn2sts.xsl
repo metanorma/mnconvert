@@ -1290,12 +1290,17 @@
 	
 	<!-- Cross-references between terminological entries or terms within the Terms and definitions clause can be tagged as <tbx:entailedTerm>. This element should only be used in child elements of <tbx:termEntry>. -->
 	<xsl:template name="insert_entailedTerm">
-		<tbx:entailedTerm target="{xref/@target}">
+		<tbx:entailedTerm>
+			<xsl:variable name="xref_target" select="normalize-space(xref/@target)"/>
+			<xsl:if test="$xref_target != ''">
+				<xsl:attribute name="target">
+					<xsl:value-of select="$xref_target"/>
+				</xsl:attribute>
+			</xsl:if>
 			<xsl:choose>
 				<xsl:when test="renderterm">
 					<xsl:value-of select="renderterm"/>
 					
-					<xsl:variable name="xref_target" select="xref/@target"/>
 					<xsl:variable name="element_xref_" select="$elements//element[@source_id = $xref_target]"/>
 					<xsl:variable name="element_xref" select="xalan:nodeset($element_xref_)"/>
 					<xsl:variable name="section" select="$element_xref/@section"/>

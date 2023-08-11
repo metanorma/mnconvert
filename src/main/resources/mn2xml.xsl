@@ -1240,9 +1240,12 @@
 					<xsl:if test="normalize-space($part_number) != ''">:<xsl:value-of select="$part_number"/></xsl:if>
 				</proj-id>
 				<release-version>
-					<xsl:apply-templates select="ext/doctype" mode="front"/>
+					<!-- <xsl:apply-templates select="ext/doctype" mode="front"/> -->
+					<xsl:apply-templates select="status/stage[1]/@abbreviation" mode="front"/>
 				</release-version>
 			</xsl:if>
+			
+			<xsl:variable name="urn" select="normalize-space(docidentifier[@type = 'URN'])" />
 			
 			<xsl:if test="$element_name != 'std-meta'">
 				<doc-ident>
@@ -1263,7 +1266,10 @@
 						<xsl:apply-templates select="status/stage[1]/@abbreviation" mode="front"/>
 					</release-version>
 					<xsl:if test="$element_name = 'iso-meta'">
-						<xsl:call-template name="generateURN"/>
+						<xsl:if test="$urn != ''">
+							<urn><xsl:value-of select="$urn"/></urn>
+						</xsl:if>
+						<!-- <xsl:call-template name="generateURN"/> -->
 					</xsl:if>
 				</doc-ident>
 			</xsl:if>
@@ -1311,17 +1317,19 @@
 				</version>
 				
 				<xsl:if test="contains($organization_abbreviation, 'IEC')">
-					<std-id-group>
-						<std-id originator="IEC" std-id-link-type="urn" std-id-type="dated">
-							<!-- urn:iec:std:iec:62830-8:2021-10::: -->
-							<xsl:text>urn:iec:std:iec:</xsl:text>
-							<xsl:value-of select="$docnumber"/>
-							<xsl:if test="normalize-space($part_number) != ''">-<xsl:value-of select="$part_number"/></xsl:if>
-							<xsl:if test="normalize-space($revision_date) != ''">:<xsl:value-of select="substring($revision_date,1,7)"/></xsl:if>
-							<xsl:text>:::</xsl:text>
-						</std-id>
-					</std-id-group>
-					
+					<xsl:if test="$urn != ''">
+						<std-id-group>
+							<std-id originator="IEC" std-id-link-type="urn" std-id-type="dated">
+								<!-- urn:iec:std:iec:62830-8:2021-10::: -->
+								<!-- <xsl:text>urn:iec:std:iec:</xsl:text>
+								<xsl:value-of select="$docnumber"/>
+								<xsl:if test="normalize-space($part_number) != ''">-<xsl:value-of select="$part_number"/></xsl:if>
+								<xsl:if test="normalize-space($revision_date) != ''">:<xsl:value-of select="substring($revision_date,1,7)"/></xsl:if>
+								<xsl:text>:::</xsl:text> -->
+								<xsl:value-of select="$urn"/>
+							</std-id>
+						</std-id-group>
+					</xsl:if>
 					<xsl:if test="docidentifier[@type = 'ISBN']">
 						<isbn><xsl:value-of select="docidentifier[@type = 'ISBN']"/></isbn>
 					</xsl:if>
@@ -2888,6 +2896,8 @@
 	</xsl:template>
 	
 	<xsl:template match="references/bibitem/*[self::docidentifier or self::docnumber or self::language or self::script]" priority="2"/>
+	
+	<xsl:template match="references/bibitem[@type = 'standard']/*[self::edition]" priority="2"/>
 	
 	<xsl:template match="references/bibitem/*[self::copyright or self::relation]" priority="2">
 		<xsl:text disable-output-escaping="yes">&lt;!--</xsl:text>
