@@ -349,6 +349,12 @@
 		<xsl:apply-templates select="xalan:nodeset($element)" mode="add_attributes"/>
 	</xsl:template>
 	
+	<xsl:template match="*[local-name() = 'bibdata'] | *[local-name() = 'bibdata']//*" mode="xml_presentation_catalog">
+		<xsl:element name="{local-name()}">
+			<xsl:apply-templates select="@*|node()" mode="xml_presentation_catalog"/>
+		</xsl:element>
+	</xsl:template>
+	
 	<xsl:variable name="xml_presentation_catalog" select="xalan:nodeset($xml_presentation_catalog_)"/>
 	<!-- ================================== -->
 	<!-- END Presentation XML Catalog -->
@@ -1471,7 +1477,10 @@
 						<xsl:value-of select="normalize-space(substring-after($related_comm_ref, $related_comm_ref_text))"/>
 					</xsl:when>
 					<xsl:when test="ext/editorialgroup/@identifier">
-						<xsl:value-of select="@identifier"/>
+						<xsl:value-of select="ext/editorialgroup/@identifier"/>
+					</xsl:when>
+					<xsl:when test="$xml_presentation_catalog/bibdata/ext/editorialgroup/@identifier">
+						<xsl:value-of select="$xml_presentation_catalog/bibdata/ext/editorialgroup/@identifier"/>
 					</xsl:when>
 					<xsl:when test="ext/editorialgroup/technical-committee and not(
 						ext/editorialgroup/subcommittee and 
@@ -2131,11 +2140,15 @@
 																bibdata/title[@type = 'title-amd'] |
 																contributor[role/@type='author']/organization/abbreviation |																
 																contributor[role/@type='author']/organization/name |
+																contributor/organization/subdivision |
+																contributor/organization/identifier |
+																contributor/role/text() |
 																ext/structuredidentifier/project-number |
 																language |
 																script |
 																contributor[role/@type='publisher']/organization/abbreviation |																
 																contributor[role/@type='publisher']/organization/name |
+																contributor[role/@type!='author' and role/@type!='publisher'] |
 																status/stage |
 																status/substage |
 																ext/doctype |
