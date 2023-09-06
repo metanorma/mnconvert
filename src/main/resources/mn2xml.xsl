@@ -2136,6 +2136,7 @@
 																script |
 																contributor[role/@type='publisher']/organization/abbreviation |																
 																contributor[role/@type='publisher']/organization/name |
+																contributor[role/@type!='author' and role/@type!='publisher'] |
 																status/stage |
 																status/substage |
 																ext/doctype |
