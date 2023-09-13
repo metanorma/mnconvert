@@ -1308,7 +1308,7 @@
 					
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:attribute name="target"><xsl:value-of select=".//tt[2]"/></xsl:attribute>
+					<xsl:attribute name="target"><xsl:value-of select="translate(.//tt[2],' ','_')"/></xsl:attribute>
 					<xsl:value-of select=".//tt[1]"/>
 				</xsl:otherwise>
 			</xsl:choose>
