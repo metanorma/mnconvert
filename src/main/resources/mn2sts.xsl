@@ -1225,7 +1225,7 @@
 			
 			<xsl:variable name="value">
 				<xsl:choose>
-					<xsl:when test="letter-symbol">symbol</xsl:when>
+					<xsl:when test="letter-symbol = 'symbol' or letter-symbol = 'formula' or letter-symbol = 'equation'"><xsl:value-of select="letter-symbol"/></xsl:when>
 					<xsl:when test=".//abbreviation-type = 'acronym'">acronym</xsl:when>
 					<xsl:when test=".//expression/@type = 'abbreviation'">abbreviation</xsl:when>
 					<xsl:when test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO' or $metanorma_type = 'BSI') and .//expression/@type = 'full'">fullForm</xsl:when> <!-- or normalize-space(.//expression/@type) = '') -->
