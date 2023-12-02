@@ -2535,7 +2535,13 @@
 				<xsl:text>abbreviation-type:: </xsl:text><xsl:value-of select="@value"/>
 			</xsl:when>
 			<xsl:when test="@value = 'symbol'">
-				<xsl:text>letter-symbol:: true</xsl:text>
+				<xsl:text>letter-symbol:: symbol</xsl:text>
+			</xsl:when>
+			<xsl:when test="@value = 'formula'">
+				<xsl:text>letter-symbol:: formula</xsl:text>
+			</xsl:when>
+			<xsl:when test="@value = 'equation'">
+				<xsl:text>letter-symbol:: equation</xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:text>type:: </xsl:text>
@@ -2543,8 +2549,6 @@
 						<xsl:when test="@value = 'fullForm'">
 							<xsl:text>full</xsl:text>
 						</xsl:when>
-						<!-- <xsl:when test="@value = 'formula'">
-						<xsl:when test="@value = 'equation'"> -->
 						<xsl:when test="@value = 'variant'">full</xsl:when>
 						<xsl:otherwise><xsl:value-of select="@value"/></xsl:otherwise> <!-- Example: abbreviation -->
 					</xsl:choose>
