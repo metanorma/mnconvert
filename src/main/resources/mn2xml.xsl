@@ -2143,6 +2143,7 @@
 																contributor/organization/subdivision |
 																contributor/organization/identifier |
 																contributor/role/text() |
+																contributor/role/description |
 																ext/structuredidentifier/project-number |
 																language |
 																script |
