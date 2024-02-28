@@ -2953,7 +2953,7 @@
 		<surname><xsl:apply-templates/></surname>
 	</xsl:template>
 	
-	<xsl:template match="bibitem/contributor/person/name/forename">
+	<xsl:template match="bibitem/contributor/person/name/forename | bibitem/contributor/person/name/formatted-initials">
 		<given-names><xsl:apply-templates/></given-names>
 	</xsl:template>
 	
