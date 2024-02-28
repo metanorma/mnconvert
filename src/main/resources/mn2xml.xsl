@@ -2949,6 +2949,16 @@
 		</name>
 	</xsl:template>
 	
+	<xsl:template match="bibitem/contributor/person/name[completename]">
+		<string-name>
+			<xsl:apply-templates />
+		</string-name>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/contributor/person/name/completename">
+		<xsl:apply-templates />
+	</xsl:template>
+	
 	<xsl:template match="bibitem/contributor/person/name/surname">
 		<surname><xsl:apply-templates/></surname>
 	</xsl:template>
@@ -3019,7 +3029,14 @@
 		<xsl:if test="$metanorma_type != 'IEC'">
 			<xsl:text>, </xsl:text>
 		</xsl:if>
-		<title><xsl:apply-templates/></title>
+		<xsl:choose>
+			<xsl:when test="normalize-space(../@type) = ''">
+				<italic><xsl:apply-templates/></italic>
+			</xsl:when>
+			<xsl:otherwise>
+				<title><xsl:apply-templates/></title>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="bibitem[@type != '' and @type != 'standard']/note" priority="3">
