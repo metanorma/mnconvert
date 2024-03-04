@@ -166,7 +166,19 @@ public class sts2mnTests {
 
         assertTrue(Files.exists(fileout));        
     }
-    
+
+    @Test
+    public void successConvertRemoteToXML() throws ParseException {
+        System.out.println(name.getMethodName());
+        Path fileout = Paths.get(System.getProperty("buildDirectory"), "NISO-STS-Standard-1-0.mn.xml");
+        fileout.toFile().delete();
+        String remoteXML = "https://www.niso-sts.org/downloadables/samples/NISO-STS-Standard-1-0.XML";
+        fileout.toFile().delete();
+        String[] args = new String[]{"--output-format", "xml", "--output", fileout.toAbsolutePath().toString(), remoteXML};
+        mnconvert.main(args);
+        assertTrue(Files.exists(fileout));
+    }
+
     @Test
     public void successConvertToADOCWithImageLink() throws ParseException {
         assumeNotNull(XMLFILE_MN);
