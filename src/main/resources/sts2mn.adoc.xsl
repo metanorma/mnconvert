@@ -1256,7 +1256,7 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	
+	<!-- for BSI, PAS -->
 	<xsl:template match="title-wrap/full | title-wrap/main" mode="bibdata_title_full">
 	
 		<!-- <xsl:variable name="title" select="translate(., '-–', '——')"/> -->
@@ -1285,24 +1285,28 @@
 		
 	</xsl:template>
 	
+	<!-- for BSI, PAS -->
 	<xsl:template match="title-wrap/intro" mode="bibdata">
 		<title language="{../@xml:lang}" format="text/plain" type="title-intro">
 			<xsl:apply-templates mode="bibdata"/>
 		</title>
 	</xsl:template>
 	
+	<!-- for BSI, PAS -->
 	<xsl:template match="title-wrap/main" mode="bibdata">
 		<title language="{../@xml:lang}" format="text/plain" type="title-main">
 			<xsl:apply-templates mode="bibdata"/>
 		</title>
 	</xsl:template>
 	
+	<!-- for BSI, PAS -->
 	<xsl:template match="title-wrap/compl" mode="bibdata">
 		<title language="{../@xml:lang}" format="text/plain" type="title-part">
 			<xsl:apply-templates mode="bibdata"/>
 		</title>
 	</xsl:template>
 	
+	<!-- for BSI, PAS -->
 	<xsl:template match="title-wrap/compl/node()[1][self::text()]" mode="bibdata">
 		<!-- strip 'Part N:' -->
 		<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(.), '^Part(\s|\h)*(\d)+:(.+)$', '$3'))"/>
@@ -1344,6 +1348,13 @@
 				<xsl:text>&#xa;</xsl:text>
 			</xsl:otherwise>
 		</xsl:choose>	
+	</xsl:template>
+	
+	<xsl:template match="title-wrap[ancestor::front or ancestor::adoption-front]/main-title-wrap/main[normalize-space(.) != '']">
+		<xsl:param name="lang"/>
+		<xsl:text>:title-main-</xsl:text><xsl:value-of select="$lang"/><xsl:text>: </xsl:text><xsl:value-of select="."/>
+		<xsl:if test="../subtitle"><xsl:text> -- </xsl:text><xsl:value-of select="../subtitle"/></xsl:if>
+		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="title-wrap[ancestor::front or ancestor::adoption-front]/compl[normalize-space(.) != '']">
