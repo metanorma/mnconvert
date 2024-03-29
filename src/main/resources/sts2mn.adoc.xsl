@@ -1164,13 +1164,15 @@
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($value), '^©(\s|\h)*', '')"/> <!-- remove copyright sign -->
 	</xsl:template>
 	
+	<xsl:template name="getDate">
+		<xsl:choose>
+			<xsl:when test="normalize-space(@iso-8601-date) != ''"><xsl:value-of select="@iso-8601-date"/></xsl:when>
+			<xsl:otherwise><xsl:value-of select="normalize-space(.)"/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
 	<xsl:template match="pub-date[ancestor::front or ancestor::adoption-front]">
-		<xsl:variable name="date">
-			<xsl:choose>
-				<xsl:when test="normalize-space(@iso-8601-date) != ''"><xsl:value-of select="@iso-8601-date"/></xsl:when>
-				<xsl:otherwise><xsl:value-of select="normalize-space(.)"/></xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
+		<xsl:variable name="date"><xsl:call-template name="getDate"/></xsl:variable>
 		<xsl:if test="normalize-space($date) != ''">
 			<xsl:choose>
 				<xsl:when test="$inputformat = 'IEEE'">
@@ -1197,10 +1199,10 @@
 	</xsl:template>
 	
 	<xsl:template match="release-date[ancestor::front or ancestor::adoption-front]">
-		<xsl:if test="normalize-space() != ''">
-			<!-- <xsl:text>:date: release </xsl:text><xsl:value-of select="."/>
-			<xsl:text>&#xa;</xsl:text> -->
-			<date type="release"><xsl:value-of select="."/></date>
+		<xsl:variable name="date"><xsl:call-template name="getDate"/></xsl:variable>
+		<xsl:if test="$date != ''">
+			<!-- <xsl:text>:date: release </xsl:text><xsl:value-of select="."/> -->
+			<date type="release"><xsl:value-of select="$date"/></date>
 		</xsl:if>
 	</xsl:template>
 	
@@ -1667,7 +1669,7 @@
 	</xsl:template>
 	
 	<xsl:template match="approval/approval-date">
-		<xsl:variable name="date" select="normalize-space(@iso-8601-date)"/>
+		<xsl:variable name="date"><xsl:call-template name="getDate"/></xsl:variable>
 		<xsl:if test="$date != ''">
 			<xsl:choose>
 				<xsl:when test="@date-type = 'approved'">
@@ -1685,7 +1687,7 @@
 	</xsl:template>
 	
 	<xsl:template match="reaffirm-date">
-		<xsl:variable name="date" select="normalize-space(@iso-8601-date)"/>
+		<xsl:variable name="date"><xsl:call-template name="getDate"/></xsl:variable>
 		<xsl:if test="$date != ''">
 			<!-- <xsl:text>:date: reaffirm </xsl:text><xsl:value-of select="$date"/>
 			<xsl:text>&#xa;</xsl:text> -->
