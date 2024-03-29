@@ -2265,12 +2265,13 @@
 			</xsl:choose>
 		</xsl:variable>
 		<xsl:variable name="title" select="normalize-space(translate(title, ',&#x200b;&#xa0;‑','    '))"/> <!-- get first word -->
-		<xsl:variable name="sec_title_">
+		<xsl:variable name="sec_title__">
 			<xsl:choose>
 				<xsl:when test="contains($title, ' ')"><xsl:value-of select="substring-before($title,' ')"/></xsl:when>
 				<xsl:otherwise><xsl:value-of select="$title"/></xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
+		<xsl:variable name="sec_title_" select="translate($sec_title__, '/.' , '__')"/>
 		<xsl:variable name="sec_title" select="java:toLowerCase(java:java.lang.String.new($sec_title_))"/>
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$sectionsFolder}/{$sec_number}-{$sec_title}.adoc">
