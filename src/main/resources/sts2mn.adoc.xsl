@@ -63,7 +63,18 @@
 	<xsl:variable name="one_document_" select="count(//standard/front/*[contains(local-name(), '-meta')]) = 1 or //standards-document"/>
 	<xsl:variable name="one_document" select="normalize-space($one_document_)"/>
 	
-	<xsl:variable name="language" select="//standard/front/*/doc-ident/language"/>
+	<xsl:variable name="language1" select="normalize-space(//standard/front/*/doc-ident/language)"/>
+	<xsl:variable name="language2" select="normalize-space(//standard/front/*/std-ident/content-language)"/>
+	<xsl:variable name="language3" select="normalize-space(//standard/front/*/content-language)"/>
+	
+	<xsl:variable name="language"> <!-- see https://www.niso-sts.org/TagLibrary/niso-sts-TL-1-2-html/element/content-language.html -->
+		<xsl:choose>
+			<xsl:when test="$language1 != ''"><xsl:value-of select="$language1"/></xsl:when>
+			<xsl:when test="$language2 != ''"><xsl:value-of select="$language2"/></xsl:when>
+			<xsl:when test="$language3 != ''"><xsl:value-of select="$language3"/></xsl:when>
+			<xsl:otherwise>en</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
 	
 	<xsl:variable name="organization">
 		<xsl:choose>
@@ -1241,7 +1252,10 @@
 					<xsl:copy-of select="xalan:nodeset($titles)/*[@type='title-part'][1]"/>
 				</xsl:variable>
 				
-				<xsl:variable name="lang" select="@xml:lang"/>
+				<!-- <xsl:variable name="lang" select="@xml:lang"/> -->
+				<xsl:variable name="lang">
+					<xsl:call-template name="getLang"/>
+				</xsl:variable>
 				<xsl:for-each select="xalan:nodeset($title_components)/*">
 					<xsl:text>:</xsl:text><xsl:value-of select="@type"/><xsl:text>-</xsl:text><xsl:value-of select="$lang"/><xsl:text>: </xsl:text><xsl:value-of select="normalize-space(.)"/>
 					<xsl:text>&#xa;</xsl:text>
@@ -1250,7 +1264,10 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:apply-templates>
-					<xsl:with-param name="lang" select="@xml:lang"/>
+					<!-- <xsl:with-param name="lang" select="@xml:lang"/> -->
+					<xsl:with-param name="lang">
+						<xsl:call-template name="getLang"/>
+					</xsl:with-param>
 				</xsl:apply-templates>
 			</xsl:otherwise>
 		</xsl:choose>
@@ -1272,7 +1289,11 @@
 		
 		<xsl:variable name="parts" select="xalan:nodeset($parts_)"/>
 		
-		<xsl:variable name="lang" select="../@xml:lang"/>
+		<xsl:variable name="lang"> <!--  select="../@xml:lang"/> -->
+			<xsl:call-template name="getLang">
+				<xsl:with-param name="fromParent">true</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
 		
 		<xsl:if test="count($parts/*) &gt; 0">
 			<title language="{$lang}" format="text/plain" type="title-main">
@@ -1287,21 +1308,36 @@
 	
 	<!-- for BSI, PAS -->
 	<xsl:template match="title-wrap/intro" mode="bibdata">
-		<title language="{../@xml:lang}" format="text/plain" type="title-intro">
+		<title format="text/plain" type="title-intro"> <!-- language="{../@xml:lang}" -->
+			<xsl:attribute name="language">
+				<xsl:call-template name="getLang">
+					<xsl:with-param name="fromParent">true</xsl:with-param>
+				</xsl:call-template>
+			</xsl:attribute>
 			<xsl:apply-templates mode="bibdata"/>
 		</title>
 	</xsl:template>
 	
 	<!-- for BSI, PAS -->
 	<xsl:template match="title-wrap/main" mode="bibdata">
-		<title language="{../@xml:lang}" format="text/plain" type="title-main">
+		<title format="text/plain" type="title-main"> <!-- language="{../@xml:lang}" -->
+			<xsl:attribute name="language">
+				<xsl:call-template name="getLang">
+					<xsl:with-param name="fromParent">true</xsl:with-param>
+				</xsl:call-template>
+			</xsl:attribute>
 			<xsl:apply-templates mode="bibdata"/>
 		</title>
 	</xsl:template>
 	
 	<!-- for BSI, PAS -->
 	<xsl:template match="title-wrap/compl" mode="bibdata">
-		<title language="{../@xml:lang}" format="text/plain" type="title-part">
+		<title format="text/plain" type="title-part"> <!-- language="{../@xml:lang}" -->
+			<xsl:attribute name="language">
+				<xsl:call-template name="getLang">
+					<xsl:with-param name="fromParent">true</xsl:with-param>
+				</xsl:call-template>
+			</xsl:attribute>
 			<xsl:apply-templates mode="bibdata"/>
 		</title>
 	</xsl:template>
@@ -1352,7 +1388,10 @@
 	
 	<xsl:template match="title-wrap[ancestor::front or ancestor::adoption-front]/main-title-wrap/main[normalize-space(.) != '']">
 		<xsl:param name="lang"/>
-		<xsl:text>:title-main-</xsl:text><xsl:value-of select="$lang"/><xsl:text>: </xsl:text><xsl:value-of select="."/>
+		<xsl:text>:title-main-</xsl:text>
+			<xsl:value-of select="$lang"/>
+			<xsl:if test="normalize-space($lang) = ''"><xsl:call-template name="getLang"/></xsl:if>
+		<xsl:text>: </xsl:text><xsl:value-of select="."/>
 		<xsl:if test="../subtitle"><xsl:text> -- </xsl:text><xsl:value-of select="../subtitle"/></xsl:if>
 		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>

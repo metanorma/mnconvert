@@ -1557,4 +1557,13 @@
 		</xsl:if>
 	</xsl:template>
 	
+	<xsl:template name="getLang">
+		<xsl:param name="fromParent">false</xsl:param>
+		<xsl:choose>
+			<xsl:when test="$fromParent = 'true' and ../@xml:lang"><xsl:value-of select="../@xml:lang"/></xsl:when>
+			<xsl:when test="@xml:lang"><xsl:value-of select="@xml:lang"/></xsl:when>
+			<xsl:otherwise><xsl:value-of select="$language"/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
 </xsl:stylesheet>
