@@ -729,6 +729,8 @@
 		<!-- :docstatus: active -->
 		<xsl:apply-templates select="/*/@article-status"/>
 		
+		<!-- :docidentifier: ANSI/NISO Z39.102-2017 -->
+		<xsl:apply-templates select="std-ident/std-id-group"/>
 		<!-- :publisher: ISO;IEC -->
 		<xsl:apply-templates select="std-ident/originator"/>
 		<!-- :partnumber: 1 -->
@@ -1014,6 +1016,13 @@
 		<xsl:apply-templates select="isbn[@publication-format = 'online']"/>
 		<!-- :isbn-print: -->
 		<xsl:apply-templates select="isbn[@publication-format = 'print']"/>
+		<!-- :isbn: -->
+		<xsl:apply-templates select="std-ident/isbn[@publication-format = 'PDF']"/>
+		<!-- :presentation-metadata-isbn-html: -->
+		<xsl:apply-templates select="std-ident/isbn[@publication-format = 'HTML']"/>
+		<!-- :presentation-metadata-issn: -->
+		<xsl:apply-templates select="std-ident/issn"/>
+		
 
 		<!-- :semantic-metadata-open-access: -->
 		<xsl:apply-templates select="ancestor::standards-document/@open-access"/>
@@ -1095,8 +1104,12 @@
 	</xsl:template>
 	
 	<xsl:template match="std-ident[ancestor::front or ancestor::adoption-front]/doc-number[normalize-space(.) != '']">
-		<xsl:text>:docnumber: </xsl:text><xsl:call-template name="getDocNumber"/>
-		<xsl:text>&#xa;</xsl:text>
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">docnumber</xsl:with-param>
+			<xsl:with-param name="value">
+				<xsl:call-template name="getDocNumber"/>
+			</xsl:with-param>
+		</xsl:call-template>
 	</xsl:template>
 	
 	<xsl:template match="std-ident[ancestor::front or ancestor::adoption-front]/originator[normalize-space(.) != '']">
@@ -1541,8 +1554,10 @@
 	</xsl:template>
 	
 	<xsl:template match="custom-meta-group/custom-meta[meta-name = 'ISBN']/meta-value">
-		<xsl:text>:isbn: </xsl:text><xsl:value-of select="."/>
-		<xsl:text>&#xa;</xsl:text>
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">isbn</xsl:with-param>
+			<xsl:with-param name="value" select="."/>
+		</xsl:call-template>
 	</xsl:template>
 	
 	<xsl:template match="custom-meta-group/custom-meta[meta-name = 'TOC Heading Level']/meta-value">
@@ -1661,13 +1676,38 @@
 	</xsl:template>
 	
 	<xsl:template match="isbn[@publication-format = 'online']">
-		<xsl:text>:isbn-pdf: </xsl:text><xsl:value-of select="."/>
-		<xsl:text>&#xa;</xsl:text>
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">isbn-pdf</xsl:with-param>
+			<xsl:with-param name="value" select="."/>
+		</xsl:call-template>
+	</xsl:template>
+	
+	<xsl:template match="isbn[@publication-format = 'PDF']">
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">isbn</xsl:with-param>
+			<xsl:with-param name="value" select="."/>
+		</xsl:call-template>
 	</xsl:template>
 	
 	<xsl:template match="isbn[@publication-format = 'print']">
-		<xsl:text>:isbn-print: </xsl:text><xsl:value-of select="."/>
-		<xsl:text>&#xa;</xsl:text>
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">isbn-print</xsl:with-param>
+			<xsl:with-param name="value" select="."/>
+		</xsl:call-template>
+	</xsl:template>
+	
+	<xsl:template match="isbn[@publication-format = 'HTML']">
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">presentation-metadata-isbn-html</xsl:with-param>
+			<xsl:with-param name="value" select="."/>
+		</xsl:call-template>
+	</xsl:template>
+	
+	<xsl:template match="issn">
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">presentation-metadata-issn</xsl:with-param>
+			<xsl:with-param name="value" select="."/>
+		</xsl:call-template>
 	</xsl:template>
 	
 	<xsl:template match="std-title-group">
@@ -3149,8 +3189,18 @@
 	</xsl:template>
 	
 
+	<xsl:template match="std-id-group">
+		<xsl:if test="ancestor::std-doc-meta">
+			<xsl:apply-templates select="std-id[@std-id-type = 'dated']"/>
+		</xsl:if>
+	</xsl:template>
 	
-	<xsl:template match="std-id-group"/>
+	<xsl:template match="std-id-group/std-id">
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">docidentifier</xsl:with-param>
+			<xsl:with-param name="value" select="."/>
+		</xsl:call-template>
+	</xsl:template>
 	
 	<!-- <xsl:template match="std[not(ancestor::ref)]/text()">
 		<xsl:variable name="text" select="normalize-space(translate(.,'&#xA0;', ' '))"/>

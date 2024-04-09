@@ -11,6 +11,8 @@
 		extension-element-prefixes="redirect"
 		version="1.0">
 
+	<xsl:variable name="newline"><xsl:text>&#xa;</xsl:text></xsl:variable>
+
 	<!-- ================= -->
 	<!-- std model processing -->
 	<!-- ================= -->
@@ -1564,6 +1566,12 @@
 			<xsl:when test="@xml:lang"><xsl:value-of select="@xml:lang"/></xsl:when>
 			<xsl:otherwise><xsl:value-of select="$language"/></xsl:otherwise>
 		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template name="addDocumentAttribute">
+		<xsl:param name="key"/>
+		<xsl:param name="value"/>
+		<xsl:value-of select="concat(':', $key, ': ', $value, $newline)"/>
 	</xsl:template>
 	
 </xsl:stylesheet>
