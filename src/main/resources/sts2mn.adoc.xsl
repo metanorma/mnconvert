@@ -80,6 +80,7 @@
 		<xsl:choose>
 			<xsl:when test="/standard/front/nat-meta/std-ident/originator = 'PAS'">PAS</xsl:when>
 			<xsl:when test="/standard/front/nat-meta/@originator = 'BSI' or /standard/front/iso-meta/secretariat = 'BSI'">BSI</xsl:when>
+			<xsl:when test="/standard/front/std-doc-meta/std-org-group/std-org/std-org-abbrev = 'NISO'">NISO</xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="/standard/front/*/doc-ident/sdo"/>
 			</xsl:otherwise>
@@ -584,8 +585,10 @@
 				
 				</xsl:for-each>
 				
-				
-				<xsl:for-each select="std-meta/abstract">
+			</xsl:if>	
+			
+			<xsl:if test="$inputformat = 'IEEE' or $organization = 'NISO'">
+				<xsl:for-each select="std-meta/abstract | std-doc-meta/abstract">
 					<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 					<xsl:variable name="section_name" select="local-name()"/>
 					<xsl:variable name="filename">
@@ -607,6 +610,22 @@
 						<xsl:text>&#xa;&#xa;</xsl:text>
 					</redirect:write>
 				</xsl:for-each>
+			</xsl:if>
+			
+			<xsl:if test="*/meta-note">
+				<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
+				<xsl:variable name="filename">
+					<xsl:value-of select="$sectionsFolder"/><xsl:text>/00-meta-notes.</xsl:text><xsl:value-of select="$docfile_ext"/>
+				</xsl:variable>
+				
+				<redirect:write file="{$outpath}/{$filename}">
+					<xsl:text>&#xa;</xsl:text>
+					<xsl:apply-templates select="*/meta-note"/>
+				</redirect:write>
+				<redirect:write file="{$outpath}/{$docfile}">
+					<xsl:text>include::</xsl:text><xsl:value-of select="$filename"/><xsl:text>[]</xsl:text>
+					<xsl:text>&#xa;&#xa;</xsl:text>
+				</redirect:write>
 			</xsl:if>
 			
 			<!-- if in front there are another elements, except xxx-meta -->
@@ -733,6 +752,13 @@
 		<xsl:apply-templates select="std-ident/std-id-group"/>
 		<!-- :publisher: ISO;IEC -->
 		<xsl:apply-templates select="std-ident/originator"/>
+		<!-- :publisher: NISO -->
+		<xsl:apply-templates select="std-org-group/std-org/std-org-abbrev"/>
+		<!-- :pub-address: NISO + \
+		     3600 Clipper Mill Road + \
+				 ...
+		-->
+		<xsl:apply-templates select="std-org-group/std-org/std-org-loc"/>
 		<!-- :partnumber: 1 -->
 		<xsl:apply-templates select="std-ident/part-number"/>		
 		<!-- :edition: 1 -->
@@ -780,7 +806,11 @@
 		<xsl:apply-templates select="self-uri"/>
 		
 		<!-- :language: en -->
-		<xsl:apply-templates select="doc-ident/language"/>
+		<!-- <xsl:apply-templates select="doc-ident/language"/> -->
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">language</xsl:with-param>
+			<xsl:with-param name="value" select="$language"/>
+		</xsl:call-template>
 		<xsl:if test="$inputformat = 'IEEE'">
 			<xsl:text>:language: en</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
@@ -883,6 +913,12 @@
 		<!-- :semantic-metadata-partner-secretariat: -->
 		<xsl:apply-templates select="partner" />
 		
+		<!-- :semantic-metadata-accrediting-organizationt: -->
+		<xsl:apply-templates select="accrediting-organization"/>
+		
+		<!-- ::authorizer: An American National Standard -->
+		<xsl:apply-templates select="authorization"/>
+		
 		<!-- :keywords: -->
 		<xsl:apply-templates select="kwd-group"/>
 		
@@ -966,6 +1002,9 @@
 		<!-- :semantic-metadata-copyright-statement:  All rights of exploitation in any form and ... -->
 		<xsl:apply-templates select="permissions/copyright-statement"/>
 		
+		<!-- :semantic-metadata-license: All rights reserved under International -->
+		<xsl:apply-templates select="permissions/license"/>
+		
 		<!-- :semantic-metadata-xplore-article-id: 6457401 -->
 		<xsl:apply-templates select="xplore-article-id"/>
 		
@@ -1018,9 +1057,9 @@
 		<xsl:apply-templates select="isbn[@publication-format = 'print']"/>
 		<!-- :isbn: -->
 		<xsl:apply-templates select="std-ident/isbn[@publication-format = 'PDF']"/>
-		<!-- :presentation-metadata-isbn-html: -->
+		<!-- :semantic-metadata-isbn-html: -->
 		<xsl:apply-templates select="std-ident/isbn[@publication-format = 'HTML']"/>
-		<!-- :presentation-metadata-issn: -->
+		<!-- :semantic-metadata-issn: -->
 		<xsl:apply-templates select="std-ident/issn"/>
 		
 
@@ -1117,6 +1156,25 @@
 			<xsl:text>:publisher: </xsl:text><xsl:value-of select="translate(., '/', ';')"/>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="std-org-group/std-org/std-org-abbrev">
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">publisher</xsl:with-param>
+			<xsl:with-param name="value" select="."/>
+		</xsl:call-template>
+	</xsl:template>
+	
+	<xsl:template match="std-org-group/std-org/std-org-loc">
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">pub-address</xsl:with-param>
+			<xsl:with-param name="value">
+				<xsl:for-each select="*">
+					<xsl:value-of select="."/>
+					<xsl:if test="position() != last()"><xsl:value-of select="concat(' + \', $newline)"/></xsl:if>
+				</xsl:for-each>
+			</xsl:with-param>
+		</xsl:call-template>
 	</xsl:template>
 
 	<xsl:template name="getDocNumber">
@@ -1225,8 +1283,16 @@
 	<xsl:template match="release-date[ancestor::front or ancestor::adoption-front]">
 		<xsl:variable name="date"><xsl:call-template name="getDate"/></xsl:variable>
 		<xsl:if test="$date != ''">
-			<!-- <xsl:text>:date: release </xsl:text><xsl:value-of select="."/> -->
-			<date type="release"><xsl:value-of select="$date"/></date>
+			<xsl:choose>
+				<xsl:when test="@date-type = 'approved'">
+					<!-- :issued-date: ... -->
+					<issued-date><xsl:value-of select="$date"/></issued-date>
+				</xsl:when>
+				<xsl:otherwise>
+					<!-- <xsl:text>:date: release </xsl:text><xsl:value-of select="."/> -->
+					<date type="release"><xsl:value-of select="$date"/></date>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:if>
 	</xsl:template>
 	
@@ -1637,6 +1703,18 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<xsl:template match="permissions/license">
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">semantic-metadata-license</xsl:with-param>
+			<xsl:with-param name="value">
+				<xsl:for-each select="*">
+					<xsl:value-of select="."/>
+					<xsl:if test="position() != last()"><xsl:value-of select="concat(' + \', $newline)"/></xsl:if>
+				</xsl:for-each>
+			</xsl:with-param>
+		</xsl:call-template>
+	</xsl:template>
+	
 	<xsl:template match="xplore-article-id[normalize-space() != '']">
 		<xsl:text>:semantic-metadata-xplore-article-id: </xsl:text><xsl:value-of select="."/>
 		<xsl:text>&#xa;</xsl:text>
@@ -1698,14 +1776,14 @@
 	
 	<xsl:template match="isbn[@publication-format = 'HTML']">
 		<xsl:call-template name="addDocumentAttribute">
-			<xsl:with-param name="key">presentation-metadata-isbn-html</xsl:with-param>
+			<xsl:with-param name="key">semantic-metadata-isbn-html</xsl:with-param>
 			<xsl:with-param name="value" select="."/>
 		</xsl:call-template>
 	</xsl:template>
 	
 	<xsl:template match="issn">
 		<xsl:call-template name="addDocumentAttribute">
-			<xsl:with-param name="key">presentation-metadata-issn</xsl:with-param>
+			<xsl:with-param name="key">semantic-metadata-issn</xsl:with-param>
 			<xsl:with-param name="value" select="."/>
 		</xsl:call-template>
 	</xsl:template>
@@ -1802,6 +1880,23 @@
 		<xsl:value-of select="."/>
 		<xsl:text>"</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="accrediting-organization">
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">semantic-metadata-accrediting-organization</xsl:with-param>
+			<xsl:with-param name="value" select="."/>
+		</xsl:call-template>
+	</xsl:template>
+	
+	<xsl:template match="authorization">
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">authorizer</xsl:with-param>
+			<xsl:with-param name="value">
+				<xsl:value-of select="."/>
+				<xsl:if test="@authorize-acronym">, <xsl:value-of select="@authorize-acronym"/></xsl:if>
+			</xsl:with-param>
+		</xsl:call-template>
 	</xsl:template>
 	
 	<xsl:template match="kwd-group">
@@ -2054,6 +2149,20 @@
 			</xsl:if>
 		</xsl:if>
 	</xsl:template>
+		
+	<xsl:template match="meta-note">
+		<xsl:text>[.preface</xsl:text>
+		<xsl:if test="@content-type">,type=<xsl:value-of select="@content-type"/></xsl:if>
+		<xsl:text>]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:if test="not(title)">
+			<xsl:text>== {blank}</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+		<xsl:apply-templates/>			
+	</xsl:template>
+		
 		
 	<!-- =========== -->
 	<!-- end bibdata (standard/front) -->
@@ -3227,6 +3336,7 @@
 	
 	<xsl:template match="ref/std/std-id"/> <!-- for IEC -->
 	
+	<xsl:template match="abstract/title"/>
 	
 	<!-- ================= -->
 	<!-- tbx:source processing -->
