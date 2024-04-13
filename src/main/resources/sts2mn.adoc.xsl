@@ -6196,6 +6196,21 @@
 		<xsl:apply-templates/>
 	</xsl:template>
 	
+	<xsl:template match="term-display">
+		<xsl:apply-templates/>
+		<xsl:text>&#xa;&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="term-display/term">
+		<xsl:apply-templates/>
+		<xsl:text>:: </xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="term-display/def/p">
+		<xsl:apply-templates/>
+		<xsl:if test="following-sibling::*"> +&#xa;</xsl:if>
+	</xsl:template>
+	
 	<!-- =============== -->
 	<!-- End Definitions list (dl) -->
 	<!-- =============== -->
