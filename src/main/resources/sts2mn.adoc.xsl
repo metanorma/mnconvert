@@ -2261,7 +2261,13 @@
 	<!-- Scope -->
 	<xsl:template match="body/sec[@sec-type = 'scope'] | front/sec[@sec-type = 'scope']" priority="2">
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
-		<redirect:write file="{$outpath}/{$sectionsFolder}/01-scope.adoc">
+		<xsl:variable name="sec_number">
+			<xsl:call-template name="getSecNumber">
+				<xsl:with-param name="defaultNum">1</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name="adoc_path" select="concat($sectionsFolder, '/', $sec_number, '-scope.adoc')"/>
+		<redirect:write file="{$outpath}/{$adoc_path}">
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:call-template name="setId"/>
 			<xsl:apply-templates />
@@ -2269,7 +2275,7 @@
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$docfile}">
-			<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/01-scope.adoc[]</xsl:text>
+			<xsl:text>include::</xsl:text><xsl:value-of select="$adoc_path"/><xsl:text>[]</xsl:text><!-- sections/01-scope.adoc[] -->
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</redirect:write>
 	</xsl:template>
@@ -2288,7 +2294,13 @@
 	<!-- ======================== -->
 	<xsl:template match="body/sec[@sec-type = 'norm-refs'] | front/sec[@sec-type = 'norm-refs'] | body/sec[title = 'Normative references' or list/@list-content = 'normative-references']" priority="2">
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
-		<redirect:write file="{$outpath}/{$sectionsFolder}/02-normrefs.adoc">
+		<xsl:variable name="sec_number">
+			<xsl:call-template name="getSecNumber">
+				<xsl:with-param name="defaultNum">2</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name="adoc_path" select="concat($sectionsFolder, '/', $sec_number, '-normrefs.adoc')"/>
+		<redirect:write file="{$outpath}/{$adoc_path}">
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:text>[bibliography]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
@@ -2297,7 +2309,7 @@
 		</redirect:write>
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$docfile}">
-			<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/02-normrefs.adoc[]</xsl:text>
+			<xsl:text>include::</xsl:text><xsl:value-of select="$adoc_path"/><xsl:text>[]</xsl:text> <!-- 02-normrefs.adoc[] -->
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</redirect:write>
 	</xsl:template>
@@ -2448,23 +2460,7 @@
 	
 	
 	<xsl:template match="body/sec | body[count(*) = 1]/sec[@sec-type = 'scope']/sec">
-		<xsl:variable name="sec_number_" select="format-number(label, '00')" />
-		<xsl:variable name="sec_number">
-			<xsl:choose>
-				<!-- Example: Section 3 -->
-				<xsl:when test="$sec_number_ = 'NaN'">
-					<xsl:choose>
-						<xsl:when test="label">
-							<xsl:value-of select="java:toLowerCase(java:java.lang.String.new(normalize-space(translate(label, ',&#x200b;&#xa0; ','___'))))"/>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:value-of select="@id"/>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:when>
-				<xsl:otherwise><xsl:value-of select="$sec_number_"/></xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
+		<xsl:variable name="sec_number"><xsl:call-template name="getSecNumber"/></xsl:variable>
 		<xsl:variable name="title" select="normalize-space(translate(title, ',&#x200b;&#xa0;‑','    '))"/> <!-- get first word -->
 		<xsl:variable name="sec_title__">
 			<xsl:choose>
@@ -2475,16 +2471,46 @@
 		<xsl:variable name="sec_title_" select="translate($sec_title__, '/.' , '__')"/>
 		<xsl:variable name="sec_title" select="java:toLowerCase(java:java.lang.String.new($sec_title_))"/>
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
-		<redirect:write file="{$outpath}/{$sectionsFolder}/{$sec_number}-{$sec_title}.adoc">
+		<xsl:variable name="adoc_path" select="concat($sectionsFolder, '/', $sec_number, '-', $sec_title, '.adoc')"/>
+		<redirect:write file="{$outpath}/{$adoc_path}">
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:call-template name="setIdOrType"/>
 			<xsl:apply-templates />
 		</redirect:write>
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$docfile}">
-			<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/</xsl:text><xsl:value-of select="$sec_number"/>-<xsl:value-of select="$sec_title"/><xsl:text>.adoc[]</xsl:text>
+			<xsl:text>include::</xsl:text><xsl:value-of select="$adoc_path"/><xsl:text>[]</xsl:text>
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</redirect:write>
+	</xsl:template>
+	
+	<xsl:template name="getSecNumber">
+		<xsl:param name="defaultNum">1</xsl:param>
+		<xsl:choose>
+			<xsl:when test="normalize-space(label) = ''">
+				<xsl:value-of select="format-number($defaultNum, '00')"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:variable name="sec_number_" select="format-number(label, '00')" />
+				<xsl:variable name="sec_number">
+					<xsl:choose>
+						<!-- Example: Section 3 -->
+						<xsl:when test="$sec_number_ = 'NaN'">
+							<xsl:choose>
+								<xsl:when test="label">
+									<xsl:value-of select="java:toLowerCase(java:java.lang.String.new(normalize-space(translate(label, ',&#x200b;&#xa0; ','___'))))"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="@id"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+						<xsl:otherwise><xsl:value-of select="$sec_number_"/></xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:value-of select="$sec_number"/>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="sec">
