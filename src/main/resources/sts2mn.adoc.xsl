@@ -156,19 +156,27 @@
 	
 	
 	<xsl:variable name="linearized_xml">
+		<!-- <xsl:message>start: linearized_xml</xsl:message> -->
 		<xsl:apply-templates select="/" mode="linearize"/>
+		<!-- <xsl:message>end: linearized_xml</xsl:message> -->
 	</xsl:variable>
 	
 	<xsl:variable name="remove_word_clause_xml">
+		<!-- <xsl:message>start: remove_word_clause_xml</xsl:message> -->
 		<xsl:apply-templates select="xalan:nodeset($linearized_xml)" mode="remove_word_clause"/>
+		<!-- <xsl:message>end: remove_word_clause_xml</xsl:message> -->
 	</xsl:variable>
 
 	<xsl:variable name="unconstrained_formatting_xml">
+		<!-- <xsl:message>start: unconstrained_formatting_xml</xsl:message> -->
 		<xsl:apply-templates select="xalan:nodeset($remove_word_clause_xml)" mode="unconstrained_formatting"/>
+		<!-- <xsl:message>end: unconstrained_formatting_xml</xsl:message> -->
 	</xsl:variable>
 
 	<xsl:variable name="ref_fix">
+		<!-- <xsl:message>start: ref_fix</xsl:message> -->
 		<xsl:apply-templates select="xalan:nodeset($unconstrained_formatting_xml)" mode="ref_fix"/>
+		<!-- <xsl:message>end: ref_fix</xsl:message> -->
 	</xsl:variable>
 	
 	<xsl:variable name="updated_xml" select="xalan:nodeset($ref_fix)"/>
@@ -6297,7 +6305,7 @@
 		
 		<xsl:variable name="target">
 			<xsl:choose>
-				<xsl:when test="translate(@xlink:href, '#', '') = ''"> <!-- empty xlink:href -->
+				<xsl:when test="@xlink:href and translate(@xlink:href, '#', '') = ''"> <!-- empty xlink:href -->
 					<xsl:value-of select="translate(normalize-space(), ' ()', '---')"/>
 				</xsl:when>
 				<xsl:when test="starts-with(@xlink:href, '#')">
@@ -6308,54 +6316,68 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-		
-		<xsl:variable name="isTerm">
-			<xsl:for-each select="$updated_xml"> <!-- change context -->
-				<xsl:value-of select="local-name(key('ids', $target)) = 'term-sec' or local-name(key('ids', $target)) = 'termEntry'"/>
-			</xsl:for-each>
-		</xsl:variable>
-		
+		<!-- target='<xsl:value-of select="$target"/>'
+		<xsl:apply-templates select="." mode="print_as_xml"/> -->
+		<!-- <xsl:message><xsl:value-of select="@content-type"/></xsl:message> -->
 		<xsl:choose>
-			<!-- <xsl:when test="@content-type = 'term' and (local-name(//*[@id = $target]) = 'term-sec' or local-name(//*[@id = $target]) = 'termEntry')"> -->
-			<!-- <xsl:when test="@content-type = 'term' and (local-name(key('ids', $target)) = 'term-sec' or local-name(key('ids', $target)) = 'termEntry')"> -->
-			<xsl:when test="@content-type = 'term' and normalize-space($isTerm) = 'true'">
-				<!-- <xsl:variable name="term_real" select="//*[@id = $target]//tbx:term[1]"/> -->
-				<!-- <xsl:variable name="term_real" select="key('ids', $target)//tbx:term[1]"/> -->
-				<xsl:variable name="term_real">
+			<xsl:when test="normalize-space($target) != ''">
+		
+				<xsl:variable name="isTerm">
 					<xsl:for-each select="$updated_xml"> <!-- change context -->
-						 <xsl:value-of select="key('ids', $target)//tbx:term[1]"/>
+						<xsl:value-of select="local-name(key('ids', $target)) = 'term-sec' or local-name(key('ids', $target)) = 'termEntry'"/>
 					</xsl:for-each>
 				</xsl:variable>
 				
-				<!-- <xsl:variable name="term_name" select="java:toLowerCase(java:java.lang.String.new(translate($term_name_, ' ', '-')))"/> -->
-				<!-- <xsl:text>term-</xsl:text><xsl:value-of select="$term_name"/>,<xsl:value-of select="."/> -->
+				<xsl:choose>
+					<!-- <xsl:when test="@content-type = 'term' and (local-name(//*[@id = $target]) = 'term-sec' or local-name(//*[@id = $target]) = 'termEntry')"> -->
+					<!-- <xsl:when test="@content-type = 'term' and (local-name(key('ids', $target)) = 'term-sec' or local-name(key('ids', $target)) = 'termEntry')"> -->
+					<xsl:when test="@content-type = 'term' and normalize-space($isTerm) = 'true'">
+						<!-- <xsl:variable name="term_real" select="//*[@id = $target]//tbx:term[1]"/> -->
+						<!-- <xsl:variable name="term_real" select="key('ids', $target)//tbx:term[1]"/> -->
+						<xsl:variable name="term_real">
+							<xsl:for-each select="$updated_xml"> <!-- change context -->
+								 <xsl:value-of select="key('ids', $target)//tbx:term[1]"/>
+							</xsl:for-each>
+						</xsl:variable>
+						
+						<!-- <xsl:variable name="term_name" select="java:toLowerCase(java:java.lang.String.new(translate($term_name_, ' ', '-')))"/> -->
+						<!-- <xsl:text>term-</xsl:text><xsl:value-of select="$term_name"/>,<xsl:value-of select="."/> -->
+						
+						<xsl:variable name="value" select="."/>
+						
+						<xsl:variable name="options">
+							<xsl:if test="ancestor::*[@sec-type='terms'] and ancestor::term-sec">
+								<xsl:text>noref,noital</xsl:text>
+							</xsl:if>
+						</xsl:variable>
+						
+						<xsl:call-template name="insertTermReference">
+							<xsl:with-param name="term" select="$term_real"/>
+							<xsl:with-param name="rendering" select="$value"/>
+							<xsl:with-param name="options" select="$options"/>
+						</xsl:call-template>
+						
+					</xsl:when>
+					<xsl:otherwise>
+						
+						<xsl:variable name="value">
+							<xsl:apply-templates/>
+						</xsl:variable>
+						
+						<xsl:call-template name="insertTermReference">
+							<xsl:with-param name="term" select="$target"/>
+							<xsl:with-param name="rendering" select="$value"/>
+						</xsl:call-template>
+						
+					</xsl:otherwise>
+				</xsl:choose>
 				
-				<xsl:variable name="value" select="."/>
-				
-				<xsl:variable name="options">
-					<xsl:if test="ancestor::*[@sec-type='terms'] and ancestor::term-sec">
-						<xsl:text>noref,noital</xsl:text>
-					</xsl:if>
-				</xsl:variable>
-				
-				<xsl:call-template name="insertTermReference">
-					<xsl:with-param name="term" select="$term_real"/>
-					<xsl:with-param name="rendering" select="$value"/>
-					<xsl:with-param name="options" select="$options"/>
-				</xsl:call-template>
-				
-			</xsl:when>
+			</xsl:when> <!-- $target != '' -->
 			<xsl:otherwise>
-				
 				<xsl:variable name="value">
 					<xsl:apply-templates/>
 				</xsl:variable>
-				
-				<xsl:call-template name="insertTermReference">
-					<xsl:with-param name="term" select="$target"/>
-					<xsl:with-param name="rendering" select="$value"/>
-				</xsl:call-template>
-				
+				<xsl:text>span:</xsl:text><xsl:value-of select="@content-type"/><xsl:text>[</xsl:text><xsl:value-of select="normalize-space($value)"/><xsl:text>]</xsl:text>
 			</xsl:otherwise>
 		</xsl:choose>
 		
