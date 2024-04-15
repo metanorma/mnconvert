@@ -637,7 +637,7 @@
 			</xsl:if>
 			
 			<!-- if in front there are another elements, except xxx-meta -->
-			<xsl:for-each select="*[local-name() != 'iso-meta' and local-name() != 'nat-meta' and local-name() != 'reg-meta' and local-name() != 'std-meta'] | ancestor::standards-document/back/ack[title = 'Acknowledgements']">
+			<xsl:for-each select="*[local-name() != 'iso-meta' and local-name() != 'nat-meta' and local-name() != 'reg-meta' and local-name() != 'std-meta' and local-name() != 'std-doc-meta'] | ancestor::standards-document/back/ack[title = 'Acknowledgements']">
 				<xsl:variable name="number_"><xsl:number /></xsl:variable>
 				<xsl:variable name="number" select="format-number($number_, '00')"/>
 				<xsl:variable name="section_name">
