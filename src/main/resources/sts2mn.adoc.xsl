@@ -43,6 +43,7 @@
 	<xsl:variable name="FILENAME_EUROPEAN_PREFACE">en-preface.adoc</xsl:variable>
 	<xsl:variable name="FILENAME_FOREWORD">00-foreword.adoc</xsl:variable>
 	<xsl:variable name="FILENAME_INTRODUCTION">00-introduction.adoc</xsl:variable>
+	<xsl:variable name="FILENAME_BIBLIOGRAPHY">99-bibliography.adoc</xsl:variable>
 	<xsl:variable name="FILENAME_COLLECTION">metanorma.yml</xsl:variable>
 	
 	<!-- false --> <!-- true, for new features -->
@@ -1122,9 +1123,9 @@
 	</xsl:template>
 	
 	<xsl:template match="//standard/back">
-		<xsl:if test="$split-bibdata != 'true'">		
-			<xsl:apply-templates select="*[not(local-name() = 'ref-list' and @content-type = 'bibl')]" />
-			<xsl:apply-templates select="ref-list[@content-type = 'bibl']" />
+		<xsl:if test="$split-bibdata != 'true'">
+			<xsl:apply-templates select="*[not(local-name() = 'ref-list' and (@content-type = 'bibl' or title = 'Bibliography'))]" />
+			<xsl:apply-templates select="ref-list[@content-type = 'bibl' or title = 'Bibliography']" />
 		</xsl:if>
 	</xsl:template>
 	
@@ -5129,9 +5130,9 @@
 	<xsl:variable name="regex_add_bsi_prefix">^(PAS(\s|\h))</xsl:variable>
 	<xsl:variable name="regex_add_bsi_prefix_result">BSI $1</xsl:variable>
 	
-	<xsl:template match="ref-list[@content-type = 'bibl']" priority="2">
+	<xsl:template match="ref-list[@content-type = 'bibl' or title = 'Bibliography']" priority="2">
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
-		<redirect:write file="{$outpath}/{$sectionsFolder}/99-bibliography.adoc">
+		<redirect:write file="{$outpath}/{$sectionsFolder}/{$FILENAME_BIBLIOGRAPHY}">
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:text>[bibliography]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
@@ -5306,15 +5307,15 @@
 		</redirect:write>
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$docfile}">
-			<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/99-bibliography.adoc[]</xsl:text>
+			<xsl:text>include::</xsl:text><xsl:value-of select="concat($sectionsFolder, '/', $FILENAME_BIBLIOGRAPHY)"/><xsl:text>[]</xsl:text>
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</redirect:write>
 	</xsl:template>
 	
 	<!-- ignore p in Bibliography with text start with 'For dated references, only the edition cited applies'-->
 	<!-- This boilerplate text will be added by metanorma -->
-	<xsl:template match="ref-list[@content-type = 'bibl']//p[starts-with(normalize-space(), 'For dated references, only the edition cited applies')]" priority="2"/>
-	<xsl:template match="ref-list[@content-type = 'bibl']//title[starts-with(normalize-space(), 'For dated references, only the edition cited applies')]" priority="2"/>
+	<xsl:template match="ref-list[@content-type = 'bibl' or title = 'Bibliography']//p[starts-with(normalize-space(), 'For dated references, only the edition cited applies')]" priority="2"/>
+	<xsl:template match="ref-list[@content-type = 'bibl' or title = 'Bibliography']//title[starts-with(normalize-space(), 'For dated references, only the edition cited applies')]" priority="2"/>
 	
 	<xsl:template match="ref-list"> <!-- sub-section for Bibliography -->
 		<!-- <xsl:if test="@content-type = 'bibl' or parent::ref-list/@content-type = 'bibl'"> -->
@@ -5385,10 +5386,14 @@
 			<xsl:choose>
 				<xsl:when test="@id and preceding-sibling::ref[@id = current()/@id]">false</xsl:when>
 				<xsl:when test="std/@std-id and preceding-sibling::ref[std/@std-id = current()/std/@std-id]">false</xsl:when>
-				<xsl:when test="std/std-ref and preceding-sibling::ref[std/std-ref = current()/std/std-ref]">false</xsl:when>
+				<xsl:when test="std/std-ref and preceding-sibling::ref[std/std-ref = current()/std/std-ref]">
+					<xsl:choose>
+						<xsl:when test="std/title and preceding-sibling::ref[std/title = current()/std/title]">false</xsl:when>
+						<xsl:when test="not(std/title)">false</xsl:when>
+					</xsl:choose>
+				</xsl:when>
 			</xsl:choose>
 		</xsl:variable>
-		
 		<!-- DEBUG:<xsl:apply-templates select="." mode="print_as_xml"/> -->
 		
 		<!-- <xsl:variable name="isAsciiBibFormat" select="normalize-space(@referenceText != '' and
