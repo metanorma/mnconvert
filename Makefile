@@ -18,6 +18,9 @@ SRCFILESTS := $(SRCDIR)/rice-en.final.sts.xml
 SRCRFCDIR := rfcsources
 SRCRFCMASK := rfc865*.xml
 
+SRCNISODIR := nisosource
+NISO_STANDARD_URL = https://www.niso-sts.org/downloadables/samples/NISO-STS-Standard-1-0.XML
+
 DESTDIR := documents
 DESTSTSXML := $(patsubst %.mn.xml,%.sts.xml,$(patsubst src/test/resources/%,documents/%,$(SRCFILE)))
 DESTSTSHTML := $(patsubst %.xml,%.html,$(DESTSTSXML))
@@ -104,6 +107,14 @@ rfcsources:
 
 saxon.jar:
 	curl -sSL $(SAXON_URL) -o $@
+
+
+NISO-STS-Standard: target/$(JAR_FILE) nisosource documents
+	for f in $(SRCNISODIR)/*.xml; do java -jar target/$(JAR_FILE) $$f  --output $(DESTDIR)/$@.adoc ; done
+
+nisosource:
+	curl -sSLk --create-dirs -O --output-dir $(SRCNISODIR) $(NISO_STANDARD_URL)
+
 
 documents.rxl: $(DESTSTSHTML) | bundle
 	bundle exec relaton concatenate \

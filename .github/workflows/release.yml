@@ -53,6 +53,8 @@ jobs:
 
       - run: make mn2stsDTD_NISO
 
+      - run: make NISO-STS-Standard
+
 #      - run: make mn2stsDTD_ISO
 
       - run: make publish

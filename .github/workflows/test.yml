@@ -81,6 +81,8 @@ jobs:
 
       - run: make testMN2IEEE
 
+      - run: make NISO-STS-Standard
+
       - if: matrix.os == 'ubuntu-latest'
         name: Notify mn-samples-bsi
         uses: peter-evans/repository-dispatch@v1

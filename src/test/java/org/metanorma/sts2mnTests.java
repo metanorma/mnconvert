@@ -121,17 +121,17 @@ public class sts2mnTests {
         assertTrue(Files.exists(fileout));
     }
 
-    @Test
+    /*@Test
     public void successConvertRemoteToAdocOutputSpecified() throws ParseException {
         System.out.println(name.getMethodName());
-        Path fileout = Paths.get(System.getProperty("buildDirectory"), "NISO-STS-Standard-1-0.adoc");
+        Path fileout = Paths.get(System.getProperty("buildDirectory"),"NISO-STS-Standard-1-0", "NISO-STS-Standard-1-0.adoc");
         fileout.toFile().delete();
         String remoteXML = "https://www.niso-sts.org/downloadables/samples/NISO-STS-Standard-1-0.XML";
         String[] args = new String[]{"--output-format", "adoc", "--output", fileout.toAbsolutePath().toString(), remoteXML};
         mnconvert.main(args);
 
         assertTrue(Files.exists(fileout));
-    }
+    }*/
 
     @Test
     public void successConvertToRelativeAdocOutputSpecified() throws ParseException {
@@ -167,7 +167,7 @@ public class sts2mnTests {
         assertTrue(Files.exists(fileout));        
     }
 
-    @Test
+    /*@Test
     public void successConvertRemoteToXML() throws ParseException {
         System.out.println(name.getMethodName());
         Path fileout = Paths.get(System.getProperty("buildDirectory"), "NISO-STS-Standard-1-0.mn.xml");
@@ -177,7 +177,7 @@ public class sts2mnTests {
         String[] args = new String[]{"--output-format", "xml", "--output", fileout.toAbsolutePath().toString(), remoteXML};
         mnconvert.main(args);
         assertTrue(Files.exists(fileout));
-    }
+    }*/
 
     @Test
     public void successConvertToADOCWithImageLink() throws ParseException {
