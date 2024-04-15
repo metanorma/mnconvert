@@ -110,7 +110,7 @@ saxon.jar:
 
 
 NISO-STS-Standard: target/$(JAR_FILE) nisosource documents
-	for f in $(SRCNISODIR)/*.xml; do java -jar target/$(JAR_FILE) $$f  --output $(DESTDIR)/$@.adoc ; done
+	for f in $(SRCNISODIR)/*.XML; do java -jar target/$(JAR_FILE) $$f  --output $(DESTDIR)/$@.adoc ; done
 
 nisosource:
 	curl -sSLk --create-dirs -O --output-dir $(SRCNISODIR) $(NISO_STANDARD_URL)
