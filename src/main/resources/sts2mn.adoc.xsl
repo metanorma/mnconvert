@@ -2481,6 +2481,10 @@
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 		<xsl:variable name="adoc_path" select="concat($sectionsFolder, '/', $sec_number, '-', $sec_title, '.adoc')"/>
 		<redirect:write file="{$outpath}/{$adoc_path}">
+			<xsl:if test="@sec-type = 'non-norm-refs'">
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>[bibliography]</xsl:text>
+			</xsl:if>
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:call-template name="setIdOrType"/>
 			<xsl:apply-templates />
@@ -6789,7 +6793,11 @@
 						<xsl:value-of select="@id"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:value-of select="@sec-type"/>
+						<xsl:variable name="sec_type" select="@sec-type"/>
+						<xsl:value-of select="$sec_type"/>
+						<xsl:if test="count(//*[@sec-type = $sec_type]) &gt; 1">
+							<xsl:number count="*[@sec-type = $sec_type]"/>
+						</xsl:if>
 					</xsl:otherwise>
 				</xsl:choose>
 			<xsl:text>]]</xsl:text>
