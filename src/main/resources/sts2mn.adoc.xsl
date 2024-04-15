@@ -5588,7 +5588,12 @@
 			<xsl:value-of select="translate($std-ref_, '&#x2011;', '-')"/>
 		</xsl:variable>
 		<xsl:if test="count($refs/ref[normalize-space(@referenceText) != '' and @referenceText = normalize-space($std-ref)]) &gt; 1">
-			<xsl:message>WARNING: Repeated reference - <xsl:copy-of select="."/></xsl:message>
+			<xsl:choose>
+				<xsl:when test="std/title"></xsl:when>
+				<xsl:otherwise>
+					<xsl:message>WARNING: Repeated reference - <xsl:copy-of select="."/></xsl:message>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:if>
 		
 	</xsl:template> <!-- ref -->
