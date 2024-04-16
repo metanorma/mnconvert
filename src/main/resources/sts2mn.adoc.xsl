@@ -6323,17 +6323,7 @@
 		<xsl:value-of select="$space_before"/>
 		
 		<xsl:variable name="target">
-			<xsl:choose>
-				<xsl:when test="@xlink:href and translate(@xlink:href, '#', '') = ''"> <!-- empty xlink:href -->
-					<xsl:value-of select="translate(normalize-space(), ' ()', '---')"/>
-				</xsl:when>
-				<xsl:when test="starts-with(@xlink:href, '#')">
-					<xsl:value-of select="substring-after(@xlink:href, '#')"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="@xlink:href"/>
-				</xsl:otherwise>
-			</xsl:choose>
+			<xsl:call-template name="get_named_content_target"/>
 		</xsl:variable>
 		<!-- target='<xsl:value-of select="$target"/>'
 		<xsl:apply-templates select="." mode="print_as_xml"/> -->

@@ -365,7 +365,9 @@
 		
 		<!-- docidentifier @type="iso", "iso-with-lang", "iso-reference" -->
 		<xsl:apply-templates select="std-ref[@type='dated']" mode="bibdata"/>	
-		<xsl:apply-templates select="doc-ref" mode="bibdata"/>	
+		<xsl:apply-templates select="doc-ref" mode="bibdata"/>
+		<xsl:apply-templates select="std-ident/std-id-group/std-id[@std-id-type='dated']" mode="bibdata"/>	
+		
 		
 		<xsl:apply-templates select="custom-meta-group/custom-meta[meta-name = 'ISBN']/meta-value" mode="bibdata"/>	
 		
@@ -591,9 +593,9 @@
 	
 	
 	
-	<xsl:template match="title-wrap/intro |
-															title-wrap/main |
-															title-wrap/compl |
+	<xsl:template match="title-wrap/intro | title-wrap/intro-title-wrap/intro |
+															title-wrap/main | title-wrap/main-title-wrap |
+															title-wrap/compl | title-wrap/compl-title-wrap |
 															title-wrap/full |
 															iso-meta/doc-ref |
 															nat-meta/doc-ref |
@@ -809,17 +811,17 @@
 				
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:apply-templates select="full[normalize-space() != '']" mode="bibdata"/>
-				<xsl:apply-templates select="intro[normalize-space() != '']" mode="bibdata"/>
-				<xsl:apply-templates select="main[normalize-space() != '']" mode="bibdata"/>
-				<xsl:apply-templates select="compl[normalize-space() != '']" mode="bibdata"/>
+				<xsl:apply-templates select=".//full[normalize-space() != '']" mode="bibdata"/>
+				<xsl:apply-templates select=".//intro[normalize-space() != '']" mode="bibdata"/>
+				<xsl:apply-templates select=".//main[normalize-space() != '']" mode="bibdata"/>
+				<xsl:apply-templates select=".//compl[normalize-space() != '']" mode="bibdata"/>
 			</xsl:otherwise>
 		</xsl:choose>
 		
 	</xsl:template>
 
 	
-	<xsl:template match="title-wrap/full | title-wrap/main" mode="bibdata_title_full">
+	<xsl:template match="title-wrap/full | title-wrap//main" mode="bibdata_title_full">
 	
 		<xsl:variable name="title" select="translate(., '–', '—')"/> <!-- replace en dash to em dash -->
 		<xsl:variable name="parts">
@@ -856,26 +858,26 @@
 		</title>
 	</xsl:template>
 	
-	<xsl:template match="title-wrap/intro" mode="bibdata">
+	<xsl:template match="title-wrap//intro" mode="bibdata">
 		<title language="{../@xml:lang}" format="text/plain" type="title-intro">
 			<xsl:apply-templates mode="bibdata"/>
 		</title>
 	</xsl:template>
 	
-	<xsl:template match="title-wrap/main" mode="bibdata">
+	<xsl:template match="title-wrap//main" mode="bibdata">
 		<title language="{../@xml:lang}" format="text/plain" type="title-main">
 			<xsl:apply-templates mode="bibdata"/>
 		</title>
 	</xsl:template>
 	
-	<xsl:template match="title-wrap/compl" mode="bibdata">
+	<xsl:template match="title-wrap//compl" mode="bibdata">
 		<title language="{../@xml:lang}" format="text/plain" type="title-part">
 			<xsl:apply-templates mode="bibdata"/>
 		</title>
 	</xsl:template>
   
   
-	<xsl:template match="iso-meta/std-ref[@type='dated'] | nat-meta/std-ref[@type='dated'] | reg-meta/std-ref[@type='dated'] | std-meta/std-ref[@type='dated']" mode="bibdata">
+	<xsl:template match="iso-meta/std-ref[@type='dated'] | nat-meta/std-ref[@type='dated'] | reg-meta/std-ref[@type='dated'] | std-meta/std-ref[@type='dated'] | std-doc-meta/std-ident//std-id[@std-id-type='dated']" mode="bibdata">
 		<docidentifier type="ISO">
 			<xsl:apply-templates mode="bibdata"/>
 		</docidentifier>
@@ -883,7 +885,7 @@
 		
 		<xsl:variable name="language_">
 			<xsl:value-of select="$language_1st_letter"/>
-			<xsl:if test="$language_1st_letter = ''"><xsl:value-of select="substring(../content-language, 1, 1)"/></xsl:if>
+			<xsl:if test="$language_1st_letter = ''"><xsl:value-of select="substring(ancestor::*[content-language]/content-language, 1, 1)"/></xsl:if>
 		</xsl:variable>
 		
 		<xsl:variable name="language" select="java:toUpperCase(java:java.lang.String.new($language_))"/>
@@ -1010,19 +1012,30 @@
 	<xsl:template match="iso-meta/pub-date | nat-meta/pub-date | reg-meta/pub-date | std-meta/pub-date | std-doc-meta/pub-date" mode="bibdata">
 		<date type="published">
 			<on>
-				<xsl:apply-templates mode="bibdata"/>
+				<!-- <xsl:apply-templates mode="bibdata"/> -->
+				<xsl:call-template name="getDate"/>
 			</on>
 		</date>
 	</xsl:template>
 	
 	<xsl:template match="iso-meta/release-date | nat-meta/release-date | reg-meta/release-date | std-meta/release-date | std-doc-meta/release-date" mode="bibdata">
 		<date type="release">
+			<xsl:if test="@date-type = 'approved' and ancestor::std-doc-meta">
+				<xsl:attribute name="type">issued</xsl:attribute>
+			</xsl:if>
 			<on>
-				<xsl:apply-templates mode="bibdata"/>
+				<!-- <xsl:apply-templates mode="bibdata"/> -->
+				<xsl:call-template name="getDate"/>
 			</on>
 		</date>
 	</xsl:template>
 			
+	<xsl:template name="getDate">
+		<xsl:choose>
+			<xsl:when test="normalize-space(@iso-8601-date) != ''"><xsl:value-of select="@iso-8601-date"/></xsl:when>
+			<xsl:otherwise><xsl:apply-templates mode="bibdata"/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 	
 	<xsl:template match="iso-meta/doc-ident/sdo | nat-meta/doc-ident/sdo | reg-meta/doc-ident/sdo | std-meta/doc-ident/sdo" mode="bibdata">
 		<contributor>
