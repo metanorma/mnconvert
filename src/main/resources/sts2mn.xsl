@@ -239,7 +239,7 @@
 		
 		<xsl:if test="not(nat-meta)">
 		
-			<xsl:for-each select="iso-meta">
+			<xsl:for-each select="iso-meta | std-doc-meta">
 				<bibdata type="standard">
 						<xsl:call-template name="xxx-meta">
 							<xsl:with-param name="include_reg_meta">true</xsl:with-param>
@@ -277,7 +277,7 @@
 		</xsl:if>
 		
 		<xsl:if test="not ($split-bibdata = 'true')">
-			<xsl:if test="/standard/front/iso-meta">
+			<xsl:if test="/standard/front/iso-meta or /standard/front/std-doc-meta">
 				<boilerplate>
 					<copyright-statement>
 						<clause>
@@ -287,7 +287,7 @@
 									<p id="boilerplate-message"><xsl:apply-templates select="/standard/front/iso-meta/permissions/copyright-statement/node()" /></p>
 								</xsl:when>
 								<xsl:otherwise>
-									<xsl:for-each select="/standard/front/iso-meta/permissions/copyright-statement">
+									<xsl:for-each select="/standard/front/iso-meta/permissions/copyright-statement | /standard/front/std-doc-meta/permissions/copyright-statement">
 										<p>
 											<xsl:copy-of select="@id"/>
 											<xsl:apply-templates />
@@ -303,7 +303,7 @@
 						</xsl:if> -->
 						</clause>
 					</copyright-statement>
-					<xsl:apply-templates select="/standard/front/iso-meta/permissions/license" mode="bibdata"/>
+					<xsl:apply-templates select="/standard/front/iso-meta/permissions/license | /standard/front/std-doc-meta/permissions/license" mode="bibdata"/>
 				</boilerplate>
 			</xsl:if>
 			<xsl:if test="sec or notes">
@@ -584,7 +584,7 @@
 
 	
 	
-	<xsl:template match="iso-meta | nat-meta | reg-meta | std-meta |
+	<xsl:template match="iso-meta | nat-meta | reg-meta | std-meta | std-doc-meta | 
 																title-wrap" mode="bibdata_check">
 		<xsl:apply-templates mode="bibdata_check"/>
 	</xsl:template>
@@ -599,23 +599,28 @@
 															nat-meta/doc-ref |
 															reg-meta/doc-ref |
 															std-meta/doc-ref |
+															std-doc-meta/doc-ref |
 															iso-meta/std-ref |
 															nat-meta/std-ref |
 															reg-meta/std-ref |
 															std-meta/std-ref |
+															std-doc-meta/std-ref |
 															iso-meta/pub-date |
 															nat-meta/pub-date |
 															reg-meta/pub-date |
 															std-meta/pub-date |
+															std-doc-meta/pub-date |
 															iso-meta/release-date |
 															nat-meta/release-date |
 															reg-meta/release-date |
 															std-meta/release-date |
+															std-doc-meta/release-date |
 															iso-meta/meta-date |															
 															iso-meta/std-ident/doc-number |
 															nat-meta/std-ident/doc-number |
 															reg-meta/std-ident/doc-number |
 															std-meta/std-ident/doc-number |
+															std-doc-meta/std-ident/doc-number |
 															iso-meta/doc-ident/sdo |
 															nat-meta/doc-ident/sdo |
 															reg-meta/doc-ident/sdo |
@@ -625,6 +630,7 @@
 															reg-meta/doc-ident/proj-id |
 															std-meta/doc-ident/proj-id |
 															std-meta/proj-id |
+															std-doc-meta/proj-id |
 															iso-meta/doc-ident/language |
 															nat-meta/doc-ident/language |
 															reg-meta/doc-ident/language |
@@ -634,18 +640,22 @@
 															nat-meta/std-ident/originator |
 															reg-meta/std-ident/originator |
 															std-meta/std-ident/originator |
+															std-doc-meta/std-ident/originator |
 															iso-meta/std-ident/edition |
 															nat-meta/std-ident/edition |
 															reg-meta/std-ident/edition |
 															std-meta/std-ident/edition |
+															std-doc-meta/std-ident/edition |
 															iso-meta/std-ident/version |
 															nat-meta/std-ident/version |
 															reg-meta/std-ident/version |
 															std-meta/std-ident/version |
+															std-doc-meta/std-ident/version |
 															iso-meta/content-language |
 															nat-meta/content-language |
 															reg-meta/content-language |
 															std-meta/content-language |
+															std-doc-meta/content-language |
 															iso-meta/doc-ident/release-version |
 															nat-meta/doc-ident/release-version |
 															reg-meta/doc-ident/release-version |
@@ -655,43 +665,54 @@
 															nat-meta/permissions/copyright-year |
 															reg-meta/permissions/copyright-year |
 															std-meta/permissions/copyright-year |
+															std-doc-meta/permissions/copyright-year |
 															iso-meta/permissions/copyright-holder |
 															nat-meta/permissions/copyright-holder |
 															reg-meta/permissions/copyright-holder |
 															std-meta/permissions/copyright-holder |
+															std-doc-meta/permissions/copyright-holder |
 															iso-meta/permissions/copyright-statement |
 															nat-meta/permissions/copyright-statement |
 															reg-meta/permissions/copyright-statement |
 															std-meta/permissions/copyright-statement |
+															std-doc-meta/permissions/copyright-statement |
 															iso-meta/permissions/license |
+															std-doc-meta/permissions/license |
 															iso-meta/std-ident/doc-type |
 															nat-meta/std-ident/doc-type |
 															reg-meta/std-ident/doc-type |
 															std-meta/std-ident/doc-type |
+															std-doc-meta/std-ident/doc-type |
 															iso-meta/comm-ref |
 															nat-meta/comm-ref |
 															reg-meta/comm-ref |
 															std-meta/comm-ref |
+															std-doc-meta/comm-ref |
 															iso-meta/secretariat |
 															nat-meta/secretariat |
 															reg-meta/secretariat |
 															std-meta/secretariat |
+															std-doc-meta/secretariat |
 															iso-meta/ics |
 															nat-meta/ics |
 															reg-meta/ics |
 															std-meta/ics |
+															std-doc-meta/ics |
 															iso-meta/std-ident/part-number |
 															nat-meta/std-ident/part-number |
 															reg-meta/std-ident/part-number |
 															std-meta/std-ident/part-number |
+															std-doc-meta/std-ident/part-number |
 															iso-meta/page-count |
 															reg-meta/page-count |
 															nat-meta/page-count |
 															std-meta/page-count |
+															std-doc-meta/page-count |
 															iso-meta/std-xref |
 															nat-meta/std-xref |
 															reg-meta/std-xref |
 															std-meta/std-xref |
+															std-doc-meta/std-xref |
 															reg-meta/meta-date |
 															reg-meta/wi-number |
 															reg-meta/release-version-id |
@@ -726,8 +747,8 @@
 	
 	
 	<xsl:template match="iso-meta/doc-ident | nat-meta/doc-ident | reg-meta/doc-ident | std-meta/doc-ident |
-															iso-meta/std-ident | nat-meta/std-ident |  reg-meta/std-ident | std-meta/std-ident |
-															iso-meta/permissions | nat-meta/permissions | reg-meta/permissions | std-meta/permissions" mode="bibdata_check">
+															iso-meta/std-ident | nat-meta/std-ident |  reg-meta/std-ident | std-meta/std-ident | std-doc-meta/std-ident |
+															iso-meta/permissions | nat-meta/permissions | reg-meta/permissions | std-meta/permissions | std-doc-meta/permissions" mode="bibdata_check">
 		<xsl:apply-templates mode="bibdata_check"/>
 	</xsl:template>
 	
@@ -739,7 +760,7 @@
 	
 	
 	
-	<xsl:template match="iso-meta/title-wrap | nat-meta/title-wrap | reg-meta/title-wrap | std-meta/title-wrap" mode="bibdata">
+	<xsl:template match="iso-meta/title-wrap | nat-meta/title-wrap | reg-meta/title-wrap | std-meta/title-wrap | std-doc-meta/title-wrap" mode="bibdata">
 		<!-- <xsl:variable name="lang" select="@xml:lang"/>
 		<title language="{$lang}" format="text/plain" type="main">
 			<xsl:apply-templates select="full" mode="bibdata"/>
@@ -979,14 +1000,14 @@
 		</semantic-metadata>
 	</xsl:template>
 	
-	<xsl:template match="iso-meta/std-ident/doc-number | nat-meta/std-ident/doc-number | reg-meta/std-ident/doc-number | std-meta/std-ident/doc-number" mode="bibdata">
+	<xsl:template match="iso-meta/std-ident/doc-number | nat-meta/std-ident/doc-number | reg-meta/std-ident/doc-number | std-meta/std-ident/doc-number | std-doc-meta/std-ident/doc-number" mode="bibdata">
 		<docnumber>
 			<xsl:apply-templates mode="bibdata"/>
 		</docnumber>
 	</xsl:template>
 	
 
-	<xsl:template match="iso-meta/pub-date | nat-meta/pub-date | reg-meta/pub-date | std-meta/pub-date" mode="bibdata">
+	<xsl:template match="iso-meta/pub-date | nat-meta/pub-date | reg-meta/pub-date | std-meta/pub-date | std-doc-meta/pub-date" mode="bibdata">
 		<date type="published">
 			<on>
 				<xsl:apply-templates mode="bibdata"/>
@@ -994,7 +1015,7 @@
 		</date>
 	</xsl:template>
 	
-	<xsl:template match="iso-meta/release-date | nat-meta/release-date | reg-meta/release-date | std-meta/release-date" mode="bibdata">
+	<xsl:template match="iso-meta/release-date | nat-meta/release-date | reg-meta/release-date | std-meta/release-date | std-doc-meta/release-date" mode="bibdata">
 		<date type="release">
 			<on>
 				<xsl:apply-templates mode="bibdata"/>
@@ -1021,7 +1042,7 @@
 	</xsl:template>
 	
 	
-	<xsl:template match="iso-meta/std-ident/originator | nat-meta/std-ident/originator | reg-meta/std-ident/originator| std-meta/std-ident/originator" mode="bibdata" name="publisher">
+	<xsl:template match="iso-meta/std-ident/originator | nat-meta/std-ident/originator | reg-meta/std-ident/originator | std-meta/std-ident/originator | std-doc-meta/std-ident/originator" mode="bibdata" name="publisher">
 		<contributor>
 			<role type="publisher"/>
 				<organization>
@@ -1038,20 +1059,20 @@
 		</contributor>
 	</xsl:template>
 	
-	<xsl:template match="iso-meta/std-org/std-org-abbrev | nat-meta/std-org/std-org-abbrev | reg-meta/std-org/std-org-abbrev | std-meta/std-org/std-org-abbrev" mode="bibdata">
+	<xsl:template match="iso-meta//std-org/std-org-abbrev | nat-meta//std-org/std-org-abbrev | reg-meta//std-org/std-org-abbrev | std-meta//std-org/std-org-abbrev | std-doc-meta//std-org/std-org-abbrev" mode="bibdata">
 		<xsl:param name="process">false</xsl:param>
 		<xsl:if test="$process = 'true'">
 			<xsl:call-template name="publisher"/>
 		</xsl:if>
 	</xsl:template>
 	
-	<xsl:template match="*[self::iso-meta or self::nat-meta or self::reg-meta or self::std-meta]/std-ident/edition[normalize-space() != '']" mode="bibdata">
+	<xsl:template match="*[self::iso-meta or self::nat-meta or self::reg-meta or self::std-meta or self::std-doc-meta]/std-ident/edition[normalize-space() != '']" mode="bibdata">
 		<edition>
 			<xsl:apply-templates mode="bibdata"/>
 		</edition>
 	</xsl:template>
 	
-	<xsl:template match="*[self::iso-meta or self::nat-meta or self::reg-meta or self::std-meta]/std-ident/version[normalize-space() != '']" mode="bibdata">
+	<xsl:template match="*[self::iso-meta or self::nat-meta or self::reg-meta or self::std-meta or self::std-doc-meta]/std-ident/version[normalize-space() != '']" mode="bibdata">
 		<version>
 			<xsl:variable name="version"><xsl:apply-templates mode="bibdata"/></xsl:variable>
 			<xsl:choose>
@@ -1070,7 +1091,7 @@
 		</version>
 	</xsl:template>
 	
-	<xsl:template match="*[self::iso-meta or self::nat-meta or self::reg-meta or self::std-meta]/content-language" mode="bibdata">
+	<xsl:template match="*[self::iso-meta or self::nat-meta or self::reg-meta or self::std-meta or self::std-doc-meta]/content-language" mode="bibdata">
 		<xsl:variable name="language"><xsl:apply-templates mode="bibdata"/></xsl:variable>
 		<language>
 			<xsl:if test="$type_xml = 'presentation'">
@@ -1172,7 +1193,7 @@
 		</status>		
 	</xsl:template>
 	
-	<xsl:template match="iso-meta/std-xref | nat-meta/std-xref | reg-meta/std-xref| std-meta/std-xref" mode="bibdata">
+	<xsl:template match="iso-meta/std-xref | nat-meta/std-xref | reg-meta/std-xref | std-meta/std-xref | std-doc-meta/std-xref" mode="bibdata">
 		<xsl:choose>
 			<xsl:when test="@type = 'isPublishedFormatOf'"></xsl:when> <!-- see <relation type="related"> -->
 			<xsl:otherwise>
@@ -1190,26 +1211,26 @@
 		</relation>
 	</xsl:template>
 	
-	<xsl:template match="iso-meta/std-xref/std-ref | nat-meta/std-xref/std-ref | reg-meta/std-xref/std-ref| std-meta/std-xref/std-ref" mode="bibdata">
+	<xsl:template match="iso-meta/std-xref/std-ref | nat-meta/std-xref/std-ref | reg-meta/std-xref/std-ref | std-meta/std-xref/std-ref | std-doc-meta/std-xref/std-ref" mode="bibdata">
 		<bibitem>
 			<xsl:apply-templates mode="bibdata"/>
 		</bibitem>
 	</xsl:template>
 	
-	<xsl:template match="iso-meta/permissions | nat-meta/permissions | reg-meta/permissions| std-meta/permissions" mode="bibdata">
+	<xsl:template match="iso-meta/permissions | nat-meta/permissions | reg-meta/permissions | std-meta/permissions | std-doc-meta/permissions" mode="bibdata">
 		<copyright>
 			<xsl:apply-templates select="copyright-year" mode="bibdata"/>
 			<xsl:apply-templates select="copyright-holder" mode="bibdata"/>			
 		</copyright>
 	</xsl:template>
 		
-	<xsl:template match="iso-meta/permissions/copyright-year | nat-meta/permissions/copyright-year | reg-meta/permissions/copyright-year | std-meta/permissions/copyright-year" mode="bibdata">
+	<xsl:template match="iso-meta/permissions/copyright-year | nat-meta/permissions/copyright-year | reg-meta/permissions/copyright-year | std-meta/permissions/copyright-year | std-doc-meta/permissions/copyright-year" mode="bibdata">
 		<from>
 			<xsl:apply-templates mode="bibdata"/>
 		</from>
 	</xsl:template>
 	
-	<xsl:template match="iso-meta/permissions/copyright-holder | nat-meta/permissions/copyright-holder | reg-meta/permissions/copyright-holder | std-meta/permissions/copyright-holder" mode="bibdata">
+	<xsl:template match="iso-meta/permissions/copyright-holder | nat-meta/permissions/copyright-holder | reg-meta/permissions/copyright-holder | std-meta/permissions/copyright-holder | std-doc-meta/permissions/copyright-holder" mode="bibdata">
 		<owner>
 				<organization>
 					<xsl:choose>
@@ -1235,7 +1256,7 @@
 	</xsl:template>
 	
 
-	<xsl:template match="iso-meta/std-ident/doc-type | nat-meta/std-ident/doc-type | reg-meta/std-ident/doc-type | std-meta/std-ident/doc-type" mode="bibdata">
+	<xsl:template match="iso-meta/std-ident/doc-type | nat-meta/std-ident/doc-type | reg-meta/std-ident/doc-type | std-meta/std-ident/doc-type | std-doc-meta/std-ident/doc-type" mode="bibdata">
 		<xsl:variable name="value" select="java:toLowerCase(java:java.lang.String.new(.))"/>
 		<xsl:variable name="originator" select=" normalize-space(ancestor::std-ident/originator)"/>
 		<doctype>
@@ -1258,7 +1279,7 @@
 		</doctype>
 	</xsl:template>
 	
-	<xsl:template match="iso-meta/comm-ref | nat-meta/comm-ref | reg-meta/comm-ref | std-meta/comm-ref" mode="bibdata">
+	<xsl:template match="iso-meta/comm-ref | nat-meta/comm-ref | reg-meta/comm-ref | std-meta/comm-ref | std-doc-meta/comm-ref" mode="bibdata">
 		<editorialgroup>
 			<xsl:if test="$organization != 'BSI'">
 				<xsl:variable name="comm-ref">
@@ -1297,13 +1318,13 @@
 		
 	</xsl:template>
 	
-	<xsl:template match="iso-meta/secretariat | nat-meta/secretariat | reg-meta/secretariat | std-meta/secretariat" mode="bibdata">
+	<xsl:template match="iso-meta/secretariat | nat-meta/secretariat | reg-meta/secretariat | std-meta/secretariat | std-doc-meta/secretariat" mode="bibdata">
 		<secretariat>
 			<xsl:apply-templates mode="bibdata"/>
 		</secretariat>
 	</xsl:template>
 	
-	<xsl:template match="iso-meta/ics | nat-meta/ics | reg-meta/ics | std-meta/ics" mode="bibdata">
+	<xsl:template match="iso-meta/ics | nat-meta/ics | reg-meta/ics | std-meta/ics | std-doc-meta/ics" mode="bibdata">
 		<ics>
 			<code>
 				<xsl:apply-templates mode="bibdata"/>
@@ -1311,7 +1332,7 @@
 		</ics>
 	</xsl:template>
 	
-	<xsl:template match="iso-meta/std-ident | nat-meta/std-ident | reg-meta/std-ident | std-meta/std-ident" mode="bibdata">
+	<xsl:template match="iso-meta/std-ident | nat-meta/std-ident | reg-meta/std-ident | std-meta/std-ident | std-doc-meta/std-ident" mode="bibdata">
 		<xsl:if test="$organization != 'BSI'">
 			<structuredidentifier>
 				<project-number part="{part-number}">
@@ -2599,7 +2620,12 @@
 			<xsl:choose>
 				<xsl:when test="@id and preceding-sibling::ref[@id = current()/@id]">false</xsl:when>
 				<xsl:when test="std/@std-id and preceding-sibling::ref[std/@std-id = current()/std/@std-id]">false</xsl:when>
-				<xsl:when test="std/std-ref and preceding-sibling::ref[std/std-ref = current()/std/std-ref]">false</xsl:when>
+				<xsl:when test="std/std-ref and preceding-sibling::ref[std/std-ref = current()/std/std-ref]">
+					<xsl:choose>
+						<xsl:when test="std/title and preceding-sibling::ref[std/title = current()/std/title]">false</xsl:when>
+						<xsl:when test="not(std/title)">false</xsl:when>
+					</xsl:choose>
+				</xsl:when>
 			</xsl:choose>
 		</xsl:variable>
 		<!-- unique='<xsl:value-of select="$unique"/>' -->
@@ -2787,17 +2813,7 @@
 	
 	<xsl:template match="named-content">
 		<xsl:variable name="target">
-			<xsl:choose>
-				<xsl:when test="translate(@xlink:href, '#', '') = ''"> <!-- empty xlink:href -->
-					<xsl:value-of select="translate(normalize-space(), ' ()', '---')"/>
-				</xsl:when>
-				<xsl:when test="starts-with(@xlink:href, '#')">
-					<xsl:value-of select="substring-after(@xlink:href, '#')"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="@xlink:href"/>
-				</xsl:otherwise>
-			</xsl:choose>
+			<xsl:call-template name="get_named_content_target"/>
 		</xsl:variable>
 		<xsl:choose>
 			<xsl:when test="$type_xml = 'semantic' and (@content-type = 'term' and (local-name(//*[@id = $target]) = 'term-sec' or local-name(//*[@id = $target]) = 'termEntry'))">
@@ -2809,13 +2825,20 @@
 				</concept>
 			</xsl:when>
 			<xsl:otherwise>
-				<xref>
-					<xsl:attribute name="target">
-						<xsl:value-of select="$target"/>
-					</xsl:attribute>
-					<xsl:copy-of select="@content-type"/>
-					<xsl:apply-templates />
-				</xref>
+				<xsl:choose>
+					<xsl:when test="normalize-space($target) != ''">
+						<xref>
+							<xsl:attribute name="target">
+								<xsl:value-of select="$target"/>
+							</xsl:attribute>
+							<xsl:copy-of select="@content-type"/>
+							<xsl:apply-templates />
+						</xref>
+					</xsl:when>
+					<xsl:otherwise>
+						<span class="{@content-type}"><xsl:apply-templates /></span>
+					</xsl:otherwise>
+				</xsl:choose>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>

@@ -1574,4 +1574,18 @@
 		<xsl:value-of select="concat(':', $key, ': ', $value, $newline)"/>
 	</xsl:template>
 	
+	<xsl:template name="get_named_content_target">
+		<xsl:choose>
+			<xsl:when test="@xlink:href and translate(@xlink:href, '#', '') = ''"> <!-- empty xlink:href -->
+				<xsl:value-of select="translate(normalize-space(), ' ()', '---')"/>
+			</xsl:when>
+			<xsl:when test="starts-with(@xlink:href, '#')">
+				<xsl:value-of select="substring-after(@xlink:href, '#')"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="@xlink:href"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
 </xsl:stylesheet>
