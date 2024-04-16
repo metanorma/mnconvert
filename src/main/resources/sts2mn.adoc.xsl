@@ -3894,7 +3894,12 @@
 			<xsl:otherwise><xsl:value-of select="$href"/></xsl:otherwise>
 		</xsl:choose>
 		
-		<xsl:text>[</xsl:text><xsl:apply-templates /><xsl:text>]</xsl:text>
+		<xsl:choose>
+			<xsl:when test="$href = normalize-space() and ancestor::ref[@content-type = 'standard_other']"></xsl:when>
+			<xsl:otherwise>
+				<xsl:text>[</xsl:text><xsl:apply-templates /><xsl:text>]</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="supplementary-material/p">
@@ -5443,8 +5448,8 @@
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:variable>
-					<!-- remove comma at start -->
-					<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($title),'^(\s|\h)*,',''))"/>
+					<!-- remove space, comma, dot at start -->
+					<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($title),'^(\s|\h|,|\.)*',''))"/>
 					<xsl:text>&#xa;</xsl:text>
 					<xsl:text>docid::&#xa;</xsl:text>
 					<xsl:text>id::: </xsl:text>
