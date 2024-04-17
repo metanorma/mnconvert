@@ -47,8 +47,6 @@
 		</xsl:choose>
 	</xsl:variable> 
 
-	<xsl:variable name="language" select="//standard/front/*/doc-ident/language"/>
-
 	<xsl:variable name="_typestandard">
 		<xsl:choose>
 			<xsl:when test="$typestandard = ''">
@@ -374,6 +372,8 @@
 		
 		<xsl:apply-templates select="custom-meta-group/custom-meta[meta-name = 'ISBN']/meta-value" mode="bibdata"/>	
 		
+		<xsl:apply-templates select="std-ident/isbn[@publication-format = 'PDF']" mode="bibdata"/>
+		
 		<!-- docnumber -->
 		<xsl:apply-templates select="std-ident/doc-number" mode="bibdata"/>
 		
@@ -392,7 +392,9 @@
 			</xsl:apply-templates>
 		</xsl:if>
 		
-		<xsl:apply-templates select="std-org-group"/>
+		<xsl:apply-templates select="std-org-group" mode="bibdata"/>
+		
+		<xsl:apply-templates select="authorization" mode="bibdata"/>
 		
 		<!-- edition -->
 		<xsl:apply-templates select="std-ident/edition" mode="bibdata"/>
@@ -402,6 +404,8 @@
 		
 		<!-- language -->
 		<xsl:apply-templates select="content-language" mode="bibdata"/>
+		
+		<xsl:apply-templates select="abstract" mode="bibdata"/>
 		
 		<!-- status/stage @abbreviation , substage -->
 		<xsl:apply-templates select="release-version | doc-ident/release-version" mode="bibdata"/>
@@ -752,6 +756,12 @@
 															*[contains(local-name(), '-meta')]/std-ident/std-id-group |
 															*[contains(local-name(), '-meta')]/std-org-group |
 															*[contains(local-name(), '-meta')]/meta-note |
+															*[contains(local-name(), '-meta')]/abstract |
+															*[contains(local-name(), '-meta')]/isbn |
+															*[contains(local-name(), '-meta')]/std-ident/isbn |
+															*[contains(local-name(), '-meta')]/std-ident/issn |
+															*[contains(local-name(), '-meta')]/accrediting-organization |
+															*[contains(local-name(), '-meta')]/authorization |
 															front/notes |
 															front/sec " mode="bibdata_check"/>
 	
@@ -808,7 +818,11 @@
 					<xsl:copy-of select="xalan:nodeset($titles)/*[@type='title-part'][1]"/>
 				</xsl:variable>
 				
-				<title language="{@xml:lang}" format="text/plain" type="main">
+				<xsl:variable name="lang">
+					<xsl:call-template name="getLang"/>
+				</xsl:variable>
+				
+				<title language="{$lang}" format="text/plain" type="main">
 					<xsl:for-each select="xalan:nodeset($title_components)/*">
 						<xsl:apply-templates mode="bibdata"/>
 						<xsl:if test="position() != last()"> — </xsl:if>
@@ -839,7 +853,11 @@
 			</xsl:call-template>
 		</xsl:variable>
 		
-		<xsl:variable name="lang" select="../@xml:lang"/>
+		<xsl:variable name="lang">
+			<xsl:call-template name="getLang">
+				<xsl:with-param name="fromParent">true</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
 		<xsl:for-each select="xalan:nodeset($parts)/*">
 			<xsl:if test="position() = 1">
 				<title language="{$lang}" format="text/plain" type="title-intro">
@@ -861,25 +879,45 @@
 	</xsl:template>
 	
 	<xsl:template match="title-wrap/full" mode="bibdata">
-		<title language="{../@xml:lang}" format="text/plain" type="main">
+		<xsl:variable name="lang">
+			<xsl:call-template name="getLang">
+				<xsl:with-param name="fromParent">true</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
+		<title language="{$lang}" format="text/plain" type="main">
 			<xsl:apply-templates mode="bibdata"/>
 		</title>
 	</xsl:template>
 	
 	<xsl:template match="title-wrap//intro" mode="bibdata">
-		<title language="{../@xml:lang}" format="text/plain" type="title-intro">
+		<xsl:variable name="lang">
+			<xsl:call-template name="getLang">
+				<xsl:with-param name="fromParent">true</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
+		<title language="{$lang}" format="text/plain" type="title-intro">
 			<xsl:apply-templates mode="bibdata"/>
 		</title>
 	</xsl:template>
 	
 	<xsl:template match="title-wrap//main" mode="bibdata">
-		<title language="{../@xml:lang}" format="text/plain" type="title-main">
+		<xsl:variable name="lang">
+			<xsl:call-template name="getLang">
+				<xsl:with-param name="fromParent">true</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
+		<title language="{$lang}" format="text/plain" type="title-main">
 			<xsl:apply-templates mode="bibdata"/>
 		</title>
 	</xsl:template>
 	
 	<xsl:template match="title-wrap//compl" mode="bibdata">
-		<title language="{../@xml:lang}" format="text/plain" type="title-part">
+		<xsl:variable name="lang">
+			<xsl:call-template name="getLang">
+				<xsl:with-param name="fromParent">true</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
+		<title language="{$lang}" format="text/plain" type="title-part">
 			<xsl:apply-templates mode="bibdata"/>
 		</title>
 	</xsl:template>
@@ -922,6 +960,10 @@
 		<docidentifier type="ISBN"><xsl:apply-templates mode="bibdata"/></docidentifier>
 	</xsl:template>
 	
+	<xsl:template match="std-ident/isbn[@publication-format = 'PDF']" mode="bibdata">
+		<docidentifier type="ISBN"><xsl:apply-templates mode="bibdata"/></docidentifier>
+	</xsl:template>
+	
 	<xsl:template name="processMetadata">
 		<xsl:variable name="metanorma-extension">
 			<xsl:apply-templates select="custom-meta-group/custom-meta[meta-name = 'TOC Heading Level']/meta-value" mode="bibdata"/>
@@ -936,6 +978,9 @@
 			<xsl:apply-templates select="page-count" mode="bibdata"/>
 			<xsl:apply-templates select="custom-meta-group/custom-meta[not(meta-name = 'TOC Heading Level' or meta-name = 'ISBN' or meta-name = 'horizontal')]" mode="bibdata"/>
 			<xsl:apply-templates select="permissions/copyright-statement" mode="bibdata"/>
+			<xsl:apply-templates select="std-ident/isbn[@publication-format = 'HTML']" mode="bibdata"/>
+			<xsl:apply-templates select="std-ident/issn" mode="bibdata"/>
+			<xsl:apply-templates select="accrediting-organization" mode="bibdata"/>
 		</xsl:variable>
 		<xsl:if test="xalan:nodeset($metanorma-extension)/*">
 			<metanorma-extension>
@@ -1008,6 +1053,18 @@
 				<xsl:apply-templates select="meta-value" mode="bibdata"/>
 			</xsl:element>
 		</semantic-metadata>
+	</xsl:template>
+	
+	<xsl:template match="isbn[@publication-format = 'HTML']" mode="bibdata">
+		<semantic-metadata><isbn-html><xsl:apply-templates mode="bibdata"/></isbn-html></semantic-metadata>
+	</xsl:template>
+	
+	<xsl:template match="issn" mode="bibdata">
+		<semantic-metadata><issn><xsl:apply-templates mode="bibdata"/></issn></semantic-metadata>
+	</xsl:template>
+	
+	<xsl:template match="accrediting-organization" mode="bibdata">
+		<semantic-metadata><accrediting-organization><xsl:apply-templates mode="bibdata"/></accrediting-organization></semantic-metadata>
 	</xsl:template>
 	
 	<xsl:template match="iso-meta/std-ident/doc-number | nat-meta/std-ident/doc-number | reg-meta/std-ident/doc-number | std-meta/std-ident/doc-number | std-doc-meta/std-ident/doc-number" mode="bibdata">
@@ -1087,7 +1144,7 @@
 		</xsl:if>
 	</xsl:template>
 	
-	<xsl:template match="iso-meta/std-org-group | nat-meta/std-org-group | reg-meta/std-org-group | std-meta/std-org-group | std-doc-meta/std-org-group">
+	<xsl:template match="iso-meta/std-org-group | nat-meta/std-org-group | reg-meta/std-org-group | std-meta/std-org-group | std-doc-meta/std-org-group" mode="bibdata">
 		<contributor>
 			<role>
 				<xsl:attribute name="type">
@@ -1113,6 +1170,21 @@
 	</contributor>
 	</xsl:template>
 	
+	<xsl:template match="*[contains(local-name(), '-meta')]/authorization" mode="bibdata">
+		<contributor>
+			<role type="authorizer" />
+			<organization>
+					<name>
+						<xsl:apply-templates mode="bibdata"/>
+						<xsl:apply-templates select="@authorize-acronym" mode="bibdata"/>
+					</name>
+			</organization>
+	</contributor>
+	</xsl:template>
+	
+	<xsl:template match="authorization/@authorize-acronym" mode="bibdata">
+		<xsl:value-of select="concat(', ', .)"/>
+	</xsl:template>
 	
 	<xsl:template match="*[self::iso-meta or self::nat-meta or self::reg-meta or self::std-meta or self::std-doc-meta]/std-ident/edition[normalize-space() != '']" mode="bibdata">
 		<edition>
@@ -1158,7 +1230,13 @@
 			</xsl:when>
 		</xsl:choose>
 	</xsl:template>
-		
+	
+	<xsl:template match="*[self::iso-meta or self::nat-meta or self::reg-meta or self::std-meta or self::std-doc-meta]/abstract" mode="bibdata">
+		<abstract>
+			<xsl:apply-templates select="*[not(self::title)]"/>
+		</abstract>
+	</xsl:template>
+	
 	<xsl:template match="iso-meta/doc-ident/release-version | nat-meta/doc-ident/release-version | reg-meta/doc-ident/release-version | std-meta/doc-ident/release-version | std-meta/release-version" mode="bibdata">
 		<xsl:variable name="value" select="java:toUpperCase(java:java.lang.String.new(.))"/>
 		

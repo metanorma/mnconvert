@@ -1558,6 +1558,19 @@
 			</xsl:if>
 		</xsl:if>
 	</xsl:template>
+
+	<xsl:variable name="language1" select="normalize-space(//standard/front/*/doc-ident/language)"/>
+	<xsl:variable name="language2" select="normalize-space(//standard/front/*/std-ident/content-language)"/>
+	<xsl:variable name="language3" select="normalize-space(//standard/front/*/content-language)"/>
+	
+	<xsl:variable name="language"> <!-- see https://www.niso-sts.org/TagLibrary/niso-sts-TL-1-2-html/element/content-language.html -->
+		<xsl:choose>
+			<xsl:when test="$language1 != ''"><xsl:value-of select="$language1"/></xsl:when>
+			<xsl:when test="$language2 != ''"><xsl:value-of select="$language2"/></xsl:when>
+			<xsl:when test="$language3 != ''"><xsl:value-of select="$language3"/></xsl:when>
+			<xsl:otherwise>en</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
 	
 	<xsl:template name="getLang">
 		<xsl:param name="fromParent">false</xsl:param>
