@@ -306,7 +306,7 @@
 					<xsl:apply-templates select="/standard/front/iso-meta/permissions/license | /standard/front/std-doc-meta/permissions/license" mode="bibdata"/>
 				</boilerplate>
 			</xsl:if>
-			<xsl:if test="sec or notes">
+			<xsl:if test="sec or notes or */meta-note">
 				<preface>
 					
 					<xsl:if test="$type_xml = 'presentation' and ($organization = 'BSI' or $organization = 'PAS')">
@@ -332,6 +332,9 @@
 					<xsl:if test="$nat_meta_only = 'true'"> <!-- move Introduction section from body to preface, if  nat_meta_only -->
 						<xsl:apply-templates select="/standard/body/sec[@sec-type = 'intro']" mode="preface"/>
 					</xsl:if>
+					
+					<xsl:apply-templates select="*/meta-note"/>
+					
 				</preface>
 			</xsl:if>
 		</xsl:if>
@@ -388,6 +391,8 @@
 				<xsl:with-param name="process">true</xsl:with-param>
 			</xsl:apply-templates>
 		</xsl:if>
+		
+		<xsl:apply-templates select="std-org-group"/>
 		
 		<!-- edition -->
 		<xsl:apply-templates select="std-ident/edition" mode="bibdata"/>
@@ -744,6 +749,9 @@
 															nat-meta/std-org/std-org-abbrev |
 															reg-meta/std-org/std-org-abbrev |
 															std-meta/std-org/std-org-abbrev |
+															*[contains(local-name(), '-meta')]/std-ident/std-id-group |
+															*[contains(local-name(), '-meta')]/std-org-group |
+															*[contains(local-name(), '-meta')]/meta-note |
 															front/notes |
 															front/sec " mode="bibdata_check"/>
 	
@@ -1078,6 +1086,33 @@
 			<xsl:call-template name="publisher"/>
 		</xsl:if>
 	</xsl:template>
+	
+	<xsl:template match="iso-meta/std-org-group | nat-meta/std-org-group | reg-meta/std-org-group | std-meta/std-org-group | std-doc-meta/std-org-group">
+		<contributor>
+			<role>
+				<xsl:attribute name="type">
+					<xsl:choose>
+						<xsl:when test="std-org/@std-org-role = 'developer'">author</xsl:when>
+						<xsl:otherwise>author</xsl:otherwise>
+					</xsl:choose>
+				</xsl:attribute>
+			</role>
+			<organization>
+					<name><xsl:value-of select="std-org/std-org-abbrev"/></name>
+					<xsl:if test="std-org/std-org-loc">
+						<address>
+							<formattedAddress>
+								<xsl:for-each select="std-org/std-org-loc/*">
+									<xsl:apply-templates />
+									<xsl:if test="position() != last()"><br/></xsl:if>
+								</xsl:for-each>
+							</formattedAddress>
+						</address>
+					</xsl:if>
+			</organization>
+	</contributor>
+	</xsl:template>
+	
 	
 	<xsl:template match="*[self::iso-meta or self::nat-meta or self::reg-meta or self::std-meta or self::std-doc-meta]/std-ident/edition[normalize-space() != '']" mode="bibdata">
 		<edition>
@@ -1441,6 +1476,11 @@
 		</xsl:element>
 	</xsl:template>
 	
+	<xsl:template match="*[contains(local-name(), '-meta')]/meta-note">
+		<clause type="{@content-type}">
+			<xsl:apply-templates />
+		</clause>
+	</xsl:template>
 	
 	<xsl:template match="front//sec">
 		<clause id="{@id}">
