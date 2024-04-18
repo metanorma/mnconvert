@@ -2343,7 +2343,7 @@
 	<!-- Terms and definitions -->
 	<!-- ======================== -->
 	<!-- first element in Terms and definitions section -->
-	<xsl:template match="sec[@sec-type = 'terms']/title | sec[@sec-type = 'terms']//sec/title | sec[.//std-def-list]/title" priority="2">
+	<xsl:template match="sec[@sec-type = 'terms' or @sec-type = 'definitions']/title | sec[@sec-type = 'terms']//sec/title | sec[.//std-def-list]/title" priority="2">
 	
 		<xsl:choose>
 			<xsl:when test="$inputformat = 'IEEE' and ../../self::body and . != 'Definitions'">
@@ -2358,6 +2358,10 @@
 				<xsl:text>&#xa;</xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
+				<xsl:if test="../@sec-type = 'definitions'">
+					<xsl:text>[heading=terms and definitions,keeptitle=true]</xsl:text>
+					<xsl:text>&#xa;</xsl:text>
+				</xsl:if>
 				<xsl:call-template name="title"/>
 			</xsl:otherwise>
 		</xsl:choose>
@@ -6242,11 +6246,19 @@
 	</xsl:template>
 	
 	<xsl:template match="term-display/term">
+		<xsl:variable name="level">
+			<xsl:call-template name="getLevel">
+				<xsl:with-param name="addon">-1</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>				
+		<xsl:value-of select="$level"/>
+		<xsl:text> </xsl:text>
 		<xsl:apply-templates/>
-		<xsl:text>:: </xsl:text>
+		<!-- <xsl:text>:: </xsl:text> -->
+		<xsl:text>&#xa;&#xa;</xsl:text>
 	</xsl:template>
 	
-	<xsl:template match="term-display/def/p">
+	<xsl:template match="term-display/def/*	">
 		<xsl:apply-templates/>
 		<xsl:if test="following-sibling::*"> +&#xa;</xsl:if>
 	</xsl:template>

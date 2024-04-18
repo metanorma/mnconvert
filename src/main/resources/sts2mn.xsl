@@ -1918,6 +1918,39 @@
 		</field-of-application>
 	</xsl:template>
 	
+	<xsl:template match="term-display">
+		<term>
+			<xsl:copy-of select="@id"/>
+			<xsl:if test="not(@id)">
+				<xsl:attribute name="id">
+					<xsl:variable name="id_tmp" select="java:replaceAll(java:java.lang.String.new(term),'[^a-zA-Z0-9 ]', '_')"/><!-- replace all non word char to underscore -->
+					<xsl:text>term-</xsl:text><xsl:value-of select="translate($id_tmp, ' ', '-')"/>
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:apply-templates/>
+		</term>
+	</xsl:template>
+	
+	<xsl:template match="term-display/term">
+		<preferred>
+			<xsl:choose>
+				<xsl:when test="$type_xml = 'presentation'">
+					<strong><xsl:apply-templates/></strong>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates/>
+				</xsl:otherwise>
+			</xsl:choose>
+			
+		</preferred>
+	</xsl:template>
+	
+	<xsl:template match="term-display/def">
+		<definition>
+			<xsl:apply-templates/>
+		</definition>
+	</xsl:template>
+	
 	<!-- ======================== -->
 	<!-- END Terms, definitions -->
 	<!-- ======================== -->
