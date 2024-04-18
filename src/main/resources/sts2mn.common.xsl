@@ -11,6 +11,8 @@
 		extension-element-prefixes="redirect"
 		version="1.0">
 
+	<xsl:variable name="newline"><xsl:text>&#xa;</xsl:text></xsl:variable>
+
 	<!-- ================= -->
 	<!-- std model processing -->
 	<!-- ================= -->
@@ -1555,6 +1557,48 @@
 				<xsl:value-of select="$indent"/>
 			</xsl:if>
 		</xsl:if>
+	</xsl:template>
+
+	<xsl:variable name="language1" select="normalize-space(//standard/front/*/doc-ident/language)"/>
+	<xsl:variable name="language2" select="normalize-space(//standard/front/*/std-ident/content-language)"/>
+	<xsl:variable name="language3" select="normalize-space(//standard/front/*/content-language)"/>
+	
+	<xsl:variable name="language"> <!-- see https://www.niso-sts.org/TagLibrary/niso-sts-TL-1-2-html/element/content-language.html -->
+		<xsl:choose>
+			<xsl:when test="$language1 != ''"><xsl:value-of select="$language1"/></xsl:when>
+			<xsl:when test="$language2 != ''"><xsl:value-of select="$language2"/></xsl:when>
+			<xsl:when test="$language3 != ''"><xsl:value-of select="$language3"/></xsl:when>
+			<xsl:otherwise>en</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	
+	<xsl:template name="getLang">
+		<xsl:param name="fromParent">false</xsl:param>
+		<xsl:choose>
+			<xsl:when test="$fromParent = 'true' and ../@xml:lang"><xsl:value-of select="../@xml:lang"/></xsl:when>
+			<xsl:when test="@xml:lang"><xsl:value-of select="@xml:lang"/></xsl:when>
+			<xsl:otherwise><xsl:value-of select="$language"/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template name="addDocumentAttribute">
+		<xsl:param name="key"/>
+		<xsl:param name="value"/>
+		<xsl:value-of select="concat(':', $key, ': ', $value, $newline)"/>
+	</xsl:template>
+	
+	<xsl:template name="get_named_content_target">
+		<xsl:choose>
+			<xsl:when test="@xlink:href and translate(@xlink:href, '#', '') = ''"> <!-- empty xlink:href -->
+				<xsl:value-of select="translate(normalize-space(), ' ()', '---')"/>
+			</xsl:when>
+			<xsl:when test="starts-with(@xlink:href, '#')">
+				<xsl:value-of select="substring-after(@xlink:href, '#')"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="@xlink:href"/>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 </xsl:stylesheet>

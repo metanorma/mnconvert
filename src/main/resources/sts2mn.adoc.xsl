@@ -43,6 +43,7 @@
 	<xsl:variable name="FILENAME_EUROPEAN_PREFACE">en-preface.adoc</xsl:variable>
 	<xsl:variable name="FILENAME_FOREWORD">00-foreword.adoc</xsl:variable>
 	<xsl:variable name="FILENAME_INTRODUCTION">00-introduction.adoc</xsl:variable>
+	<xsl:variable name="FILENAME_BIBLIOGRAPHY">99-bibliography.adoc</xsl:variable>
 	<xsl:variable name="FILENAME_COLLECTION">metanorma.yml</xsl:variable>
 	
 	<!-- false --> <!-- true, for new features -->
@@ -63,12 +64,11 @@
 	<xsl:variable name="one_document_" select="count(//standard/front/*[contains(local-name(), '-meta')]) = 1 or //standards-document"/>
 	<xsl:variable name="one_document" select="normalize-space($one_document_)"/>
 	
-	<xsl:variable name="language" select="//standard/front/*/doc-ident/language"/>
-	
 	<xsl:variable name="organization">
 		<xsl:choose>
 			<xsl:when test="/standard/front/nat-meta/std-ident/originator = 'PAS'">PAS</xsl:when>
 			<xsl:when test="/standard/front/nat-meta/@originator = 'BSI' or /standard/front/iso-meta/secretariat = 'BSI'">BSI</xsl:when>
+			<xsl:when test="/standard/front/std-doc-meta/std-org-group/std-org/std-org-abbrev = 'NISO'">NISO</xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="/standard/front/*/doc-ident/sdo"/>
 			</xsl:otherwise>
@@ -144,19 +144,27 @@
 	
 	
 	<xsl:variable name="linearized_xml">
+		<!-- <xsl:message>start: linearized_xml</xsl:message> -->
 		<xsl:apply-templates select="/" mode="linearize"/>
+		<!-- <xsl:message>end: linearized_xml</xsl:message> -->
 	</xsl:variable>
 	
 	<xsl:variable name="remove_word_clause_xml">
+		<!-- <xsl:message>start: remove_word_clause_xml</xsl:message> -->
 		<xsl:apply-templates select="xalan:nodeset($linearized_xml)" mode="remove_word_clause"/>
+		<!-- <xsl:message>end: remove_word_clause_xml</xsl:message> -->
 	</xsl:variable>
 
 	<xsl:variable name="unconstrained_formatting_xml">
+		<!-- <xsl:message>start: unconstrained_formatting_xml</xsl:message> -->
 		<xsl:apply-templates select="xalan:nodeset($remove_word_clause_xml)" mode="unconstrained_formatting"/>
+		<!-- <xsl:message>end: unconstrained_formatting_xml</xsl:message> -->
 	</xsl:variable>
 
 	<xsl:variable name="ref_fix">
+		<!-- <xsl:message>start: ref_fix</xsl:message> -->
 		<xsl:apply-templates select="xalan:nodeset($unconstrained_formatting_xml)" mode="ref_fix"/>
+		<!-- <xsl:message>end: ref_fix</xsl:message> -->
 	</xsl:variable>
 	
 	<xsl:variable name="updated_xml" select="xalan:nodeset($ref_fix)"/>
@@ -573,8 +581,10 @@
 				
 				</xsl:for-each>
 				
-				
-				<xsl:for-each select="std-meta/abstract">
+			</xsl:if>	
+			
+			<xsl:if test="$inputformat = 'IEEE' or $organization = 'NISO'">
+				<xsl:for-each select="std-meta/abstract | std-doc-meta/abstract">
 					<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 					<xsl:variable name="section_name" select="local-name()"/>
 					<xsl:variable name="filename">
@@ -598,8 +608,24 @@
 				</xsl:for-each>
 			</xsl:if>
 			
+			<xsl:if test="*/meta-note">
+				<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
+				<xsl:variable name="filename">
+					<xsl:value-of select="$sectionsFolder"/><xsl:text>/00-meta-notes.</xsl:text><xsl:value-of select="$docfile_ext"/>
+				</xsl:variable>
+				
+				<redirect:write file="{$outpath}/{$filename}">
+					<xsl:text>&#xa;</xsl:text>
+					<xsl:apply-templates select="*/meta-note"/>
+				</redirect:write>
+				<redirect:write file="{$outpath}/{$docfile}">
+					<xsl:text>include::</xsl:text><xsl:value-of select="$filename"/><xsl:text>[]</xsl:text>
+					<xsl:text>&#xa;&#xa;</xsl:text>
+				</redirect:write>
+			</xsl:if>
+			
 			<!-- if in front there are another elements, except xxx-meta -->
-			<xsl:for-each select="*[local-name() != 'iso-meta' and local-name() != 'nat-meta' and local-name() != 'reg-meta' and local-name() != 'std-meta'] | ancestor::standards-document/back/ack[title = 'Acknowledgements']">
+			<xsl:for-each select="*[local-name() != 'iso-meta' and local-name() != 'nat-meta' and local-name() != 'reg-meta' and local-name() != 'std-meta' and local-name() != 'std-doc-meta'] | ancestor::standards-document/back/ack[title = 'Acknowledgements']">
 				<xsl:variable name="number_"><xsl:number /></xsl:variable>
 				<xsl:variable name="number" select="format-number($number_, '00')"/>
 				<xsl:variable name="section_name">
@@ -718,8 +744,17 @@
 		<!-- :docstatus: active -->
 		<xsl:apply-templates select="/*/@article-status"/>
 		
+		<!-- :docidentifier: ANSI/NISO Z39.102-2017 -->
+		<xsl:apply-templates select="std-ident/std-id-group"/>
 		<!-- :publisher: ISO;IEC -->
 		<xsl:apply-templates select="std-ident/originator"/>
+		<!-- :publisher: NISO -->
+		<xsl:apply-templates select="std-org-group/std-org/std-org-abbrev"/>
+		<!-- :pub-address: NISO + \
+		     3600 Clipper Mill Road + \
+				 ...
+		-->
+		<xsl:apply-templates select="std-org-group/std-org/std-org-loc"/>
 		<!-- :partnumber: 1 -->
 		<xsl:apply-templates select="std-ident/part-number"/>		
 		<!-- :edition: 1 -->
@@ -767,7 +802,11 @@
 		<xsl:apply-templates select="self-uri"/>
 		
 		<!-- :language: en -->
-		<xsl:apply-templates select="doc-ident/language"/>
+		<!-- <xsl:apply-templates select="doc-ident/language"/> -->
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">language</xsl:with-param>
+			<xsl:with-param name="value" select="$language"/>
+		</xsl:call-template>
 		<xsl:if test="$inputformat = 'IEEE'">
 			<xsl:text>:language: en</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
@@ -870,6 +909,12 @@
 		<!-- :semantic-metadata-partner-secretariat: -->
 		<xsl:apply-templates select="partner" />
 		
+		<!-- :semantic-metadata-accrediting-organizationt: -->
+		<xsl:apply-templates select="accrediting-organization"/>
+		
+		<!-- ::authorizer: An American National Standard -->
+		<xsl:apply-templates select="authorization"/>
+		
 		<!-- :keywords: -->
 		<xsl:apply-templates select="kwd-group"/>
 		
@@ -953,6 +998,9 @@
 		<!-- :semantic-metadata-copyright-statement:  All rights of exploitation in any form and ... -->
 		<xsl:apply-templates select="permissions/copyright-statement"/>
 		
+		<!-- :semantic-metadata-license: All rights reserved under International -->
+		<xsl:apply-templates select="permissions/license"/>
+		
 		<!-- :semantic-metadata-xplore-article-id: 6457401 -->
 		<xsl:apply-templates select="xplore-article-id"/>
 		
@@ -1003,6 +1051,13 @@
 		<xsl:apply-templates select="isbn[@publication-format = 'online']"/>
 		<!-- :isbn-print: -->
 		<xsl:apply-templates select="isbn[@publication-format = 'print']"/>
+		<!-- :isbn: -->
+		<xsl:apply-templates select="std-ident/isbn[@publication-format = 'PDF']"/>
+		<!-- :semantic-metadata-isbn-html: -->
+		<xsl:apply-templates select="std-ident/isbn[@publication-format = 'HTML']"/>
+		<!-- :semantic-metadata-issn: -->
+		<xsl:apply-templates select="std-ident/issn"/>
+		
 
 		<!-- :semantic-metadata-open-access: -->
 		<xsl:apply-templates select="ancestor::standards-document/@open-access"/>
@@ -1055,9 +1110,9 @@
 	</xsl:template>
 	
 	<xsl:template match="//standard/back">
-		<xsl:if test="$split-bibdata != 'true'">		
-			<xsl:apply-templates select="*[not(local-name() = 'ref-list' and @content-type = 'bibl')]" />
-			<xsl:apply-templates select="ref-list[@content-type = 'bibl']" />
+		<xsl:if test="$split-bibdata != 'true'">
+			<xsl:apply-templates select="*[not(local-name() = 'ref-list' and (@content-type = 'bibl' or title = 'Bibliography'))]" />
+			<xsl:apply-templates select="ref-list[@content-type = 'bibl' or title = 'Bibliography']" />
 		</xsl:if>
 	</xsl:template>
 	
@@ -1084,8 +1139,12 @@
 	</xsl:template>
 	
 	<xsl:template match="std-ident[ancestor::front or ancestor::adoption-front]/doc-number[normalize-space(.) != '']">
-		<xsl:text>:docnumber: </xsl:text><xsl:call-template name="getDocNumber"/>
-		<xsl:text>&#xa;</xsl:text>
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">docnumber</xsl:with-param>
+			<xsl:with-param name="value">
+				<xsl:call-template name="getDocNumber"/>
+			</xsl:with-param>
+		</xsl:call-template>
 	</xsl:template>
 	
 	<xsl:template match="std-ident[ancestor::front or ancestor::adoption-front]/originator[normalize-space(.) != '']">
@@ -1093,6 +1152,25 @@
 			<xsl:text>:publisher: </xsl:text><xsl:value-of select="translate(., '/', ';')"/>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="std-org-group/std-org/std-org-abbrev">
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">publisher</xsl:with-param>
+			<xsl:with-param name="value" select="."/>
+		</xsl:call-template>
+	</xsl:template>
+	
+	<xsl:template match="std-org-group/std-org/std-org-loc">
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">pub-address</xsl:with-param>
+			<xsl:with-param name="value">
+				<xsl:for-each select="*">
+					<xsl:value-of select="."/>
+					<xsl:if test="position() != last()"><xsl:value-of select="concat(' + \', $newline)"/></xsl:if>
+				</xsl:for-each>
+			</xsl:with-param>
+		</xsl:call-template>
 	</xsl:template>
 
 	<xsl:template name="getDocNumber">
@@ -1164,13 +1242,15 @@
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($value), '^©(\s|\h)*', '')"/> <!-- remove copyright sign -->
 	</xsl:template>
 	
+	<xsl:template name="getDate">
+		<xsl:choose>
+			<xsl:when test="normalize-space(@iso-8601-date) != ''"><xsl:value-of select="@iso-8601-date"/></xsl:when>
+			<xsl:otherwise><xsl:value-of select="normalize-space(.)"/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
 	<xsl:template match="pub-date[ancestor::front or ancestor::adoption-front]">
-		<xsl:variable name="date">
-			<xsl:choose>
-				<xsl:when test="normalize-space(@iso-8601-date) != ''"><xsl:value-of select="@iso-8601-date"/></xsl:when>
-				<xsl:otherwise><xsl:value-of select="normalize-space(.)"/></xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
+		<xsl:variable name="date"><xsl:call-template name="getDate"/></xsl:variable>
 		<xsl:if test="normalize-space($date) != ''">
 			<xsl:choose>
 				<xsl:when test="$inputformat = 'IEEE'">
@@ -1197,10 +1277,18 @@
 	</xsl:template>
 	
 	<xsl:template match="release-date[ancestor::front or ancestor::adoption-front]">
-		<xsl:if test="normalize-space() != ''">
-			<!-- <xsl:text>:date: release </xsl:text><xsl:value-of select="."/>
-			<xsl:text>&#xa;</xsl:text> -->
-			<date type="release"><xsl:value-of select="."/></date>
+		<xsl:variable name="date"><xsl:call-template name="getDate"/></xsl:variable>
+		<xsl:if test="$date != ''">
+			<xsl:choose>
+				<xsl:when test="@date-type = 'approved'">
+					<!-- :issued-date: ... -->
+					<issued-date><xsl:value-of select="$date"/></issued-date>
+				</xsl:when>
+				<xsl:otherwise>
+					<!-- <xsl:text>:date: release </xsl:text><xsl:value-of select="."/> -->
+					<date type="release"><xsl:value-of select="$date"/></date>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:if>
 	</xsl:template>
 	
@@ -1239,7 +1327,10 @@
 					<xsl:copy-of select="xalan:nodeset($titles)/*[@type='title-part'][1]"/>
 				</xsl:variable>
 				
-				<xsl:variable name="lang" select="@xml:lang"/>
+				<!-- <xsl:variable name="lang" select="@xml:lang"/> -->
+				<xsl:variable name="lang">
+					<xsl:call-template name="getLang"/>
+				</xsl:variable>
 				<xsl:for-each select="xalan:nodeset($title_components)/*">
 					<xsl:text>:</xsl:text><xsl:value-of select="@type"/><xsl:text>-</xsl:text><xsl:value-of select="$lang"/><xsl:text>: </xsl:text><xsl:value-of select="normalize-space(.)"/>
 					<xsl:text>&#xa;</xsl:text>
@@ -1248,13 +1339,16 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:apply-templates>
-					<xsl:with-param name="lang" select="@xml:lang"/>
+					<!-- <xsl:with-param name="lang" select="@xml:lang"/> -->
+					<xsl:with-param name="lang">
+						<xsl:call-template name="getLang"/>
+					</xsl:with-param>
 				</xsl:apply-templates>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
 	
-	
+	<!-- for BSI, PAS -->
 	<xsl:template match="title-wrap/full | title-wrap/main" mode="bibdata_title_full">
 	
 		<!-- <xsl:variable name="title" select="translate(., '-–', '——')"/> -->
@@ -1270,7 +1364,11 @@
 		
 		<xsl:variable name="parts" select="xalan:nodeset($parts_)"/>
 		
-		<xsl:variable name="lang" select="../@xml:lang"/>
+		<xsl:variable name="lang"> <!--  select="../@xml:lang"/> -->
+			<xsl:call-template name="getLang">
+				<xsl:with-param name="fromParent">true</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
 		
 		<xsl:if test="count($parts/*) &gt; 0">
 			<title language="{$lang}" format="text/plain" type="title-main">
@@ -1283,24 +1381,43 @@
 		
 	</xsl:template>
 	
+	<!-- for BSI, PAS -->
 	<xsl:template match="title-wrap/intro" mode="bibdata">
-		<title language="{../@xml:lang}" format="text/plain" type="title-intro">
+		<title format="text/plain" type="title-intro"> <!-- language="{../@xml:lang}" -->
+			<xsl:attribute name="language">
+				<xsl:call-template name="getLang">
+					<xsl:with-param name="fromParent">true</xsl:with-param>
+				</xsl:call-template>
+			</xsl:attribute>
 			<xsl:apply-templates mode="bibdata"/>
 		</title>
 	</xsl:template>
 	
+	<!-- for BSI, PAS -->
 	<xsl:template match="title-wrap/main" mode="bibdata">
-		<title language="{../@xml:lang}" format="text/plain" type="title-main">
+		<title format="text/plain" type="title-main"> <!-- language="{../@xml:lang}" -->
+			<xsl:attribute name="language">
+				<xsl:call-template name="getLang">
+					<xsl:with-param name="fromParent">true</xsl:with-param>
+				</xsl:call-template>
+			</xsl:attribute>
 			<xsl:apply-templates mode="bibdata"/>
 		</title>
 	</xsl:template>
 	
+	<!-- for BSI, PAS -->
 	<xsl:template match="title-wrap/compl" mode="bibdata">
-		<title language="{../@xml:lang}" format="text/plain" type="title-part">
+		<title format="text/plain" type="title-part"> <!-- language="{../@xml:lang}" -->
+			<xsl:attribute name="language">
+				<xsl:call-template name="getLang">
+					<xsl:with-param name="fromParent">true</xsl:with-param>
+				</xsl:call-template>
+			</xsl:attribute>
 			<xsl:apply-templates mode="bibdata"/>
 		</title>
 	</xsl:template>
 	
+	<!-- for BSI, PAS -->
 	<xsl:template match="title-wrap/compl/node()[1][self::text()]" mode="bibdata">
 		<!-- strip 'Part N:' -->
 		<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(.), '^Part(\s|\h)*(\d)+:(.+)$', '$3'))"/>
@@ -1342,6 +1459,16 @@
 				<xsl:text>&#xa;</xsl:text>
 			</xsl:otherwise>
 		</xsl:choose>	
+	</xsl:template>
+	
+	<xsl:template match="title-wrap[ancestor::front or ancestor::adoption-front]/main-title-wrap/main[normalize-space(.) != '']">
+		<xsl:param name="lang"/>
+		<xsl:text>:title-main-</xsl:text>
+			<xsl:value-of select="$lang"/>
+			<xsl:if test="normalize-space($lang) = ''"><xsl:call-template name="getLang"/></xsl:if>
+		<xsl:text>: </xsl:text><xsl:value-of select="."/>
+		<xsl:if test="../subtitle"><xsl:text> -- </xsl:text><xsl:value-of select="../subtitle"/></xsl:if>
+		<xsl:text>&#xa;</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="title-wrap[ancestor::front or ancestor::adoption-front]/compl[normalize-space(.) != '']">
@@ -1489,8 +1616,10 @@
 	</xsl:template>
 	
 	<xsl:template match="custom-meta-group/custom-meta[meta-name = 'ISBN']/meta-value">
-		<xsl:text>:isbn: </xsl:text><xsl:value-of select="."/>
-		<xsl:text>&#xa;</xsl:text>
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">isbn</xsl:with-param>
+			<xsl:with-param name="value" select="."/>
+		</xsl:call-template>
 	</xsl:template>
 	
 	<xsl:template match="custom-meta-group/custom-meta[meta-name = 'TOC Heading Level']/meta-value">
@@ -1570,6 +1699,18 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<xsl:template match="permissions/license">
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">semantic-metadata-license</xsl:with-param>
+			<xsl:with-param name="value">
+				<xsl:for-each select="*">
+					<xsl:value-of select="."/>
+					<xsl:if test="position() != last()"><xsl:value-of select="concat(' + \', $newline)"/></xsl:if>
+				</xsl:for-each>
+			</xsl:with-param>
+		</xsl:call-template>
+	</xsl:template>
+	
 	<xsl:template match="xplore-article-id[normalize-space() != '']">
 		<xsl:text>:semantic-metadata-xplore-article-id: </xsl:text><xsl:value-of select="."/>
 		<xsl:text>&#xa;</xsl:text>
@@ -1609,13 +1750,38 @@
 	</xsl:template>
 	
 	<xsl:template match="isbn[@publication-format = 'online']">
-		<xsl:text>:isbn-pdf: </xsl:text><xsl:value-of select="."/>
-		<xsl:text>&#xa;</xsl:text>
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">isbn-pdf</xsl:with-param>
+			<xsl:with-param name="value" select="."/>
+		</xsl:call-template>
+	</xsl:template>
+	
+	<xsl:template match="isbn[@publication-format = 'PDF']">
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">isbn</xsl:with-param>
+			<xsl:with-param name="value" select="."/>
+		</xsl:call-template>
 	</xsl:template>
 	
 	<xsl:template match="isbn[@publication-format = 'print']">
-		<xsl:text>:isbn-print: </xsl:text><xsl:value-of select="."/>
-		<xsl:text>&#xa;</xsl:text>
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">isbn-print</xsl:with-param>
+			<xsl:with-param name="value" select="."/>
+		</xsl:call-template>
+	</xsl:template>
+	
+	<xsl:template match="isbn[@publication-format = 'HTML']">
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">semantic-metadata-isbn-html</xsl:with-param>
+			<xsl:with-param name="value" select="."/>
+		</xsl:call-template>
+	</xsl:template>
+	
+	<xsl:template match="issn">
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">semantic-metadata-issn</xsl:with-param>
+			<xsl:with-param name="value" select="."/>
+		</xsl:call-template>
 	</xsl:template>
 	
 	<xsl:template match="std-title-group">
@@ -1667,7 +1833,7 @@
 	</xsl:template>
 	
 	<xsl:template match="approval/approval-date">
-		<xsl:variable name="date" select="normalize-space(@iso-8601-date)"/>
+		<xsl:variable name="date"><xsl:call-template name="getDate"/></xsl:variable>
 		<xsl:if test="$date != ''">
 			<xsl:choose>
 				<xsl:when test="@date-type = 'approved'">
@@ -1685,7 +1851,7 @@
 	</xsl:template>
 	
 	<xsl:template match="reaffirm-date">
-		<xsl:variable name="date" select="normalize-space(@iso-8601-date)"/>
+		<xsl:variable name="date"><xsl:call-template name="getDate"/></xsl:variable>
 		<xsl:if test="$date != ''">
 			<!-- <xsl:text>:date: reaffirm </xsl:text><xsl:value-of select="$date"/>
 			<xsl:text>&#xa;</xsl:text> -->
@@ -1710,6 +1876,23 @@
 		<xsl:value-of select="."/>
 		<xsl:text>"</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="accrediting-organization">
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">semantic-metadata-accrediting-organization</xsl:with-param>
+			<xsl:with-param name="value" select="."/>
+		</xsl:call-template>
+	</xsl:template>
+	
+	<xsl:template match="authorization">
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">authorizer</xsl:with-param>
+			<xsl:with-param name="value">
+				<xsl:value-of select="."/>
+				<xsl:if test="@authorize-acronym">, <xsl:value-of select="@authorize-acronym"/></xsl:if>
+			</xsl:with-param>
+		</xsl:call-template>
 	</xsl:template>
 	
 	<xsl:template match="kwd-group">
@@ -1963,6 +2146,20 @@
 		</xsl:if>
 	</xsl:template>
 		
+	<xsl:template match="meta-note">
+		<xsl:text>[.preface</xsl:text>
+		<xsl:if test="@content-type">,type=<xsl:value-of select="@content-type"/></xsl:if>
+		<xsl:text>]</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		<xsl:if test="not(title)">
+			<xsl:text>== {blank}</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+		<xsl:apply-templates/>			
+	</xsl:template>
+		
+		
 	<!-- =========== -->
 	<!-- end bibdata (standard/front) -->
 	<!-- =========== -->
@@ -2060,7 +2257,13 @@
 	<!-- Scope -->
 	<xsl:template match="body/sec[@sec-type = 'scope'] | front/sec[@sec-type = 'scope']" priority="2">
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
-		<redirect:write file="{$outpath}/{$sectionsFolder}/01-scope.adoc">
+		<xsl:variable name="sec_number">
+			<xsl:call-template name="getSecNumber">
+				<xsl:with-param name="defaultNum">1</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name="adoc_path" select="concat($sectionsFolder, '/', $sec_number, '-scope.adoc')"/>
+		<redirect:write file="{$outpath}/{$adoc_path}">
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:call-template name="setId"/>
 			<xsl:apply-templates />
@@ -2068,7 +2271,7 @@
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$docfile}">
-			<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/01-scope.adoc[]</xsl:text>
+			<xsl:text>include::</xsl:text><xsl:value-of select="$adoc_path"/><xsl:text>[]</xsl:text><!-- sections/01-scope.adoc[] -->
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</redirect:write>
 	</xsl:template>
@@ -2087,7 +2290,13 @@
 	<!-- ======================== -->
 	<xsl:template match="body/sec[@sec-type = 'norm-refs'] | front/sec[@sec-type = 'norm-refs'] | body/sec[title = 'Normative references' or list/@list-content = 'normative-references']" priority="2">
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
-		<redirect:write file="{$outpath}/{$sectionsFolder}/02-normrefs.adoc">
+		<xsl:variable name="sec_number">
+			<xsl:call-template name="getSecNumber">
+				<xsl:with-param name="defaultNum">2</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name="adoc_path" select="concat($sectionsFolder, '/', $sec_number, '-normrefs.adoc')"/>
+		<redirect:write file="{$outpath}/{$adoc_path}">
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:text>[bibliography]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
@@ -2096,7 +2305,7 @@
 		</redirect:write>
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$docfile}">
-			<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/02-normrefs.adoc[]</xsl:text>
+			<xsl:text>include::</xsl:text><xsl:value-of select="$adoc_path"/><xsl:text>[]</xsl:text> <!-- 02-normrefs.adoc[] -->
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</redirect:write>
 	</xsl:template>
@@ -2134,7 +2343,7 @@
 	<!-- Terms and definitions -->
 	<!-- ======================== -->
 	<!-- first element in Terms and definitions section -->
-	<xsl:template match="sec[@sec-type = 'terms']/title | sec[@sec-type = 'terms']//sec/title | sec[.//std-def-list]/title" priority="2">
+	<xsl:template match="sec[@sec-type = 'terms' or @sec-type = 'definitions']/title | sec[@sec-type = 'terms']//sec/title | sec[.//std-def-list]/title" priority="2">
 	
 		<xsl:choose>
 			<xsl:when test="$inputformat = 'IEEE' and ../../self::body and . != 'Definitions'">
@@ -2149,6 +2358,10 @@
 				<xsl:text>&#xa;</xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
+				<xsl:if test="../@sec-type = 'definitions'">
+					<xsl:text>[heading=terms and definitions,keeptitle=true]</xsl:text>
+					<xsl:text>&#xa;</xsl:text>
+				</xsl:if>
 				<xsl:call-template name="title"/>
 			</xsl:otherwise>
 		</xsl:choose>
@@ -2247,42 +2460,61 @@
 	
 	
 	<xsl:template match="body/sec | body[count(*) = 1]/sec[@sec-type = 'scope']/sec">
-		<xsl:variable name="sec_number_" select="format-number(label, '00')" />
-		<xsl:variable name="sec_number">
-			<xsl:choose>
-				<!-- Example: Section 3 -->
-				<xsl:when test="$sec_number_ = 'NaN'">
-					<xsl:choose>
-						<xsl:when test="label">
-							<xsl:value-of select="java:toLowerCase(java:java.lang.String.new(normalize-space(translate(label, ',&#x200b;&#xa0; ','___'))))"/>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:value-of select="@id"/>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:when>
-				<xsl:otherwise><xsl:value-of select="$sec_number_"/></xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
+		<xsl:variable name="sec_number"><xsl:call-template name="getSecNumber"/></xsl:variable>
 		<xsl:variable name="title" select="normalize-space(translate(title, ',&#x200b;&#xa0;‑','    '))"/> <!-- get first word -->
-		<xsl:variable name="sec_title_">
+		<xsl:variable name="sec_title__">
 			<xsl:choose>
 				<xsl:when test="contains($title, ' ')"><xsl:value-of select="substring-before($title,' ')"/></xsl:when>
 				<xsl:otherwise><xsl:value-of select="$title"/></xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
+		<xsl:variable name="sec_title_" select="translate($sec_title__, '/.' , '__')"/>
 		<xsl:variable name="sec_title" select="java:toLowerCase(java:java.lang.String.new($sec_title_))"/>
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
-		<redirect:write file="{$outpath}/{$sectionsFolder}/{$sec_number}-{$sec_title}.adoc">
+		<xsl:variable name="adoc_path" select="concat($sectionsFolder, '/', $sec_number, '-', $sec_title, '.adoc')"/>
+		<redirect:write file="{$outpath}/{$adoc_path}">
+			<xsl:if test="@sec-type = 'non-norm-refs'">
+				<xsl:text>&#xa;</xsl:text>
+				<xsl:text>[bibliography]</xsl:text>
+			</xsl:if>
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:call-template name="setIdOrType"/>
 			<xsl:apply-templates />
 		</redirect:write>
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$docfile}">
-			<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/</xsl:text><xsl:value-of select="$sec_number"/>-<xsl:value-of select="$sec_title"/><xsl:text>.adoc[]</xsl:text>
+			<xsl:text>include::</xsl:text><xsl:value-of select="$adoc_path"/><xsl:text>[]</xsl:text>
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</redirect:write>
+	</xsl:template>
+	
+	<xsl:template name="getSecNumber">
+		<xsl:param name="defaultNum">1</xsl:param>
+		<xsl:choose>
+			<xsl:when test="normalize-space(label) = ''">
+				<xsl:value-of select="format-number($defaultNum, '00')"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:variable name="sec_number_" select="format-number(label, '00')" />
+				<xsl:variable name="sec_number">
+					<xsl:choose>
+						<!-- Example: Section 3 -->
+						<xsl:when test="$sec_number_ = 'NaN'">
+							<xsl:choose>
+								<xsl:when test="label">
+									<xsl:value-of select="java:toLowerCase(java:java.lang.String.new(normalize-space(translate(label, ',&#x200b;&#xa0; ','___'))))"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="@id"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+						<xsl:otherwise><xsl:value-of select="$sec_number_"/></xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:value-of select="$sec_number"/>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="sec">
@@ -3096,8 +3328,18 @@
 	</xsl:template>
 	
 
+	<xsl:template match="std-id-group">
+		<xsl:if test="ancestor::std-doc-meta">
+			<xsl:apply-templates select="std-id[@std-id-type = 'dated']"/>
+		</xsl:if>
+	</xsl:template>
 	
-	<xsl:template match="std-id-group"/>
+	<xsl:template match="std-id-group/std-id">
+		<xsl:call-template name="addDocumentAttribute">
+			<xsl:with-param name="key">docidentifier</xsl:with-param>
+			<xsl:with-param name="value" select="."/>
+		</xsl:call-template>
+	</xsl:template>
 	
 	<!-- <xsl:template match="std[not(ancestor::ref)]/text()">
 		<xsl:variable name="text" select="normalize-space(translate(.,'&#xA0;', ' '))"/>
@@ -3124,6 +3366,7 @@
 	
 	<xsl:template match="ref/std/std-id"/> <!-- for IEC -->
 	
+	<xsl:template match="abstract/title"/>
 	
 	<!-- ================= -->
 	<!-- tbx:source processing -->
@@ -3642,7 +3885,12 @@
 			<xsl:otherwise><xsl:value-of select="$href"/></xsl:otherwise>
 		</xsl:choose>
 		
-		<xsl:text>[</xsl:text><xsl:apply-templates /><xsl:text>]</xsl:text>
+		<xsl:choose>
+			<xsl:when test="$href = normalize-space() and ancestor::ref[@content-type = 'standard_other']"></xsl:when>
+			<xsl:otherwise>
+				<xsl:text>[</xsl:text><xsl:apply-templates /><xsl:text>]</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="supplementary-material/p">
@@ -4878,9 +5126,9 @@
 	<xsl:variable name="regex_add_bsi_prefix">^(PAS(\s|\h))</xsl:variable>
 	<xsl:variable name="regex_add_bsi_prefix_result">BSI $1</xsl:variable>
 	
-	<xsl:template match="ref-list[@content-type = 'bibl']" priority="2">
+	<xsl:template match="ref-list[@content-type = 'bibl' or title = 'Bibliography']" priority="2">
 		<xsl:variable name="sectionsFolder"><xsl:call-template name="getSectionsFolder"/></xsl:variable>
-		<redirect:write file="{$outpath}/{$sectionsFolder}/99-bibliography.adoc">
+		<redirect:write file="{$outpath}/{$sectionsFolder}/{$FILENAME_BIBLIOGRAPHY}">
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:text>[bibliography]</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
@@ -5055,15 +5303,15 @@
 		</redirect:write>
 		<xsl:variable name="docfile"><xsl:call-template name="getDocFilename"/></xsl:variable>
 		<redirect:write file="{$outpath}/{$docfile}">
-			<xsl:text>include::</xsl:text><xsl:value-of select="$sectionsFolder"/><xsl:text>/99-bibliography.adoc[]</xsl:text>
+			<xsl:text>include::</xsl:text><xsl:value-of select="concat($sectionsFolder, '/', $FILENAME_BIBLIOGRAPHY)"/><xsl:text>[]</xsl:text>
 			<xsl:text>&#xa;&#xa;</xsl:text>
 		</redirect:write>
 	</xsl:template>
 	
 	<!-- ignore p in Bibliography with text start with 'For dated references, only the edition cited applies'-->
 	<!-- This boilerplate text will be added by metanorma -->
-	<xsl:template match="ref-list[@content-type = 'bibl']//p[starts-with(normalize-space(), 'For dated references, only the edition cited applies')]" priority="2"/>
-	<xsl:template match="ref-list[@content-type = 'bibl']//title[starts-with(normalize-space(), 'For dated references, only the edition cited applies')]" priority="2"/>
+	<xsl:template match="ref-list[@content-type = 'bibl' or title = 'Bibliography']//p[starts-with(normalize-space(), 'For dated references, only the edition cited applies')]" priority="2"/>
+	<xsl:template match="ref-list[@content-type = 'bibl' or title = 'Bibliography']//title[starts-with(normalize-space(), 'For dated references, only the edition cited applies')]" priority="2"/>
 	
 	<xsl:template match="ref-list"> <!-- sub-section for Bibliography -->
 		<!-- <xsl:if test="@content-type = 'bibl' or parent::ref-list/@content-type = 'bibl'"> -->
@@ -5134,10 +5382,14 @@
 			<xsl:choose>
 				<xsl:when test="@id and preceding-sibling::ref[@id = current()/@id]">false</xsl:when>
 				<xsl:when test="std/@std-id and preceding-sibling::ref[std/@std-id = current()/std/@std-id]">false</xsl:when>
-				<xsl:when test="std/std-ref and preceding-sibling::ref[std/std-ref = current()/std/std-ref]">false</xsl:when>
+				<xsl:when test="std/std-ref and preceding-sibling::ref[std/std-ref = current()/std/std-ref]">
+					<xsl:choose>
+						<xsl:when test="std/title and preceding-sibling::ref[std/title = current()/std/title]">false</xsl:when>
+						<xsl:when test="not(std/title)">false</xsl:when>
+					</xsl:choose>
+				</xsl:when>
 			</xsl:choose>
 		</xsl:variable>
-		
 		<!-- DEBUG:<xsl:apply-templates select="." mode="print_as_xml"/> -->
 		
 		<!-- <xsl:variable name="isAsciiBibFormat" select="normalize-space(@referenceText != '' and
@@ -5187,8 +5439,8 @@
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:variable>
-					<!-- remove comma at start -->
-					<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($title),'^(\s|\h)*,',''))"/>
+					<!-- remove space, comma, dot at start -->
+					<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($title),'^(\s|\h|,|\.)*',''))"/>
 					<xsl:text>&#xa;</xsl:text>
 					<xsl:text>docid::&#xa;</xsl:text>
 					<xsl:text>id::: </xsl:text>
@@ -5332,7 +5584,12 @@
 			<xsl:value-of select="translate($std-ref_, '&#x2011;', '-')"/>
 		</xsl:variable>
 		<xsl:if test="count($refs/ref[normalize-space(@referenceText) != '' and @referenceText = normalize-space($std-ref)]) &gt; 1">
-			<xsl:message>WARNING: Repeated reference - <xsl:copy-of select="."/></xsl:message>
+			<xsl:choose>
+				<xsl:when test="std/title"></xsl:when>
+				<xsl:otherwise>
+					<xsl:message>WARNING: Repeated reference - <xsl:copy-of select="."/></xsl:message>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:if>
 		
 	</xsl:template> <!-- ref -->
@@ -5983,6 +6240,29 @@
 		<xsl:apply-templates/>
 	</xsl:template>
 	
+	<xsl:template match="term-display">
+		<xsl:apply-templates/>
+		<xsl:text>&#xa;&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="term-display/term">
+		<xsl:variable name="level">
+			<xsl:call-template name="getLevel">
+				<xsl:with-param name="addon">-1</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>				
+		<xsl:value-of select="$level"/>
+		<xsl:text> </xsl:text>
+		<xsl:apply-templates/>
+		<!-- <xsl:text>:: </xsl:text> -->
+		<xsl:text>&#xa;&#xa;</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="term-display/def/*	">
+		<xsl:apply-templates/>
+		<xsl:if test="following-sibling::*"> +&#xa;</xsl:if>
+	</xsl:template>
+	
 	<!-- =============== -->
 	<!-- End Definitions list (dl) -->
 	<!-- =============== -->
@@ -6042,66 +6322,70 @@
 		<xsl:value-of select="$space_before"/>
 		
 		<xsl:variable name="target">
-			<xsl:choose>
-				<xsl:when test="translate(@xlink:href, '#', '') = ''"> <!-- empty xlink:href -->
-					<xsl:value-of select="translate(normalize-space(), ' ()', '---')"/>
-				</xsl:when>
-				<xsl:when test="starts-with(@xlink:href, '#')">
-					<xsl:value-of select="substring-after(@xlink:href, '#')"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="@xlink:href"/>
-				</xsl:otherwise>
-			</xsl:choose>
+			<xsl:call-template name="get_named_content_target"/>
 		</xsl:variable>
-		
-		<xsl:variable name="isTerm">
-			<xsl:for-each select="$updated_xml"> <!-- change context -->
-				<xsl:value-of select="local-name(key('ids', $target)) = 'term-sec' or local-name(key('ids', $target)) = 'termEntry'"/>
-			</xsl:for-each>
-		</xsl:variable>
-		
+		<!-- target='<xsl:value-of select="$target"/>'
+		<xsl:apply-templates select="." mode="print_as_xml"/> -->
+		<!-- <xsl:message><xsl:value-of select="@content-type"/></xsl:message> -->
 		<xsl:choose>
-			<!-- <xsl:when test="@content-type = 'term' and (local-name(//*[@id = $target]) = 'term-sec' or local-name(//*[@id = $target]) = 'termEntry')"> -->
-			<!-- <xsl:when test="@content-type = 'term' and (local-name(key('ids', $target)) = 'term-sec' or local-name(key('ids', $target)) = 'termEntry')"> -->
-			<xsl:when test="@content-type = 'term' and normalize-space($isTerm) = 'true'">
-				<!-- <xsl:variable name="term_real" select="//*[@id = $target]//tbx:term[1]"/> -->
-				<!-- <xsl:variable name="term_real" select="key('ids', $target)//tbx:term[1]"/> -->
-				<xsl:variable name="term_real">
+			<xsl:when test="normalize-space($target) != ''">
+		
+				<xsl:variable name="isTerm">
 					<xsl:for-each select="$updated_xml"> <!-- change context -->
-						 <xsl:value-of select="key('ids', $target)//tbx:term[1]"/>
+						<xsl:value-of select="local-name(key('ids', $target)) = 'term-sec' or local-name(key('ids', $target)) = 'termEntry'"/>
 					</xsl:for-each>
 				</xsl:variable>
 				
-				<!-- <xsl:variable name="term_name" select="java:toLowerCase(java:java.lang.String.new(translate($term_name_, ' ', '-')))"/> -->
-				<!-- <xsl:text>term-</xsl:text><xsl:value-of select="$term_name"/>,<xsl:value-of select="."/> -->
+				<xsl:choose>
+					<!-- <xsl:when test="@content-type = 'term' and (local-name(//*[@id = $target]) = 'term-sec' or local-name(//*[@id = $target]) = 'termEntry')"> -->
+					<!-- <xsl:when test="@content-type = 'term' and (local-name(key('ids', $target)) = 'term-sec' or local-name(key('ids', $target)) = 'termEntry')"> -->
+					<xsl:when test="@content-type = 'term' and normalize-space($isTerm) = 'true'">
+						<!-- <xsl:variable name="term_real" select="//*[@id = $target]//tbx:term[1]"/> -->
+						<!-- <xsl:variable name="term_real" select="key('ids', $target)//tbx:term[1]"/> -->
+						<xsl:variable name="term_real">
+							<xsl:for-each select="$updated_xml"> <!-- change context -->
+								 <xsl:value-of select="key('ids', $target)//tbx:term[1]"/>
+							</xsl:for-each>
+						</xsl:variable>
+						
+						<!-- <xsl:variable name="term_name" select="java:toLowerCase(java:java.lang.String.new(translate($term_name_, ' ', '-')))"/> -->
+						<!-- <xsl:text>term-</xsl:text><xsl:value-of select="$term_name"/>,<xsl:value-of select="."/> -->
+						
+						<xsl:variable name="value" select="."/>
+						
+						<xsl:variable name="options">
+							<xsl:if test="ancestor::*[@sec-type='terms'] and ancestor::term-sec">
+								<xsl:text>noref,noital</xsl:text>
+							</xsl:if>
+						</xsl:variable>
+						
+						<xsl:call-template name="insertTermReference">
+							<xsl:with-param name="term" select="$term_real"/>
+							<xsl:with-param name="rendering" select="$value"/>
+							<xsl:with-param name="options" select="$options"/>
+						</xsl:call-template>
+						
+					</xsl:when>
+					<xsl:otherwise>
+						
+						<xsl:variable name="value">
+							<xsl:apply-templates/>
+						</xsl:variable>
+						
+						<xsl:call-template name="insertTermReference">
+							<xsl:with-param name="term" select="$target"/>
+							<xsl:with-param name="rendering" select="$value"/>
+						</xsl:call-template>
+						
+					</xsl:otherwise>
+				</xsl:choose>
 				
-				<xsl:variable name="value" select="."/>
-				
-				<xsl:variable name="options">
-					<xsl:if test="ancestor::*[@sec-type='terms'] and ancestor::term-sec">
-						<xsl:text>noref,noital</xsl:text>
-					</xsl:if>
-				</xsl:variable>
-				
-				<xsl:call-template name="insertTermReference">
-					<xsl:with-param name="term" select="$term_real"/>
-					<xsl:with-param name="rendering" select="$value"/>
-					<xsl:with-param name="options" select="$options"/>
-				</xsl:call-template>
-				
-			</xsl:when>
+			</xsl:when> <!-- $target != '' -->
 			<xsl:otherwise>
-				
 				<xsl:variable name="value">
 					<xsl:apply-templates/>
 				</xsl:variable>
-				
-				<xsl:call-template name="insertTermReference">
-					<xsl:with-param name="term" select="$target"/>
-					<xsl:with-param name="rendering" select="$value"/>
-				</xsl:call-template>
-				
+				<xsl:text>span:</xsl:text><xsl:value-of select="@content-type"/><xsl:text>[</xsl:text><xsl:value-of select="normalize-space($value)"/><xsl:text>]</xsl:text>
 			</xsl:otherwise>
 		</xsl:choose>
 		
@@ -6513,7 +6797,11 @@
 						<xsl:value-of select="@id"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:value-of select="@sec-type"/>
+						<xsl:variable name="sec_type" select="@sec-type"/>
+						<xsl:value-of select="$sec_type"/>
+						<xsl:if test="count(//*[@sec-type = $sec_type]) &gt; 1">
+							<xsl:number count="*[@sec-type = $sec_type]"/>
+						</xsl:if>
 					</xsl:otherwise>
 				</xsl:choose>
 			<xsl:text>]]</xsl:text>
