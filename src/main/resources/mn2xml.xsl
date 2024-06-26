@@ -5285,7 +5285,18 @@
 
 		<xsl:if test="starts-with(@id, concat($first_table_id, '_'))">
 			<table>
-				<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix' or local-name() = 'width')]"/>
+				<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix' or local-name() = 'width' or local-name() = 'class' or local-name() = 'type' or local-name() = 'presentation')]"/>
+				<!-- for requirements -->
+				<xsl:if test="@type or @class">
+					<xsl:copy-of select="@id"/>
+				</xsl:if>
+				<xsl:if test="@type">
+					<xsl:attribute name="content-type"><xsl:value-of select="@type"/></xsl:attribute>
+				</xsl:if>
+				<xsl:if test="@class">
+					<xsl:attribute name="specific-use"><xsl:value-of select="@class"/></xsl:attribute>
+				</xsl:if><!-- END: for requirements -->
+				
 				<xsl:apply-templates select="@width"/>
 				
 				<xsl:apply-templates select="colgroup" mode="table"/>
