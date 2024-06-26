@@ -41,6 +41,10 @@ jobs:
 
       - run: sudo gem install metanorma-cli
 
+      - run: mkdir ~/bundle_tmp
+
+      - run: bundle config path ~/bundle_tmp
+
       - run: bundle update
 
       - run: make testMN2STS
