@@ -74,8 +74,9 @@ jobs:
         run: gem install metanorma-cli
 
       - if: matrix.os == 'ubuntu-latest'
-        run: mkdir ~/bundle_tmp
-        run: bundle config path ~/bundle_tmp
+        run: |
+         mkdir ~/bundle_tmp
+         bundle config path ~/bundle_tmp
 
       - run: bundle update
 
