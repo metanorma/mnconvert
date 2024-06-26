@@ -39,7 +39,7 @@ jobs:
         with:
           ruby-version: 3.1
           rubygems: latest
-          bundler: 2.5.10
+#          bundler: 2.5.10
 
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
@@ -66,6 +66,10 @@ jobs:
 
       - if: matrix.os == 'ubuntu-latest'
         run: sudo snap install yq
+
+      - name: Install bundler
+        run: |
+          gem install bundler:2.5.10
 
       - if: matrix.os == 'ubuntu-latest'
         run: gem install metanorma-cli
