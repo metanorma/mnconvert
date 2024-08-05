@@ -1039,6 +1039,12 @@
 		</sec>
 	</xsl:template>
 	
+	<xsl:template match="clause[position() &gt;= 2]" mode="publication_info">
+		<sec id="sec_{@id}">
+			<xsl:apply-templates mode="publication_info"/>
+		</sec>
+	</xsl:template>
+	
 	<xsl:template match="title" mode="publication_info">
 		<xsl:call-template name="title"/>
 	</xsl:template>
