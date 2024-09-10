@@ -5210,7 +5210,7 @@
 			<!-- </table-wrap> -->
 			</xsl:element>
 			
-			<xsl:if test="note and $wrap-element = 'array'">
+			<xsl:if test="(note or dl) and $wrap-element = 'array'">
 				<xsl:call-template name="insertTableFootNote"/>
 			</xsl:if>
 			
@@ -5227,6 +5227,11 @@
 				</p>
 			</xsl:when>
 			<xsl:otherwise>
+				<xsl:for-each select="dl">
+					<p>
+						<xsl:call-template name="dl"/>
+					</p>
+				</xsl:for-each>
 				<xsl:for-each select="note">
 					<xsl:call-template name="note"/>
 				</xsl:for-each>
@@ -5339,6 +5344,7 @@
 	</xsl:template>
 	
 	<xsl:template match="table/note" priority="2"/>
+	<xsl:template match="table/dl" priority="2"/>
 	
 	<xsl:template match="name"/>
 	<xsl:template match="name" mode="table">
@@ -5453,7 +5459,7 @@
 	<!-- =============================== -->
 	<!-- Definitions list processing -->
 	<!-- =============================== -->
-	<xsl:template match="dl">
+	<xsl:template match="dl" name="dl">
 		<xsl:param name="skip">true</xsl:param>
 		<xsl:choose>
 			<xsl:when test="preceding-sibling::*[1][self::figure] or preceding-sibling::*[1][self::stem]">
@@ -5913,10 +5919,27 @@
 	<xsl:template match="review">
 		<xsl:if test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and $format = 'NISO'">
 			<editing-instruction specific-use="review">
-				<xsl:apply-templates/>
+				<xsl:apply-templates mode="review"/>
 			</editing-instruction>
 		</xsl:if>
 	</xsl:template>
+	
+	<xsl:template match="review/ul" mode="review">
+		<p>
+			<xsl:call-template name="ul"/>
+		</p>
+	</xsl:template>
+	
+	<xsl:template match="review/ol" mode="review">>
+		<p>
+			<xsl:call-template name="ol"/>
+		</p>
+	</xsl:template>
+	
+	<xsl:template match="review/*[not(local-name() = 'ul') and not(local-name() = 'ol')]" mode="review">
+		<xsl:apply-templates select="."/>
+	</xsl:template>
+	
 
 	<xsl:template match="sourcecode">
 		<xsl:param name="skip">true</xsl:param>
