@@ -1687,6 +1687,7 @@
 											status/substage">
 							<xsl:apply-templates select="docidentifier[@type = 'ISBN']" mode="custom_meta"/>
 							<xsl:apply-templates select="ext/horizontal" mode="custom_meta"/>
+							<xsl:apply-templates select="ext/flavor" mode="custom_meta"/>
 							<xsl:apply-templates select="status/stage" mode="custom_meta"/>
 							<xsl:apply-templates select="status/substage" mode="custom_meta"/>
 						</xsl:if>
@@ -2021,6 +2022,13 @@
 		</custom-meta>
 	</xsl:template>
 	
+		<xsl:template match="ext/flavor" mode="custom_meta">
+			<custom-meta>
+				<meta-name>flavor</meta-name>
+				<meta-value><xsl:value-of select="."/></meta-value>
+			</custom-meta>
+		</xsl:template>
+	
 	<xsl:template match="metanorma-extension/presentation-metadata[name = 'TOC Heading Levels'] |
 						metanorma-extension/presentation-metadata[name = 'HTML TOC Heading Levels'] |
 						metanorma-extension/presentation-metadata[name = 'DOC TOC Heading Levels']" mode="custom_meta">
@@ -2190,6 +2198,7 @@
 																coverimages |
 																ext/horizontal |
 																ext/price-code |
+																ext/flavor |
 																bibdata/uri |
 																metanorma-extension/semantic-metadata/proj-id |
 																metanorma-extension/semantic-metadata/suppl-type |
