@@ -2022,12 +2022,12 @@
 		</custom-meta>
 	</xsl:template>
 	
-		<xsl:template match="ext/flavor" mode="custom_meta">
-			<custom-meta>
-				<meta-name>flavor</meta-name>
-				<meta-value><xsl:value-of select="."/></meta-value>
-			</custom-meta>
-		</xsl:template>
+	<xsl:template match="ext/flavor" mode="custom_meta">
+		<custom-meta>
+			<meta-name>flavor</meta-name>
+			<meta-value><xsl:value-of select="."/></meta-value>
+		</custom-meta>
+	</xsl:template>
 	
 	<xsl:template match="metanorma-extension/presentation-metadata[name = 'TOC Heading Levels'] |
 						metanorma-extension/presentation-metadata[name = 'HTML TOC Heading Levels'] |
