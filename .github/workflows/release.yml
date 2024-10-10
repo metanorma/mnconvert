@@ -36,6 +36,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.1
+          rubygems: latest
 
       - run: sudo snap install yq
 
