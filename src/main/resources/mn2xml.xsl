@@ -6403,6 +6403,10 @@
 	<!-- END: requirement processing -->
 	<!-- ======================= -->
 
+	<xsl:template match="semx">
+		<xsl:apply-templates />
+	</xsl:template>
+
 	<xsl:template name="insert_label">
 		<xsl:param name="label"/>
 		<xsl:param name="isAddition">false</xsl:param>
