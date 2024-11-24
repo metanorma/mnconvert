@@ -3730,8 +3730,8 @@
 						<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
-				<xsl:variable name="type" select="normalize-space($ol_presentation_type)"/>
-				
+				<!-- <xsl:variable name="type" select="normalize-space($ol_presentation_type)"/> -->
+				<xsl:variable name="type" select="normalize-space($type_)"/>
 				<xsl:variable name="list-type">
 					<xsl:choose>
 						<xsl:when test="($type = 'arabic' or $type = '') and ($metanorma_type = 'ISO' or $metanorma_type = 'BSI')">order</xsl:when>
