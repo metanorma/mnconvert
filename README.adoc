@@ -7,7 +7,7 @@
 
 [source,sh]
 ----
-java -jar mnconvert-1.64.0.jar xml_file --check-type xsd-niso
+java -jar mnconvert-1.65.0.jar xml_file --check-type xsd-niso
 ----
 
 - `--check-type`, `-ct` - Check against XSD NISO (value xsd-niso), DTD ISO (dtd-iso), DTD NISO (dtd-niso)
@@ -19,7 +19,7 @@ or check any XML against XSD, DTD.
 
 [source,sh]
 ----
-java -jar mnconvert-1.64.0.jar xml_file --validation-against <path DTD or XSD>
+java -jar mnconvert-1.65.0.jar xml_file --validation-against <path DTD or XSD>
 ----
 
 - `--validation-against`, `-va` - Check against specified DTD ot XSD
@@ -30,7 +30,7 @@ java -jar mnconvert-1.64.0.jar xml_file --validation-against <path DTD or XSD>
 
 [source,sh]
 ----
-java -jar mnconvert-1.64.0.jar xml_file [options]
+java -jar mnconvert-1.65.0.jar xml_file [options]
 ----
 
 - `--xsl-file`, `-s` - path to XSL file, optional
@@ -45,7 +45,7 @@ java -jar mnconvert-1.64.0.jar xml_file [options]
 
 [source,sh]
 ----
-java -jar mnconvert-1.64.0.jar xml_file [options]
+java -jar mnconvert-1.65.0.jar xml_file [options]
 ----
 
 - `--xsl-file`, `-s` - path to XSL file, optional
@@ -60,7 +60,7 @@ java -jar mnconvert-1.64.0.jar xml_file [options]
 
 [source,sh]
 ----
-java -jar mnconvert-1.64.0.jar xml_file [options]
+java -jar mnconvert-1.65.0.jar xml_file [options]
 ----
 
 - `--xsl-file`, `-s` - path to XSL file, optional
@@ -71,7 +71,7 @@ java -jar mnconvert-1.64.0.jar xml_file [options]
 
 [source,sh]
 ----
-java -jar mnconvert-1.64.0.jar docx_file [options]
+java -jar mnconvert-1.65.0.jar docx_file [options]
 ----
 
 - `--xsl-file`, `-s` - path to XSL file, optional
@@ -81,7 +81,7 @@ java -jar mnconvert-1.64.0.jar docx_file [options]
 === 6. Convert from IEEE STL XML to Metanorma AsciiDoc.
 
 ----
-java -jar mnconvert-1.64.0.jar xml_file [options]
+java -jar mnconvert-1.65.0.jar xml_file [options]
 ----
 
 - `--xsl-file`, `-s` - path to XSL file, optional
@@ -93,7 +93,7 @@ java -jar mnconvert-1.64.0.jar xml_file [options]
 
 [source,sh]
 ----
-java -jar mnconvert-1.64.0.jar xml_file --output-format ieee --validation-against <path to IEEE DTD>
+java -jar mnconvert-1.65.0.jar xml_file --output-format ieee --validation-against <path to IEEE DTD>
 ----
 
 - `--xsl-file`, `-s` - path to XSL file, optional
@@ -111,7 +111,7 @@ e.g.
 
 [source,sh]
 ----
-java -jar target/mnconvert-1.64.0.jar tests/iso-tc154-8601-1-en.xml --output tests/iso-tc154-8601-1-en.out.xml
+java -jar target/mnconvert-1.65.0.jar tests/iso-tc154-8601-1-en.xml --output tests/iso-tc154-8601-1-en.out.xml --output-format ieee
 ----
 
 NOTE: Input XML format (Metanorma, STS ISO/NISO, IEEE or XML2RFC) determines programmatically by root element of input file: +
@@ -150,7 +150,7 @@ Update version in `pom.xml`, e.g.:
 ----
 <groupId>org.metanorma</groupId>
 <artifactId>mnconvert</artifactId>
-<version>1.64.0</version>
+<version>1.65.0</version>
 <name>Metanorma XML to NISO STS XML two-directional converter</name>
 ----
 
@@ -161,8 +161,8 @@ Tag the same version in Git:
 
 [source,xml]
 ----
-git tag v1.64.0
-git push origin v1.64.0
+git tag v1.65.0
+git push origin v1.65.0
 ----
 
 Then the corresponding GitHub release will be automatically created at:

@@ -316,8 +316,10 @@
 											*[*[local-name() = 'title' or local-name() = 'name']] | 
 											*[local-name() = 'title'] |
 											*[local-name() = 'title']//* |
+											*[local-name() = 'fmt-title']//* |
 											*[local-name() = 'name'] | 
 											*[local-name() = 'name']//* | 
+											*[local-name() = 'fmt-name']//* | 
 											*[local-name() = 'xref'] | 
 											*[local-name() = 'xref']//* | 
 											*[local-name() = 'eref'] |
@@ -343,6 +345,27 @@
 				<xsl:if test="local-name() = 'clause' or local-name() = 'annex' or local-name() = 'table' or local-name() = 'figure' or local-name() = 'xref' or local-name() = 'eref'">
 					<xsl:attribute name="presentation">true</xsl:attribute>
 				</xsl:if>
+				<xsl:apply-templates select="@*|node()" mode="xml_presentation_catalog"/>
+			</xsl:element>
+		</xsl:variable>
+		<xsl:apply-templates select="xalan:nodeset($element)" mode="add_attributes"/>
+	</xsl:template>
+	
+	<xsl:template match="*[local-name() = 'title'][following-sibling::*[1][local-name() = 'fmt-title']] |
+											*[local-name() = 'name'][following-sibling::*[1][local-name() = 'fmt-name']]" mode="xml_presentation_catalog"/>
+											
+	<xsl:template match="*[local-name() = 'fmt-title']//*[local-name() = 'span'] |
+											*[local-name() = 'semx'] | 
+											*[local-name() = 'fmt-name']//*[local-name() = 'span']" mode="xml_presentation_catalog">
+		<xsl:apply-templates mode="xml_presentation_catalog"/>
+	</xsl:template>
+	
+	<xsl:template match="*[local-name() = 'fmt-xref-label']" mode="xml_presentation_catalog"/>
+	
+	<xsl:template match="*[local-name() = 'fmt-title'] |
+											*[local-name() = 'fmt-name']" mode="xml_presentation_catalog">
+		<xsl:variable name="element">
+			<xsl:element name="{substring-after(local-name(), 'fmt-')}">
 				<xsl:apply-templates select="@*|node()" mode="xml_presentation_catalog"/>
 			</xsl:element>
 		</xsl:variable>
@@ -3707,8 +3730,8 @@
 						<xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
-				<xsl:variable name="type" select="normalize-space($ol_presentation_type)"/>
-				
+				<!-- <xsl:variable name="type" select="normalize-space($ol_presentation_type)"/> -->
+				<xsl:variable name="type" select="normalize-space($type_)"/>
 				<xsl:variable name="list-type">
 					<xsl:choose>
 						<xsl:when test="($type = 'arabic' or $type = '') and ($metanorma_type = 'ISO' or $metanorma_type = 'BSI')">order</xsl:when>
@@ -6402,6 +6425,10 @@
 	<!-- ======================= -->
 	<!-- END: requirement processing -->
 	<!-- ======================= -->
+
+	<xsl:template match="semx">
+		<xsl:apply-templates />
+	</xsl:template>
 
 	<xsl:template name="insert_label">
 		<xsl:param name="label"/>
