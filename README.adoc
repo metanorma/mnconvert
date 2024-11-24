@@ -111,7 +111,7 @@ e.g.
 
 [source,sh]
 ----
-java -jar target/mnconvert-1.65.0.jar tests/iso-tc154-8601-1-en.xml --output tests/iso-tc154-8601-1-en.out.xml
+java -jar target/mnconvert-1.65.0.jar tests/iso-tc154-8601-1-en.xml --output tests/iso-tc154-8601-1-en.out.xml --output-format ieee
 ----
 
 NOTE: Input XML format (Metanorma, STS ISO/NISO, IEEE or XML2RFC) determines programmatically by root element of input file: +
