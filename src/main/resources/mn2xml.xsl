@@ -67,6 +67,26 @@
 			<xsl:value-of select="substring-after(., 'semantic__')"/>
 		</xsl:attribute>
 	</xsl:template>
+	
+	<xsl:template match="*[local-name() = 'title'][following-sibling::*[1][local-name() = 'fmt-title']] |
+											*[local-name() = 'name'][following-sibling::*[1][local-name() = 'fmt-name']]" mode="remove_namespace" priority="3"/>
+											
+	<xsl:template match="*[local-name() = 'fmt-title']//*[local-name() = 'span'] |
+											*[local-name() = 'semx'] | 
+											*[local-name() = 'fmt-name']//*[local-name() = 'span']" mode="remove_namespace" priority="3">
+		<xsl:apply-templates mode="remove_namespace"/>
+	</xsl:template>
+	
+	<xsl:template match="*[local-name() = 'fmt-xref-label']" mode="remove_namespace" priority="3"/>
+	
+	<xsl:template match="*[local-name() = 'fmt-title'] |
+											*[local-name() = 'fmt-name']" mode="remove_namespace" priority="3">
+		<xsl:element name="{substring-after(local-name(), 'fmt-')}">
+			<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
+		</xsl:element>
+	</xsl:template>
+	
+	
 	<!-- ===================== -->
 	<!-- END remove namespace -->
 	<!-- ===================== -->
