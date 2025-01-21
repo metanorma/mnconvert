@@ -69,7 +69,13 @@
 	</xsl:template>
 	
 	<xsl:template match="*[local-name() = 'title'][following-sibling::*[1][local-name() = 'fmt-title']] |
-											*[local-name() = 'name'][following-sibling::*[1][local-name() = 'fmt-name']]" mode="remove_namespace" priority="3"/>
+											*[local-name() = 'name'][following-sibling::*[1][local-name() = 'fmt-name']] |
+											*[local-name() = 'preferred'] |
+											*[local-name() = 'admitted'] |
+											*[local-name() = 'deprecates'] |
+											*[local-name() = 'related'] |
+											*[local-name() = 'definition'] |
+											*[local-name() = 'termsource']" mode="remove_namespace" priority="3"/>
 											
 	<xsl:template match="*[local-name() = 'fmt-title']//*[local-name() = 'span'] |
 											*[local-name() = 'semx'] | 
@@ -79,8 +85,37 @@
 	
 	<xsl:template match="*[local-name() = 'fmt-xref-label']" mode="remove_namespace" priority="3"/>
 	
+	<xsl:template match="*[local-name() = 'fmt-preferred'][*[local-name() = 'p']]" mode="remove_namespace" priority="3">
+		<xsl:apply-templates mode="remove_namespace"/>
+	</xsl:template>
+	<xsl:template match="*[local-name() = 'fmt-preferred'][not(*[local-name() = 'p'])] | *[local-name() = 'fmt-preferred']/*[local-name() = 'p']" mode="remove_namespace" priority="3">
+		<xsl:element name="preferred">
+			<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
+		</xsl:element>
+	</xsl:template>
+	
+		<xsl:template match="*[local-name() = 'fmt-admitted'][*[local-name() = 'p']]" mode="remove_namespace" priority="3">
+			<xsl:apply-templates mode="remove_namespace"/>
+		</xsl:template>
+		<xsl:template match="*[local-name() = 'fmt-admitted'][not(*[local-name() = 'p'])] | *[local-name() = 'fmt-admitted']/*[local-name() = 'p']" mode="remove_namespace" priority="3">
+			<xsl:element name="admitted">
+				<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
+			</xsl:element>
+		</xsl:template>
+	
+		<xsl:template match="*[local-name() = 'fmt-deprecates'][*[local-name() = 'p']]" mode="remove_namespace" priority="3">
+			<xsl:apply-templates mode="remove_namespace"/>
+		</xsl:template>
+		<xsl:template match="*[local-name() = 'fmt-deprecates'][not(*[local-name() = 'p'])] | *[local-name() = 'fmt-deprecates']/*[local-name() = 'p']" mode="remove_namespace" priority="3">
+			<xsl:element name="deprecates">
+				<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
+			</xsl:element>
+		</xsl:template>
+
 	<xsl:template match="*[local-name() = 'fmt-title'] |
-											*[local-name() = 'fmt-name']" mode="remove_namespace" priority="3">
+											*[local-name() = 'fmt-name'] |
+											*[local-name() = 'fmt-definition'] |
+											*[local-name() = 'fmt-termsource']" mode="remove_namespace" priority="3">
 		<xsl:element name="{substring-after(local-name(), 'fmt-')}">
 			<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
 		</xsl:element>
