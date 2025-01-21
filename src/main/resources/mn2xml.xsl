@@ -70,12 +70,12 @@
 	
 	<xsl:template match="*[local-name() = 'title'][following-sibling::*[1][local-name() = 'fmt-title']] |
 											*[local-name() = 'name'][following-sibling::*[1][local-name() = 'fmt-name']] |
-											*[local-name() = 'preferred'] |
-											*[local-name() = 'admitted'] |
-											*[local-name() = 'deprecates'] |
+											*[local-name() = 'preferred'][ancestor::*[local-name() = 'term'][1]//*[local-name() = 'fmt-preferred']] |
+											*[local-name() = 'admitted'][ancestor::*[local-name() = 'term'][1]//*[local-name() = 'fmt-admitted']] |
+											*[local-name() = 'deprecates'][ancestor::*[local-name() = 'term'][1]//*[local-name() = 'fmt-deprecates']] |
 											*[local-name() = 'related'] |
-											*[local-name() = 'definition'] |
-											*[local-name() = 'termsource']" mode="remove_namespace" priority="3"/>
+											*[local-name() = 'definition'][ancestor::*[local-name() = 'term'][1]//*[local-name() = 'fmt-definition']] |
+											*[local-name() = 'termsource'][ancestor::*[local-name() = 'term'][1]//*[local-name() = 'fmt-termsource']]" mode="remove_namespace" priority="3"/>
 											
 	<xsl:template match="*[local-name() = 'fmt-title']//*[local-name() = 'span'] |
 											*[local-name() = 'semx'] | 
