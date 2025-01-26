@@ -121,6 +121,7 @@
 		</xsl:element>
 	</xsl:template>
 	
+	<xsl:template match="*[local-name() = 'source-highlighter-css']" mode="remove_namespace" priority="3"/>
 	
 	<!-- ===================== -->
 	<!-- END remove namespace -->
@@ -1013,7 +1014,7 @@
 			<xsl:apply-templates select="preface/clause[@type = 'front_notes']" mode="front_notes"/>
 			
 			<xsl:if test="$organization = 'BSI'">
-				<xsl:call-template name="insert_publication_info"/>
+				<xsl:call-template name="BSI_insert_publication_info"/>
 			</xsl:if>
 			
 			<xsl:apply-templates select="preface" mode="front_preface"/>
@@ -1085,12 +1086,16 @@
 	<xsl:template match="bibliography"/>
 	
 	<!-- ================================== -->
+	<!-- BSI specific template -->
 	<!-- Publishing and copyright information block -->
 	<!-- ================================== -->
-	<xsl:template name="insert_publication_info">
+	<xsl:template name="BSI_insert_publication_info">
 		<sec id="sec_pub_info_nat" sec-type="publication_info">
 			<xsl:variable name="data">
-				<xsl:apply-templates select="boilerplate/copyright-statement/*" mode="publication_info"/>
+				<xsl:apply-templates select="boilerplate/copyright-statement/*[1]" mode="BSI_publication_info"/>
+				<xsl:apply-templates select="preface/clause[@type = 'related-refs']"  mode="BSI_publication_info"/>
+				<xsl:apply-templates select="preface/clause[@type = 'corrigenda' or @type = 'publication-history']"  mode="BSI_publication_info"/>
+				<xsl:apply-templates select="boilerplate/copyright-statement/*[position() &gt; 1]" mode="BSI_publication_info"/>
 			</xsl:variable>
 			<xsl:if test="not(xalan:nodeset($data)/label)">
 				<label/>
@@ -1098,7 +1103,7 @@
 			<xsl:copy-of select="$data"/>
 			
 			<!-- 
-			<xsl:apply-templates select="bibdata/docidentifier[@type = 'ISBN']" mode="publication_info"/>
+			<xsl:apply-templates select="bibdata/docidentifier[@type = 'ISBN']" mode="BSI_publication_info"/>
 			
 			<xsl:if test="bibdata/ext/ics">
 				<p><xsl:text>ICS </xsl:text>
@@ -1110,28 +1115,28 @@
 				</p>
 			</xsl:if> -->
 			
-			<xsl:apply-templates select="preface/clause[@type = 'related-refs']"  mode="publication_info"/>
+			<!-- <xsl:apply-templates select="preface/clause[@type = 'related-refs']"  mode="BSI_publication_info"/> -->
 			
-			<!-- <xsl:apply-templates select="clause[@type = 'corrigenda' or @type = 'publication-history']"  mode="publication_info"/> --> <!-- preface/ -->
+			<!-- <xsl:apply-templates select="clause[@type = 'corrigenda' or @type = 'publication-history']"  mode="BSI_publication_info"/> --> <!-- preface/ -->
 			
 		</sec>
 	</xsl:template>
 	
-	<xsl:template match="clause[position() &gt;= 2]" mode="publication_info">
+	<xsl:template match="clause[position() &gt;= 2]" mode="BSI_publication_info">
 		<sec id="sec_{@id}">
-			<xsl:apply-templates mode="publication_info"/>
+			<xsl:apply-templates mode="BSI_publication_info"/>
 		</sec>
 	</xsl:template>
 	
-	<xsl:template match="title" mode="publication_info">
+	<xsl:template match="title" mode="BSI_publication_info">
 		<xsl:call-template name="title"/>
 	</xsl:template>
 	
-	<xsl:template match="p" mode="publication_info">
+	<xsl:template match="p" mode="BSI_publication_info">
 		<xsl:call-template name="p"/>
 	</xsl:template>
 	
-	<xsl:template match="bibdata/docidentifier[@type = 'ISBN']" mode="publication_info">
+	<xsl:template match="bibdata/docidentifier[@type = 'ISBN']" mode="BSI_publication_info">
 		<p>ISBN <xsl:apply-templates /></p>
 	</xsl:template>
 	
@@ -1143,23 +1148,32 @@
 	<xsl:template match="preface/clause[@type = 'front_notes']" priority="2" mode="front_preface"/>
 	
 	<xsl:template match="preface/clause[@type = 'related-refs']" priority="2" mode="front_preface"/>
-	<xsl:template match="preface/clause[@type = 'related-refs']"  mode="publication_info">
-		<xsl:apply-templates />
+	<xsl:template match="preface/clause[@type = 'related-refs']"  mode="BSI_publication_info">
+		<list id="BSI_ref" list-type="simple">
+			<list-item>
+				<xsl:apply-templates />
+			</list-item>
+		</list>
 	</xsl:template>
 	
+	<xsl:template match="preface/clause[@type = 'toc']" priority="2" mode="front_preface"/>
+	
 	<xsl:template match="clause[@type = 'corrigenda' or @type = 'publication-history']" priority="2" mode="front_preface"/> <!-- preface/ -->
-	<xsl:template match="clause[@type = 'corrigenda' or @type = 'publication-history']"  mode="publication_info"> <!-- preface/ -->
-		<sec>
-			<xsl:copy-of select="@id"/>
+	<xsl:template match="clause[@type = 'corrigenda' or @type = 'publication-history']"  mode="BSI_publication_info"> <!-- preface/ -->
+		<!-- <sec>
+			<xsl:copy-of select="@id"/> -->
 			<xsl:variable name="data_corrigenda">
 				<xsl:apply-templates />
 			</xsl:variable>
-			<xsl:if test="not(xalan:nodeset($data_corrigenda)/label)">
+			<!-- <xsl:if test="not(xalan:nodeset($data_corrigenda)/label)">
 				<label/>
-			</xsl:if>
+			</xsl:if> -->
 			<xsl:copy-of select="$data_corrigenda"/>
-		</sec>
+		<!-- </sec> -->
 	</xsl:template>
+	
+	<xsl:template match="copyright-statement/clause[@id = '__amendments' or starts-with(title, 'Amendments')]"  mode="BSI_publication_info"/>
+	
 	<!-- ================================== -->
 	<!-- END Publishing and copyright information block -->
 	<!-- ================================== -->
@@ -3232,6 +3246,8 @@
 	<xsl:template match="bibitem/uri/@type">
 		<xsl:attribute name="content-type"><xsl:value-of select="."/></xsl:attribute>
 	</xsl:template>
+	
+	<xsl:template match="bibitem/biblio-tag"/>
 
 	
 	<xsl:template match="fn" priority="2">
@@ -3614,6 +3630,8 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<xsl:template match="sections/p[@class = 'zzSTDTitle1' or @class = 'zzSTDTitle2']"/>
+	
 	<xsl:template match="p/@columns"/>
 	
 	<xsl:template match="sections//*[@type = 'section-title' or local-name() = 'section-title']" priority="2">
@@ -3656,7 +3674,7 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	<xsl:template match="*[self::p or self::ul or self::ol]/@id">
+	<xsl:template match="*[self::p or self::ul or self::ol or self::li]/@id">
 		<xsl:variable name="p_id" select="."/>
 		<xsl:choose>
 			<xsl:when test="starts-with($p_id, '_') and not(//*[@target = $p_id])"></xsl:when> <!-- remove @id generated by Metanorma -->
@@ -3861,7 +3879,8 @@
 			<!-- <xsl:if test="@id">
 				<xsl:attribute name="id"><xsl:value-of select="@id"/></xsl:attribute>
 			</xsl:if> -->
-			<xsl:copy-of select="@id"/>
+			<!-- <xsl:copy-of select="@id"/> -->
+			<xsl:apply-templates select="@id"/>
 			<xsl:choose>
 				<xsl:when test="local-name(..) = 'ul'">
 					<xsl:choose>
@@ -5264,7 +5283,7 @@
 					<xsl:apply-templates select="name" mode="table"/>
 				</xsl:if>
 				<table>
-					<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix' or local-name() = 'width' or local-name() = 'class' or local-name() = 'type' or local-name() = 'presentation')]"/>
+					<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'autonum' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix' or local-name() = 'width' or local-name() = 'class' or local-name() = 'type' or local-name() = 'presentation')]"/>
 					<xsl:if test="$outputformat = 'IEEE'">
 					 <xsl:attribute name="cellpadding">5</xsl:attribute>
 					 <xsl:attribute name="frame">box</xsl:attribute>
