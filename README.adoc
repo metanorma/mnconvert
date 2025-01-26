@@ -26,7 +26,7 @@ java -jar mnconvert-1.68.0.jar xml_file --validation-against <path DTD or XSD>
 - `--idrefchecking`, `-idref` - Enable checking of ID/IDREF constraints (for XSD only)
 
 
-=== 2. Convert ISO/NISO STS XML to Metanorma XML or Metanorma AsciiDoc.
+=== 2. Convert ISO/NISO STS XML to Metanorma AsciiDoc.
 
 [source,sh]
 ----
@@ -35,11 +35,11 @@ java -jar mnconvert-1.68.0.jar xml_file [options]
 
 - `--xsl-file`, `-s` - path to XSL file, optional
 - `--output`, `-o` - path to output file, optional
-- `--output-format`, `-of` - xml|adoc(default), optional
+- `--output-format`, `-of` - adoc, optional
 - `--imagesdir`, `-img` - folder with images (default 'images'), optional
 - `--split-bibdata`, `-sb` - create Metanorma AsciiDoc and Relaton XML, both with document's attributes only, optional
 - `--type`, `-st` - type of standard to generate (iso, bsi, etc.), optional
-- `--semantic`, `-sx` - generate semantic Metanorma XML instead of presentation Metanorma XML (for xml output format only)
+
 
 === 3. Convert Metanorma XML to ISO/NISO STS XML.
 
