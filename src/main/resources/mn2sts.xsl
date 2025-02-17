@@ -1031,7 +1031,7 @@
 								<xsl:value-of select=".//expression/@language"/>
 							</xsl:when>
 							<xsl:otherwise>
-								<xsl:value-of select="ancestor::*[contains(local-name(), '-standard')]/bibdata/language"/>
+								<xsl:value-of select="ancestor::*[contains(local-name(), '-standard') or self::metanorma]/bibdata/language"/>
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:attribute>

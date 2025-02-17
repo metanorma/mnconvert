@@ -269,7 +269,9 @@ public class Util {
                 
                 Node node = doc.getDocumentElement();
                 String root = node.getNodeName();
-                if (root.endsWith("-standard") || root.equals("metanorma-collection")) {
+                if (root.endsWith("-standard") ||
+                    root.equals("metanorma-collection") ||
+                    root.equals("metanorma")) {
                     return "metanorma";
                 } else if (root.equals("rfc"))  {
                     return "rfc";

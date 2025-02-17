@@ -10,7 +10,13 @@
 			extension-element-prefixes="redirect"
 			version="1.0">
 
-	<xsl:variable name="metanorma_type" select="java:toUpperCase(java:java.lang.String.new(substring-before(local-name(//*[contains(local-name(), '-standard')]), '-')))"/> <!-- ISO, IEC, ... -->
+   <!-- ISO, IEC, ... -->
+	<xsl:variable name="metanorma_type">
+    <xsl:choose>
+      <xsl:when test="//*[contains(local-name(), '-standard')]"><xsl:value-of select="java:toUpperCase(java:java.lang.String.new(substring-before(local-name(//*[contains(local-name(), '-standard')]), '-')))"/></xsl:when>
+      <xsl:otherwise><xsl:value-of select="java:toUpperCase(java:java.lang.String.new(//*[local-name() = 'metanorma']/@flavor))"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
 
 	<xsl:variable name="CHAR_NBSP">&#xa0;</xsl:variable> <!-- &#xA0; -->
 	<xsl:variable name="CHAR_EM_DASH">—</xsl:variable> <!-- &#x2014; -->
@@ -179,7 +185,7 @@
 			
 			<!-- Normative References -->
 			<xsl:when test="ancestor::bibliography and self::references and @normative='true'">
-				<xsl:value-of select="count(ancestor::*[contains(local-name(), '-standard')]/sections/clause[@type='scope' or @type='overview' or title = 'Overview']) + 1"/>
+				<xsl:value-of select="count(ancestor::*[contains(local-name(), '-standard') or self::metanorma]/sections/clause[@type='scope' or @type='overview' or title = 'Overview']) + 1"/>
 			</xsl:when>
 			
 			<!-- Terms and definitions -->
@@ -189,14 +195,14 @@
 											self::definitions or 
 											(self::clause and ..//definitions))">
 				<xsl:variable name="num" select="count(preceding-sibling::*) + 1"/>
-				<xsl:variable name="section_number" select="count(ancestor::*[contains(local-name(), '-standard')]//bibliography/references[@normative='true']) + $num"/>
+				<xsl:variable name="section_number" select="count(ancestor::*[contains(local-name(), '-standard') or self::metanorma]//bibliography/references[@normative='true']) + $num"/>
 				<xsl:value-of select="$section_number"/>
 			</xsl:when>
 			
 			<!-- Another main sections -->
 			<xsl:when test="parent::sections">
 				<xsl:variable name="num" select="count(preceding-sibling::*) + 1"/>
-				<xsl:value-of select="count(ancestor::*[contains(local-name(), '-standard')]//bibliography/references[@normative='true']) + $num"/>
+				<xsl:value-of select="count(ancestor::*[contains(local-name(), '-standard') or self::metanorma]//bibliography/references[@normative='true']) + $num"/>
 			</xsl:when>
 			
 			<xsl:when test="$sectionNum"><xsl:value-of select="$sectionNum"/></xsl:when>
@@ -668,7 +674,7 @@
 					<xsl:number format="A" level="any" count="annex"/>
 				</xsl:when>
 				<xsl:when test="(self::table[not(ancestor::metanorma-extension)] or self::requirement[not(ancestor::requirement)] or self::figure) and not(ancestor::annex)">
-					<xsl:variable name="root_element_id" select="generate-id(ancestor::*[contains(local-name(), '-standard')])"/> <!-- prevent global numbering for metanorma-collection -->
+					<xsl:variable name="root_element_id" select="generate-id(ancestor::*[contains(local-name(), '-standard') or self::metanorma])"/> <!-- prevent global numbering for metanorma-collection -->
 					<xsl:choose>
 						<xsl:when test="self::table or self::requirement">
 							<xsl:variable name="table_number_">
@@ -802,7 +808,7 @@
 		</xsl:element>
 	</xsl:template>
 	
-	<!-- root element, for example: iso-standard -->
+	<!-- root element, for example: metanorma (former iso-standard) -->
 	<xsl:template match="/*">
 		<xsl:variable name="startTime" select="java:getTime(java:java.util.Date.new())"/>
 		
