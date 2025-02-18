@@ -25,6 +25,11 @@
 
   <!-- input XML -> remove namespace (xml_source) -> add attributes  -->
 
+	<xsl:variable name="bibdata">
+		<xsl:copy-of select="//*[local-name() = 'metanorma']/*[local-name() = 'bibdata']" />
+		<xsl:copy-of select="//*[local-name() = 'metanorma']/*[local-name() = 'localized-strings']" />
+	</xsl:variable>
+
 	<xsl:variable name="xml_source_"><xsl:apply-templates mode="remove_namespace"/></xsl:variable>
 	<xsl:variable name="xml_source" select="xalan:nodeset($xml_source_)"/>
 	
@@ -237,148 +242,6 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	<xsl:template name="getSection">
-		<xsl:param name="sectionNum"/>
-		<xsl:variable name="level">
-			<xsl:call-template name="getLevel"/>
-		</xsl:variable>		
-		<xsl:variable name="section">
-			<xsl:choose>
-				<xsl:when test="self::dl"><xsl:number format="a" level="any"/></xsl:when>
-				<xsl:when test="self::formula[not(unnumbered='true')] and ancestor::sections"><xsl:number format="(1)" level="any" count="formula[not(@unnumbered = 'true')]"/></xsl:when>
-				<xsl:when test="self::formula[not(unnumbered='true')] and ancestor::annex">
-					<xsl:variable name="root_element_id" select="generate-id(ancestor::annex)"/>
-					<xsl:number format="A" level="any" count="annex"/>
-					<xsl:text>.</xsl:text>
-					<xsl:number format="1" level="any" count="formula[ancestor::*[generate-id() = $root_element_id] and not(@unnumbered = 'true')]"/>
-				</xsl:when>
-				<!-- <xsl:when test="self::bibitem and ancestor::references[@normative='true']">norm_ref_<xsl:number/></xsl:when> -->
-				<xsl:when test="self::bibitem and ancestor::references[@normative='true']"><xsl:number/></xsl:when>
-				<xsl:when test="self::bibitem and parent::references[not(@normative='true')]"><xsl:number level="any" count="bibitem[parent::references[not(@normative='true')]]"/></xsl:when>
-				<!-- <xsl:when test="self::bibitem">ref_<xsl:number/></xsl:when> -->
-				<xsl:when test="self::bibitem"><xsl:number/></xsl:when>
-				<xsl:when test="ancestor::bibliography">
-					<xsl:value-of select="$sectionNum"/>
-				</xsl:when>
-				<xsl:when test="self::annex">
-					<xsl:number format="A" level="any" count="annex"/>
-				</xsl:when>
-				<xsl:when test="(self::table[not(ancestor::metanorma-extension)] or self::requirement[not(ancestor::requirement)] or self::figure) and not(ancestor::annex)">
-					<xsl:variable name="root_element_id" select="generate-id(ancestor::*[contains(local-name(), '-standard') or self::metanorma])"/> <!-- prevent global numbering for metanorma-collection -->
-					<xsl:choose>
-						<xsl:when test="self::table or self::requirement">
-							<xsl:variable name="table_number_">
-								<xsl:number format="1" level="any" count="*[self::table or self::requirement][ancestor::*[generate-id() = $root_element_id] and not(ancestor::annex or ancestor::metanorma-extension or ancestor::requirement) and not(@unnumbered = 'true')]"/>
-							</xsl:variable>
-							<xsl:variable name="table_number" select="normalize-space($table_number_)"/>
-							<xsl:if test="$table_number != '0'"><xsl:value-of select="$table_number"/></xsl:if>
-						</xsl:when>
-						<xsl:when test="self::figure">
-							<xsl:variable name="figure_number_">
-								<xsl:number format="1" level="any" count="figure[ancestor::*[generate-id() = $root_element_id] and not(ancestor::annex) and not(@unnumbered = 'true')]"/>
-							</xsl:variable>
-							<xsl:variable name="figure_number" select="normalize-space($figure_number_)"/>
-							<xsl:if test="$figure_number != '0'"><xsl:value-of select="$figure_number"/></xsl:if>
-							</xsl:when>
-					</xsl:choose>
-				</xsl:when>
-				<xsl:when test="(self::p and @type = 'section-title') or self::section-title">
-					<xsl:number format="1" level="any" count="p[@type = 'section-title'] | section-title"/>
-				</xsl:when>
-				<xsl:when test="ancestor::sections">
-					<!-- 1, 2, 3, 4, ... from main section (not annex, bibliography, ...) -->
-					<xsl:choose>
-						<!-- <xsl:when test="self::table"><xsl:number format="1" level="any" count="table[ancestor::sections or ancestor::introduction]"/></xsl:when>
-						<xsl:when test="self::figure"><xsl:number format="1" level="any" count="figure[ancestor::sections or ancestor::introduction]"/></xsl:when> -->
-						<xsl:when test="$level = 1">
-							<xsl:value-of select="$sectionNum"/>
-						</xsl:when>
-						<xsl:when test="$level &gt;= 2">
-							<xsl:variable name="num">
-								<xsl:number format=".1" level="multiple" count="clause/clause | 
-																																										clause/terms | 
-																																										terms/term | 
-																																										clause/term |  
-																																										term/term |  
-																																										terms/clause |
-																																										terms/definitions |
-																																										definitions/clause |
-																																										clause/definitions |
-																																										definitions/definitions"/>
-							</xsl:variable>
-							<xsl:variable name="addon">
-								<xsl:choose>
-									<xsl:when test="self::preferred or self::admitted or self::deprecates or self::domain">
-										<xsl:number format="-1" count="preferred | admitted | deprecates | domain"/>
-									</xsl:when>
-									<xsl:otherwise></xsl:otherwise>
-								</xsl:choose>
-							</xsl:variable>
-							<xsl:value-of select="concat($sectionNum, $num, $addon)"/>
-							
-						</xsl:when>
-						<xsl:otherwise></xsl:otherwise>
-					</xsl:choose>
-				</xsl:when>				
-				<xsl:when test="ancestor::annex">
-					<xsl:variable name="annexid" select="normalize-space(/*/bibdata/ext/structuredidentifier/annexid)"/>
-					<xsl:variable name="curr_annexid" select="ancestor::annex/@id"/>							
-					<xsl:choose>
-						<xsl:when test="self::table or self::requirement[not(ancestor::requirement)]">
-							<xsl:number format="A" count="annex"/>
-							<xsl:number format=".1" level="any" count="*[self::table or self::requirement][ancestor::annex/@id = $curr_annexid and not(ancestor::metanorma-extension or ancestor::requirement)]"/>
-						</xsl:when>						
-						<xsl:when test="self::figure">
-							<xsl:number format="A" count="annex"/>
-							<xsl:number format=".1" level="any" count="figure[not(parent::figure)][ancestor::annex/@id = $curr_annexid]"/>
-							<xsl:number format="-1" count="figure[parent::figure][ancestor::annex/@id = $curr_annexid]"/>
-						</xsl:when>
-						<xsl:when test="$level = 1">							
-							<xsl:choose>
-								<xsl:when test="count(//annex) = 1 and $annexid != ''">
-									<xsl:value-of select="$annexid"/>
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:number format="A" level="any" count="annex"/>
-								</xsl:otherwise>
-							</xsl:choose>
-						</xsl:when>
-						<xsl:otherwise>							
-							<xsl:choose>
-								<xsl:when test="count(//annex) = 1 and $annexid != ''">
-									<xsl:value-of select="$annexid"/><xsl:number format=".1" level="multiple" count="clause"/>
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:number format="A.1" level="multiple" count="annex | clause"/>
-								</xsl:otherwise>
-							</xsl:choose>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:when>
-				<xsl:when test="ancestor::preface"> <!-- if preface and there is clause(s) -->
-					<xsl:choose>
-						<xsl:when test="ancestor::foreword">
-							<xsl:variable name="num">
-								<xsl:number format="_1" level="multiple" count="clause"/>
-							</xsl:variable>
-							<xsl:value-of select="concat($sectionNum,$num)"/>
-						</xsl:when>
-						<xsl:when test="$level = 1 and  ..//clause">0</xsl:when>
-						<xsl:when test="$level &gt;= 2">
-							<xsl:variable name="num">
-								<xsl:number format=".1" level="multiple" count="clause"/>
-							</xsl:variable>
-							<xsl:value-of select="concat('0', $num)"/>
-						</xsl:when>
-						<xsl:otherwise></xsl:otherwise>
-					</xsl:choose>
-				</xsl:when>
-				<xsl:otherwise></xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		<xsl:value-of select="$section"/>
-	</xsl:template>
-	
 	<!-- elements is using in the template for 'xref' -->
 	<xsl:variable name="elements" select="xalan:nodeset($elements_)"/>
 	<!-- ====================================================================== -->
@@ -402,9 +265,16 @@
 	<xsl:template match="/*">
 		<xsl:variable name="startTime" select="java:getTime(java:java.util.Date.new())"/>
 		
-		<!-- <redirect:write file="test.xml">
-			<xsl:copy-of select="$xml"/>
-		</redirect:write> -->
+		<xsl:if test="normalize-space($debug) = 'true'">
+		
+			<redirect:write file="debug_xml_source_{$startTime}.xml">
+				<xsl:copy-of select="$xml_source"/>
+			</redirect:write>
+			
+			<redirect:write file="xml_{$startTime}.xml">
+				<xsl:copy-of select="$xml"/>
+			</redirect:write>
+		</xsl:if>
 		
 		<xsl:apply-templates select="$xml" mode="xml"/>
     
@@ -6228,6 +6098,28 @@
 	<xsl:template match="footnote" mode="footnotes_update">
 		<xsl:apply-templates mode="footnotes_update"/>
 	</xsl:template>
+	
+	<xsl:template name="getLocalizedString">
+		<xsl:param name="key"/>
+		<xsl:param name="returnEmptyIfNotFound">false</xsl:param>
+		
+		<xsl:variable name="data_value" select="normalize-space(xalan:nodeset($bibdata)//*[local-name() = 'localized-string'][@key = $key])"/>
+
+		<xsl:choose>
+			<xsl:when test="normalize-space($data_value) != ''">
+				<xsl:value-of select="$data_value"/>
+			</xsl:when>
+			<xsl:when test="$returnEmptyIfNotFound = 'true'"></xsl:when>
+			<xsl:otherwise>
+				<xsl:variable name="key_">
+					<xsl:call-template name="capitalize">
+						<xsl:with-param name="str" select="translate($key, '_', ' ')"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:value-of select="$key_"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template> <!-- getLocalizedString -->
 	
 	<xsl:template match="*" mode="print_as_xml">
 		<xsl:text>&#xa;&lt;</xsl:text>
