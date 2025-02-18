@@ -109,9 +109,9 @@
 								<span class="fmt-obligation">(informative)</span>
 							</span>
 					-->
-					<xsl:when test="fmt-title/span[@class = 'fmt-caption-label']">
+					<xsl:when test="title/span[@class = 'fmt-caption-label']">
 						<xsl:variable name="label">
-							<xsl:copy-of select="fmt-title/span[@class = 'fmt-caption-label']//node()[@element = 'autonum' or @class = 'fmt-autonum-delim']"/>
+							<xsl:copy-of select="title/span[@class = 'fmt-caption-label']//node()[@element = 'autonum' or @class = 'fmt-autonum-delim']"/>
 						</xsl:variable>
 						<xsl:value-of select="normalize-space($label)"/>
 					</xsl:when>
@@ -127,9 +127,9 @@
 							<semx element="name" source="_a12f0b45-8053-4160-9e23-033b66b4d326">Table of requirements</semx>
 						</fmt-name>
 					-->
-					<xsl:when test="fmt-name/span[@class = 'fmt-caption-label']">
+					<xsl:when test="name/span[@class = 'fmt-caption-label']">
 						<xsl:variable name="label">
-							<xsl:copy-of select="fmt-name/span[@class = 'fmt-caption-label']//node()[@element = 'autonum' or @class = 'fmt-autonum-delim']"/>
+							<xsl:copy-of select="name/span[@class = 'fmt-caption-label']//node()[@element = 'autonum' or @class = 'fmt-autonum-delim']"/>
 						</xsl:variable>
 						<xsl:value-of select="normalize-space($label)"/>
 					</xsl:when>
@@ -180,9 +180,9 @@
 								<span class="fmt-obligation">(informative)</span>
 							</span>
 					-->
-					<xsl:when test="fmt-title/span[@class = 'fmt-caption-label']/span[@class = 'fmt-element-name']">
+					<xsl:when test="title/span[@class = 'fmt-caption-label']/span[@class = 'fmt-element-name']">
 						<xsl:variable name="label">
-							<xsl:copy-of select="fmt-title/span[@class = 'fmt-caption-label']/node()[self::text() or self::span[@class = 'fmt-element-name']]"/>
+							<xsl:copy-of select="title/span[@class = 'fmt-caption-label']/node()[self::text() or self::span[@class = 'fmt-element-name']]"/>
 						</xsl:variable>
 						<xsl:value-of select="normalize-space($label)"/><xsl:if test="self::annex">&#xA0;</xsl:if>
 					</xsl:when>
@@ -198,9 +198,9 @@
 							<semx element="name" source="_a12f0b45-8053-4160-9e23-033b66b4d326">Table of requirements</semx>
 						</fmt-name>
 					-->
-					<xsl:when test="fmt-name/span[@class = 'fmt-caption-label']/span[@class = 'fmt-element-name']">
+					<xsl:when test="name/span[@class = 'fmt-caption-label']/span[@class = 'fmt-element-name']">
 						<xsl:variable name="label">
-							<xsl:copy-of select="fmt-name/span[@class = 'fmt-caption-label']/node()[self::text() or self::span[@class = 'fmt-element-name']]"/>
+							<xsl:copy-of select="name/span[@class = 'fmt-caption-label']/node()[self::text() or self::span[@class = 'fmt-element-name']]"/>
 						</xsl:variable>
 						<xsl:value-of select="normalize-space($label)"/><xsl:if test="self::table or self::figure">&#xA0;</xsl:if>
 					</xsl:when>

@@ -321,12 +321,6 @@
 		
 		<xsl:call-template name="insertBack"/>
 		
-		<xsl:if test="normalize-space($debug) = 'true'">
-			<xsl:text disable-output-escaping="yes">&lt;!-- </xsl:text>
-			<xsl:value-of select="count($elements//element)"/>
-			<xsl:copy-of select="$elements"/>
-			<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
-		</xsl:if>
 	</xsl:template>
 	
 	<!-- ======= -->
@@ -5507,13 +5501,14 @@
 	
 	<xsl:template match="title" name="title">
 		<xsl:choose>
-			<xsl:when test="not(tab) and normalize-space(translate(., '0123456789.', '')) = ''"><!-- put number in label, see above --></xsl:when>
+			<xsl:when test="not(.//tab) and normalize-space(translate(., '0123456789.', '')) = ''"><!-- put number in label, see above --></xsl:when>
 			
 			 <!-- amendment title with section number and title : 5.5.1, fourth paragraph -->
-			<xsl:when test="not(tab) and following-sibling::amend and normalize-space(translate(substring-before(., ','), '0123456789.', '')) = '' and contains (node()[1], ',')">
+			<xsl:when test="not(.//tab) and following-sibling::amend and normalize-space(translate(substring-before(., ','), '0123456789.', '')) = '' and contains (node()[1], ',')">
 			<!-- put number in label, see above -->
 				<title>
-					<xsl:for-each select="node()">
+					<!-- <xsl:for-each select="node()"> -->
+					<xsl:for-each select="*[@element = 'title']/node()">
 						<xsl:choose>
 							<xsl:when test="position() = 1">
 								<xsl:value-of select="substring-after(., ',')"/>
@@ -5523,19 +5518,21 @@
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:for-each>
+					
 				</title>
 			</xsl:when>
 			
 			<xsl:otherwise>
 				<title>
-					<xsl:choose>
+					<!-- <xsl:choose>
 						<xsl:when test="tab">
 							<xsl:apply-templates select="tab[1]/following-sibling::node()"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:apply-templates />
 						</xsl:otherwise>
-					</xsl:choose>
+					</xsl:choose> -->
+					<xsl:apply-templates select="*[@element = 'title']"/>
 				</title>
 			</xsl:otherwise>
 		</xsl:choose>

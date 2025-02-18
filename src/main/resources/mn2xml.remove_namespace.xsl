@@ -32,7 +32,7 @@
 	
 	
 	
-	<!-- <xsl:template match="*[local-name() = 'title'][following-sibling::*[1][local-name() = 'fmt-title']] |
+	<xsl:template match="*[local-name() = 'title'][following-sibling::*[1][local-name() = 'fmt-title']] |
 											*[local-name() = 'name'][following-sibling::*[1][local-name() = 'fmt-name']] |
 											*[local-name() = 'preferred'][ancestor::*[local-name() = 'term'][1]//*[local-name() = 'fmt-preferred']] |
 											*[local-name() = 'admitted'][ancestor::*[local-name() = 'term'][1]//*[local-name() = 'fmt-admitted']] |
@@ -41,15 +41,15 @@
 											*[local-name() = 'definition'][ancestor::*[local-name() = 'term'][1]//*[local-name() = 'fmt-definition']] |
 											*[local-name() = 'termsource'][ancestor::*[local-name() = 'term'][1]//*[local-name() = 'fmt-termsource']]" mode="remove_namespace" priority="3"/>
 											
-	<xsl:template match="*[local-name() = 'fmt-title']//*[local-name() = 'span'] |
+	<!-- <xsl:template match="*[local-name() = 'fmt-title']//*[local-name() = 'span'] |
 											*[local-name() = 'semx'] | 
 											*[local-name() = 'fmt-name']//*[local-name() = 'span']" mode="remove_namespace" priority="3">
 		<xsl:apply-templates mode="remove_namespace"/>
-	</xsl:template>
+	</xsl:template> -->
 	
 	<xsl:template match="*[local-name() = 'fmt-xref-label']" mode="remove_namespace" priority="3"/>
 	
-	<xsl:template match="*[local-name() = 'fmt-preferred'][*[local-name() = 'p']]" mode="remove_namespace" priority="3">
+	<!-- <xsl:template match="*[local-name() = 'fmt-preferred'][*[local-name() = 'p']]" mode="remove_namespace" priority="3">
 		<xsl:apply-templates mode="remove_namespace"/>
 	</xsl:template>
 	<xsl:template match="*[local-name() = 'fmt-preferred'][not(*[local-name() = 'p'])] | *[local-name() = 'fmt-preferred']/*[local-name() = 'p']" mode="remove_namespace" priority="3">
@@ -74,7 +74,7 @@
 			<xsl:element name="deprecates">
 				<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
 			</xsl:element>
-		</xsl:template>
+		</xsl:template> -->
 
 	<xsl:template match="*[local-name() = 'fmt-title'] |
 											*[local-name() = 'fmt-name'] |
@@ -83,7 +83,7 @@
 		<xsl:element name="{substring-after(local-name(), 'fmt-')}">
 			<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
 		</xsl:element>
-	</xsl:template> -->
+	</xsl:template>
 	
 	<xsl:template match="*[local-name() = 'source-highlighter-css']" mode="remove_namespace" priority="3"/>
 	
