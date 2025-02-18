@@ -85,7 +85,10 @@
 		</xsl:element>
 	</xsl:template>
 	
-	<!-- no need to process quote/attribution, because structured data is in quote/author and quote/source -->
+	<!-- no need to process sourcecode/fmt-sourcecode, because the clear data is in sourcecode/text() and sourcecode/annotation -->
+	<xsl:template match="*[local-name() = 'sourcecode']/*[local-name() = 'fmt-sourcecode']" mode="remove_namespace" priority="3"/>
+	
+	<!-- no need to process quote/attribution, because the structured data is in quote/author and quote/source -->
 	<xsl:template match="*[local-name() = 'quote']/*[local-name() = 'attribution']" mode="remove_namespace" priority="3"/>
 	
 	<xsl:template match="*[local-name() = 'source-highlighter-css']" mode="remove_namespace" priority="3"/>
