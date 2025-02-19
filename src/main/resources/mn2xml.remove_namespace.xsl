@@ -92,6 +92,9 @@
 	<!-- no need to process quote/attribution, because the structured data is in quote/author and quote/source -->
 	<xsl:template match="*[local-name() = 'quote']/*[local-name() = 'attribution']" mode="remove_namespace" priority="3"/>
 	
+	<!-- no need to process fmt-concept, because concept contains structured data -->
+	<xsl:template match="*[local-name() = 'fmt-concept']" mode="remove_namespace" priority="3"/>
+	
 	<xsl:template match="*[local-name() = 'source-highlighter-css']" mode="remove_namespace" priority="3"/>
 	
 	<!-- ===================== -->
