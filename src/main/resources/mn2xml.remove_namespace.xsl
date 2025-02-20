@@ -95,6 +95,11 @@
 	<!-- no need to process fmt-concept, because concept contains structured data -->
 	<xsl:template match="*[local-name() = 'fmt-concept']" mode="remove_namespace" priority="3"/>
 	
+	<xsl:template match="*[local-name() = 'date'][not(ancestor::*[local-name() = 'bibdata']) and not(ancestor::*[local-name() = 'bibitem'])]" mode="remove_namespace" priority="3"/>
+	<xsl:template match="*[local-name() = 'fmt-date']" mode="remove_namespace" priority="3">
+		<xsl:apply-templates mode="remove_namespace"/>
+	</xsl:template>
+	
 	<xsl:template match="*[local-name() = 'source-highlighter-css']" mode="remove_namespace" priority="3"/>
 	
 	<!-- ===================== -->
