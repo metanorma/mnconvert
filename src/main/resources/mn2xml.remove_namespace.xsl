@@ -100,6 +100,13 @@
 		<xsl:apply-templates mode="remove_namespace"/>
 	</xsl:template>
 	
+	<xsl:template match="*[local-name() = 'stem']" mode="remove_namespace" priority="3"/>
+	<xsl:template match="*[local-name() = 'fmt-stem']" mode="remove_namespace" priority="3">
+		<xsl:element name="stem">
+			<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
+		</xsl:element>
+	</xsl:template>
+	
 	<xsl:template match="*[local-name() = 'source-highlighter-css']" mode="remove_namespace" priority="3"/>
 	
 	<!-- ===================== -->
