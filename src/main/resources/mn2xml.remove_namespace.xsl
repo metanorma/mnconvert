@@ -130,6 +130,47 @@
 		</xsl:element>
 	</xsl:template>
 	
+	<xsl:template match="*[local-name() = 'eref'][not(following-sibling::*[1][local-name() = 'semx'])]" mode="remove_namespace" priority="3"/>
+	<xsl:template match="*[local-name() = 'fmt-eref']" mode="remove_namespace" priority="3">
+		<xsl:element name="eref">
+			<xsl:copy-of select="@*"/>
+			<xsl:apply-templates mode="remove_namespace"/>
+		</xsl:element>
+	</xsl:template>
+	
+	<xsl:template match="*[local-name() = 'xref'][not(ancestor::*[local-name() = 'definition'])]" mode="remove_namespace" priority="3"/>
+	
+	<xsl:template match="*[local-name() = 'semx'][@element = 'eref']/*[local-name() = 'fmt-xref']" mode="remove_namespace" priority="4"/>
+	
+	<xsl:template match="*[local-name() = 'fmt-xref']" mode="remove_namespace" priority="3">
+		<xsl:element name="xref">
+			<xsl:copy-of select="@*"/>
+			<xsl:apply-templates mode="remove_namespace"/>
+		</xsl:element>
+	</xsl:template>
+	
+  <xsl:template match="*[local-name() = 'link']" mode="remove_namespace" priority="3"/>
+	<xsl:template match="*[local-name() = 'fmt-link']" mode="remove_namespace" priority="3">
+		<xsl:element name="link">
+			<xsl:copy-of select="@*"/>
+			<xsl:apply-templates mode="remove_namespace"/>
+		</xsl:element>
+	</xsl:template>
+  
+  <xsl:template match="*[local-name() = 'origin'][not(ancestor::*[local-name() = 'termsource'])]" mode="remove_namespace" priority="3"/>
+	<xsl:template match="*[local-name() = 'fmt-origin']" mode="remove_namespace" priority="3">
+		<xsl:element name="origin">
+			<xsl:copy-of select="@*"/>
+			<xsl:apply-templates mode="remove_namespace"/>
+		</xsl:element>
+	</xsl:template>
+  
+	<xsl:template match="*[local-name() = 'erefstack ']" mode="remove_namespace" priority="3"/>
+	
+	<!-- <xsl:template match="*[local-name() = 'span'][@class = 'stdpublisher' or @class = 'stddocNumber']" mode="remove_namespace" priority="3">
+		<xsl:apply-templates mode="remove_namespace"/>
+	</xsl:template> -->
+	
 	<xsl:template match="*[local-name() = 'source-highlighter-css']" mode="remove_namespace" priority="3"/>
 	
 	<!-- ===================== -->
