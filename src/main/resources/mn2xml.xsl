@@ -2997,6 +2997,7 @@
 															$parent_name = 'modification' or
 															$parent_name = 'dd'">
 					<xsl:if test="preceding-sibling::*[1][self::p]"><break /></xsl:if>
+					<!-- <test><xsl:copy-of select="."/></test> -->
 					<xsl:apply-templates />
 				</xsl:when>
 				<xsl:when test="@type = 'floating-title'">
