@@ -171,7 +171,8 @@
 		<xsl:apply-templates mode="remove_namespace"/>
 	</xsl:template> -->
 	
-	<xsl:template match="*[local-name() = 'p']/@original-id" mode="remove_namespace" priority="3"/>
+	<!-- <xsl:template match="*[local-name() = 'p']/@keep-with-next" mode="remove_namespace" priority="3"/> -->
+	<xsl:template match="@original-id" mode="remove_namespace" priority="3"/>
 	
 	<xsl:template match="*[local-name() = 'source-highlighter-css']" mode="remove_namespace" priority="3"/>
 	
