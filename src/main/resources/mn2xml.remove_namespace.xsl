@@ -138,7 +138,7 @@
 		</xsl:element>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'xref'][not(ancestor::*[local-name() = 'definition'])]" mode="remove_namespace" priority="3"/>
+	<xsl:template match="*[local-name() = 'xref'][not(ancestor::*[local-name() = 'definition'] or ancestor::*[local-name() = 'concept'])]" mode="remove_namespace" priority="3"/>
 	
 	<xsl:template match="*[local-name() = 'semx'][@element = 'eref']/*[local-name() = 'fmt-xref']" mode="remove_namespace" priority="4"/>
 	
