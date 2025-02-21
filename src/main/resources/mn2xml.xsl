@@ -2975,6 +2975,9 @@
 	<xsl:template match="field-of-application" priority="2"/>
 	
 	
+	<xsl:variable name="i18n_where"><xsl:call-template name="getLocalizedString"><xsl:with-param name="key">where</xsl:with-param></xsl:call-template></xsl:variable>
+	<xsl:variable name="i18n_key"><xsl:call-template name="getLocalizedString"><xsl:with-param name="key">key</xsl:with-param></xsl:call-template></xsl:variable>
+	
 	<xsl:template match="p" name="p">
 		<!-- <xsl:if test="$debug = 'true'">
 			<xsl:message>DEBUG: p processing <xsl:number level="any" count="*[local-name() = 'p']"/></xsl:message>
@@ -2982,6 +2985,35 @@
 		<xsl:variable name="paragraph_">
 			<xsl:variable name="parent_name" select="local-name(..)"/>
 			<xsl:choose>
+				
+				<!-- Example:
+					<image src="data:image/png;base64,.../>
+					<p keep-with-next="true">
+						<strong>Key</strong>
+					</p>
+					<dl id="_5d3c108d-9b89-7ff0-9d24-fe248540b86a" key="true" class="formula_dl">
+				-->
+				<xsl:when test="@keep-with-next and preceding-sibling::*[1][self::image] and normalize-space() = $i18n_key and following-sibling::*[1][self::dl]"/>
+				
+				<!-- Example:
+					</fmt-stem>
+					<p keep-with-next="true">where</p>
+					<dl id="_1888cb29-de0b-4b5e-1580-9df5170d10a7" key="true" class="formula_dl">
+				-->
+				<xsl:when test="@keep-with-next and preceding-sibling::*[1][self::stem] and normalize-space() = $i18n_where and following-sibling::*[1][self::dl]">
+					<break />
+					<xsl:apply-templates />
+				</xsl:when>
+				
+				<!-- Example:
+					</fmt-stem>
+					<p>where <stem block="false" type="MathML" id="_14028ff7-9dce-41e8-90e7-c0160f2dfb67">
+				-->
+				<xsl:when test="preceding-sibling::*[1][self::stem] and starts-with(normalize-space(), $i18n_where)">
+					<break />
+					<xsl:apply-templates />
+				</xsl:when>
+				
 				<!-- <xsl:when test="parent::*[local-name() = 'termexample'] or 
 															parent::*[local-name() = 'definition']  or 
 															parent::*[local-name() = 'termnote'] or 
@@ -4605,7 +4637,7 @@
 				
 				<xsl:variable name="isKeyTable" select="normalize-space(preceding-sibling::*[1][self::figure] and (name/text() = 'Key' or name/text() = 'Table &#160;&#8212; Key'))"/>
 				
-				<xsl:variable name="isWhereTable" select="normalize-space(preceding-sibling::*[1][self::stem] or (preceding-sibling::*[1][self::p][text() = 'where:'] and preceding-sibling::*[2][self::stem]))"/>
+				<xsl:variable name="isWhereTable" select="normalize-space(preceding-sibling::*[1][self::stem] or (preceding-sibling::*[1][self::p][text() = 'where:' or text() = $i18n_where] and preceding-sibling::*[2][self::stem]))"/>
 				
 				<xsl:if test="$wrap-element = 'table-wrap'">
 					<xsl:if test="ancestor::preface">
@@ -4963,7 +4995,8 @@
 	<xsl:template match="dl" name="dl">
 		<xsl:param name="skip">true</xsl:param>
 		<xsl:choose>
-			<xsl:when test="preceding-sibling::*[1][self::figure] or preceding-sibling::*[1][self::stem]">
+			<!-- 'key' or 'where' -->
+			<xsl:when test="preceding-sibling::*[1][self::figure] or preceding-sibling::*[1][self::stem] or (@key = 'true' and @class = 'formula_dl')">
 				<xsl:call-template name="create_array"/>
 			</xsl:when>
 			<xsl:when test="$metanorma_type = 'ISO' and @key = 'true'">
@@ -5002,7 +5035,7 @@
 					</xsl:if>
 					
 					<xsl:if test="$metanorma_type = 'IEC' and @key = 'true'">
-						<label>Key</label>
+						<label><xsl:value-of select="$i18n_key"/></label>
 					</xsl:if>
 					
 					<xsl:apply-templates select="node()[not(self::note)]" mode="dl"/>
@@ -5022,14 +5055,21 @@
 		</xsl:if>
 		<array> <!-- id="{$id}" -->
 			<xsl:copy-of select="@id"/>
-			<xsl:if test="preceding-sibling::*[1][self::figure]">
+			<xsl:if test="preceding-sibling::*[1][self::figure] or (preceding-sibling::*[1][self::p] and preceding-sibling::*[2][self::image])">
 				<xsl:attribute name="content-type">figure-index</xsl:attribute>
 			</xsl:if>
-			<xsl:if test="preceding-sibling::*[1][self::stem]">
+			<xsl:if test="preceding-sibling::*[1][self::stem] or preceding-sibling::*[2][self::stem]">
 				<xsl:attribute name="content-type">formula-index</xsl:attribute>
 			</xsl:if>
 			<xsl:if test="@key = 'true'">
-				<label>Key</label>
+				<label>
+					<xsl:if test="preceding-sibling::image">
+						<xsl:choose>
+							<xsl:when test="preceding-sibling::*[1][self::p][@keep-with-next]"><xsl:value-of select="normalize-space(preceding-sibling::*[1][self::p][@keep-with-next])"/></xsl:when>
+							<xsl:otherwise><xsl:value-of select="$i18n_key"/></xsl:otherwise>
+						</xsl:choose>
+					</xsl:if>
+				</label>
 			</xsl:if>
 			<table>
 				<tbody>

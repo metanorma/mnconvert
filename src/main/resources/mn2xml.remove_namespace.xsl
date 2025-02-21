@@ -165,11 +165,13 @@
 		</xsl:element>
 	</xsl:template>
   
-	<xsl:template match="*[local-name() = 'erefstack ']" mode="remove_namespace" priority="3"/>
+	<xsl:template match="*[local-name() = 'erefstack']" mode="remove_namespace" priority="3"/>
 	
 	<!-- <xsl:template match="*[local-name() = 'span'][@class = 'stdpublisher' or @class = 'stddocNumber']" mode="remove_namespace" priority="3">
 		<xsl:apply-templates mode="remove_namespace"/>
 	</xsl:template> -->
+	
+	<xsl:template match="*[local-name() = 'p']/@original-id" mode="remove_namespace" priority="3"/>
 	
 	<xsl:template match="*[local-name() = 'source-highlighter-css']" mode="remove_namespace" priority="3"/>
 	
