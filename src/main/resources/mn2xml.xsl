@@ -26,8 +26,8 @@
   <!-- input XML -> remove namespace (xml_source) -> add attributes  -->
 
 	<xsl:variable name="bibdata">
-		<xsl:copy-of select="//*[local-name() = 'metanorma']/*[local-name() = 'bibdata']" />
-		<xsl:copy-of select="//*[local-name() = 'metanorma']/*[local-name() = 'localized-strings']" />
+		<xsl:copy-of select="//*[local-name() = 'metanorma' or contains(local-name(), '-standard')]/*[local-name() = 'bibdata']" />
+		<xsl:copy-of select="//*[local-name() = 'metanorma' or contains(local-name(), '-standard')]/*[local-name() = 'localized-strings']" />
 	</xsl:variable>
 
 	<xsl:variable name="xml_source_"><xsl:apply-templates mode="remove_namespace"/></xsl:variable>
@@ -273,6 +273,11 @@
 			
 			<redirect:write file="xml_{$startTime}.xml">
 				<xsl:copy-of select="$xml"/>
+			</redirect:write>
+			
+			<redirect:write file="elements_{$startTime}.xml">
+				<count><xsl:value-of select="count($elements//element)"/></count>
+				<xsl:copy-of select="$elements"/>
 			</redirect:write>
 		</xsl:if>
 		
@@ -848,7 +853,7 @@
 					</xsl:for-each>
 				</originator>
 				<doc-type>
-					<xsl:apply-templates select="ext/doctype" mode="front"/>
+					<xsl:apply-templates select="ext/doctype[normalize-space(@language) = '']" mode="front"/>
 				</doc-type>
 				
 				<xsl:apply-templates select="ext/subdoctype" mode="front"/>
@@ -867,7 +872,7 @@
 				</xsl:if>
 				
 				<edition>
-					<xsl:apply-templates select="edition" mode="front"/>
+					<xsl:apply-templates select="edition[normalize-space(@language) = '']" mode="front"/>
 				</edition>
 				
 				<xsl:variable name="revision_date">
@@ -5015,35 +5020,51 @@
 				</table-wrap>
 			</xsl:when>
 			<xsl:otherwise>
-				<def-list>
-					<xsl:if test="not(starts-with(@id,'_'))">
-						<xsl:copy-of select="@id"/>
-					</xsl:if>
-					
-					<xsl:if test="$metanorma_type = 'IEC' and @key = 'true'">
-						<xsl:attribute name="list-content">figure</xsl:attribute>
-					</xsl:if>
-					
-					<xsl:if test="preceding-sibling::*[1][self::title][contains(normalize-space(), 'Abbrev')] or 
-					(($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and (dt[starts-with(@id, 'abb-')] or dt[starts-with(@id, 'abb_')]))">
-						<xsl:attribute name="list-type">
-							<xsl:choose>
-								<xsl:when test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO'">abbreviation</xsl:when>
-								<xsl:otherwise>abbreviations</xsl:otherwise>
-							</xsl:choose>
-						</xsl:attribute>
-					</xsl:if>
-					
-					<xsl:if test="$metanorma_type = 'IEC' and @key = 'true'">
-						<label><xsl:value-of select="$i18n_key"/></label>
-					</xsl:if>
-					
-					<xsl:apply-templates select="node()[not(self::note)]" mode="dl"/>
-				</def-list>
-				<!-- move notes outside dl -->
-				<xsl:for-each select="note">
-					<xsl:call-template name="note"/>
-				</xsl:for-each>
+				<xsl:variable name="def_list">
+					<def-list>
+						<xsl:if test="not(starts-with(@id,'_'))">
+							<xsl:copy-of select="@id"/>
+						</xsl:if>
+						
+						<xsl:if test="$metanorma_type = 'IEC' and @key = 'true'">
+							<xsl:attribute name="list-content">figure</xsl:attribute>
+						</xsl:if>
+						
+						<xsl:if test="preceding-sibling::*[1][self::title][contains(normalize-space(), 'Abbrev')] or 
+						(($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and (dt[starts-with(@id, 'abb-')] or dt[starts-with(@id, 'abb_')]))">
+							<xsl:attribute name="list-type">
+								<xsl:choose>
+									<xsl:when test="$metanorma_type = 'IEC' or $metanorma_type = 'ISO'">abbreviation</xsl:when>
+									<xsl:otherwise>abbreviations</xsl:otherwise>
+								</xsl:choose>
+							</xsl:attribute>
+						</xsl:if>
+						
+						<xsl:if test="$metanorma_type = 'IEC' and @key = 'true'">
+							<label><xsl:value-of select="$i18n_key"/></label>
+						</xsl:if>
+						
+						<xsl:apply-templates select="node()[not(self::note)]" mode="dl"/>
+					</def-list>
+					<!-- move notes outside dl -->
+					<xsl:for-each select="note">
+						<xsl:call-template name="note"/>
+					</xsl:for-each>
+				</xsl:variable>
+				<xsl:choose>
+					<xsl:when test="parent::sourcecode">
+						<element-citation>
+							<annotation>
+								<p>
+									<xsl:copy-of select="$def_list"/>
+								</p>
+							</annotation>
+						</element-citation>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:copy-of select="$def_list"/>
+					</xsl:otherwise>
+				</xsl:choose>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -5112,6 +5133,10 @@
 			</xsl:if>
 			<xsl:apply-templates/>
 		</td>
+	</xsl:template>
+	
+	<xsl:template match="dl/name" mode="dl">
+		<label><xsl:apply-templates/></label>
 	</xsl:template>
 	
 	<xsl:template match="dt" mode="dl">
