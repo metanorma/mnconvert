@@ -49,7 +49,7 @@ tests/iso-8601-1/_site/documents/iso-tc154-8601-1-en.xml:
 #	$(MAKE) -C tests/iso-8601-1 all
 #endif
 
-src/test/resources/iso-rice-en.cd.mn.xml: tests/mn-samples-iso/documents/international-standard/rice-en.cd.xml
+src/test/resources/iso-rice-en.cd.mn.xml: tests/mn-samples-iso/documents/international-standard/rice-2016/document-en.cd.presentation.xml
 	cp $< $@
 
 #tests/mn-samples-iso/documents/international-standard/rice-en.cd.xml:
@@ -65,7 +65,7 @@ documents/%.mn.xml: src/test/resources/%.mn.xml
 target/$(JAR_FILE):
 	mvn --settings settings.xml -DskipTests clean package shade:shade
 
-testMN2STS: tests/mn-samples-iso/documents/international-standard/rice-en.cd.xml target/$(JAR_FILE)
+testMN2STS: tests/mn-samples-iso/documents/international-standard/rice-2016/document-en.cd.presentation.xml target/$(JAR_FILE)
 	mvn -DinputMNXML=$< --settings settings.xml test surefire-report:report
 
 testSTS2MN:
