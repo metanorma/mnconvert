@@ -5599,6 +5599,9 @@
 						</xsl:otherwise>
 					</xsl:choose> -->
 					<xsl:apply-templates select="*[@element = 'title']"/>
+					<xsl:if test="not(*)">
+						<xsl:apply-templates />
+					</xsl:if>
 				</title>
 			</xsl:otherwise>
 		</xsl:choose>
