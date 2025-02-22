@@ -5,4 +5,4 @@
 [submodule "tests/iso-8601-1"]
 	path = tests/iso-8601-1
 	url = https://github.com/metanorma/iso-8601-1
-	branch = master
+	branch = main
