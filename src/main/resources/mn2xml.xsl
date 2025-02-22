@@ -5443,7 +5443,7 @@
 	
 	<xsl:template match="mml:*">
 		<xsl:element name="mml:{local-name()}">		
-			<xsl:copy-of select="@*"/>
+			<xsl:copy-of select="@*[not(local-name() = 'xref')]"/>
 			<xsl:apply-templates/>
 		</xsl:element>
 	</xsl:template>
