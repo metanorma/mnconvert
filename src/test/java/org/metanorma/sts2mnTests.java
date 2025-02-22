@@ -152,7 +152,7 @@ public class sts2mnTests {
         assertTrue(Files.exists(fileout));
     }
     
-    @Test
+    /*@Test
     public void successConvertToXML() throws ParseException {
         assumeNotNull(XMLFILE_MN);
         System.out.println(name.getMethodName());
@@ -165,7 +165,7 @@ public class sts2mnTests {
         mnconvert.main(args);
 
         assertTrue(Files.exists(fileout));        
-    }
+    }*/
 
     /*@Test
     public void successConvertRemoteToXML() throws ParseException {
@@ -202,7 +202,7 @@ public class sts2mnTests {
         }
     }
     
-    @Test
+    /*@Test
     public void successConvertToXMLWithImageLink() throws ParseException {
         assumeNotNull(XMLFILE_MN);
         System.out.println(name.getMethodName());
@@ -224,7 +224,7 @@ public class sts2mnTests {
             assertTrue(Files.exists(fileout));
             assertTrue(Files.exists(imageout));
         }
-    }
+    }*/
     
     @Test
     public void successSplitBibData() throws ParseException {

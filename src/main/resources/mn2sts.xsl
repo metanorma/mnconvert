@@ -995,14 +995,8 @@
 			<xsl:call-template name="getId"/>
 		</xsl:variable>
 		
-		<xsl:variable name="term_presentation_" select="$xml_presentation_catalog//term[@id = current()/@id]"/>
-		<xsl:variable name="term_presentation" select="xalan:nodeset($term_presentation_)"/>
-		
 		<xsl:variable name="section">
 			<xsl:choose>
-				<xsl:when test="$term_presentation/node()">
-					<xsl:value-of select="$term_presentation/@section"/>
-				</xsl:when>
 				<xsl:when test="normalize-space(name) != '' and  normalize-space(translate(name, '0123456789.', '')) = ''">
 					<xsl:value-of select="name"/>
 				</xsl:when>
@@ -1031,7 +1025,7 @@
 								<xsl:value-of select=".//expression/@language"/>
 							</xsl:when>
 							<xsl:otherwise>
-								<xsl:value-of select="ancestor::*[contains(local-name(), '-standard')]/bibdata/language"/>
+								<xsl:value-of select="ancestor::*[contains(local-name(), '-standard') or self::metanorma]/bibdata/language"/>
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:attribute>
