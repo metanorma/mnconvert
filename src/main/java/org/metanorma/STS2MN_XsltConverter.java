@@ -46,7 +46,7 @@ public class STS2MN_XsltConverter extends XsltConverter {
     
     private String typeStandard = ""; // default value empty - allows to determine standard via xslt
     
-    private boolean isSemanticXML = false;
+    //private boolean isSemanticXML = false;
     
     final String SPLIT = "///SPLIT ";
     
@@ -71,9 +71,9 @@ public class STS2MN_XsltConverter extends XsltConverter {
         }
     }
 
-    public void setIsSemanticXML(boolean isSemanticXML) {
+    /*public void setIsSemanticXML(boolean isSemanticXML) {
         this.isSemanticXML = isSemanticXML;
-    }
+    }*/
     
     
     private void setDefaultOutputFilePath() {
@@ -81,14 +81,14 @@ public class STS2MN_XsltConverter extends XsltConverter {
             
             String outputFilePathWithoutExtension = super.getDefaultOutputFilePath();
             
-            if (outputFormat.equals("xml")) {
+            /*if (outputFormat.equals("xml")) {
                 outputFilePath = outputFilePathWithoutExtension + "mn." + outputFormat;
                 if (isSplitBibdata) { //relaton XML
                     outputFilePath = getSplitBibdataFilename(outputFilePath, outputFormat);
                 }
-            } else { // adoc
-                outputFilePath = outputFilePathWithoutExtension + outputFormat;
-            }
+            } else {*/ // adoc
+            outputFilePath = outputFilePathWithoutExtension + outputFormat;
+            //}
         }
     }
 
@@ -119,7 +119,7 @@ public class STS2MN_XsltConverter extends XsltConverter {
                 }
             }
 
-            if (!outputFormat.equals("adoc") && !outputFormat.equals("xml")) {
+            if (!outputFormat.equals("adoc")) { //  && !outputFormat.equals("xml")
                 //System.out.println(String.format(UNKNOWN_OUTPUT_FORMAT, outputFormat));
                 logger.severe(String.format(UNKNOWN_OUTPUT_FORMAT, outputFormat));
                 return false;
@@ -135,11 +135,11 @@ public class STS2MN_XsltConverter extends XsltConverter {
             if (isSplitBibdata) {
                 String addon_outputFormat = "";
                 String addon_outputFilePath = "";
-                if (outputFormat.equals("xml")) {
+                /*if (outputFormat.equals("xml")) {
                     addon_outputFormat = "adoc";
-                } else { // adoc output
-                    addon_outputFormat = "xml";
-                }
+                } else { // adoc output*/
+                addon_outputFormat = "xml";
+                //}
                 addon_outputFilePath = getSplitBibdataFilename(outputFilePath, addon_outputFormat);
                 logger.info(String.format(OUTPUT_LOG_STS2MN, addon_outputFormat.toUpperCase(), addon_outputFilePath));
             }
@@ -176,7 +176,7 @@ public class STS2MN_XsltConverter extends XsltConverter {
         String outputFolder = fileOut.getAbsoluteFile().getParent();
 
         String bibdataFileName = fileOut.getName();
-        if (isSplitBibdata && outputFormat.equals("xml")) {
+        if (isSplitBibdata) { //  && outputFormat.equals("xml")
             String addon_outputFormat = "adoc";
             bibdataFileName = getSplitBibdataFilename(bibdataFileName, addon_outputFormat);
         }
@@ -207,7 +207,7 @@ public class STS2MN_XsltConverter extends XsltConverter {
 
         logger.info("Transforming...");
 
-        if (outputFormat.equals("xml") ||  isSplitBibdata) {
+        if (isSplitBibdata) { // outputFormat.equals("xml") ||
             Source srcXSL;
             if (fileXSL != null) { //external xsl
                 srcXSL = new StreamSource(fileXSL);
@@ -222,7 +222,7 @@ public class STS2MN_XsltConverter extends XsltConverter {
             transformer.setParameter("imagesdir", imagesDir);
             transformer.setParameter("outpath", outputFolder);
             transformer.setParameter("typestandard", typeStandard);
-            transformer.setParameter("semantic", isSemanticXML);
+            //transformer.setParameter("semantic", isSemanticXML);
             transformer.setParameter("debug", isDebugMode);
 
             StringWriter resultWriter = new StringWriter();

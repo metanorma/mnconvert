@@ -19,7 +19,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 /**
- * This class for the command line application for conversion between Metanorma XML and NISO/ISO STS format XML (STS <-> MN XML, STS -> MN ADOC)
+ * This class for the command line application for conversion between NISO/ISO STS format XML and Metanorma XML/ADOC (MN XML -> STS , STS -> MN ADOC)
  */
 public class mnconvert {
 
@@ -129,7 +129,7 @@ public class mnconvert {
                     .build());
             addOption(Option.builder("of")
                     .longOpt("output-format")
-                    .desc("output format: xml|adoc(default) for Metanorma output, iso|niso(default) for STS output, or ieee for IEEE format output")
+                    .desc("output format: adoc for Metanorma output, iso|niso(default) for STS output, or ieee for IEEE format output")
                     .hasArg()
                     .argName("xml|adoc|iso|niso|ieee")
                     .required(false)
@@ -151,11 +151,11 @@ public class mnconvert {
                     .hasArg()
                     .required(false)
                     .build());
-            addOption(Option.builder("sx")
+            /*addOption(Option.builder("sx")
                     .longOpt("semantic")
                     .desc("For STS input only: generate semantic XML (Metanorma XML output only)")
                     .required(false)
-                    .build());
+                    .build());*/
             addOption(Option.builder("ct")
                     .longOpt("check-type")
                     .desc("For STS output only: check against XSD NISO (value 'xsd-niso', default), DTD ISO (value 'dtd-iso'), DTD NISO (value 'dtd-niso')")
@@ -354,7 +354,7 @@ public class mnconvert {
                             sts2mn.setImagesDir(cmdMain.getOptionValue("imagesdir"));
                             sts2mn.setIsSplitBibdata(cmdMain.hasOption("split-bibdata"));
                             sts2mn.setTypeStandard(cmdMain.getOptionValue("type"));
-                            sts2mn.setIsSemanticXML(cmdMain.hasOption("semantic"));
+                            //sts2mn.setIsSemanticXML(cmdMain.hasOption("semantic"));
                             defaultOutputFormat = "adoc";
                             converter = sts2mn;
                             break;
