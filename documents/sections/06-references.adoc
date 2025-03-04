@@ -1,0 +1,40 @@
+
+[bibliography]
+[[sec_6]]
+== References
+
+This standard references the following documents. When cited in the text of this standard, the referenced standard may be referred to by its number only or an abbreviated title. Where no date is supplied, the most current version of the standard should be used.
+
+* [[[ref_5,ISO 30042]]], _Systems to manage terminology, knowledge and content -- TermBase eXchange (TBX)_. https://www.iso.org/standard/45797.html[https://www.iso.org/standard/45797.html]
+
+* [[[ref_7]]]W3C. 
+span:title[Namespaces in XML 1.0 (Third Edition)]. 
+span:uri[https://www.w3.org/TR/REC-xml-names/]
+span:type[website]
+
+* [[[ref_8]]]W3C. 
+span:title[XHTML Modularization 1.1, Section 5.6.2. Tables Modules], 13 February 
+span:date[2006]. 
+span:uri[https://www.w3.org/TR/2006/PR-xhtml-modularization-20060213/]
+span:type[website]
+
+* [[[ref_9]]]W3C. 
+span:title[XML Linking Language (XLink) Version 1.0], 27 June 
+span:date[2001]. 
+span:uri[https://www.w3.org/TR/xlink/]
+span:type[website]
+
+* [[[ref_10]]]W3C. 
+span:title[XML Schema Part 1: Structures Second Edition], 28 October 
+span:date[2004]. 
+span:uri[https://www.w3.org/TR/xmlschema-1/]
+span:type[website]
+
+[[ref_6]]
+[%bibitem]
+=== _Access License and Indicators_, 5 January 2015. https://www.niso.org/apps/group_public/download.php/14226/rp-22-2015_ALI.pdf
+docid::
+id::: NISO RP-22-2015
+type:: standard
+
+
