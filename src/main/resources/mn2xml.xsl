@@ -2697,7 +2697,8 @@
 
 	
 	<xsl:template match="fn" priority="2">
-		<xsl:variable name="number" select="@reference"/>
+		<!-- <xsl:variable name="number" select="@reference"/> -->
+		<xsl:variable name="number" select="normalize-space(fmt-fn-label)"/>
 		<xsl:variable name="number_id">
 			<xsl:value-of select="$number"/>_<xsl:number level="any" count="fn"/>
 		</xsl:variable>
@@ -2708,13 +2709,15 @@
 			<!-- 'footnote' is special wrapper for further processing in mode="footnotes_fix" -->
 			<footnote id="{generate-id()}">
 				<xref ref-type="fn" rid="fn_{$number_id}"> <!-- {$sfx} rid="fn_{$number}" -->
-					<sup><xsl:value-of select="$number"/><xsl:if test="$outputformat != 'IEEE'">)</xsl:if></sup>
+					<sup><xsl:value-of select="$number"/></sup> <!-- <xsl:if test="$outputformat != 'IEEE'">)</xsl:if> -->
 				</xref>
 				<fn id="fn_{$number_id}"> <!-- {$sfx} -->
 					<label>
-						<sup><xsl:value-of select="$number"/><xsl:if test="$outputformat != 'IEEE'">)</xsl:if></sup>
+						<sup><xsl:value-of select="$number"/></sup> <!-- <xsl:if test="$outputformat != 'IEEE'">)</xsl:if> -->
 					</label>
-					<xsl:apply-templates/>
+					<!-- <xsl:apply-templates/> -->
+					<xsl:variable name="target" select="@target"/>
+					<xsl:apply-templates select="key('element_by_id', $target)"/>
 				</fn>
 			</footnote>
 		</xsl:variable>
@@ -2740,6 +2743,17 @@
 		</xsl:if>
 	</xsl:template>
 	
+	<xsl:template match="fmt-fn-body">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="fmt-fn-label">
+		<xsl:value-of select="."/>
+	</xsl:template>
+	
+	<xsl:template match="fmt-fn-body//fmt-fn-label"/>
+	
+	<xsl:template match="fmt-footnote-container"/>
 	
 	<xsl:template match="clause | 
 																references[@normative='true'] | 
@@ -2987,6 +3001,7 @@
 		<!-- <xsl:if test="$debug = 'true'">
 			<xsl:message>DEBUG: p processing <xsl:number level="any" count="*[local-name() = 'p']"/></xsl:message>
 		</xsl:if> -->
+		
 		<xsl:variable name="paragraph_">
 			<xsl:variable name="parent_name" select="local-name(..)"/>
 			<xsl:choose>
@@ -2998,7 +3013,7 @@
 					</p>
 					<dl id="_5d3c108d-9b89-7ff0-9d24-fe248540b86a" key="true" class="formula_dl">
 				-->
-				<xsl:when test="@keep-with-next and preceding-sibling::*[1][self::image] and normalize-space() = $i18n_key and following-sibling::*[1][self::dl]"/>
+				<xsl:when test="@keep-with-next and preceding-sibling::*[self::image] and normalize-space() = $i18n_key and following-sibling::*[1][self::dl]"/>
 				
 				<!-- Example:
 					</fmt-stem>
@@ -5581,6 +5596,10 @@
 	</xsl:template>
 	
 	<xsl:template match="sourcecode/@unnumbered"/>
+	
+	<xsl:template match="sourcecode/body">
+		<xsl:apply-templates/>
+	</xsl:template>
 	
 	<xsl:template match="title" name="title">
 		<xsl:choose>
