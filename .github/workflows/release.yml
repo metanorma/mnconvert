@@ -50,6 +50,8 @@ jobs:
 
       - run: bundle update
 
+      - run: make update-init update-modules
+
       - run: make testMN2STS
 
       - run: make testSTS2MN
