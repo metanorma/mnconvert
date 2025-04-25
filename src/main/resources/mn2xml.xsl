@@ -2228,7 +2228,7 @@
 			
 			<xsl:call-template name="addSectionAttribute"/>
 			
-			<xsl:apply-templates select="docidentifier[@type = 'metanorma']" mode="docidentifier_metanorma"/>
+			<xsl:apply-templates select="docidentifier[@type = 'metanorma-ordinal' or @type = 'metanorma']" mode="docidentifier_metanorma"/>
 			<xsl:if test="not(docidentifier[@type='metanorma'])">
 				<!-- <label><xsl:number format="[1]"/></label> --> <!-- see docidentifier @type="metanorma" -->
 			</xsl:if>
@@ -2630,7 +2630,7 @@
 		<title><xsl:apply-templates/></title>
 	</xsl:template>
 	
-	<xsl:template match="bibitem/docidentifier[@type = 'metanorma']" mode="docidentifier_metanorma">
+	<xsl:template match="bibitem/docidentifier[@type = 'metanorma-ordinal' or @type = 'metanorma']" mode="docidentifier_metanorma">
 		<label><xsl:apply-templates /></label>
 	</xsl:template>
 	
@@ -3364,8 +3364,11 @@
 						<xsl:when test="$list-type = 'simple'"></xsl:when>
 						<xsl:when test="../@type = 'bullet' or $list-type = 'bullet' or normalize-space(../@type) = ''">
 							<xsl:choose>
-								<xsl:when test="($metanorma_type = 'ISO' or $metanorma_type = 'IEC' or $metanorma_type = 'BSI') and $ul_label/label">
+								<!-- <xsl:when test="($metanorma_type = 'ISO' or $metanorma_type = 'IEC' or $metanorma_type = 'BSI') and $ul_label/label">
 									<label><xsl:value-of select="$ul_label/label"/></label>
+								</xsl:when> -->
+								<xsl:when test="($metanorma_type = 'ISO' or $metanorma_type = 'IEC' or $metanorma_type = 'BSI') and name">
+									<label><xsl:value-of select="normalize-space(name)"/></label>
 								</xsl:when>
 								
 								<xsl:otherwise>
@@ -3439,8 +3442,10 @@
 						</xsl:choose>
 					</xsl:variable>
 					
+					
 					<xsl:call-template name="insert_label">
-						<xsl:with-param name="label" select="$list-item-label"/>
+						<!-- <xsl:with-param name="label" select="$list-item-label"/> -->
+						<xsl:with-param name="label" select="normalize-space(name)"/>
 						<xsl:with-param name="isAddition" select="count(*[1]/node()[normalize-space() != ''][1][self::add]) = 1"/>
 						<xsl:with-param name="color" select="$color-list-label"/>
 						<xsl:with-param name="isNotePAS" select="(ancestor::note or ancestor::termnote) and $color-title != ''"/>
@@ -3487,6 +3492,7 @@
 					</label>
 				</xsl:when>
 				<xsl:otherwise>
+					<!-- <xsl:copy-of select="."/> -->
 					<xsl:apply-templates select="name"/>
 				</xsl:otherwise>
 			</xsl:choose>
@@ -3498,12 +3504,22 @@
 	<xsl:template match="example/name" priority="2">
 		<xsl:variable name="label" select="."/>
 		<xsl:choose>
+			<xsl:when test="$format = 'ISO'">
+				<label><xsl:value-of select="$label"/></label>
+			</xsl:when>
 			<xsl:when test="contains($label, $CHAR_EM_DASH)">
 				<label>
 					<xsl:value-of select="translate(normalize-space(translate(substring-before($label, $CHAR_EM_DASH), '&#xa0;', ' ')), ' ', '&#xa0;')"/>
 				</label>
 				<title>
-					<xsl:apply-templates />
+					<xsl:choose>
+						<xsl:when test=".//*[local-name() = 'span'][@class = 'fmt-caption-delim']">
+							<xsl:apply-templates select=".//*[local-name() = 'span'][@class = 'fmt-caption-delim']/following-sibling::node()"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:apply-templates />
+						</xsl:otherwise>
+					</xsl:choose>
 				</title>
 			</xsl:when>
 			<xsl:otherwise>
@@ -4524,18 +4540,21 @@
 	</xsl:template>
 	
 	<xsl:template match="annotation">
-		<element-citation>			
+		<element-citation>
 			<xsl:if test="$format = 'ISO'">
 				<xsl:attribute name="id">
-					<xsl:value-of select="@id"/>					
+					<!-- <xsl:value-of select="@id"/> -->
+					<xsl:value-of select="@original-id"/>	
 				</xsl:attribute>				
 			</xsl:if>			
 			<annotation>
 				<xsl:if test="$format = 'NISO'">
 					<xsl:attribute name="id">
-						<xsl:value-of select="@id"/>					
+						<!-- <xsl:value-of select="@id"/> -->
+						<xsl:value-of select="@original-id"/>	
 					</xsl:attribute>
 				</xsl:if>
+				<!-- <xsl:copy-of select="."/> -->
 				<xsl:apply-templates/>
 			</annotation>
 		</element-citation>

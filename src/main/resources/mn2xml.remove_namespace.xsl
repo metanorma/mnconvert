@@ -38,6 +38,11 @@
 											*[local-name() = 'fmt-deprecates'] |
 											*[local-name() = 'fmt-definition'] |
 											*[local-name() = 'fmt-termsource']" mode="remove_namespace" priority="3"/>
+											
+	<xsl:template match="*[local-name() = 'title'][following-sibling::*[1][local-name() = 'fmt-title']][.//*[local-name() = 'fmt-review-end']]" mode="remove_namespace" priority="3">
+		<xsl:apply-templates select=".//*[local-name() = 'fmt-review-end']" mode="remove_namespace"/>
+	</xsl:template>
+
 	<!-- 
 	*[local-name() = 'preferred'][ancestor::*[local-name() = 'term'][1]//*[local-name() = 'fmt-preferred']] |
 											*[local-name() = 'admitted'][ancestor::*[local-name() = 'term'][1]//*[local-name() = 'fmt-admitted']] |
@@ -173,7 +178,12 @@
 	</xsl:template> -->
 	
 	<!-- <xsl:template match="*[local-name() = 'p']/@keep-with-next" mode="remove_namespace" priority="3"/> -->
-	<xsl:template match="@original-id" mode="remove_namespace" priority="3"/>
+	<xsl:template match="@original-id" mode="remove_namespace" priority="3">
+		<xsl:if test="parent::*[local-name() = 'annotation']">
+			<!-- <xsl:attribute name="id"><xsl:value-of select="."/></xsl:attribute> -->
+			<xsl:copy-of select="."/>
+		</xsl:if>
+	</xsl:template>
 	
 	<xsl:template match="*[local-name() = 'source-highlighter-css']" mode="remove_namespace" priority="3"/>
 	
