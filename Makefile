@@ -136,20 +136,6 @@ clean:
 	mvn clean
 	rm -rf documents
 
-update-init:
-	git submodule update --init
-
-update-modules:
-ifeq ($(OS),Windows_NT)
-	git submodule foreach "git fetch origin gh-pages"
-	git submodule foreach "git checkout origin/gh-pages"
-	git submodule foreach "git reset --hard origin/gh-pages"
-else
-	git submodule foreach "git fetch origin gh-pages"; \
-	git submodule foreach "git checkout origin/gh-pages"; \
-	git submodule foreach "git reset --hard origin/gh-pages"
-endif
-
 publish: published
 published: documents.html documents.adoc xml2rfc.adoc
 	mkdir $@
