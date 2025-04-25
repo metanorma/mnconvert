@@ -5489,11 +5489,15 @@
 		<xsl:if test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and $format = 'NISO'">
 			<editing-instruction specific-use="review">
 				<xsl:variable name="target" select="@target"/>
-				<xsl:apply-templates select="key('element_by_id', $target)/node()" mode="review"/>
+				<xsl:apply-templates select="key('element_by_id', $target)" mode="review"/>
+				<!-- <xsl:copy-of select="key('element_by_id', $target)"/> -->
 			</editing-instruction>
 		</xsl:if>
 	</xsl:template>
 	
+	<xsl:template match="fmt-review-body | fmt-review-body//semx" mode="review" priority="2">
+		<xsl:apply-templates mode="review"/>
+	</xsl:template>
 	
 	<xsl:template match="review/ul | fmt-review-body//ul" mode="review">
 		<p>
@@ -5501,7 +5505,7 @@
 		</p>
 	</xsl:template>
 	
-	<xsl:template match="review/ol | fmt-review-body//ul" mode="review">>
+	<xsl:template match="review/ol | fmt-review-body//ul" mode="review">
 		<p>
 			<xsl:call-template name="ol"/>
 		</p>

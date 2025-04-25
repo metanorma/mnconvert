@@ -1009,7 +1009,7 @@
 		<term-sec id="sec_{$section}"><!-- id="{$current_id}" -->
 			<xsl:call-template name="addSectionAttribute"/>
 			
-			<xsl:apply-templates select="review"/>
+			<xsl:apply-templates select="review | fmt-review-end"/>
 			
 			<xsl:call-template name="insert_label">
 				<xsl:with-param name="label" select="$section"/>
@@ -1034,7 +1034,7 @@
 					
 					<xsl:apply-templates select="node()[not(self::termexample or self::termnote or self::termsource or 
 																										self::preferred or self::admitted or self::deprecates or self::domain or 
-																										self::term or self::review)]"/>
+																										self::term or self::review or self::fmt-review-end or self::fmt-review-start)]"/>
 					
 					<xsl:apply-templates select="termexample"/>
 					
