@@ -2698,7 +2698,12 @@
 	
 	<xsl:template match="fn" priority="2">
 		<!-- <xsl:variable name="number" select="@reference"/> -->
-		<xsl:variable name="number" select="normalize-space(fmt-fn-label)"/>
+		<xsl:variable name="number">
+			<xsl:choose>
+				<xsl:when test="fmt-fn-label"><xsl:value-of select="normalize-space(fmt-fn-label)"/></xsl:when>
+				<xsl:otherwise><xsl:value-of select="@reference"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
 		<xsl:variable name="number_id">
 			<xsl:value-of select="$number"/>_<xsl:number level="any" count="fn"/>
 		</xsl:variable>
@@ -2715,9 +2720,13 @@
 					<label>
 						<sup><xsl:value-of select="$number"/></sup> <!-- <xsl:if test="$outputformat != 'IEEE'">)</xsl:if> -->
 					</label>
-					<!-- <xsl:apply-templates/> -->
-					<xsl:variable name="target" select="@target"/>
-					<xsl:apply-templates select="key('element_by_id', $target)"/>
+					<xsl:choose>
+						<xsl:when test="fmt-fn-label">
+							<xsl:variable name="target" select="@target"/>
+							<xsl:apply-templates select="key('element_by_id', $target)"/>
+						</xsl:when>
+						<xsl:otherwise><xsl:apply-templates/></xsl:otherwise>
+					</xsl:choose>					
 				</fn>
 			</footnote>
 		</xsl:variable>
