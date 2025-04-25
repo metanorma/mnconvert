@@ -5475,6 +5475,8 @@
 		</sc>
 	</xsl:template>
 	
+	<xsl:template match="fmt-review-start | review-container"/>
+	
 	<xsl:template match="review">
 		<xsl:if test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and $format = 'NISO'">
 			<editing-instruction specific-use="review">
@@ -5483,19 +5485,30 @@
 		</xsl:if>
 	</xsl:template>
 	
-	<xsl:template match="review/ul" mode="review">
+	<xsl:template match="fmt-review-end">
+		<xsl:if test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and $format = 'NISO'">
+			<editing-instruction specific-use="review">
+				<xsl:variable name="target" select="@target"/>
+				<xsl:apply-templates select="key('element_by_id', $target)/node()" mode="review"/>
+			</editing-instruction>
+		</xsl:if>
+	</xsl:template>
+	
+	
+	<xsl:template match="review/ul | fmt-review-body//ul" mode="review">
 		<p>
 			<xsl:call-template name="ul"/>
 		</p>
 	</xsl:template>
 	
-	<xsl:template match="review/ol" mode="review">>
+	<xsl:template match="review/ol | fmt-review-body//ul" mode="review">>
 		<p>
 			<xsl:call-template name="ol"/>
 		</p>
 	</xsl:template>
 	
-	<xsl:template match="review/*[not(local-name() = 'ul') and not(local-name() = 'ol')]" mode="review">
+	<xsl:template match="review/*[not(local-name() = 'ul') and not(local-name() = 'ol')] |
+			fmt-review-body//*[not(local-name() = 'ul') and not(local-name() = 'ol')]" mode="review">
 		<xsl:apply-templates select="."/>
 	</xsl:template>
 	
