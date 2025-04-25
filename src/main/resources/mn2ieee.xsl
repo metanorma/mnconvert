@@ -13,6 +13,8 @@
 	<xsl:param name="debug">false</xsl:param>
 	<xsl:param name="outputformat">IEEE</xsl:param>
 	
+	<xsl:key name="element_by_id" match="*" use="@id"/>
+	
 	<xsl:include href="mn2xml.xsl"/>
 	
 	<xsl:template match="/*" mode="xml">
