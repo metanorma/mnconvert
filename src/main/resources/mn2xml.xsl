@@ -2228,7 +2228,7 @@
 			
 			<xsl:call-template name="addSectionAttribute"/>
 			
-			<xsl:apply-templates select="docidentifier[@type = 'metanorma']" mode="docidentifier_metanorma"/>
+			<xsl:apply-templates select="docidentifier[@type = 'metanorma-ordinal' or @type = 'metanorma']" mode="docidentifier_metanorma"/>
 			<xsl:if test="not(docidentifier[@type='metanorma'])">
 				<!-- <label><xsl:number format="[1]"/></label> --> <!-- see docidentifier @type="metanorma" -->
 			</xsl:if>
@@ -2630,7 +2630,7 @@
 		<title><xsl:apply-templates/></title>
 	</xsl:template>
 	
-	<xsl:template match="bibitem/docidentifier[@type = 'metanorma']" mode="docidentifier_metanorma">
+	<xsl:template match="bibitem/docidentifier[@type = 'metanorma-ordinal' or @type = 'metanorma']" mode="docidentifier_metanorma">
 		<label><xsl:apply-templates /></label>
 	</xsl:template>
 	
@@ -2697,7 +2697,13 @@
 
 	
 	<xsl:template match="fn" priority="2">
-		<xsl:variable name="number" select="@reference"/>
+		<!-- <xsl:variable name="number" select="@reference"/> -->
+		<xsl:variable name="number">
+			<xsl:choose>
+				<xsl:when test="fmt-fn-label"><xsl:value-of select="normalize-space(fmt-fn-label)"/></xsl:when>
+				<xsl:otherwise><xsl:value-of select="@reference"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
 		<xsl:variable name="number_id">
 			<xsl:value-of select="$number"/>_<xsl:number level="any" count="fn"/>
 		</xsl:variable>
@@ -2708,13 +2714,19 @@
 			<!-- 'footnote' is special wrapper for further processing in mode="footnotes_fix" -->
 			<footnote id="{generate-id()}">
 				<xref ref-type="fn" rid="fn_{$number_id}"> <!-- {$sfx} rid="fn_{$number}" -->
-					<sup><xsl:value-of select="$number"/><xsl:if test="$outputformat != 'IEEE'">)</xsl:if></sup>
+					<sup><xsl:value-of select="$number"/></sup> <!-- <xsl:if test="$outputformat != 'IEEE'">)</xsl:if> -->
 				</xref>
 				<fn id="fn_{$number_id}"> <!-- {$sfx} -->
 					<label>
-						<sup><xsl:value-of select="$number"/><xsl:if test="$outputformat != 'IEEE'">)</xsl:if></sup>
+						<sup><xsl:value-of select="$number"/></sup> <!-- <xsl:if test="$outputformat != 'IEEE'">)</xsl:if> -->
 					</label>
-					<xsl:apply-templates/>
+					<xsl:choose>
+						<xsl:when test="fmt-fn-label">
+							<xsl:variable name="target" select="@target"/>
+							<xsl:apply-templates select="key('element_by_id', $target)"/>
+						</xsl:when>
+						<xsl:otherwise><xsl:apply-templates/></xsl:otherwise>
+					</xsl:choose>					
 				</fn>
 			</footnote>
 		</xsl:variable>
@@ -2740,6 +2752,17 @@
 		</xsl:if>
 	</xsl:template>
 	
+	<xsl:template match="fmt-fn-body">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="fmt-fn-label">
+		<xsl:value-of select="."/>
+	</xsl:template>
+	
+	<xsl:template match="fmt-fn-body//fmt-fn-label"/>
+	
+	<xsl:template match="fmt-footnote-container"/>
 	
 	<xsl:template match="clause | 
 																references[@normative='true'] | 
@@ -2987,6 +3010,7 @@
 		<!-- <xsl:if test="$debug = 'true'">
 			<xsl:message>DEBUG: p processing <xsl:number level="any" count="*[local-name() = 'p']"/></xsl:message>
 		</xsl:if> -->
+		
 		<xsl:variable name="paragraph_">
 			<xsl:variable name="parent_name" select="local-name(..)"/>
 			<xsl:choose>
@@ -2998,7 +3022,7 @@
 					</p>
 					<dl id="_5d3c108d-9b89-7ff0-9d24-fe248540b86a" key="true" class="formula_dl">
 				-->
-				<xsl:when test="@keep-with-next and preceding-sibling::*[1][self::image] and normalize-space() = $i18n_key and following-sibling::*[1][self::dl]"/>
+				<xsl:when test="@keep-with-next and preceding-sibling::*[self::image] and normalize-space() = $i18n_key and following-sibling::*[1][self::dl]"/>
 				
 				<!-- Example:
 					</fmt-stem>
@@ -3349,8 +3373,11 @@
 						<xsl:when test="$list-type = 'simple'"></xsl:when>
 						<xsl:when test="../@type = 'bullet' or $list-type = 'bullet' or normalize-space(../@type) = ''">
 							<xsl:choose>
-								<xsl:when test="($metanorma_type = 'ISO' or $metanorma_type = 'IEC' or $metanorma_type = 'BSI') and $ul_label/label">
+								<!-- <xsl:when test="($metanorma_type = 'ISO' or $metanorma_type = 'IEC' or $metanorma_type = 'BSI') and $ul_label/label">
 									<label><xsl:value-of select="$ul_label/label"/></label>
+								</xsl:when> -->
+								<xsl:when test="($metanorma_type = 'ISO' or $metanorma_type = 'IEC' or $metanorma_type = 'BSI') and name">
+									<label><xsl:value-of select="normalize-space(name)"/></label>
 								</xsl:when>
 								
 								<xsl:otherwise>
@@ -3424,8 +3451,10 @@
 						</xsl:choose>
 					</xsl:variable>
 					
+					
 					<xsl:call-template name="insert_label">
-						<xsl:with-param name="label" select="$list-item-label"/>
+						<!-- <xsl:with-param name="label" select="$list-item-label"/> -->
+						<xsl:with-param name="label" select="normalize-space(name)"/>
 						<xsl:with-param name="isAddition" select="count(*[1]/node()[normalize-space() != ''][1][self::add]) = 1"/>
 						<xsl:with-param name="color" select="$color-list-label"/>
 						<xsl:with-param name="isNotePAS" select="(ancestor::note or ancestor::termnote) and $color-title != ''"/>
@@ -3472,6 +3501,7 @@
 					</label>
 				</xsl:when>
 				<xsl:otherwise>
+					<!-- <xsl:copy-of select="."/> -->
 					<xsl:apply-templates select="name"/>
 				</xsl:otherwise>
 			</xsl:choose>
@@ -3483,12 +3513,22 @@
 	<xsl:template match="example/name" priority="2">
 		<xsl:variable name="label" select="."/>
 		<xsl:choose>
+			<xsl:when test="$format = 'ISO'">
+				<label><xsl:value-of select="$label"/></label>
+			</xsl:when>
 			<xsl:when test="contains($label, $CHAR_EM_DASH)">
 				<label>
 					<xsl:value-of select="translate(normalize-space(translate(substring-before($label, $CHAR_EM_DASH), '&#xa0;', ' ')), ' ', '&#xa0;')"/>
 				</label>
 				<title>
-					<xsl:apply-templates />
+					<xsl:choose>
+						<xsl:when test=".//*[local-name() = 'span'][@class = 'fmt-caption-delim']">
+							<xsl:apply-templates select=".//*[local-name() = 'span'][@class = 'fmt-caption-delim']/following-sibling::node()"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:apply-templates />
+						</xsl:otherwise>
+					</xsl:choose>
 				</title>
 			</xsl:when>
 			<xsl:otherwise>
@@ -4509,18 +4549,21 @@
 	</xsl:template>
 	
 	<xsl:template match="annotation">
-		<element-citation>			
+		<element-citation>
 			<xsl:if test="$format = 'ISO'">
 				<xsl:attribute name="id">
-					<xsl:value-of select="@id"/>					
+					<!-- <xsl:value-of select="@id"/> -->
+					<xsl:value-of select="@original-id"/>	
 				</xsl:attribute>				
 			</xsl:if>			
 			<annotation>
 				<xsl:if test="$format = 'NISO'">
 					<xsl:attribute name="id">
-						<xsl:value-of select="@id"/>					
+						<!-- <xsl:value-of select="@id"/> -->
+						<xsl:value-of select="@original-id"/>	
 					</xsl:attribute>
 				</xsl:if>
+				<!-- <xsl:copy-of select="."/> -->
 				<xsl:apply-templates/>
 			</annotation>
 		</element-citation>
@@ -5475,6 +5518,8 @@
 		</sc>
 	</xsl:template>
 	
+	<xsl:template match="fmt-review-start | review-container"/>
+	
 	<xsl:template match="review">
 		<xsl:if test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and $format = 'NISO'">
 			<editing-instruction specific-use="review">
@@ -5483,19 +5528,34 @@
 		</xsl:if>
 	</xsl:template>
 	
-	<xsl:template match="review/ul" mode="review">
+	<xsl:template match="fmt-review-end">
+		<xsl:if test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and $format = 'NISO'">
+			<editing-instruction specific-use="review">
+				<xsl:variable name="target" select="@target"/>
+				<xsl:apply-templates select="key('element_by_id', $target)" mode="review"/>
+				<!-- <xsl:copy-of select="key('element_by_id', $target)"/> -->
+			</editing-instruction>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="fmt-review-body | fmt-review-body//semx" mode="review" priority="2">
+		<xsl:apply-templates mode="review"/>
+	</xsl:template>
+	
+	<xsl:template match="review/ul | fmt-review-body//ul" mode="review">
 		<p>
 			<xsl:call-template name="ul"/>
 		</p>
 	</xsl:template>
 	
-	<xsl:template match="review/ol" mode="review">>
+	<xsl:template match="review/ol | fmt-review-body//ul" mode="review">
 		<p>
 			<xsl:call-template name="ol"/>
 		</p>
 	</xsl:template>
 	
-	<xsl:template match="review/*[not(local-name() = 'ul') and not(local-name() = 'ol')]" mode="review">
+	<xsl:template match="review/*[not(local-name() = 'ul') and not(local-name() = 'ol')] |
+			fmt-review-body//*[not(local-name() = 'ul') and not(local-name() = 'ol')]" mode="review">
 		<xsl:apply-templates select="."/>
 	</xsl:template>
 	
@@ -5564,6 +5624,10 @@
 	</xsl:template>
 	
 	<xsl:template match="sourcecode/@unnumbered"/>
+	
+	<xsl:template match="sourcecode/body">
+		<xsl:apply-templates/>
+	</xsl:template>
 	
 	<xsl:template match="title" name="title">
 		<xsl:choose>

@@ -29,6 +29,7 @@ DESTMNADOC := $(patsubst %.sts.xml,%.mn.adoc,$(patsubst src/test/resources/%,doc
 
 SAXON_URL := https://repo1.maven.org/maven2/net/sf/saxon/Saxon-HE/10.1/Saxon-HE-10.1.jar
 STS2HTMLXSL := https://www.iso.org/schema/isosts/resources/isosts2html_standalone.xsl
+STS2HTMLXSLADD := https://www.iso.org/schema/isosts/resources/isosts2html.xsl
 
 ifeq ($(OS),Windows_NT)
   CMD_AND = &
@@ -77,8 +78,8 @@ testMN2IEEE:
 deploy:
 	mvn --settings settings.xml -Dmaven.test.skip=true clean deploy shade:shade
 
-documents/%.sts.html: documents/%.sts.xml saxon.jar
-	java -jar saxon.jar -s:$< -xsl:$(STS2HTMLXSL) -o:$@
+documents/%.sts.html: documents/%.sts.xml saxon.jar isosts2html_standalone.xsl isosts2html.xsl
+	java -jar saxon.jar -s:$< -xsl:isosts2html_standalone.xsl -o:$@
 
 documents/%.sts.xml: documents/%.mn.xml | target/$(JAR_FILE) documents
 	java -jar target/$(JAR_FILE) $< --output $@ --output-format iso
@@ -104,6 +105,12 @@ xml2rfc.adoc: target/$(JAR_FILE) rfcsources documents
 rfcsources:
 	wget -r -l 1 -nd -erobots=off -A ${SRCRFCMASK} -R rfc-*.xml -P ${SRCRFCDIR} https://www.rfc-editor.org/rfc/
 
+
+isosts2html_standalone.xsl:
+	curl -sSL $(STS2HTMLXSL) -o $@
+
+isosts2html.xsl:
+	curl -sSL $(STS2HTMLXSLADD) -o $@
 
 saxon.jar:
 	curl -sSL $(SAXON_URL) -o $@
