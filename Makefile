@@ -77,7 +77,7 @@ testMN2IEEE:
 deploy:
 	mvn --settings settings.xml -Dmaven.test.skip=true clean deploy shade:shade
 
-documents/%.sts.html: documents/%.sts.xml saxon.jar isosts2html_standalone.xsl
+documents/%.sts.html: documents/%.sts.xml saxon.jar isosts2html_standalone.xsl isosts2html.xsl
 	java -jar saxon.jar -s:$< -xsl:isosts2html_standalone.xsl -o:$@
 
 documents/%.sts.xml: documents/%.mn.xml | target/$(JAR_FILE) documents
@@ -106,6 +106,9 @@ rfcsources:
 
 
 isosts2html_standalone.xsl:
+	curl -sSL $(STS2HTMLXSL) -o $@
+
+isosts2html.xsl:
 	curl -sSL $(STS2HTMLXSL) -o $@
 
 saxon.jar:
