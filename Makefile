@@ -29,6 +29,7 @@ DESTMNADOC := $(patsubst %.sts.xml,%.mn.adoc,$(patsubst src/test/resources/%,doc
 
 SAXON_URL := https://repo1.maven.org/maven2/net/sf/saxon/Saxon-HE/10.1/Saxon-HE-10.1.jar
 STS2HTMLXSL := https://www.iso.org/schema/isosts/resources/isosts2html_standalone.xsl
+STS2HTMLXSLADD := https://www.iso.org/schema/isosts/resources/isosts2html.xsl
 
 ifeq ($(OS),Windows_NT)
   CMD_AND = &
@@ -109,7 +110,7 @@ isosts2html_standalone.xsl:
 	curl -sSL $(STS2HTMLXSL) -o $@
 
 isosts2html.xsl:
-	curl -sSL $(STS2HTMLXSL) -o $@
+	curl -sSL $(STS2HTMLXSLADD) -o $@
 
 saxon.jar:
 	curl -sSL $(SAXON_URL) -o $@
