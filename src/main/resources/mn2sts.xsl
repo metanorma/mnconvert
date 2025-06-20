@@ -16,6 +16,8 @@
 	
 	<xsl:key name="element_by_id" match="*" use="@id"/>
 	
+	<xsl:key name="element_by_source_id" match="*" use="@source_id"/>
+	
 	<!-- special element 'footnote' is wrapper for xref + fn, will be removed at last step -->
 	<xsl:key name="footnotes_in_text_iterator" match="footnote[not(ancestor::table-wrap or ancestor::fig)]" use="'all'"/>
 	<xsl:key name="footnotes_in_text" match="footnote[not(ancestor::table-wrap or ancestor::fig)]" use="normalize-space()"/>
@@ -1006,6 +1008,10 @@
 			</xsl:choose>
 		</xsl:variable>
 	
+	
+		<!-- <xsl:variable name="startTime" select="java:getTime(java:java.util.Date.new())"/>
+		<xsl:message>start term '<xsl:value-of select="$section"/>'</xsl:message> -->
+	
 		<term-sec id="sec_{$section}"><!-- id="{$current_id}" -->
 			<xsl:call-template name="addSectionAttribute"/>
 			
@@ -1032,6 +1038,13 @@
 					
 					<xsl:apply-templates select="domain"/>
 					
+					<!-- <xsl:message>
+						<xsl:for-each select="node()[not(self::termexample or self::termnote or self::termsource or self::source or 
+																										self::preferred or self::admitted or self::deprecates or self::domain or 
+																										self::term or self::review or self::fmt-review-end or self::fmt-review-start)]">
+							<xsl:message>processing for '<xsl:value-of select="local-name()"/>'</xsl:message>
+																										</xsl:for-each>
+					</xsl:message> -->
 					<xsl:apply-templates select="node()[not(self::termexample or self::termnote or self::termsource or self::source or 
 																										self::preferred or self::admitted or self::deprecates or self::domain or 
 																										self::term or self::review or self::fmt-review-end or self::fmt-review-start)]"/>
@@ -1050,6 +1063,7 @@
 			<xsl:apply-templates select="term"/>
 			
 		</term-sec>
+		<!-- <xsl:message>end term '<xsl:value-of select="$section"/>': processing time <xsl:value-of select="java:getTime(java:java.util.Date.new()) - $startTime"/> msec.</xsl:message> -->
 	</xsl:template>
 	
 	<xsl:template match="definition">
@@ -1182,7 +1196,7 @@
 		
 		<tbx:tig>
 			<xsl:if test="normalize-space($id) != ''">
-				<xsl:attribute name="id"><xsl:value-of select="$id"/></xsl:attribute>
+				<xsl:attribute name="id"><xsl:value-of select="translate($id, ':', '_')"/></xsl:attribute>
 			</xsl:if>
 			<tbx:term><xsl:apply-templates /></tbx:term>
 			<tbx:partOfSpeech>
@@ -1295,9 +1309,15 @@
 				<xsl:when test="renderterm">
 					<xsl:value-of select="renderterm"/>
 					
-					<xsl:variable name="element_xref_" select="$elements//element[@source_id = $xref_target]"/>
+					<!-- <xsl:variable name="element_xref_" select="$elements//element[@source_id = $xref_target]"/>
 					<xsl:variable name="element_xref" select="xalan:nodeset($element_xref_)"/>
-					<xsl:variable name="section" select="$element_xref/@section"/>
+					<xsl:variable name="section" select="$element_xref/@section"/> -->
+					
+					<!-- takes 75 sec -->
+					<xsl:variable name="section" select="$elements_source_id//element[generate-id(.) = generate-id(key('element_by_source_id', $xref_target)[1])]/@section"/>
+					<!-- takes 95 sec -->
+					<!-- <xsl:variable name="section" select="$elements_source_id//element[@source_id = $xref_target]/@section"/> -->
+					
 					<xsl:text> (</xsl:text><xsl:value-of select="$section"/><xsl:text>)</xsl:text>
 					
 				</xsl:when>

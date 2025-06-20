@@ -38,7 +38,14 @@
 											*[local-name() = 'fmt-deprecates'] |
 											*[local-name() = 'fmt-definition'] |
 											*[local-name() = 'fmt-termsource']" mode="remove_namespace" priority="3"/>
-											
+	
+	<xsl:template match="*[local-name() = 'preferred']//*[local-name() = 'bookmark']" mode="remove_namespace" priority="4">
+		<xsl:variable name="pos" select="position()"/>
+		<xsl:element name="{local-name()}">
+			<xsl:attribute name="id"><xsl:value-of select="ancestor::*[local-name() = 'preferred']/following-sibling::*[local-name() = 'fmt-preferred'][1]//*[local-name() = 'bookmark']/@id"/></xsl:attribute>
+		</xsl:element>
+	</xsl:template>
+	
 	<xsl:template match="*[local-name() = 'title'][following-sibling::*[1][local-name() = 'fmt-title']][.//*[local-name() = 'fmt-review-end']]" mode="remove_namespace" priority="3">
 		<xsl:apply-templates select=".//*[local-name() = 'fmt-review-end']" mode="remove_namespace"/>
 	</xsl:template>
@@ -187,6 +194,13 @@
 	
 	<xsl:template match="*[local-name() = 'source-highlighter-css']" mode="remove_namespace" priority="3"/>
 	
+	<xsl:template match="@semx-id" mode="remove_namespace" priority="3"/>
+	
+	<xsl:template match="*[local-name() = 'semx']/@source" mode="remove_namespace" priority="3"/>
+		
+	<!-- <xsl:template match="*[local-name() = 'semx']" mode="remove_namespace" priority="3">
+		<xsl:apply-templates mode="remove_namespace"/>
+	</xsl:template> -->
 	<!-- ===================== -->
 	<!-- END remove namespace -->
 	<!-- ===================== -->
