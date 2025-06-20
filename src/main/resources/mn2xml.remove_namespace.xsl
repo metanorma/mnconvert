@@ -163,7 +163,7 @@
 		</xsl:element>
 	</xsl:template>
   
-  <xsl:template match="*[local-name() = 'origin'][not(ancestor::*[local-name() = 'termsource'])]" mode="remove_namespace" priority="3"/>
+  <xsl:template match="*[local-name() = 'origin'][not(ancestor::*[local-name() = 'termsource']) and not(ancestor::*[local-name() = 'source'])]" mode="remove_namespace" priority="3"/>
 	<xsl:template match="*[local-name() = 'fmt-origin']" mode="remove_namespace" priority="3">
 		<xsl:element name="origin">
 			<xsl:copy-of select="@*"/>

@@ -2918,7 +2918,7 @@
 	<xsl:template match="definition/text()[1] |
 																termexample/text()[1] | 
 																termnote/text()[1] |
-																termsource/text()[1] |
+																termsource/text()[1] | term/source/text()[1] |
 																modification/text()[1] |
 																dd/text()[1] |
 																formattedref/text()[1]">
@@ -2937,10 +2937,10 @@
 	</xsl:template>
 	
 	<!-- remove '[SOURCE:'   and ']' -->
-	<xsl:template match="termsource/text()[starts-with(., '[SOURCE: ')]">
+	<xsl:template match="termsource/text()[starts-with(., '[SOURCE: ')] | term/source/text()[starts-with(., '[SOURCE: ')]">
 		<xsl:value-of select="substring-after(., '[SOURCE: ')"/>
 	</xsl:template>
-	<xsl:template match="termsource/text()[last()][normalize-space() = ']']"/>
+	<xsl:template match="termsource/text()[last()][normalize-space() = ']'] | term/source/text()[last()][normalize-space() = ']']"/>
 	
 	<xsl:template match="origin">
 		<xsl:choose>
@@ -2987,7 +2987,7 @@
 	<!-- <xsl:template match="*[local-name() = 'termexample'] | *[local-name() = 'termnote'] | *[local-name() = 'termsource']"/> -->
 	
 	<!-- temporary solution for https://github.com/metanorma/iso-10303-2/issues/44 -->
-	<xsl:template match="clause/domain | clause/termsource" priority="2">
+	<xsl:template match="clause/domain | clause/termsource | clause/term/source" priority="2">
 		<xsl:text disable-output-escaping="yes">&lt;!--</xsl:text>
 			<xsl:copy-of select="."/>
 		<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>

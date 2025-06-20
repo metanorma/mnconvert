@@ -1032,7 +1032,7 @@
 					
 					<xsl:apply-templates select="domain"/>
 					
-					<xsl:apply-templates select="node()[not(self::termexample or self::termnote or self::termsource or 
+					<xsl:apply-templates select="node()[not(self::termexample or self::termnote or self::termsource or self::source or 
 																										self::preferred or self::admitted or self::deprecates or self::domain or 
 																										self::term or self::review or self::fmt-review-end or self::fmt-review-start)]"/>
 					
@@ -1040,7 +1040,7 @@
 					
 					<xsl:apply-templates select="termnote"/>
 					
-					<xsl:apply-templates select="termsource"/>
+					<xsl:apply-templates select="termsource | source"/>
 					
 					<xsl:apply-templates select="preferred | admitted | deprecates"/>
 					
@@ -1141,7 +1141,7 @@
 		</non-normative-note>
 	</xsl:template>
 	
-	<xsl:template match="termsource">
+	<xsl:template match="termsource | term/source">
 		<tbx:source>
 			<xsl:variable name="source">
 				<xsl:apply-templates />
