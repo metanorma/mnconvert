@@ -1249,6 +1249,10 @@
 		</tbx:tig>
 	</xsl:template>
 	
+	<xsl:template match="preferred//bookmark[@id] | admitted//bookmark[@id] | deprecates//bookmark[@id]">
+		<target id="{@id}"/>
+	</xsl:template>
+	
 	<xsl:template match="field-of-application" priority="2" mode="usageNote">
 		<tbx:usageNote><xsl:apply-templates/></tbx:usageNote>
 	</xsl:template>

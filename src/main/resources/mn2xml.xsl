@@ -4335,6 +4335,8 @@
 	<xsl:template match="xref" name="xref">
 		<xsl:if test="normalize-space($debug) = 'true'">
 			<xsl:message>DEBUG: Start xref <xsl:number level="any"/></xsl:message>
+			<!-- <xsl:message>@target=<xsl:value-of select="@target"/></xsl:message>
+			<xsl:message>@bibitemid=<xsl:value-of select="@bibitemid"/></xsl:message> -->
 		</xsl:if>
 		<!-- <xsl:variable name="element_xref_" select="$elements//element[@source_id = current()/@target or @source_id = current()/@bibitemid]"/> -->
 		
@@ -4342,6 +4344,8 @@
 											generate-id(.) = generate-id(key('element_by_source_id', current()/@bibitemid)[1])]"/>
 		
 		<xsl:variable name="element_xref" select="xalan:nodeset($element_xref_)"/>
+		
+		<!-- <element_xref><xsl:copy-of select="$element_xref"/></element_xref> -->
 		
 		<xsl:variable name="section" select="$element_xref/@section"/>
 		<xsl:variable name="section_prefix" select="$element_xref/@section_prefix"/>
@@ -4368,15 +4372,8 @@
 		</xsl:variable>
 		<!-- parent=<xsl:value-of select="$parent"/> -->
 		<xsl:if test="not($element_xref)">
-			<xsl:message>WARNING: There is no ID/IDREF binding for IDREF '<xsl:value-of select="@target"/>'.</xsl:message>
+			<xsl:message>WARNING: There is no ID/IDREF binding for IDREF '<xsl:value-of select="@target | @bibitemid"/>'.</xsl:message>
 		</xsl:if>
-		
-		<xsl:variable name="preferred_term_id_">
-			<!-- replace the link from bookmark to term -->
-			<!-- <xsl:if test="$parent = 'preferred'"><xsl:value-of select="normalize-space($elements//element[@source_id = current()/@target or @source_id = current()/@bibitemid][local-name(..) = 'bookmark']/preceding::term[1]/element/@id)"/></xsl:if> -->
-		</xsl:variable>
-		<!-- <xsl:variable name="preferred_term_id"><xsl:value-of select="normalize-space($preferred_term_id_)"/></xsl:variable> -->
-		<xsl:variable name="preferred_term_id"><xsl:value-of select="normalize-space($element_xref/@bookmark_preferred)"/></xsl:variable>
 		
 		<xref> <!-- ref-type="{$ref_type}" rid="{$id}" --> <!-- replaced by xsl:attribute name=... for save ordering -->
 			<xsl:attribute name="ref-type">
@@ -4384,9 +4381,7 @@
 			</xsl:attribute>
 			<xsl:attribute name="rid">
 				<xsl:choose>
-					<xsl:when test="$preferred_term_id != ''">
-						<xsl:value-of select="$preferred_term_id"/>
-					</xsl:when>
+					<xsl:when test="$parent = 'preferred' or $parent = 'deprecates' or $parent = 'admitted'"><xsl:value-of select="@target"/></xsl:when>
 					<xsl:when test="$parent_id != ''"><xsl:value-of select="$parent_id"/></xsl:when>
 					<xsl:when test="@bibitemid != ''"><xsl:value-of select="@bibitemid"/></xsl:when> <!-- from origin -->
 					<xsl:otherwise><xsl:value-of select="@target"/></xsl:otherwise>

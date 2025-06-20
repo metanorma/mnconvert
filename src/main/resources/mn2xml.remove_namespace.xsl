@@ -40,9 +40,9 @@
 											*[local-name() = 'fmt-termsource']" mode="remove_namespace" priority="3"/>
 	
 	<xsl:template match="*[local-name() = 'preferred']//*[local-name() = 'bookmark']" mode="remove_namespace" priority="4">
-		<xsl:variable name="pos" select="position()"/>
+		<xsl:variable name="pos" select="count(ancestor::*[local-name() = 'preferred'][1]/preceding-sibling::*[local-name() = 'preferred']) + 1"/>
 		<xsl:element name="{local-name()}">
-			<xsl:attribute name="id"><xsl:value-of select="ancestor::*[local-name() = 'preferred']/following-sibling::*[local-name() = 'fmt-preferred'][1]//*[local-name() = 'bookmark']/@id"/></xsl:attribute>
+			<xsl:attribute name="id"><xsl:value-of select="(ancestor::*[local-name() = 'preferred']/following-sibling::*[local-name() = 'fmt-preferred'][1]//*[local-name() = 'bookmark'])[$pos]/@id"/></xsl:attribute>
 		</xsl:element>
 	</xsl:template>
 	
