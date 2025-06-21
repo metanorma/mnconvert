@@ -1,6 +1,8 @@
 package org.metanorma;
 
 import static org.metanorma.Constants.*;
+import static org.metanorma.mnconvert.VER;
+
 import org.metanorma.utils.Util;
 import org.metanorma.validator.CheckAgainstEnum;
 
@@ -196,6 +198,7 @@ public class MN2STS_XsltConverter extends XsltConverter {
         Transformer transformer = factory.newTransformer(srcXSL);
         transformer.setParameter("debug", isDebugMode);
         transformer.setParameter("outputformat", outputFormat.toUpperCase());
+        transformer.setParameter("mnconvert_version", VER);
 
         File fXmlIn = new File(inputFilePath);
         Source src = new StreamSource(fXmlIn);
