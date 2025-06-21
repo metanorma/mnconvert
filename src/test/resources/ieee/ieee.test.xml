@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ieee-standard xmlns="https://www.metanorma.org/ns/ieee" type="semantic" version="1.0.4">
+<metanorma xmlns="https://www.metanorma.org/ns/standoc" type="semantic" version="1.0.4">
 	<bibdata type="standard">
 		<title language="en" format="text/plain">IEEE Standards Draft</title>
 		<docidentifier type="IEEE">123.4</docidentifier>
@@ -442,4 +442,4 @@ readers context, including background, key themes, history, etc.</p>
 			</bibitem>
 		</references>
 	</bibliography>
-</ieee-standard>
+</metanorma>

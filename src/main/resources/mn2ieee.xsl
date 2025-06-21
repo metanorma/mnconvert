@@ -4,8 +4,10 @@
 			xmlns:xlink="http://www.w3.org/1999/xlink" 
 			xmlns:xalan="http://xml.apache.org/xalan" 
 			xmlns:java="http://xml.apache.org/xalan/java" 
+			xmlns:redirect="http://xml.apache.org/xalan/redirect"
 			xmlns:metanorma-class="xalan://org.metanorma.utils.RegExHelper"
 			exclude-result-prefixes="xalan java metanorma-class" 
+			extension-element-prefixes="redirect"
 			version="1.0">
 
 	<xsl:output version="1.0" method="xml" encoding="UTF-8" indent="yes"/>
@@ -15,9 +17,25 @@
 	
 	<xsl:key name="element_by_id" match="*" use="@id"/>
 	
+	<xsl:key name="element_by_source_id" match="*" use="@source_id"/>
+	
 	<xsl:include href="mn2xml.xsl"/>
 	
+	<xsl:template match="*[local-name() = 'boilerplate']//*[local-name() = 'clause']/@anchor" mode="remove_namespace" priority="4">
+		<xsl:copy-of select="."/>
+	</xsl:template>
+	
 	<xsl:template match="/*" mode="xml">
+		
+		<xsl:variable name="startTime" select="java:getTime(java:java.util.Date.new())"/>
+		
+		<xsl:if test="normalize-space($debug) = 'true'">
+		
+			<redirect:write file="xml_{$startTime}.xml">
+				<xsl:copy-of select="$xml"/>
+			</redirect:write>
+			
+		</xsl:if>
 		
 		<xsl:variable name="xml">
 			<standards-document xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -158,10 +176,10 @@
 			</xsl:if>
 			
 			<!-- contrib-group -->
-			<xsl:apply-templates select="../boilerplate/legal-statement//clause[@id = 'boilerplate-participants' or title = 'Participants']/clause[
-					@id = 'boilerplate-participants-wg' or title = 'Working group' or
-					@id = 'boilerplate-participants-bg' or title = 'Balloting group' or
-					@id = 'boilerplate-participants-sb' or title = 'Standards board']" mode="contrib-group"/>
+			<xsl:apply-templates select="../boilerplate/legal-statement//clause[@id = 'boilerplate-participants' or @anchor = 'boilerplate-participants' or @type = 'participants' or title = 'Participants']/clause[
+					@id = 'boilerplate-participants-wg' or @anchor = 'boilerplate-participants-wg' or title = 'Working group' or
+					@id = 'boilerplate-participants-bg' or @anchor = 'boilerplate-participants-bg' or title = 'Balloting group' or
+					@id = 'boilerplate-participants-sb' or @anchor = 'boilerplate-participants-sb' or title = 'Standards board']" mode="contrib-group"/>
 			
 			<!-- <isbn publication-format="online" specific-use="ISBN-13"> -->
 			<xsl:apply-templates select="docidentifier[@type = 'ISBN' and @scope = 'PDF']" mode="front_ieee"/>
@@ -256,7 +274,7 @@
 		<!-- <notes> -->
 		<xsl:apply-templates select="../boilerplate/legal-statement" mode="front_ieee_notes"/>
 		<!-- <sec id="participants1"><title>Participants</title> ... -->
-		<xsl:apply-templates select="../boilerplate/legal-statement/clause[@id = 'boilerplate-participants']" mode="front_ieee_participants"/>
+		<xsl:apply-templates select="../boilerplate/legal-statement/clause[@id = 'boilerplate-participants' or @type = 'participants' or @type = 'participants']" mode="front_ieee_participants"/>
 		
 	</xsl:template>
 	
@@ -481,7 +499,7 @@
 			<xsl:apply-templates mode="front_ieee_notes"/>
 		</notes>
 	</xsl:template>
-	<xsl:template match="legal-statement//clause[@id = 'boilerplate-participants']" mode="front_ieee_notes" priority="2"/> <!-- will be processed out of <notes> -->
+	<xsl:template match="legal-statement//clause[@id = 'boilerplate-participants' or @type = 'participants' or @type = 'participants']" mode="front_ieee_notes" priority="2"/> <!-- will be processed out of <notes> -->
 	<xsl:template match="legal-statement//clause" mode="front_ieee_notes">
 		<sec>
 			<xsl:apply-templates mode="front_ieee_notes"/>
@@ -502,7 +520,7 @@
 		<xsl:apply-templates select="p" mode="contrib-group"/>
 	</xsl:template>
 	
-	<xsl:template match="legal-statement//clause/p" mode="contrib-group">
+	<xsl:template match="legal-statement//clause/p[not(@type)]" mode="contrib-group">
 		<!-- Source (metanorma xml) example: 
 			<ul id="_">
 				<li>
@@ -517,6 +535,9 @@
 		-->
 		<xsl:variable name="content-type">
 			<xsl:choose>
+				<xsl:when test="contains(../@id, '-participants-wg') or contains(../@anchor, '-participants-wg')">Working Group</xsl:when>
+				<xsl:when test="contains(../@id, '-participants-bg') or contains(../@anchor, '-participants-bg')">Balloting Group</xsl:when>
+				<xsl:when test="contains(../@id, '-participants-sb') or contains(../@anchor, '-participants-sb')">Standards Board</xsl:when>
 				<xsl:when test="contains(., ' liaisons') or contains(., ' Liaisons')">
 					<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new(.),'^.* (IEEE(\s|\h|\-)SA Standards Board [l|L]iaisons).*$','$1'))"/>
 				</xsl:when>
@@ -526,10 +547,12 @@
 			</xsl:choose>
 		</xsl:variable>
 		<contrib-group content-type="{$content-type}">
-			<xsl:apply-templates select="following::ul[preceding-sibling::p[1][@id = current()/@id]]//dl" mode="contrib"/>
+			<xsl:apply-templates select="following::ul[preceding-sibling::p[1][@id = current()/@id]]//dl |
+						following-sibling::p" mode="contrib"/>
 		</contrib-group>
 	</xsl:template>
 	<xsl:template match="legal-statement//clause/p[@type='emeritus_sign']" mode="contrib-group"/>
+	<xsl:template match="legal-statement//clause/p[@type]" mode="contrib-group"/>
 	
 	<xsl:template match="dl" mode="contrib">
 		<!-- Destination IEEE xml example:
@@ -544,7 +567,7 @@
 			</contrib>
 		-->
 		<xsl:variable name="contrib-type" select="dt[. = 'role']/following-sibling::dd[1]"/>
-		<xsl:variable name="num"><xsl:number count="dl[ancestor::clause[@id = 'boilerplate-participants' or title = 'Participants']]" level="any"/></xsl:variable>
+		<xsl:variable name="num"><xsl:number count="dl[ancestor::clause[@id = 'boilerplate-participants' or @type = 'participants' or title = 'Participants']]" level="any"/></xsl:variable>
 		<xsl:variable name="name_" select="normalize-space(dt[. = 'name']/following-sibling::dd[1])"/>
 		<xsl:variable name="name" select="translate($name_,'*','')"/>
 		<xsl:variable name="company_" select="normalize-space(dt[. = 'company']/following-sibling::dd[1])"/>
@@ -589,6 +612,69 @@
 		</contrib>
 	</xsl:template>
 	
+	<xsl:template match="p" mode="contrib">
+		<!-- <contrib contrib-type="chair" id="contrib1">
+			<name-alternatives>
+				<string-name specific-use="display">
+					<given-names>FirstName</given-names>
+					<surname>LastName</surname>
+				</string-name>
+			</name-alternatives>
+			<role>Chair</role>
+		</contrib> -->
+		<xsl:variable name="contrib-type" select=".//span[contains(@class, '_role')]"/>
+		<xsl:variable name="num"><xsl:number count="p[starts-with(@type, 'office')][ancestor::clause[@id = 'boilerplate-participants' or @type = 'participants' or title = 'Participants']]" level="any"/></xsl:variable>
+		<xsl:variable name="name_">
+			<xsl:choose>
+				<xsl:when test="strong"><xsl:value-of select="normalize-space(strong)"/></xsl:when>
+				<xsl:otherwise><xsl:value-of select="normalize-space()"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="name" select="translate($name_,'*','')"/>
+		<xsl:variable name="company_" select="normalize-space(dt[. = 'company']/following-sibling::dd[1])"/>
+		<xsl:variable name="company" select="translate($company_,'*','')"/>
+		
+		<xsl:variable name="isEmeritus" select="normalize-space(java:endsWith(java:java.lang.String.new($name_),'*'))"/>
+		<contrib>
+			<xsl:attribute name="contrib-type">
+				<xsl:variable name="value" select="java:toLowerCase(java:java.lang.String.new(normalize-space(translate($contrib-type,' ','-'))))"/>
+				<xsl:choose>
+					<xsl:when test="contains($value,',')"><xsl:value-of select="substring-before($value,',')"/></xsl:when>
+					<xsl:when test="normalize-space($contrib-type) = ''"><xsl:value-of select="substring-after(@type, 'office')"/></xsl:when>
+					<xsl:otherwise><xsl:value-of select="$value"/></xsl:otherwise>
+				</xsl:choose>
+				<xsl:if test="$isEmeritus = 'true'">-emeritus</xsl:if>
+			</xsl:attribute>
+			<xsl:if test="$isEmeritus = 'true'">
+				<xsl:attribute name="emeritus">yes</xsl:attribute>
+			</xsl:if>
+			<xsl:attribute name="id">contrib<xsl:value-of select="$num"/></xsl:attribute>
+			
+			<xsl:if test="$name != ''">
+				<name-alternatives>
+					<string-name specific-use="display">
+						<xsl:variable name="name_regex">^(.*)(\s|\h)(.*)</xsl:variable>
+						<given-names><xsl:value-of select="java:replaceAll(java:java.lang.String.new($name),$name_regex,'$1')"/></given-names>
+						<surname><xsl:value-of select="java:replaceAll(java:java.lang.String.new($name),$name_regex,'$3')"/></surname>
+					</string-name>
+				</name-alternatives>
+			</xsl:if>
+			<xsl:if test="$company != ''">
+				<collab-alternatives>
+					<collab><xsl:value-of select="$company"/></collab>
+				</collab-alternatives>
+			</xsl:if>
+			
+			<xsl:if test="$contrib-type != 'member'">
+				<role><xsl:value-of select="$contrib-type"/></role>
+			</xsl:if>
+			<xsl:if test="$isEmeritus = 'true'">
+				<role>Member Emeritus</role>
+			</xsl:if>
+		</contrib>
+	</xsl:template>
+	
+	<xsl:template match="legal-statement//clause/p[@type='emeritus_sign']" mode="contrib"/>
 	
 	<!-- [@id = 'boilerplate-participants'] -->
 	<xsl:template match="legal-statement/clause" mode="front_ieee_participants">
@@ -613,9 +699,19 @@
 			<p>
 				<xsl:apply-templates mode="front_ieee_participants"/>
 			</p>
-			<xsl:apply-templates select="following::ul[preceding-sibling::p[1][@id = current()/@id]]" mode="front_ieee_participants">
-				<xsl:with-param name="process">true</xsl:with-param>
-			</xsl:apply-templates>
+			<xsl:choose>
+				<xsl:when test="following::ul[preceding-sibling::p[1][@id = current()/@id]]">
+					<xsl:apply-templates select="following::ul[preceding-sibling::p[1][@id = current()/@id]]" mode="front_ieee_participants">
+						<xsl:with-param name="process">true</xsl:with-param>
+					</xsl:apply-templates>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates select="following-sibling::p[1]" mode="front_ieee_participants">
+						<xsl:with-param name="process">true</xsl:with-param>
+					</xsl:apply-templates>
+				</xsl:otherwise>
+			</xsl:choose>
+			
 		</participants-sec>
 	</xsl:template>
 	
@@ -647,7 +743,7 @@
 		<xsl:apply-templates mode="front_ieee_participants"/>
 	</xsl:template>
 	<xsl:template match="dl" mode="front_ieee_participants">
-		<xsl:variable name="num"><xsl:number count="dl[ancestor::clause[@id = 'boilerplate-participants' or title = 'Participants']]" level="any"/></xsl:variable>
+		<xsl:variable name="num"><xsl:number count="dl[ancestor::clause[@id = 'boilerplate-participants' or @type = 'participants' or title = 'Participants']]" level="any"/></xsl:variable>
 		<list-item>
 			<p>
 				<xref>
@@ -658,7 +754,40 @@
 		</list-item>
 	</xsl:template>
 	
-	<xsl:template match="legal-statement//clause/p[@type]" mode="front_ieee_participants"/>
+	<xsl:template match="legal-statement//clause/p[@type]" mode="front_ieee_participants">
+		<xsl:param name="process">false</xsl:param>
+		<xsl:if test="$process = 'true'">
+			<xsl:if test="../p[@type and not(contains(@type, 'member'))]">
+				<officers>
+					<list list-type="simple">
+						<xsl:for-each select="../p[@type and not(contains(@type, 'member'))]">
+							<xsl:call-template name="front_ieee_participants_list_item"/>
+						</xsl:for-each>
+					</list>
+				</officers>
+			</xsl:if>
+			<xsl:if test="../p[contains(@type, 'member')]">
+				<list list-type="simple">
+					<xsl:for-each select="../p[contains(@type, 'member')]">
+						<xsl:call-template name="front_ieee_participants_list_item"/>
+					</xsl:for-each>
+				</list>
+			</xsl:if>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template name="front_ieee_participants_list_item">
+		<xsl:variable name="num"><xsl:number count="p[starts-with(@type, 'office')][ancestor::clause[@id = 'boilerplate-participants' or @type = 'participants' or title = 'Participants']]" level="any"/></xsl:variable>
+		<list-item>
+			<p>
+				<xref>
+					<xsl:attribute name="ref-type">contrib</xsl:attribute>
+					<xsl:attribute name="rid">contrib<xsl:value-of select="$num"/></xsl:attribute>
+				</xref>
+			</p>
+		</list-item>
+	</xsl:template>
+	
 	
 	<!-- ============= -->
 	<!-- End IEEE bibdata -->
