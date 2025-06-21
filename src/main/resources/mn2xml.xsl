@@ -5240,7 +5240,11 @@
 	
 	<xsl:template match="dt" mode="dl">
 		<def-item>
-			<xsl:copy-of select="@id"/>
+			<!-- <xsl:copy-of select="@id"/> -->
+			<xsl:variable name="dt_id" select="normalize-space(translate(@id, ':', '_'))"/>
+			<xsl:if test="$dt_id != ''">
+				<xsl:attribute name="id"><xsl:value-of select="$dt_id"/></xsl:attribute>
+			</xsl:if>
 			<term>
 				<xsl:apply-templates />
 			</term>
