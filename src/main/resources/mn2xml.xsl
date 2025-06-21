@@ -35,12 +35,20 @@
 	
 	<xsl:include href="mn2xml.remove_namespace.xsl"/>
   	
-	<xsl:variable name="xml_">
+	<xsl:variable name="xml_added_attributes">
 		<xsl:apply-templates select="$xml_source" mode="add_attributes"/>
 	</xsl:variable>
-	<xsl:variable name="xml" select="xalan:nodeset($xml_)"/>
 	
 	<xsl:include href="mn2xml.add_attributes.xsl"/>
+	
+	<xsl:variable name="xml_removed_semantic">
+		<xsl:apply-templates select="xalan:nodeset($xml_added_attributes)" mode="remove_semantic"/>
+	</xsl:variable>
+	<xsl:variable name="xml" select="xalan:nodeset($xml_removed_semantic)"/>
+	
+	<xsl:include href="mn2xml.remove_semantic.xsl"/>
+	
+	
 	
 	<xsl:variable name="format" select="normalize-space($outputformat)"/>
 	
@@ -221,7 +229,13 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:element name="{$wrapper}">
-						<element source_id="{$source_id}" id="{$id}" section="{$section}" section_prefix="{$section_prefix}" section_bolded="{$section_bolded}" parent="{$parent}" parent_id="{normalize-space($parent_id)}" type="{$type}"/>
+						<element source_id="{$source_id}" id="{$id}" section="{$section}" section_prefix="{$section_prefix}" section_bolded="{$section_bolded}" parent="{$parent}" parent_id="{normalize-space($parent_id)}" type="{$type}">
+							<xsl:if test="$wrapper = 'bookmark' and $parent = 'preferred'">
+								<xsl:attribute name="bookmark_preferred">
+									<xsl:value-of select="ancestor::term[1]/@id"/>
+								</xsl:attribute>
+							</xsl:if>
+						</element>
 					</xsl:element>
 				</xsl:otherwise>
 			</xsl:choose>
@@ -244,6 +258,20 @@
 	
 	<!-- elements is using in the template for 'xref' -->
 	<xsl:variable name="elements" select="xalan:nodeset($elements_)"/>
+	
+	<!-- for optimizaztion, source_id only for tbx:entailedTerm template, for element 'concept' -->
+	<xsl:variable name="elements_source_id_">
+		<elements>
+			<xsl:apply-templates select="$elements" mode="elements_source_id"/>
+		</elements>
+	</xsl:variable>
+	<xsl:variable name="elements_source_id" select="xalan:nodeset($elements_source_id_)"/>
+		
+	<xsl:template match="*[@source_id][@parent = 'term']" mode="elements_source_id">
+		<element>
+			<xsl:copy-of select="@*[local-name() = 'source_id' or local-name() = 'section']"/>
+		</element>
+	</xsl:template>
 	<!-- ====================================================================== -->
 	<!-- END array 'elements' -->
 	<!-- ====================================================================== -->
@@ -279,6 +307,11 @@
 				<count><xsl:value-of select="count($elements//element)"/></count>
 				<xsl:copy-of select="$elements"/>
 			</redirect:write>
+			
+			<redirect:write file="elements_source_id_{$startTime}.xml">
+				<xsl:copy-of select="$elements_source_id"/>
+			</redirect:write>
+			
 		</xsl:if>
 		
 		<xsl:apply-templates select="$xml" mode="xml"/>
@@ -2886,7 +2919,11 @@
 						</editing-instruction>
 					</xsl:if>
 					
+					<!-- <xsl:variable name="startTime" select="java:getTime(java:java.util.Date.new())"/>
+					<xsl:message>start</xsl:message> -->
 					<xsl:apply-templates select="node()[not(self::title)]"/>
+					
+					<!-- <xsl:message>end: processing time <xsl:value-of select="java:getTime(java:java.util.Date.new()) - $startTime"/> msec.</xsl:message> -->
 					
 				</sec>
 			</xsl:otherwise>
@@ -2918,7 +2955,7 @@
 	<xsl:template match="definition/text()[1] |
 																termexample/text()[1] | 
 																termnote/text()[1] |
-																termsource/text()[1] |
+																termsource/text()[1] | term/source/text()[1] |
 																modification/text()[1] |
 																dd/text()[1] |
 																formattedref/text()[1]">
@@ -2937,10 +2974,10 @@
 	</xsl:template>
 	
 	<!-- remove '[SOURCE:'   and ']' -->
-	<xsl:template match="termsource/text()[starts-with(., '[SOURCE: ')]">
+	<xsl:template match="termsource/text()[starts-with(., '[SOURCE: ')] | term/source/text()[starts-with(., '[SOURCE: ')]">
 		<xsl:value-of select="substring-after(., '[SOURCE: ')"/>
 	</xsl:template>
-	<xsl:template match="termsource/text()[last()][normalize-space() = ']']"/>
+	<xsl:template match="termsource/text()[last()][normalize-space() = ']'] | term/source/text()[last()][normalize-space() = ']']"/>
 	
 	<xsl:template match="origin">
 		<xsl:choose>
@@ -2987,7 +3024,7 @@
 	<!-- <xsl:template match="*[local-name() = 'termexample'] | *[local-name() = 'termnote'] | *[local-name() = 'termsource']"/> -->
 	
 	<!-- temporary solution for https://github.com/metanorma/iso-10303-2/issues/44 -->
-	<xsl:template match="clause/domain | clause/termsource" priority="2">
+	<xsl:template match="clause/domain | clause/termsource | clause/term/source" priority="2">
 		<xsl:text disable-output-escaping="yes">&lt;!--</xsl:text>
 			<xsl:copy-of select="."/>
 		<xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
@@ -4298,9 +4335,17 @@
 	<xsl:template match="xref" name="xref">
 		<xsl:if test="normalize-space($debug) = 'true'">
 			<xsl:message>DEBUG: Start xref <xsl:number level="any"/></xsl:message>
+			<!-- <xsl:message>@target=<xsl:value-of select="@target"/></xsl:message>
+			<xsl:message>@bibitemid=<xsl:value-of select="@bibitemid"/></xsl:message> -->
 		</xsl:if>
-		<xsl:variable name="element_xref_" select="$elements//element[@source_id = current()/@target or @source_id = current()/@bibitemid]"/>
+		<!-- <xsl:variable name="element_xref_" select="$elements//element[@source_id = current()/@target or @source_id = current()/@bibitemid]"/> -->
+		
+		<xsl:variable name="element_xref_" select="$elements//element[generate-id(.) = generate-id(key('element_by_source_id', current()/@target)[1]) or
+											generate-id(.) = generate-id(key('element_by_source_id', current()/@bibitemid)[1])]"/>
+		
 		<xsl:variable name="element_xref" select="xalan:nodeset($element_xref_)"/>
+		
+		<!-- <element_xref><xsl:copy-of select="$element_xref"/></element_xref> -->
 		
 		<xsl:variable name="section" select="$element_xref/@section"/>
 		<xsl:variable name="section_prefix" select="$element_xref/@section_prefix"/>
@@ -4327,7 +4372,7 @@
 		</xsl:variable>
 		<!-- parent=<xsl:value-of select="$parent"/> -->
 		<xsl:if test="not($element_xref)">
-			<xsl:message>WARNING: There is no ID/IDREF binding for IDREF '<xsl:value-of select="@target"/>'.</xsl:message>
+			<xsl:message>WARNING: There is no ID/IDREF binding for IDREF '<xsl:value-of select="@target | @bibitemid"/>'.</xsl:message>
 		</xsl:if>
 		
 		<xref> <!-- ref-type="{$ref_type}" rid="{$id}" --> <!-- replaced by xsl:attribute name=... for save ordering -->
@@ -4336,6 +4381,7 @@
 			</xsl:attribute>
 			<xsl:attribute name="rid">
 				<xsl:choose>
+					<xsl:when test="$parent = 'preferred' or $parent = 'deprecates' or $parent = 'admitted'"><xsl:value-of select="@target"/></xsl:when>
 					<xsl:when test="$parent_id != ''"><xsl:value-of select="$parent_id"/></xsl:when>
 					<xsl:when test="@bibitemid != ''"><xsl:value-of select="@bibitemid"/></xsl:when> <!-- from origin -->
 					<xsl:otherwise><xsl:value-of select="@target"/></xsl:otherwise>
@@ -4394,6 +4440,16 @@
 					</xsl:choose>
 				</xsl:when>
 				<xsl:otherwise> <!-- presentation xml -->
+					<!-- <xsl:variable name="xref_nodes_">
+						<xsl:apply-templates select="node()[not(local-name() = 'stem')]"/>
+					</xsl:variable>
+					<xsl:variable name="xref_nodes" select="xalan:nodeset($xref_nodes_)"/>
+					<xsl:choose>
+						<xsl:when test="count($xref_nodes//node()) = 1 and $xref_nodes/text()">
+							<xsl:value-of select="normalize-space($xref_nodes)"/>
+						</xsl:when>
+						<xsl:otherwise><xsl:copy-of select="$xref_nodes"/></xsl:otherwise>
+					</xsl:choose> -->
 					<xsl:apply-templates select="node()[not(local-name() = 'stem')]"/>
 				</xsl:otherwise>
 			</xsl:choose>
@@ -4550,17 +4606,21 @@
 	
 	<xsl:template match="annotation">
 		<element-citation>
+			<xsl:variable name="annotation_id">
+				<xsl:choose>
+					<xsl:when test="@original-id"><xsl:value-of select="@original-id"/></xsl:when>
+					<xsl:otherwise><xsl:value-of select="@id"/></xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
 			<xsl:if test="$format = 'ISO'">
 				<xsl:attribute name="id">
-					<!-- <xsl:value-of select="@id"/> -->
-					<xsl:value-of select="@original-id"/>	
+					<xsl:value-of select="$annotation_id"/>
 				</xsl:attribute>				
 			</xsl:if>			
 			<annotation>
 				<xsl:if test="$format = 'NISO'">
 					<xsl:attribute name="id">
-						<!-- <xsl:value-of select="@id"/> -->
-						<xsl:value-of select="@original-id"/>	
+						<xsl:value-of select="$annotation_id"/>
 					</xsl:attribute>
 				</xsl:if>
 				<!-- <xsl:copy-of select="."/> -->
@@ -5184,7 +5244,11 @@
 	
 	<xsl:template match="dt" mode="dl">
 		<def-item>
-			<xsl:copy-of select="@id"/>
+			<!-- <xsl:copy-of select="@id"/> -->
+			<xsl:variable name="dt_id" select="normalize-space(translate(@id, ':', '_'))"/>
+			<xsl:if test="$dt_id != ''">
+				<xsl:attribute name="id"><xsl:value-of select="$dt_id"/></xsl:attribute>
+			</xsl:if>
 			<term>
 				<xsl:apply-templates />
 			</term>

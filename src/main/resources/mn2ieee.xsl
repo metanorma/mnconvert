@@ -857,7 +857,7 @@
 		<def><term><xsl:apply-templates /></term></def>
 	</xsl:template>
 	
-	<xsl:template match="termsource">
+	<xsl:template match="termsource | term/source">
 		<term>
 			<related-object source-id="{origin/@bibitemid}">
 				<xsl:value-of select="origin"/>
