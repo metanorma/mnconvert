@@ -39,10 +39,10 @@ endif
 
 all: target/$(JAR_FILE) documents documents.html
 
-src/test/resources/iso-tc154-8601-1-en.mn.xml: tests/iso-8601-1/_site/documents/iso-tc154-8601-1-en.xml
+src/test/resources/iso-tc154-8601-1-en.mn.xml: tests/iso-8601-1/_site/documents/iso-tc154-8601-1-en.presentation.xml
 	cp $< $@
 
-tests/iso-8601-1/_site/documents/iso-tc154-8601-1-en.xml:
+tests/iso-8601-1/_site/documents/iso-tc154-8601-1-en.presentation.xml:
 	cd tests/iso-8601-1 && metanorma site generate --agree-to-terms
 #ifeq ($(OS),Windows_NT)
 #	$(MAKE) -C tests/iso-8601-1 -f Makefile.win all SHELL=cmd
