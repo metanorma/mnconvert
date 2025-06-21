@@ -198,6 +198,7 @@
 	
 	<xsl:template match="*[local-name() = 'semx']/@source" mode="remove_namespace" priority="3"/>
 		
+	<xsl:template match="@anchor" mode="remove_namespace" priority="3"/>
 	<!-- <xsl:template match="*[local-name() = 'semx']" mode="remove_namespace" priority="3">
 		<xsl:apply-templates mode="remove_namespace"/>
 	</xsl:template> -->
