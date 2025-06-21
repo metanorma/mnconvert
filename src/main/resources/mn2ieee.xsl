@@ -4,8 +4,10 @@
 			xmlns:xlink="http://www.w3.org/1999/xlink" 
 			xmlns:xalan="http://xml.apache.org/xalan" 
 			xmlns:java="http://xml.apache.org/xalan/java" 
+			xmlns:redirect="http://xml.apache.org/xalan/redirect"
 			xmlns:metanorma-class="xalan://org.metanorma.utils.RegExHelper"
 			exclude-result-prefixes="xalan java metanorma-class" 
+			extension-element-prefixes="redirect"
 			version="1.0">
 
 	<xsl:output version="1.0" method="xml" encoding="UTF-8" indent="yes"/>
@@ -15,9 +17,25 @@
 	
 	<xsl:key name="element_by_id" match="*" use="@id"/>
 	
+	<xsl:key name="element_by_source_id" match="*" use="@source_id"/>
+	
 	<xsl:include href="mn2xml.xsl"/>
 	
+	<xsl:template match="*[local-name() = 'boilerplate']//*[local-name() = 'clause']/@anchor" mode="remove_namespace" priority="4">
+		<xsl:copy-of select="."/>
+	</xsl:template>
+	
 	<xsl:template match="/*" mode="xml">
+		
+		<xsl:variable name="startTime" select="java:getTime(java:java.util.Date.new())"/>
+		
+		<xsl:if test="normalize-space($debug) = 'true'">
+		
+			<redirect:write file="xml_{$startTime}.xml">
+				<xsl:copy-of select="$xml"/>
+			</redirect:write>
+			
+		</xsl:if>
 		
 		<xsl:variable name="xml">
 			<standards-document xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -158,10 +176,10 @@
 			</xsl:if>
 			
 			<!-- contrib-group -->
-			<xsl:apply-templates select="../boilerplate/legal-statement//clause[@id = 'boilerplate-participants' or title = 'Participants']/clause[
-					@id = 'boilerplate-participants-wg' or title = 'Working group' or
-					@id = 'boilerplate-participants-bg' or title = 'Balloting group' or
-					@id = 'boilerplate-participants-sb' or title = 'Standards board']" mode="contrib-group"/>
+			<xsl:apply-templates select="../boilerplate/legal-statement//clause[@id = 'boilerplate-participants' or @anchor = 'boilerplate-participants' or @type = 'participants' or title = 'Participants']/clause[
+					@id = 'boilerplate-participants-wg' or @anchor = 'boilerplate-participants-wg' or title = 'Working group' or
+					@id = 'boilerplate-participants-bg' or @anchor = 'boilerplate-participants-bg' or title = 'Balloting group' or
+					@id = 'boilerplate-participants-sb' or @anchor = 'boilerplate-participants-sb' or title = 'Standards board']" mode="contrib-group"/>
 			
 			<!-- <isbn publication-format="online" specific-use="ISBN-13"> -->
 			<xsl:apply-templates select="docidentifier[@type = 'ISBN' and @scope = 'PDF']" mode="front_ieee"/>
@@ -256,7 +274,7 @@
 		<!-- <notes> -->
 		<xsl:apply-templates select="../boilerplate/legal-statement" mode="front_ieee_notes"/>
 		<!-- <sec id="participants1"><title>Participants</title> ... -->
-		<xsl:apply-templates select="../boilerplate/legal-statement/clause[@id = 'boilerplate-participants']" mode="front_ieee_participants"/>
+		<xsl:apply-templates select="../boilerplate/legal-statement/clause[@id = 'boilerplate-participants' or @type = 'participants' or @type = 'participants']" mode="front_ieee_participants"/>
 		
 	</xsl:template>
 	
@@ -481,7 +499,7 @@
 			<xsl:apply-templates mode="front_ieee_notes"/>
 		</notes>
 	</xsl:template>
-	<xsl:template match="legal-statement//clause[@id = 'boilerplate-participants']" mode="front_ieee_notes" priority="2"/> <!-- will be processed out of <notes> -->
+	<xsl:template match="legal-statement//clause[@id = 'boilerplate-participants' or @type = 'participants' or @type = 'participants']" mode="front_ieee_notes" priority="2"/> <!-- will be processed out of <notes> -->
 	<xsl:template match="legal-statement//clause" mode="front_ieee_notes">
 		<sec>
 			<xsl:apply-templates mode="front_ieee_notes"/>
@@ -544,7 +562,7 @@
 			</contrib>
 		-->
 		<xsl:variable name="contrib-type" select="dt[. = 'role']/following-sibling::dd[1]"/>
-		<xsl:variable name="num"><xsl:number count="dl[ancestor::clause[@id = 'boilerplate-participants' or title = 'Participants']]" level="any"/></xsl:variable>
+		<xsl:variable name="num"><xsl:number count="dl[ancestor::clause[@id = 'boilerplate-participants' or @type = 'participants' or title = 'Participants']]" level="any"/></xsl:variable>
 		<xsl:variable name="name_" select="normalize-space(dt[. = 'name']/following-sibling::dd[1])"/>
 		<xsl:variable name="name" select="translate($name_,'*','')"/>
 		<xsl:variable name="company_" select="normalize-space(dt[. = 'company']/following-sibling::dd[1])"/>
@@ -647,7 +665,7 @@
 		<xsl:apply-templates mode="front_ieee_participants"/>
 	</xsl:template>
 	<xsl:template match="dl" mode="front_ieee_participants">
-		<xsl:variable name="num"><xsl:number count="dl[ancestor::clause[@id = 'boilerplate-participants' or title = 'Participants']]" level="any"/></xsl:variable>
+		<xsl:variable name="num"><xsl:number count="dl[ancestor::clause[@id = 'boilerplate-participants' or @type = 'participants' or title = 'Participants']]" level="any"/></xsl:variable>
 		<list-item>
 			<p>
 				<xref>
