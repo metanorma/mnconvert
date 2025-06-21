@@ -4606,17 +4606,21 @@
 	
 	<xsl:template match="annotation">
 		<element-citation>
+			<xsl:variable name="annotation_id">
+				<xsl:choose>
+					<xsl:when test="@original-id"><xsl:value-of select="@original-id"/></xsl:when>
+					<xsl:otherwise><xsl:value-of select="@id"/></xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
 			<xsl:if test="$format = 'ISO'">
 				<xsl:attribute name="id">
-					<!-- <xsl:value-of select="@id"/> -->
-					<xsl:value-of select="@original-id"/>	
+					<xsl:value-of select="$annotation_id"/>
 				</xsl:attribute>				
 			</xsl:if>			
 			<annotation>
 				<xsl:if test="$format = 'NISO'">
 					<xsl:attribute name="id">
-						<!-- <xsl:value-of select="@id"/> -->
-						<xsl:value-of select="@original-id"/>	
+						<xsl:value-of select="$annotation_id"/>
 					</xsl:attribute>
 				</xsl:if>
 				<!-- <xsl:copy-of select="."/> -->
