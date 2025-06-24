@@ -5291,14 +5291,15 @@
 			<xsl:call-template name="addSectionAttribute"/>
 			
 			<label>
-				<xsl:choose>
+				<!-- <xsl:choose> -->
 					<!-- <xsl:when test="$figure_presentation/node()">
 						<xsl:value-of select="$figure_presentation/@section_prefix"/><xsl:value-of select="$figure_presentation/@section"/>
 					</xsl:when> -->
-					<xsl:otherwise>
+					<!-- <xsl:otherwise>
 						<xsl:value-of select="@section_prefix"/><xsl:value-of select="@section"/>
 					</xsl:otherwise>
-				</xsl:choose>
+				</xsl:choose> -->
+				<xsl:value-of select="@section_prefix"/><xsl:value-of select="@section"/>
 			</label>
 			<xsl:apply-templates />
 		</xsl:element>
