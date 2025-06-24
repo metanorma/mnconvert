@@ -143,7 +143,12 @@
 		</xsl:element>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'eref'][not(following-sibling::*[1][local-name() = 'semx'])]" mode="remove_namespace" priority="3"/>
+	<xsl:template match="*[local-name() = 'eref'][not(following-sibling::*[1][local-name() = 'semx']) and
+	not(ancestor::*[local-name() = 'definition'] or 
+			ancestor::*[local-name() = 'concept'] or 
+			ancestor::*[local-name() = 'termsource'] or 
+			ancestor::*[local-name() = 'source'] or 
+			ancestor::*[local-name() = 'figure'])]" mode="remove_namespace" priority="3"/>
 	<xsl:template match="*[local-name() = 'fmt-eref']" mode="remove_namespace" priority="3">
 		<xsl:element name="eref">
 			<xsl:copy-of select="@*"/>
@@ -151,7 +156,11 @@
 		</xsl:element>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'xref'][not(ancestor::*[local-name() = 'definition'] or ancestor::*[local-name() = 'concept'])]" mode="remove_namespace" priority="3"/>
+	<xsl:template match="*[local-name() = 'xref'][not(ancestor::*[local-name() = 'definition'] or 
+					ancestor::*[local-name() = 'concept'] or 
+					ancestor::*[local-name() = 'termsource'] or 
+					ancestor::*[local-name() = 'source'] or 
+					ancestor::*[local-name() = 'figure'])]" mode="remove_namespace" priority="3"/>
 	
 	<xsl:template match="*[local-name() = 'semx'][@element = 'eref']/*[local-name() = 'fmt-xref']" mode="remove_namespace" priority="4"/>
 	
@@ -162,7 +171,11 @@
 		</xsl:element>
 	</xsl:template>
 	
-  <xsl:template match="*[local-name() = 'link']" mode="remove_namespace" priority="3"/>
+  <xsl:template match="*[local-name() = 'link'][not(ancestor::*[local-name() = 'definition'] or 
+				ancestor::*[local-name() = 'concept'] or
+				ancestor::*[local-name() = 'termsource'] or 
+				ancestor::*[local-name() = 'source'] or 
+				ancestor::*[local-name() = 'figure'])]" mode="remove_namespace" priority="3"/>
 	<xsl:template match="*[local-name() = 'fmt-link']" mode="remove_namespace" priority="3">
 		<xsl:element name="link">
 			<xsl:copy-of select="@*"/>

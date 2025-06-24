@@ -1324,6 +1324,10 @@
 					<!-- takes 95 sec -->
 					<!-- <xsl:variable name="section" select="$elements_source_id//element[@source_id = $xref_target]/@section"/> -->
 					
+					<xsl:if test="normalize-space($section) = ''">
+						<xsl:message>WARNING: Can't determine the clause number for the term '<xsl:value-of select="renderterm"/>'.</xsl:message>
+					</xsl:if>
+					
 					<xsl:text> (</xsl:text><xsl:value-of select="$section"/><xsl:text>)</xsl:text>
 					
 				</xsl:when>
