@@ -1017,7 +1017,7 @@
 		<term-sec id="sec_{$section}"><!-- id="{$current_id}" -->
 			<xsl:call-template name="addSectionAttribute"/>
 			
-			<xsl:apply-templates select="review | fmt-review-end"/>
+			<xsl:apply-templates select="annotation | fmt-annotation-end | p/fmt-annotation-end"/>
 			
 			<xsl:call-template name="insert_label">
 				<xsl:with-param name="label" select="$section"/>
@@ -1043,13 +1043,13 @@
 					<!-- <xsl:message>
 						<xsl:for-each select="node()[not(self::termexample or self::termnote or self::termsource or self::source or 
 																										self::preferred or self::admitted or self::deprecates or self::domain or 
-																										self::term or self::review or self::fmt-review-end or self::fmt-review-start)]">
+																										self::term or self::annotation or self::fmt-annotation-end or self::fmt-annotation-start)]">
 							<xsl:message>processing for '<xsl:value-of select="local-name()"/>'</xsl:message>
 																										</xsl:for-each>
 					</xsl:message> -->
 					<xsl:apply-templates select="node()[not(self::termexample or self::termnote or self::termsource or self::source or 
 																										self::preferred or self::admitted or self::deprecates or self::domain or 
-																										self::term or self::review or self::fmt-review-end or self::fmt-review-start)]"/>
+																										self::term or self::annotation or self::fmt-annotation-end or self::fmt-annotation-start or self::p[fmt-annotation-end])]"/>
 					
 					<xsl:apply-templates select="termexample"/>
 					
@@ -1157,7 +1157,7 @@
 		</non-normative-note>
 	</xsl:template>
 	
-	<xsl:template match="termsource | term/source">
+	<xsl:template match="termsource | term/source" name="termsource">
 		<tbx:source>
 			<xsl:variable name="source">
 				<xsl:apply-templates />
