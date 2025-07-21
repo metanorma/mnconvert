@@ -940,7 +940,7 @@
 	
 	
 	<!-- remove @id from 'list' and 'p' if starts with '_' -->
-	<xsl:template match="*[self::list or self::p or self::non-normative-note]/@id[starts-with(., '_')]" mode="id_replace"/>
+	<xsl:template match="*[self::list or self::p or self::non-normative-note or self::tr or self::td or self::th]/@id[starts-with(., '_')]" mode="id_replace"/>
 	
 	<!-- additional action in 'id_replace' task (for time saving): add non-break space -->
 	<xsl:variable name="regex_nbsp_">

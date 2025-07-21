@@ -5784,10 +5784,16 @@
 							<xsl:apply-templates />
 						</xsl:otherwise>
 					</xsl:choose> -->
-					<xsl:apply-templates select="*[@element = 'title']"/>
-					<xsl:if test="not(*)">
-						<xsl:apply-templates />
-					</xsl:if>
+					<xsl:variable name="node_title">
+						<xsl:apply-templates select="*[@element = 'title']"/>
+						<xsl:if test="not(*)">
+							<xsl:apply-templates />
+						</xsl:if>
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test="normalize-space($node_title) = parent::*/@section"><!-- skip title --></xsl:when>
+						<xsl:otherwise><xsl:copy-of select="$node_title"/></xsl:otherwise>
+					</xsl:choose>
 				</title>
 			</xsl:otherwise>
 		</xsl:choose>
