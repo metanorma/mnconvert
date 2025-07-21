@@ -3211,7 +3211,6 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	
 	<!-- =============================== -->
 	<!-- list processing -->
 	<!-- =============================== -->
@@ -4604,7 +4603,7 @@
 		</sec>
 	</xsl:template>
 	
-	<xsl:template match="annotation">
+	<xsl:template match="callout-annotation">
 		<element-citation>
 			<xsl:variable name="annotation_id">
 				<xsl:choose>
@@ -4843,7 +4842,7 @@
 				<xsl:apply-templates select="following-sibling::*[1][self::table]" mode="table_wrap_multiple"/>
 				
 				<!-- move notes outside table -->
-				<xsl:if test="note and $wrap-element != 'array'">
+				<xsl:if test="(note or source) and $wrap-element != 'array'">
 					<table-wrap-foot>
 						<xsl:call-template name="insertTableFootNote"/>
 					</table-wrap-foot>
@@ -4851,7 +4850,7 @@
 			<!-- </table-wrap> -->
 			</xsl:element>
 			
-			<xsl:if test="(note or dl) and $wrap-element = 'array'">
+			<xsl:if test="(note or dl or source) and $wrap-element = 'array'">
 				<xsl:call-template name="insertTableFootNote"/>
 			</xsl:if>
 			
@@ -4875,6 +4874,9 @@
 				</xsl:for-each>
 				<xsl:for-each select="note">
 					<xsl:call-template name="note"/>
+				</xsl:for-each>
+				<xsl:for-each select="source">
+					<xsl:call-template name="source"/>
 				</xsl:for-each>
 			</xsl:otherwise>
 		</xsl:choose>
@@ -4986,6 +4988,7 @@
 	
 	<xsl:template match="table/note" priority="2"/>
 	<xsl:template match="table/dl" priority="2"/>
+	<xsl:template match="table/source" priority="2"/>
 	
 	<xsl:template match="name"/>
 	<xsl:template match="name" mode="table">
@@ -5096,6 +5099,30 @@
 		</xsl:element>
 	</xsl:template>
 	
+	<!-- Example: table/source -->
+	<xsl:template name="source">
+		<notes-group>
+			<title/>
+			<p>
+				<element-citation>
+					<source>
+						<xsl:variable name="source">
+							<xsl:apply-templates />
+						</xsl:variable>
+						<xsl:choose>
+							<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">
+								<!-- 'std' inside tbx:source should be omitted for ISO. -->
+								<xsl:value-of select="$source"/> <!-- just text -->
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:copy-of select="$source"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</source>
+				</element-citation>
+			</p>
+		</notes-group>
+	</xsl:template>
 	
 	<!-- =============================== -->
 	<!-- Definitions list processing -->
@@ -5436,6 +5463,10 @@
 		</p>
 	</xsl:template>
 	
+	<xsl:template match="figure/source">
+		<xsl:call-template name="source"/>
+	</xsl:template>
+	
   <xsl:template match="image[not(parent::figure)]">
     <graphic>
 			<xsl:choose>
@@ -5577,15 +5608,19 @@
 		</monospace>
 	</xsl:template>
 	
+	<xsl:template match="identifier/tt">
+		<xsl:apply-templates/>
+	</xsl:template>
+	
 	<xsl:template match="smallcap">
 		<sc>
 			<xsl:apply-templates/>
 		</sc>
 	</xsl:template>
 	
-	<xsl:template match="fmt-review-start | review-container"/>
+	<xsl:template match="fmt-annotation-start | annotation-container"/>
 	
-	<xsl:template match="review">
+	<xsl:template match="annotation">
 		<xsl:if test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and $format = 'NISO'">
 			<editing-instruction specific-use="review">
 				<xsl:apply-templates mode="review"/>
@@ -5593,34 +5628,56 @@
 		</xsl:if>
 	</xsl:template>
 	
-	<xsl:template match="fmt-review-end">
+	<xsl:template match="fmt-annotation-end" name="fmt-annotation-end">
 		<xsl:if test="($metanorma_type = 'IEC' or $metanorma_type = 'ISO') and $format = 'NISO'">
-			<editing-instruction specific-use="review">
-				<xsl:variable name="target" select="@target"/>
-				<xsl:apply-templates select="key('element_by_id', $target)" mode="review"/>
-				<!-- <xsl:copy-of select="key('element_by_id', $target)"/> -->
-			</editing-instruction>
+			<xsl:choose>
+				<xsl:when test="(parent::p and not(ancestor::term) ) or parent::td">
+					<notes-group>
+						<title/>
+						<xsl:call-template name="add_editing-instruction"/>
+					</notes-group>
+				</xsl:when>
+				<xsl:when test="parent::th and $metanorma_type = 'ISO'">
+					<xsl:text disable-output-escaping="yes">&lt;/bold&gt;</xsl:text>
+						<notes-group>
+							<title/>
+							<xsl:call-template name="add_editing-instruction"/>
+						</notes-group>
+					<xsl:text disable-output-escaping="yes">&lt;bold&gt;</xsl:text>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:call-template name="add_editing-instruction"/>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:if>
 	</xsl:template>
 	
-	<xsl:template match="fmt-review-body | fmt-review-body//semx" mode="review" priority="2">
+	<xsl:template name="add_editing-instruction">
+		<editing-instruction specific-use="review">
+			<xsl:variable name="target" select="@target"/>
+			<xsl:apply-templates select="key('element_by_id', $target)" mode="review"/>
+			<!-- <xsl:copy-of select="key('element_by_id', $target)"/> -->
+		</editing-instruction>
+	</xsl:template>
+	
+	<xsl:template match="fmt-annotation-body | fmt-annotation-body//semx" mode="review" priority="2">
 		<xsl:apply-templates mode="review"/>
 	</xsl:template>
 	
-	<xsl:template match="review/ul | fmt-review-body//ul" mode="review">
+	<xsl:template match="annotation/ul | fmt-annotation-body//ul" mode="review">
 		<p>
 			<xsl:call-template name="ul"/>
 		</p>
 	</xsl:template>
 	
-	<xsl:template match="review/ol | fmt-review-body//ul" mode="review">
+	<xsl:template match="annotation/ol | fmt-annotation-body//ul" mode="review">
 		<p>
 			<xsl:call-template name="ol"/>
 		</p>
 	</xsl:template>
 	
-	<xsl:template match="review/*[not(local-name() = 'ul') and not(local-name() = 'ol')] |
-			fmt-review-body//*[not(local-name() = 'ul') and not(local-name() = 'ol')]" mode="review">
+	<xsl:template match="annotation/*[not(local-name() = 'ul') and not(local-name() = 'ol')] |
+			fmt-annotation-body//*[not(local-name() = 'ul') and not(local-name() = 'ol')]" mode="review">
 		<xsl:apply-templates select="."/>
 	</xsl:template>
 	
@@ -5727,13 +5784,29 @@
 							<xsl:apply-templates />
 						</xsl:otherwise>
 					</xsl:choose> -->
-					<xsl:apply-templates select="*[@element = 'title']"/>
-					<xsl:if test="not(*)">
-						<xsl:apply-templates />
-					</xsl:if>
+					<xsl:variable name="node_title">
+						<xsl:apply-templates select="*[@element = 'title']"/>
+						<xsl:if test="not(*)">
+							<xsl:apply-templates />
+						</xsl:if>
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test="normalize-space($node_title) = parent::*/@section"><!-- skip title --></xsl:when>
+						<xsl:otherwise><xsl:copy-of select="$node_title"/></xsl:otherwise>
+					</xsl:choose>
 				</title>
 			</xsl:otherwise>
 		</xsl:choose>
+		<xsl:apply-templates select=".//fmt-annotation-end">
+			<xsl:with-param name="process">true</xsl:with-param>
+		</xsl:apply-templates>
+	</xsl:template>
+	
+	<xsl:template match="title//fmt-annotation-end" priority="2">
+		<xsl:param name="process">false</xsl:param>
+		<xsl:if test="$process = 'true'">
+			<xsl:call-template name="fmt-annotation-end"/>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="title/@depth"/>

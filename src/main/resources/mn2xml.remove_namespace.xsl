@@ -46,8 +46,8 @@
 		</xsl:element>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'title'][following-sibling::*[1][local-name() = 'fmt-title']][.//*[local-name() = 'fmt-review-end']]" mode="remove_namespace" priority="3">
-		<xsl:apply-templates select=".//*[local-name() = 'fmt-review-end']" mode="remove_namespace"/>
+	<xsl:template match="*[local-name() = 'title'][following-sibling::*[1][local-name() = 'fmt-title']][.//*[local-name() = 'fmt-annotation-end']]" mode="remove_namespace" priority="3">
+		<xsl:apply-templates select=".//*[local-name() = 'fmt-annotation-end']" mode="remove_namespace"/>
 	</xsl:template>
 
 	<!-- 
@@ -108,6 +108,8 @@
 	<!-- no need to process sourcecode/fmt-sourcecode, because the clear data is in sourcecode/text() and sourcecode/annotation -->
 	<xsl:template match="*[local-name() = 'sourcecode']/*[local-name() = 'fmt-sourcecode']" mode="remove_namespace" priority="3"/>
 	<xsl:template match="*[local-name() = 'figure']/*[local-name() = 'fmt-figure']" mode="remove_namespace" priority="3"/>
+	
+	<xsl:template match="*[local-name() = 'fmt-source']" mode="remove_namespace" priority="3"/>
 	
 	<!-- no need to process quote/attribution, because the structured data is in quote/author and quote/source -->
 	<xsl:template match="*[local-name() = 'quote']/*[local-name() = 'attribution']" mode="remove_namespace" priority="3"/>
@@ -199,7 +201,7 @@
 	
 	<!-- <xsl:template match="*[local-name() = 'p']/@keep-with-next" mode="remove_namespace" priority="3"/> -->
 	<xsl:template match="@original-id" mode="remove_namespace" priority="3">
-		<xsl:if test="parent::*[local-name() = 'annotation']">
+		<xsl:if test="parent::*[local-name() = 'callout-annotation']">
 			<!-- <xsl:attribute name="id"><xsl:value-of select="."/></xsl:attribute> -->
 			<xsl:copy-of select="."/>
 		</xsl:if>
@@ -218,5 +220,7 @@
 	<!-- ===================== -->
 	<!-- END remove namespace -->
 	<!-- ===================== -->
+	
+	<xsl:template match="*[local-name() = 'image']/@filename" mode="remove_namespace" priority="3"/>
 	
 </xsl:stylesheet>
