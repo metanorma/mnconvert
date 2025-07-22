@@ -15,7 +15,8 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<jarname>${project.artifactId}-${project.version}.jar</jarname>
 		<exec.mainClass>org.metanorma.mnconvert</exec.mainClass>
-            	<junit.version>5.4.2</junit.version>
+		<junit.version>5.4.2</junit.version>
+		<native.maven.plugin.version>0.11.0</native.maven.plugin.version>
 	</properties>
 	<distributionManagement>
 		<repository>
@@ -126,4 +127,31 @@
 			 <version>1.4.01</version>
 		</dependency>
 	</dependencies>
+	<profiles>
+		 <profile>
+			 <id>native</id>
+			 <build>
+				 <plugins>
+					 <plugin>
+						 <groupId>org.graalvm.buildtools</groupId>
+						 <artifactId>native-maven-plugin</artifactId>
+						 <version>${native.maven.plugin.version}</version>
+						 <extensions>true</extensions>
+						 <executions>
+							 <execution>
+							 <id>build-native</id>
+								 <goals>
+									 <goal>compile-no-fork</goal>
+								 </goals>
+								 <phase>package</phase>
+							 </execution>
+						 </executions>
+						 <configuration>
+								 <mainClass>org.metanorma.mnconvert</mainClass>
+						 </configuration>
+					 </plugin>
+				 </plugins>
+			 </build>
+		 </profile>
+	 </profiles>
 </project>
