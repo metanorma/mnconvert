@@ -8,10 +8,10 @@ on:
     paths-ignore:
       - .github/workflows/release.yml
 
-permissions:
-  contents: read
-  packages: write
-  actions: write
+#permissions:
+#  contents: read
+#  packages: write
+#  actions: write
 
 jobs:
   clean_release:
