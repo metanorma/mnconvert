@@ -30,6 +30,17 @@ jobs:
     strategy:
       matrix:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
+        include:
+          - os: 'ubuntu-latest'
+            platform: 'linux-amd64'
+          - os: 'ubuntu-24.04-arm'
+            platform: 'linux-arm64'
+          - os: 'macos-latest'
+            platform: 'darwin-arm64'
+          - os: 'macos-13'
+            platform: 'darwin-amd64'
+          - os: 'windows-latest'
+            platform: 'win-amd64'
     runs-on: ${{matrix.os}}
     steps:
       - name: Checkout the repository
