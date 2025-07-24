@@ -24,15 +24,23 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build:
-    runs-on: ubuntu-latest
+  build_images_debug:
+    name: 'Build Native Image ${{ matrix.platform }}'
+    needs: clean_release
+    strategy:
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
+    runs-on: ${{matrix.os}}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
       - uses: graalvm/setup-graalvm@v1
         with:
           java-version: '21'      # See 'Options' for more details
           distribution: 'graalvm' # See 'Supported distributions' for available options
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          cache: maven
       - name: Example step
         run: |
           echo "GRAALVM_HOME: $GRAALVM_HOME"
