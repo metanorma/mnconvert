@@ -41,6 +41,9 @@ jobs:
             platform: 'darwin-amd64'
           - os: 'windows-latest'
             platform: 'win-amd64'
+          - os: 'windows-11-arm'
+            platform: 'win-arm64'
+            
     runs-on: ${{matrix.os}}
     steps:
       - name: Checkout the repository
@@ -78,6 +81,8 @@ jobs:
             platform: 'darwin-amd64'
           - os: 'windows-latest'
             platform: 'win-amd64'
+          - os: 'windows-11-arm'
+            platform: 'win-arm64'
     runs-on: ${{matrix.os}}
     steps:
       - name: Checkout the repository
@@ -87,7 +92,7 @@ jobs:
         with:
           java-version: '21'
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          distribution: liberica
+          distribution: graalvm
           cache: maven
 
       - name: Set the release version
@@ -100,7 +105,7 @@ jobs:
 
       - name: Build mnconvert native image
         shell: bash
-        run: ./mvn -Pnative --settings settings.xml -DskipTests clean package shade:shade
+        run: mvn -Pnative --settings settings.xml -DskipTests clean package shade:shade
 
       - name: Archive Release
         uses: thedoctor0/zip-release@0.7.6
