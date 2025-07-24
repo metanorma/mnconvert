@@ -96,7 +96,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: "mnconvert-${{ matrix.platform }}-SNAPSHOT.zip"
+          file: "target/mnconvert-${{ matrix.platform }}-SNAPSHOT.zip"
           file_glob: true
           tag: snapshot-native
           release_name: snapshot - Native Image (~v${{ env.VERSION }})
@@ -105,6 +105,6 @@ jobs:
           prerelease: true
           body: |
               ## Version ~v${{ env.VERSION }} of the ${{ env.DATETIME }}
-              This is a [Native Image](https://www.graalvm.org/latest/reference-manual/native-image/) pre-release of [the latest development work].
+              This is a [Native Image](https://www.graalvm.org/latest/reference-manual/native-image/) pre-release of mnconvert tool.
               ⚠️  **It is not ready for general use** ⚠️
               ⏱  _Snapshot taken the ${{ env.DATETIME }}_
