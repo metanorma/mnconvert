@@ -41,8 +41,8 @@ jobs:
             platform: 'darwin-amd64'
           - os: 'windows-latest'
             platform: 'win-amd64'
-          - os: 'windows-11-arm'
-            platform: 'win-arm64'
+          #- os: 'windows-11-arm'
+          #  platform: 'win-arm64'
             
     runs-on: ${{matrix.os}}
     steps:
@@ -81,8 +81,8 @@ jobs:
             platform: 'darwin-amd64'
           - os: 'windows-latest'
             platform: 'win-amd64'
-          - os: 'windows-11-arm'
-            platform: 'win-arm64'
+          #- os: 'windows-11-arm' # https://github.com/metanorma/mnconvert/issues/431#issuecomment-3113974980
+          #  platform: 'win-arm64'
     runs-on: ${{matrix.os}}
     steps:
       - name: Checkout the repository
