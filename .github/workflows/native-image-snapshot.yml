@@ -8,10 +8,10 @@ on:
     paths-ignore:
       - .github/workflows/release.yml
 
-#permissions:
-#  contents: read
-#  packages: write
-#  actions: write
+permissions:
+  contents: write
+  packages: write
+  actions: write
 
 jobs:
   clean_release:
@@ -33,19 +33,19 @@ jobs:
     needs: clean_release
     strategy:
       matrix:
-        os: [ ubuntu-latest ] #[ macos-latest, windows-latest, ubuntu-latest ]
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
         include:
           - os: 'ubuntu-latest'
             platform: 'linux-amd64'
-          #- os: 'ubuntu-24.04-arm'
-          #  platform: 'linux-arm64'
-          #- os: 'macos-latest'
-          #  platform: 'darwin-arm64'
-          #- os: 'macos-13'
-          #  platform: 'darwin-amd64'
-          #- os: 'windows-latest'
-          #  platform: 'win-amd64'
-          #- os: 'windows-11-arm' # https://github.com/metanorma/mnconvert/issues/431#issuecomment-3113974980
+          - os: 'ubuntu-24.04-arm'
+            platform: 'linux-arm64'
+          - os: 'macos-latest'
+            platform: 'darwin-arm64'
+          - os: 'macos-13'
+            platform: 'darwin-amd64'
+          - os: 'windows-latest'
+            platform: 'win-amd64'
+          #- os: 'windows-11-arm' # TO DO: check later, see https://github.com/metanorma/mnconvert/issues/431#issuecomment-3113974980
           #  platform: 'win-arm64'
     runs-on: ${{matrix.os}}
     steps:
