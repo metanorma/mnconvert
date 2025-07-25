@@ -148,6 +148,9 @@
 						 </executions>
 						 <configuration>
 								 <mainClass>org.metanorma.mnconvert</mainClass>
+								 <buildArgs>
+									 <buildArg>-march=compatibility</buildArg> <!-- generate instructions for best compatibility -->
+								 </buildArgs>
 						 </configuration>
 					 </plugin>
 				 </plugins>
