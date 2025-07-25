@@ -76,7 +76,7 @@ jobs:
         with:
           type: 'zip'
           filename: "mnconvert-${{ matrix.platform }}-SNAPSHOT.zip"
-          directory: target/native/nativeCompile/
+          directory: target/mnconvert.*
 
       #- name: Archive Full Release
       #  uses: thedoctor0/zip-release@0.7.6
