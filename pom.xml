@@ -151,6 +151,32 @@
 						 </executions>
 					 </plugin>
 					 <plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>3.2.1</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+								<configuration>
+									<transformers>
+										<transformer
+											implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+										<transformer
+											implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+											<manifestEntries>
+												<Main-Class>org.metanorma.mnconvert</Main-Class>
+												<Implementation-Version>${project.version}</Implementation-Version>
+											</manifestEntries>
+										</transformer>
+									</transformers>
+								</configuration>
+							</execution>
+						</executions>
+					 </plugin>
+					 <plugin>
 						 <groupId>org.graalvm.buildtools</groupId>
 						 <artifactId>native-maven-plugin</artifactId>
 						 <version>${native.maven.plugin.version}</version>
@@ -170,6 +196,9 @@
 								 <buildArgs>
 									 <buildArg>-march=compatibility</buildArg> <!-- generate instructions for best compatibility -->
 								 </buildArgs>
+								 <classpath>
+									 <param>${project.build.directory}/${project.artifactId}-${project.version}.jar</param>
+								 </classpath>
 						 </configuration>
 					 </plugin>
 				 </plugins>
