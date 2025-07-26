@@ -69,7 +69,7 @@ jobs:
 
       - name: Build mnconvert native image
         shell: bash
-        run: mvn -Pnative --settings settings.xml -DskipTests clean package shade:shade
+        run: mvn -Pnative --settings settings.xml -DskipTests clean package # shade:shade
 
       - name: Archive Release
         uses: thedoctor0/zip-release@0.7.6

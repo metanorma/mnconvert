@@ -39,7 +39,7 @@
 	</repositories>
 	<build>
 		<plugins>
-			<plugin>
+			<!-- <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>3.2.1</version>
@@ -64,7 +64,7 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -196,9 +196,9 @@
 								 <buildArgs>
 									 <buildArg>-march=compatibility</buildArg> <!-- generate instructions for best compatibility -->
 								 </buildArgs>
-								 <!-- <classpath>
+								 <classpath>
 									 <param>${project.build.directory}/${project.artifactId}-${project.version}.jar</param>
-								 </classpath> -->
+								 </classpath>
 						 </configuration>
 					 </plugin>
 				 </plugins>
