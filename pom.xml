@@ -192,13 +192,13 @@
 						 </executions>
 						 <configuration>
 								 <mainClass>org.metanorma.mnconvert</mainClass>
-								 <imageName>native/nativeCompile/${project.artifactId}-${project.version}</imageName>
+								 <!-- <imageName>native/nativeCompile/${project.artifactId}-${project.version}</imageName> -->
 								 <buildArgs>
 									 <buildArg>-march=compatibility</buildArg> <!-- generate instructions for best compatibility -->
 								 </buildArgs>
-								 <classpath>
+								 <!-- <classpath>
 									 <param>${project.build.directory}/${project.artifactId}-${project.version}.jar</param>
-								 </classpath>
+								 </classpath> -->
 						 </configuration>
 					 </plugin>
 				 </plugins>
