@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.metanorma</groupId>
 	<artifactId>mnconvert</artifactId>
-	<version>1.72.0</version>
+	<version>1.73.0</version>
 	<name>Metanorma XML to NISO STS XML two-directional, IEEE to Metanorma ADOC, Metanorma XML to IEEE XML, and XML2RFC to Metanorma Asciidoc IETF converter</name>
 	<packaging>jar</packaging>
 	<url>https://www.metanorma.org</url>
@@ -15,7 +15,8 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<jarname>${project.artifactId}-${project.version}.jar</jarname>
 		<exec.mainClass>org.metanorma.mnconvert</exec.mainClass>
-            	<junit.version>5.4.2</junit.version>
+		<junit.version>5.13.4</junit.version>
+		<maven.surefire.plugin>3.5.3</maven.surefire.plugin>
 	</properties>
 	<distributionManagement>
 		<repository>
@@ -67,7 +68,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.22.1</version>
+				<version>${maven.surefire.plugin}</version>
 				<configuration>
 					<!--redirectTestOutputToFile>true</redirectTestOutputToFile-->
 					<systemPropertyVariables>
@@ -94,15 +95,15 @@
 			<version>2.7.3</version>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.13.1</version>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.github.stefanbirkner</groupId>
-			<artifactId>system-rules</artifactId>
-			<version>1.19.0</version>
+			<groupId>com.ginsberg</groupId>
+			<artifactId>junit5-system-exit</artifactId>
+			<version>1.1.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

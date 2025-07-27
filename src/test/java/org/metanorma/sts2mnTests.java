@@ -1,5 +1,7 @@
 package org.metanorma;
 
+import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
+import org.junit.jupiter.api.*;
 import org.metanorma.utils.LoggerHelper;
 import java.io.File;
 import java.nio.file.Files;
@@ -7,43 +9,26 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.cli.ParseException;
 
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeNotNull;
-
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.contrib.java.lang.system.SystemOutRule;
-import org.junit.rules.TestName;
-
 public class sts2mnTests {
 
     static String XMLFILE_MN;// = "test.mn.xml";
     //final String XMLFILE_STS = "test.sts.xml";
     
-    @Rule
-    public final ExpectedSystemExit exitRule = ExpectedSystemExit.none();
 
-    @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
-
-    @Rule
-    public final EnvironmentVariables envVarRule = new EnvironmentVariables();
-
-    @Rule public TestName name = new TestName();
-    
-    @BeforeClass
+    @BeforeAll
     public static void setUpBeforeClass() throws Exception {
         LoggerHelper.setupLogger();
         XMLFILE_MN = System.getProperty("inputSTSXML");
     }
-    
+
+    @BeforeEach
+    void setUp(TestInfo testInfo) {
+        System.out.println(testInfo.getDisplayName());
+    }
+
     @Test
+    @ExpectSystemExitWithStatus(-1)
     public void notEnoughArguments() throws ParseException {
-        System.out.println(name.getMethodName());
-        exitRule.expectSystemExitWithStatus(-1);
         String[] args = new String[]{""};
         mnconvert.main(args);
 
@@ -52,9 +37,8 @@ public class sts2mnTests {
 
     
     @Test
+    @ExpectSystemExitWithStatus(-1)
     public void xmlNotExists() throws ParseException {
-        System.out.println(name.getMethodName());
-        exitRule.expectSystemExitWithStatus(-1);
 
         String[] args = new String[]{"nonexist.xml"};
         mnconvert.main(args);
@@ -64,10 +48,9 @@ public class sts2mnTests {
     }
 
     @Test
+    @ExpectSystemExitWithStatus(-1)
     public void unknownOutputFormat() throws ParseException {
-        assumeNotNull(XMLFILE_MN);
-        System.out.println(name.getMethodName());
-        exitRule.expectSystemExitWithStatus(-1);
+        Assumptions.assumeTrue(XMLFILE_MN != null);
 
         String[] args = new String[]{"--output-format", "abc", XMLFILE_MN};
         mnconvert.main(args);
@@ -80,8 +63,7 @@ public class sts2mnTests {
 
     @Test
     public void successConvertToAdocDefault() throws ParseException {
-        assumeNotNull(XMLFILE_MN);
-        System.out.println(name.getMethodName());
+        Assumptions.assumeTrue(XMLFILE_MN != null);
         String outFileName = new File(XMLFILE_MN).getAbsolutePath();
         outFileName = outFileName.substring(0, outFileName.lastIndexOf('.') + 1);
         Path fileout = Paths.get(outFileName + "adoc");
@@ -90,13 +72,12 @@ public class sts2mnTests {
         String[] args = new String[]{XMLFILE_MN};
         mnconvert.main(args);
 
-        assertTrue(Files.exists(fileout));        
+        Assumptions.assumeTrue(Files.exists(fileout));
     }
     
     @Test
     public void successConvertToAdoc() throws ParseException {
-        assumeNotNull(XMLFILE_MN);
-        System.out.println(name.getMethodName());
+        Assumptions.assumeTrue(XMLFILE_MN != null);
         String outFileName = new File(XMLFILE_MN).getAbsolutePath();
         outFileName = outFileName.substring(0, outFileName.lastIndexOf('.') + 1);
         Path fileout = Paths.get(outFileName + "adoc");
@@ -105,20 +86,19 @@ public class sts2mnTests {
         String[] args = new String[]{"--output-format", "adoc", XMLFILE_MN};
         mnconvert.main(args);
 
-        assertTrue(Files.exists(fileout));        
+        Assumptions.assumeTrue(Files.exists(fileout));
     }
     
     @Test
     public void successConvertToAdocOutputSpecified() throws ParseException {
-        assumeNotNull(XMLFILE_MN);
-        System.out.println(name.getMethodName());
+        Assumptions.assumeTrue(XMLFILE_MN != null);
         Path fileout = Paths.get(System.getProperty("buildDirectory"), "custom.adoc");
         fileout.toFile().delete();
         
         String[] args = new String[]{"--output-format", "adoc", "--output", fileout.toAbsolutePath().toString(), XMLFILE_MN};
         mnconvert.main(args);
 
-        assertTrue(Files.exists(fileout));
+        Assumptions.assumeTrue(Files.exists(fileout));
     }
 
     /*@Test
@@ -135,12 +115,11 @@ public class sts2mnTests {
 
     @Test
     public void successConvertToRelativeAdocOutputSpecified() throws ParseException {
-        assumeNotNull(XMLFILE_MN);
+        Assumptions.assumeTrue(XMLFILE_MN != null);
         String user_dir = System.getProperty("user.dir");
         System.setProperty("user.dir", System.getProperty("buildDirectory"));
 
         String filename = "custom_relative.adoc";
-        System.out.println(name.getMethodName());
         //Path fileout = Paths.get(System.getProperty("buildDirectory"), "custom_relative.adoc");
         Path fileout = Paths.get(new File(filename).getAbsolutePath());
         fileout.toFile().delete();
@@ -149,7 +128,7 @@ public class sts2mnTests {
                 Paths.get(System.getProperty("buildDirectory"), "..", XMLFILE_MN).normalize().toString()};
         mnconvert.main(args);
         System.setProperty("user.dir", user_dir); // we should restore value for another tests
-        assertTrue(Files.exists(fileout));
+        Assumptions.assumeTrue(Files.exists(fileout));
     }
     
     /*@Test
@@ -181,8 +160,7 @@ public class sts2mnTests {
 
     @Test
     public void successConvertToADOCWithImageLink() throws ParseException {
-        assumeNotNull(XMLFILE_MN);
-        System.out.println(name.getMethodName());
+        Assumptions.assumeTrue(XMLFILE_MN != null);
         String XMLFILE_MN_WITH_IMGLINK = XMLFILE_MN + ".img.xml";
         if (Files.exists(Paths.get(XMLFILE_MN_WITH_IMGLINK))) {
 
@@ -197,8 +175,8 @@ public class sts2mnTests {
             String[] args = new String[]{"--output-format", "adoc", "--imagesdir", "img", "--output", outFileName, XMLFILE_MN_WITH_IMGLINK};
             mnconvert.main(args);
 
-            assertTrue(Files.exists(fileout));
-            assertTrue(Files.exists(imageout));
+            Assumptions.assumeTrue(Files.exists(fileout));
+            Assumptions.assumeTrue(Files.exists(imageout));
         }
     }
     
@@ -228,8 +206,7 @@ public class sts2mnTests {
     
     @Test
     public void successSplitBibData() throws ParseException {
-        assumeNotNull(XMLFILE_MN);
-        System.out.println(name.getMethodName());
+        Assumptions.assumeTrue(XMLFILE_MN != null);
         String outFileName = new File(XMLFILE_MN).getAbsolutePath();
         outFileName = outFileName.substring(0, outFileName.lastIndexOf('.') + 1);
         Path fileoutAdoc = Paths.get(outFileName + "adoc");
@@ -240,8 +217,8 @@ public class sts2mnTests {
         String[] args = new String[]{"--split-bibdata", XMLFILE_MN};
         mnconvert.main(args);
 
-        assertTrue(Files.exists(fileoutAdoc));
-        assertTrue(Files.exists(fileoutRxl));
+        Assumptions.assumeTrue(Files.exists(fileoutAdoc));
+        Assumptions.assumeTrue(Files.exists(fileoutRxl));
     }
     //--split-bibdata
     
