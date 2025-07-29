@@ -1,0 +1,322 @@
+[
+{
+  "name":"com.thaiopensource.relaxng.jaxp.CompactSyntaxSchemaFactory",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.thaiopensource.relaxng.jaxp.XMLSyntaxSchemaFactory",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"java.util.Date",
+  "queryAllPublicMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"getTime","parameterTypes":[] }]
+},
+{
+  "name":"java.io.StringWriter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"java.lang.Character",
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"isDigit","parameterTypes":["char"] }, {"name":"isLetter","parameterTypes":["char"] }]
+},
+{
+  "name":"java.lang.String",
+  "queryAllPublicMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.String"] }, {"name":"endsWith","parameterTypes":["java.lang.String"] }, {"name":"replaceAll","parameterTypes":["java.lang.String","java.lang.String"] }, {"name":"toLowerCase","parameterTypes":[] }, {"name":"toUpperCase","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xalan.extensions.ExtensionHandlerJavaClass",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.String","java.lang.String","java.lang.String"] }]
+},
+{
+  "name":"org.apache.xalan.extensions.ExtensionHandlerJavaPackage",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.String","java.lang.String","java.lang.String"] }]
+},
+{
+  "name":"org.apache.xalan.lib.ExsltStrings",
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"padding","parameterTypes":["double","java.lang.String"] }]
+},
+{
+  "name":"org.apache.xalan.lib.Extensions",
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"nodeset","parameterTypes":["org.apache.xalan.extensions.ExpressionContext","java.lang.Object"] }]
+},
+{
+  "name":"org.apache.xalan.lib.Redirect",
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"close","parameterTypes":["org.apache.xalan.extensions.XSLProcessorContext","org.apache.xalan.templates.ElemExtensionCall"] }, {"name":"open","parameterTypes":["org.apache.xalan.extensions.XSLProcessorContext","org.apache.xalan.templates.ElemExtensionCall"] }, {"name":"write","parameterTypes":["org.apache.xalan.extensions.XSLProcessorContext","org.apache.xalan.templates.ElemExtensionCall"] }]
+},
+{
+  "name":"org.apache.xalan.processor.ProcessorInclude",
+  "methods":[{"name":"setHref","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"org.apache.xalan.processor.ProcessorOutputElem",
+  "methods":[{"name":"setEncoding","parameterTypes":["java.lang.String"] }, {"name":"setIndent","parameterTypes":["boolean"] }, {"name":"setMethod","parameterTypes":["org.apache.xml.utils.QName"] }, {"name":"setVersion","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"org.apache.xalan.processor.WhitespaceInfoPaths",
+  "methods":[{"name":"setElements","parameterTypes":["java.util.Vector"] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemApplyTemplates",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setMode","parameterTypes":["org.apache.xml.utils.QName"] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemAttribute",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setName","parameterTypes":["org.apache.xalan.templates.AVT"] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemCallTemplate",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setName","parameterTypes":["org.apache.xml.utils.QName"] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemChoose",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemComment",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemCopy",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemCopyOf",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setSelect","parameterTypes":["org.apache.xpath.XPath"] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemElement",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setName","parameterTypes":["org.apache.xalan.templates.AVT"] }, {"name":"setNamespace","parameterTypes":["org.apache.xalan.templates.AVT"] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemExtensionCall"
+},
+{
+  "name":"org.apache.xalan.templates.ElemForEach",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setSelect","parameterTypes":["org.apache.xpath.XPath"] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemIf",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setTest","parameterTypes":["org.apache.xpath.XPath"] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemLiteralResult",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"addLiteralResultAttribute","parameterTypes":["org.apache.xalan.templates.AVT"] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemMessage",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setTerminate","parameterTypes":["boolean"] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemNumber",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setCount","parameterTypes":["org.apache.xpath.XPath"] }, {"name":"setFormat","parameterTypes":["org.apache.xalan.templates.AVT"] }, {"name":"setLang","parameterTypes":["org.apache.xalan.templates.AVT"] }, {"name":"setLevel","parameterTypes":["int"] }, {"name":"setValue","parameterTypes":["org.apache.xpath.XPath"] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemOtherwise",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemPI",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setName","parameterTypes":["org.apache.xalan.templates.AVT"] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemParam",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemSort",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setDataType","parameterTypes":["org.apache.xalan.templates.AVT"] }, {"name":"setOrder","parameterTypes":["org.apache.xalan.templates.AVT"] }, {"name":"setSelect","parameterTypes":["org.apache.xpath.XPath"] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemTemplate",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setMatch","parameterTypes":["org.apache.xpath.XPath"] }, {"name":"setMode","parameterTypes":["org.apache.xml.utils.QName"] }, {"name":"setName","parameterTypes":["org.apache.xml.utils.QName"] }, {"name":"setPriority","parameterTypes":["double"] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemText",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setDisableOutputEscaping","parameterTypes":["boolean"] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemValueOf",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setDisableOutputEscaping","parameterTypes":["boolean"] }, {"name":"setSelect","parameterTypes":["org.apache.xpath.XPath"] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemVariable",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setName","parameterTypes":["org.apache.xml.utils.QName"] }, {"name":"setSelect","parameterTypes":["org.apache.xpath.XPath"] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemWhen",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setTest","parameterTypes":["org.apache.xpath.XPath"] }]
+},
+{
+  "name":"org.apache.xalan.templates.ElemWithParam",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setName","parameterTypes":["org.apache.xml.utils.QName"] }, {"name":"setSelect","parameterTypes":["org.apache.xpath.XPath"] }]
+},
+{
+  "name":"org.apache.xalan.templates.FuncFormatNumb",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xalan.templates.FuncKey",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xalan.templates.KeyDeclaration",
+  "methods":[{"name":"setMatch","parameterTypes":["org.apache.xpath.XPath"] }, {"name":"setName","parameterTypes":["org.apache.xml.utils.QName"] }, {"name":"setUse","parameterTypes":["org.apache.xpath.XPath"] }]
+},
+{
+  "name":"org.apache.xalan.templates.Stylesheet",
+  "methods":[{"name":"setExcludeResultPrefixes","parameterTypes":["org.apache.xml.utils.StringVector"] }, {"name":"setExtensionElementPrefixes","parameterTypes":["org.apache.xml.utils.StringVector"] }, {"name":"setVersion","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"org.apache.xalan.templates.StylesheetRoot"
+},
+{
+  "name":"org.apache.xalan.transformer.TransformerImpl",
+  "methods":[{"name":"getErrorListener","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xerces.impl.dv.dtd.DTDDVFactoryImpl",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xerces.impl.dv.xs.ExtendedSchemaDVFactoryImpl",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xerces.impl.dv.xs.SchemaDVFactoryImpl",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xerces.impl.xpath.regex.message"
+},
+{
+  "name":"org.apache.xerces.impl.xpath.regex.message_en"
+},
+{
+  "name":"org.apache.xerces.parsers.SAXParser",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xerces.parsers.XIncludeAwareParserConfiguration",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xerces.parsers.XIncludeParserConfiguration",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xml.dtm.ref.DTMManagerDefault",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xml.serializer.ToTextStream",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xml.serializer.XMLEntities"
+},
+{
+  "name":"org.apache.xml.serializer.ToXMLStream",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xml.utils.FastStringBuffer",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncConcat",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncContains",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncCount",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncCurrent",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncGenerateId",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncLast",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncLocalPart",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncNamespace",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncNormalizeSpace",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncNot",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncNumber",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncPosition",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncQname",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncRound",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncStartsWith",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncStringLength",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncSubstring",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncSubstringAfter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncSubstringBefore",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncSum",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.xpath.functions.FuncTranslate",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.metanorma.utils.RegExHelper",
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"escapeFormattingCommands","parameterTypes":["java.lang.String"] }, {"name":"matches","parameterTypes":["java.lang.String","java.lang.String"] }]
+}
+]
