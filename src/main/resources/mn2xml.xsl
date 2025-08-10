@@ -1816,7 +1816,8 @@
 																metanorma-extension/semantic-metadata/copyright-statement |
 																metanorma-extension/presentation-metadata/* |
 																metanorma-extension/table[@id = '_misccontainer_anchor_aliases'] |
-																metanorma-extension/*[local-name() = 'UnitsML']"
+																metanorma-extension/*[local-name() = 'UnitsML'] |
+																metanorma-extension/toc"
 																mode="front_check"/>
 
 	<!-- skip processed structure and deep down -->
