@@ -2278,7 +2278,7 @@
 					<xsl:apply-templates select="docidentifier"/>
 					<xsl:apply-templates select="title" mode="mixed_citation"/>
 				</xsl:when>
-				<xsl:when test="(@type = 'standard' or @type = 'international-standard' or docnumber or fetched) and $outputformat != 'IEEE'">
+				<xsl:when test="(@type = 'standard' or @type = 'international-standard' or docnumber) and $outputformat != 'IEEE'"> <!--  or fetched -->
 					<std>
 						<xsl:variable name="urn" select="docidentifier[@type = 'URN']"/>
 						<xsl:variable name="docidentifier_URN" select="$bibitems_URN/bibitem[@id = $id]/urn"/>
@@ -2425,6 +2425,10 @@
 					</mixed-citation>
 				</xsl:otherwise>
 			</xsl:choose>
+			<xsl:variable name="bibitem_id" select="@id"/>
+			<xsl:apply-templates select="following-sibling::note[preceding-sibling::bibitem[1][@id = current()/@id]]">
+				<xsl:with-param name="skip_in_bibitem">false</xsl:with-param>
+			</xsl:apply-templates>
 		</ref>
 	</xsl:template>
 	
@@ -3594,8 +3598,9 @@
 	</xsl:template>
 	
 	<xsl:template match="note" name="note">
-	
+		<xsl:param name="skip_in_bibitem">true</xsl:param>
 		<xsl:choose>
+			<xsl:when test="$skip_in_bibitem = 'true' and parent::references"></xsl:when>
 			<xsl:when test="parent::table and @type = 'units'">
 				<p content-type="Dimension">
 					<xsl:apply-templates/>
