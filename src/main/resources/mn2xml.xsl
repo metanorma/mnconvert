@@ -1186,7 +1186,7 @@
 			</comm-ref>
 			
 			<xsl:variable name="secretariat">
-				<!-- <xsl:apply-templates select="ext/editorialgroup/secretariat" mode="front"/> -->
+				<xsl:apply-templates select="ext/editorialgroup/secretariat" mode="front"/>
 				<xsl:apply-templates select="contributor[role/description = 'secretariat']/organization/subdivision/name" mode="front"/>
 			</xsl:variable>
 			<xsl:if test="normalize-space($secretariat) != '' or $organization = 'BSI'">
