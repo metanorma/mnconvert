@@ -5492,7 +5492,10 @@
   
 	<xsl:template match="image/@src">
 		<xsl:attribute name="xlink:href">
-			<xsl:value-of select="."/>
+			<xsl:choose>
+				<xsl:when test="not(starts-with(., 'data:'))"><xsl:value-of select="java:org.metanorma.utils.Util.encodeURL(.)"/></xsl:when>
+				<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+			</xsl:choose>
 		</xsl:attribute>
 	</xsl:template>
 	
