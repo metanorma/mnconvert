@@ -1067,29 +1067,79 @@
 			
 			<xsl:variable name="related_comm_ref" select="relation[@type='related']/bibitem/docidentifier"/>
 			<xsl:variable name="related_comm_ref_text">Committee reference</xsl:variable>
+			
+			<xsl:variable name="contributor_author_">
+				<xsl:copy-of select="contributor[role[@type = 'author']/description = 'committee']/node()"/>
+			</xsl:variable>
+			<xsl:variable name="contributor_author" select="xalan:nodeset($contributor_author_)"/>
+			<!-- <xsl:copy-of select="$contributor_author"/> -->
+			<xsl:variable name="organization_abbreviation" select="normalize-space($contributor_author/organization/abbreviation)"/>
+			<xsl:variable name="editorialgroup">
+				<xsl:if test="$organization_abbreviation = 'ISO' or 
+					contains($organization_abbreviation, 'ISO/') or
+					contains($organization_abbreviation, '/ISO')"><xsl:value-of select="concat($organization_abbreviation, '/')"/></xsl:if>
+				<xsl:value-of select="normalize-space($contributor_author/organization/subdivision/identifier[@type = 'full'])"/>
+			</xsl:variable>
+			
+			<xsl:variable name="subdivision_subcommittee_">
+				<xsl:copy-of select="$contributor_author/organization/subdivision[@type = 'Subcommittee']/node()"/>
+			</xsl:variable>
+			<xsl:variable name="subdivision_subcommittee" select="xalan:nodeset($subdivision_subcommittee_)"/>
+			
+			<xsl:variable name="subdivision_technical_committee_">
+				<xsl:copy-of select="$contributor_author/organization/subdivision[@type = 'Technical committee']/node()"/>
+			</xsl:variable>
+			<xsl:variable name="subdivision_technical_committee" select="xalan:nodeset($subdivision_technical_committee_)"/>
+			
+			<xsl:variable name="subdivision_workgroup_">
+				<xsl:copy-of select="$contributor_author/organization/subdivision[@type = 'Workgroup']/node()"/>
+			</xsl:variable>
+			<xsl:variable name="subdivision_workgroup" select="xalan:nodeset($subdivision_workgroup_)"/>
+			
+			<!-- <subdivision_technical_committee><xsl:value-of select="$subdivision_technical_committee"/></subdivision_technical_committee>
+			<subdivision_subcommittee><xsl:value-of select="$subdivision_subcommittee"/></subdivision_subcommittee>
+			<subdivision_workgroup><xsl:value-of select="$subdivision_workgroup"/></subdivision_workgroup> -->
+			
 			<comm-ref>
 				<xsl:choose>
 					<xsl:when test="$organization = 'BSI' and starts-with($related_comm_ref, $related_comm_ref_text)">
 						<xsl:value-of select="normalize-space(substring-after($related_comm_ref, $related_comm_ref_text))"/>
 					</xsl:when>
-					<xsl:when test="ext/editorialgroup/@identifier">
+					<!-- <xsl:when test="ext/editorialgroup/@identifier">
 						<xsl:value-of select="ext/editorialgroup/@identifier"/>
+					</xsl:when> -->
+					<xsl:when test="normalize-space($editorialgroup) != ''">
+						<xsl:value-of select="$editorialgroup"/>
 					</xsl:when>
-					<xsl:when test="ext/editorialgroup/technical-committee and not(
+					<!-- <xsl:when test="ext/editorialgroup/technical-committee and not(
 						ext/editorialgroup/subcommittee and 
 						ext/editorialgroup/workgroup )">
 						<xsl:value-of select="ext/editorialgroup/technical-committee/@number"/>
+					</xsl:when> -->
+					<xsl:when test="normalize-space($subdivision_technical_committee) != '' and
+						normalize-space($subdivision_subcommittee) = '' and 
+						normalize-space($subdivision_workgroup) = ''">
+						<xsl:value-of select="substring-after($subdivision_technical_committee/identifier, ' ')"/>
 					</xsl:when>
+					
 					<xsl:otherwise>
 
 						<xsl:choose>
-							<xsl:when test="ext/editorialgroup/agency">
+							<!-- <xsl:when test="ext/editorialgroup/agency">
 								<xsl:for-each select="ext/editorialgroup/agency">
 									<xsl:value-of select="."/>
 									<xsl:if test="position() != last()">/</xsl:if>
 								</xsl:for-each>
 								<xsl:text> </xsl:text>
+							</xsl:when> -->
+							<xsl:when test="$organization_abbreviation != ''">
+								<xsl:for-each select="contributor[role[@type = 'author']/description = 'committee']">
+									<xsl:value-of select="organization/abbreviation"/>
+									<xsl:if test="position() != last()">/</xsl:if>
+								</xsl:for-each>
+								<xsl:text> </xsl:text>
 							</xsl:when>
+							
 							<xsl:otherwise>
 								<xsl:variable name="abbreviation">
 									<xsl:for-each select="copyright/owner/organization/abbreviation">
@@ -1112,15 +1162,15 @@
 						</xsl:choose>
 							
 						
-						
-						<xsl:variable name="editorialgroup">
+						<!-- TODO: remove this code, no need anymore -->
+						<xsl:variable name="editorialgroup_var2">
 							<item><xsl:apply-templates select="ext/editorialgroup/technical-committee" mode="front"/></item>
 							<item><xsl:apply-templates select="ext/editorialgroup/subcommittee" mode="front"/></item>
 							<xsl:if test="$organization != 'ISO'"> <!-- should only be the "committee level" -->
 								<item><xsl:apply-templates select="ext/editorialgroup/workgroup" mode="front"/></item> 
 							</xsl:if>
 						</xsl:variable>
-						<xsl:for-each select="xalan:nodeset($editorialgroup)/item[normalize-space() != '']">
+						<xsl:for-each select="xalan:nodeset($editorialgroup_var2)/item[normalize-space() != '']">
 							<xsl:value-of select="."/>
 							<xsl:if test="following-sibling::*[normalize-space() != '']">
 								<xsl:text>/</xsl:text>
@@ -1404,6 +1454,7 @@
 		<xsl:apply-templates />
 	</xsl:template>
 	
+	<!-- TODO: remove this code, no need anymore -->
 	<xsl:template match="ext/editorialgroup/technical-committee |
 																ext/editorialgroup/subcommittee |
 																ext/editorialgroup/workgroup" mode="front">
@@ -5640,7 +5691,7 @@
 		</tex-math>
 	</xsl:template>
 	
-	<xsl:template match="tt | identifier[not(ancestor::requirement)]">
+	<xsl:template match="tt | identifier[not(ancestor::requirement) and not(ancestor::contributor)]">
 		<monospace>
 			<xsl:apply-templates/>
 		</monospace>
