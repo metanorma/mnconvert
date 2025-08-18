@@ -4513,6 +4513,9 @@
 	<!-- need to be tested (find original NISO) -->
 	<xsl:template match="callout">
 		<xref ref-type="other" rid="{@target}">
+			<xsl:if test="not(@target)">
+				<xsl:attribute name="rid">empty</xsl:attribute>
+			</xsl:if>
 			<xsl:apply-templates/>
 		</xref>
 	</xsl:template>
