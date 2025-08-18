@@ -1,0 +1,61 @@
+{
+  "resources":{
+  "includes":[{
+    "pattern":"\\QMETA-INF/MANIFEST.MF\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/org.apache.xerces.xni.parser.XMLParserConfiguration\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/org.xml.sax.XMLReader\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/org.xml.sax.driver\\E"
+  }, {
+    "pattern":"\\Qsun/util/logging/resources/logging_en.properties\\E"
+  }, {
+    "pattern":".*/*.xsl$"
+  }, {
+    "pattern":".*NISO-STS-.*"
+  }, {
+    "pattern":".*ISO-STS-.*"
+  }, {
+    "pattern":".*RFC/.*"
+  }, {
+    "pattern":"\\Qorg/apache/xml/serializer/Encodings.properties\\E"
+  }, {
+    "pattern":"\\Qorg/apache/xml/serializer/output_text.properties\\E"
+  }, {
+    "pattern":"\\Qorg/apache/xml/serializer/output_unknown.properties\\E"
+  }, {
+    "pattern":"\\Qorg/apache/xml/serializer/output_xml.properties\\E"
+  }, {
+    "pattern":"\\Qorg/apache/xerces/impl/xpath/regex/message.properties\\E"
+  }]},
+  "bundles":[{
+    "name":"sun.util.logging.resources.logging",
+    "locales":["", "en"]
+  }, {
+    "name":"org.apache.xml.res.XMLErrorResources",
+    "locales":[""]
+  }, {
+    "name":"org.apache.xalan.res.XSLTErrorResources",
+    "locales":[""]
+  }, {
+    "name":"com.thaiopensource.relaxng.pattern.resources.Messages",
+    "locales":[""]
+  }, {
+    "name":"org.apache.xerces.impl.xpath.regex.message",
+    "locales":["", "en"]
+  }, {
+    "name":"org.apache.xerces.impl.msg.XMLSchemaMessages",
+    "locales":["", "en"]
+  }, {
+    "name":"org.apache.xml.serializer.XMLEntities",
+    "locales":["", "en"]
+  }, {
+    "name":"org.apache.xml.serializer.utils.SerializerMessages",
+    "locales":[""]
+  }, {
+    "name":"org.apache.xml.utils.res.XResources_en",
+    "classNames":["org.apache.xml.utils.res.XResources_en"],
+    "locales":["", "en"]
+  }]
+}
