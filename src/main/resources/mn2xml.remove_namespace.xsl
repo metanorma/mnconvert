@@ -217,10 +217,12 @@
 	<!-- <xsl:template match="*[local-name() = 'semx']" mode="remove_namespace" priority="3">
 		<xsl:apply-templates mode="remove_namespace"/>
 	</xsl:template> -->
-	<!-- ===================== -->
-	<!-- END remove namespace -->
-	<!-- ===================== -->
 	
 	<xsl:template match="*[local-name() = 'image']/@filename" mode="remove_namespace" priority="3"/>
 	
+	<xsl:template match="@autonum" mode="remove_namespace" priority="3"/>
+	
+	<!-- ===================== -->
+	<!-- END remove namespace -->
+	<!-- ===================== -->
 </xsl:stylesheet>
