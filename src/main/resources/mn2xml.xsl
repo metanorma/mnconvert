@@ -5555,6 +5555,11 @@
 						<xsl:copy-of select="$disp-formula"/>
 					</p>
 				</xsl:when>
+				<xsl:when test="parent::li">
+					<p>
+						<xsl:copy-of select="$disp-formula"/>
+					</p>
+				</xsl:when>
 				<xsl:otherwise>
 					<xsl:copy-of select="$disp-formula"/>
 				</xsl:otherwise>
