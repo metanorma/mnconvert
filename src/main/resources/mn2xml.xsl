@@ -1259,6 +1259,10 @@
 			
 			<xsl:apply-templates select="/*/preface/abstract" mode="front_abstract"/>
 			
+			<xsl:apply-templates select="keyword[1]">
+				<xsl:with-param name="process">true</xsl:with-param>
+			</xsl:apply-templates>
+			
 			<xsl:variable name="custom-meta-group_">
 				<xsl:choose>
 					<xsl:when test="$metanorma_type = 'IEC'">
@@ -1787,6 +1791,8 @@
 																ext/price-code |
 																ext/flavor |
 																bibdata/uri |
+																bibdata/keyword |
+																stage-published |
 																metanorma-extension/semantic-metadata/proj-id |
 																metanorma-extension/semantic-metadata/suppl-type |
 																metanorma-extension/semantic-metadata/suppl-number |
