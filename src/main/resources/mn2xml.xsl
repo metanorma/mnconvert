@@ -5597,7 +5597,9 @@
 		</xsl:element>
 	</xsl:template>
 	
-	<xsl:template match="asciimath[following-sibling::latexmath or preceding-sibling::latexmath or following-sibling::mml:math or preceding-sibling::mml:math]"/>
+	<xsl:template match="asciimath[following-sibling::latexmath or preceding-sibling::latexmath or 
+				following-sibling::mml:math or preceding-sibling::mml:math or
+				preceding-sibling::node()[1][self::text()]]"/>
 	
 	<!-- if there latexmath, then ignore mathml -->
 	<xsl:template match="mml:math[following-sibling::latexmath or preceding-sibling::latexmath]"/>
