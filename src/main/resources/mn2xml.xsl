@@ -2530,6 +2530,17 @@
 	<xsl:template match="bibitem/contributor[role/@type = 'author']/organization" priority="2">
 		<collab><xsl:apply-templates /></collab>
 	</xsl:template>
+	<xsl:template match="bibitem/contributor/person/affiliation" priority="2">
+		<aff>
+			<xsl:apply-templates />
+		</aff>
+	</xsl:template>
+	<xsl:template match="bibitem/contributor/person/affiliation/organization" priority="2">
+		<xsl:apply-templates />
+	</xsl:template>
+	<xsl:template match="bibitem/contributor/person/affiliation/organization/name" priority="2">
+		<xsl:apply-templates />
+	</xsl:template>
 	<xsl:template match="bibitem/contributor/organization/name" priority="2">
 		<xsl:apply-templates />
 	</xsl:template>
