@@ -189,12 +189,23 @@
 			<!-- <publisher> -->
 			<xsl:apply-templates select="../boilerplate/feedback-statement/clause[1]/p[1]" mode="front_ieee_publisher"/>
 			
-			<xsl:if test="ext/editorialgroup/committee or ext/editorialgroup/society">
+			<xsl:variable name="contributor_authorizer_">
+				<xsl:copy-of select="contributor[role[@type = 'authorizer']/description = 'committee']/node()"/>
+			</xsl:variable>
+			<xsl:variable name="contributor_authorizer" select="xalan:nodeset($contributor_authorizer_)"/>
+			
+			<xsl:variable name="subdivision_committee" select="normalize-space($contributor_authorizer/organization/subdivision[@type = 'Committee']/name)"/>
+			<xsl:variable name="subdivision_society" select="normalize-space($contributor_authorizer/organization/subdivision[@type = 'Society']/name)"/>
+			
+			<!-- ext/editorialgroup/committee or ext/editorialgroup/society -->
+			<xsl:if test="$subdivision_committee != '' or $subdivision_society != ''">
 				<std-sponsor>
 					<!-- <xsl:text>Sponsor </xsl:text> -->
 					<xsl:variable name="items_">
-						<xsl:apply-templates select="ext/editorialgroup/committee" mode="front_ieee"/>
-						<xsl:apply-templates select="ext/editorialgroup/society" mode="front_ieee"/>
+						<!-- <xsl:apply-templates select="ext/editorialgroup/committee" mode="front_ieee"/>
+						<xsl:apply-templates select="ext/editorialgroup/society" mode="front_ieee"/> -->
+						<committee><xsl:value-of select="$subdivision_committee"/></committee>
+						<society><xsl:value-of select="$subdivision_society"/></society>
 					</xsl:variable>
 					<xsl:variable name="items" select="xalan:nodeset($items_)"/>
 					<xsl:for-each select="$items/*[normalize-space() != '']">
@@ -355,9 +366,9 @@
 		</publisher>
 	</xsl:template>
 	
-	<xsl:template match="ext/editorialgroup/committee | ext/editorialgroup/society" mode="front_ieee">
+	<!-- <xsl:template match="ext/editorialgroup/committee | ext/editorialgroup/society" mode="front_ieee">
 		<xsl:copy-of select="."/>
-	</xsl:template>
+	</xsl:template> -->
 	
 	<xsl:template match="semantic-metadata/partner-secretariat">
 		<partner>
