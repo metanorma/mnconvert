@@ -1,0 +1,135 @@
+
+[[sec_7]]
+[heading=terms and definitions,keeptitle=true]
+== Definitions
+
+
+=== ANSI
+
+American National Standards Institute. ANSI is a private nonprofit organization that oversees the development of voluntary consensus standards in the U.S.
+
+=== ASCII
+
+ASCII is a character-encoding scheme based on the English alphabet. It defines the encoding for 128 characters including A-Z, a-z, 0-9, some symbols, and some control characters. +
+It is sometimes used to refer to “plain text,” i.e., text without special characters or equations.
+
+=== attribute (an XML term)
+
+An attribute is a name-value pair associated with an XML element that modifies certain features of the element. Attributes hold facts about an element, such as which type of list (e.g., numbered, bulleted, or plain) is being requested when using the List <list> element. Each attribute has both a name (e.g., @list-type) and a value (e.g., “``bullet``”).
+
+=== container element (an XML term)
+
+An XML term of art that indicates that one element has only other elements inside it, in a parent/child or ancestor/descendent relationship.
+
+=== Crossref
+
+Crossref is an independent membership association appointed as an official DOI® Registration Agency for scholarly and professional publications.
+
+=== document type (an XML term)
+
+A class of documents, for example, “standards,” that can be described with a single XML model.
+
+=== DOI®
+
+Digital Object Identifier. A DOI® is a character string used to identify an electronic document or other object persistently (over changes in time, location, and ownership).
+
+=== DTD (an XML term)
+
+Document Type Definition. A DTD is a set of markup declarations that define a type of document in XML. DTDs are one type of XML schema language, see also XSD schema and RELAX NG schema.
+
+=== element (an XML term)
+
+Elements are nouns, such as “section” and “non normative example,” that represent components of standards documents, the standards themselves, and accompanying metadata.
+
+=== element content (an XML term)
+
+The content of an element that contains only other elements. For example, the element for List (<list>) is a container element for the elements that make up the structure of a list, such as the list title (<title>) and list items (<list-item>). The List element contains no text directly inside it, all list text is inside the contained elements.
+
+=== emoticon
+
+An icon or small graphic used to depict emotion (for example, a “smiley face” to indicate happiness or laughter).
+
+=== ftp
+
+File Transfer Protocol. An Internet Engineering Task Force standard (RFC 959) that defines a protocol for transferring files between two hosts over a network.
+
+=== glyph
+
+A graphical element used to represent a character.
+
+=== JATS
+
+ANSI/NISO Z39.96 Journal Article Tag Suite.
+
+=== LaTeX
+
+A document preparation system for the TeX typesetting program.
+
+=== MathML
+
+A specification of the World Wide Web Consortium (W3C) for describing mathematical notation and capturing both its structure and content in XML.
+
+=== metadata
+
+Metadata are data about data, such as bibliographic information. Metadata elements that describe a standard (such as the date on which the standard was approved) are distinct from elements that contain the textual narrative and graphical content of the standard.
+
+=== milestone
+
+A milestone is a marker for the beginning or end of a non-hierarchically nested object, that is, a textual component that cannot be expressed in the normal, non-overlapping, tree structure of an XML document.
+
+=== mixed content (an XML term)
+
+The content of an element that may contain embedded elements as well as text (letters, numbers, and special characters). For example, a mixed content element may contain the highlighting elements such as bold and italic interspersed in the text.
+
+=== pixel
+
+In digital imaging, a pixel is a single point in a bitmap.
+
+=== RELAX NG schema (RNG)
+
+A schema language for XML.
+
+=== Schematron
+
+A rule-based validation language used for making and testing assertions about an XML instance.
+
+=== tag set
+
+A model for a particular document type, built from the XML elements and attributes defined in the Tag Suite. Many tag sets can be made from the elements and attributes of the full Tag Suite.
+
+=== Tag Suite
+
+All of the XML elements and attributes defined as part of this NISO standard. From this Suite of components, individual tag sets for a particular document type may be constructed.
+
+=== TeX
+
+A typesetting system popular for setting mathematics and physical sciences content.
+
+=== Unicode®
+
+Used to represent both the Unicode® Standard, which specifies the representation of text in modern software products and standards, and The Unicode Consortium, which is the organization responsible for developing and maintaining the Unicode® Standard.
+
+=== Unicode Private Use Area
+
+Blocks of characters that are officially not defined by the Unicode standard but are reserved for an organization’s private use. Users must understand that characters within the private use area must be defined within a system and that they have no meaning outside of that system.
+
+=== URI
+
+Uniform Resource Identifier. An identifier (such as a URL) that may be used as a live link, typically naming a website, such as: https://www.mulberrytech.com[https://www.mulberrytech.com]
+
+=== wrapper element (an XML term)
+
+An element that contains a series of elements that make up a whole unit; it acts as a single wrapper around all the elements that are part of a single logical component.
+
+=== XML (Extensible Markup Language)
+
+A specification of the World Wide Web Consortium (W3C) for creating custom markup languages that enable information systems to share structured information.
+
+=== XML term
+
+A term defined in the XML specification or commonly used by the XML community in the context of XML applications.
+
+=== XSD schema
+
+XML Schema Definition. A recommendation of the World Wide Web Consortium (W3C) that defines a language for creating XML Schemas: https://www.w3.org/TR/xmlschema-1[https://www.w3.org/TR/xmlschema-1]
+

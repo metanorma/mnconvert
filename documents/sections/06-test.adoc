@@ -1,0 +1,150 @@
+
+[[sec_6]]
+== Test methods
+
+[[sec_6.1]]
+=== Moisture content
+
+Determine the mass fraction of moisture in accordance with the method specified in <<ISO_712>>.
+
+[[sec_6.2]]
+=== Waxy rice content
+
+Determine the mass fraction of waxy rice. <<sec_B>> gives an example of a suitable method.
+
+[[sec_6.3]]
+=== Nitrogen content and crude protein content
+
+Determine the nitrogen content and crude protein content in accordance with either <<ISO_16634_,clause=9>>, or <<norm_ref_6,ISO 20483:2013>>. For details on the determination of protein content using the Kjeldahl method, see Reference <<ref_10,<<ref_10>>>> in the Bibliography. For details concerning the use of the Dumas method, see References <<ref_15,<<ref_15>>>> and <<ref_16,<<ref_16>>>>.
+
+Calculate the crude protein content of the dry product by multiplying the value of the nitrogen content by the conversion factor specified in <<norm_ref_6,annex=C>> and Table C.1, that is adapted to the type of cereals or pulses <<ref_11,<<ref_11>>>>  <<ref_12,<<ref_12>>>> and to their use.
+
+[[sec_6.4]]
+=== Gelatinization time
+
+Determine the gelatinization time, 
+
+[stem]
+++++
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<msub>
+<mi>t</mi>
+<mn>90</mn>
+</msub>
+</math>
+++++
+
+, for rice kernels during cooking. An example of a typical curve is given in <<fig_C.1>>. Three typical stages of gelatinization are shown in <<fig_C.2>>.
+
+Report the results as specified in <<sec_7>>.
+
+[[sec_6.5]]
+=== Husked rice yield
+
+[[sec_6.5.1]]
+==== Determination
+
+NOTE: Only use paddy or parboiled rice for the determination of husked rice yield.
+
+Determine the husked rice yield in accordance with <<ISO_6646>>.
+
+[[sec_6.5.2]]
+==== Precision
+
+[[sec_6.5.2.1]]
+===== Interlaboratory test
+
+The results of an interlaboratory test are given in <<sec_D>> for information
+
+[[sec_6.5.2.2]]
+===== Repeatability
+
+The absolute difference between two independent single test results, obtained using the same method on identical test material in the same laboratory by the same operator using the same equipment within a short interval of time, shall not exceed the arithmetic mean of the values for 
+
+[stem]
+++++
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<mi>r</mi>
+</math>
+++++
+
+ obtained from the interlaboratory study for husked rice in more than 5 % of cases:
+
+[[formula_6.5.2.2]]
+[stem]
+++++
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<mi>r</mi>
+<mo>=</mo>
+<mn>1</mn>
+<mi>%</mi>
+</math>
+++++
+
+
+[[array_tab_a]]
+[%unnumbered]
+[cols="1,1"]
+|===
+
+|
+
+[stem]
+++++
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<mi>r</mi>
+</math>
+++++
+
+ |is the repeatability limit. 
+
+|===
+
+
+
+[[sec_6.5.2.3]]
+===== Reproducibility
+
+The absolute difference between two single test results, obtained using the same method on identical test material in different laboratories by different operators using different equipment, shall not exceed the arithmetic mean of the values for 
+
+[stem]
+++++
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<mi>R</mi>
+</math>
+++++
+
+ obtained from the interlaboratory study in more than 5 % of cases:
+
+[[formula_6.5.2.3]]
+[stem]
+++++
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<mi>R</mi>
+<mo>=</mo>
+<mn>3</mn>
+<mi>%</mi>
+</math>
+++++
+
+
+[[array_tab_b]]
+[%unnumbered]
+[cols="1,1"]
+|===
+
+|
+
+[stem]
+++++
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<mi>R</mi>
+</math>
+++++
+
+ |is the reproducibility limit. 
+
+|===
+
+
+
