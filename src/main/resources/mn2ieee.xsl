@@ -143,16 +143,24 @@
 				</xsl:call-template>
 			</xsl:variable>
 			
-			<xsl:variable name="title">
+			<!-- <!ENTITY % std-title-group-model
+											"(std-intro-title*, std-main-title, 
+												std-full-title, alt-title*)"               > -->
+			<!-- <xsl:variable name="title">
 				<xsl:text>IEEE </xsl:text>
 				<xsl:value-of select="$doctype_str"/>
 				<xsl:text> for </xsl:text>
 				<xsl:apply-templates select="title[not(@type='provenance')]/node()"/>
-			</xsl:variable>
+			</xsl:variable> -->
+			<xsl:variable name="title_intro"><xsl:apply-templates select="title[@type='intro']/node()"/></xsl:variable>
+			<xsl:variable name="title_main"><xsl:apply-templates select="title[@type='main']/node()"/></xsl:variable>
 			
 			<std-title-group>
-				<std-main-title><xsl:copy-of select="$title"/></std-main-title>
-				<std-full-title><xsl:copy-of select="$title"/></std-full-title>
+				<xsl:if test="normalize-space($title_intro) != ''">
+					<std-intro-title><xsl:copy-of select="$title_intro"/></std-intro-title>
+				</xsl:if>
+				<std-main-title><xsl:copy-of select="$title_main"/></std-main-title>
+				<std-full-title><xsl:copy-of select="$title_main"/></std-full-title>
 				<xsl:if test="relation[@type = 'updates'] or ../metanorma-extension/semantic-metadata/related-article-edition">
 					<alt-title>
 						<!-- <related-article related-article-type="revision-of">(Revision of <std>IEEE Std 1127-1998</std>)</related-article> -->
