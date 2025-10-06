@@ -1910,6 +1910,7 @@
 		<xsl:value-of select="."/>
 	</xsl:template>
 	
+	<xsl:variable name="linebreak">&#x2028;</xsl:variable>
 	
 	<xsl:template match="boilerplate/copyright-statement">
 		<xsl:apply-templates/>
@@ -4380,7 +4381,10 @@
 	</xsl:template>
 
 	<xsl:template match="br">
-		<break/>
+		<xsl:choose>
+			<xsl:when test="$outputformat = 'IEEE' and ancestor::feedback-statement and ancestor::clause[count(preceding-sibling::clause) = 1]"><xsl:value-of select="$linebreak"/></xsl:when>
+			<xsl:otherwise><break/></xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="th[strong][br[parent::strong]]/node()[1][self::text()]">
