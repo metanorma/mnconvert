@@ -111,16 +111,28 @@
 			
 			<xsl:variable name="bibdata"><xsl:copy-of select="."/></xsl:variable> <!-- for using bibdata in another context in 'for-each' iterations -->
 			
-			<xsl:variable name="std_prefix">IEEE Std </xsl:variable>
+			<!-- <xsl:variable name="std_prefix">IEEE Std </xsl:variable> -->
 			<xsl:variable name="number" select="docidentifier[@type = 'IEEE'][not(@scope)]"/>
 			<xsl:variable name="year" select="substring(normalize-space(date[@type = 'issued']),1,4)"/> <!-- approval date -->
 			
 			<std-id std-id-type="doi"><xsl:value-of select="../metanorma-extension/semantic-metadata/std-id-doi"/></std-id>
 			
-			<std-designation content-type="full"><xsl:value-of select="concat($std_prefix,$number,'-',$year)"/></std-designation> <!-- Example: IEEE Std 1127-2013 -->
-			<std-designation content-type="full-tm"><xsl:value-of select="concat($std_prefix,$number,$trademark,'-',$year)"/></std-designation> <!-- Example: IEEE Std 1127&#x2122;-2013 -->
-			<std-designation content-type="std-num"><xsl:value-of select="concat($number,'-',$year)"/></std-designation> <!-- Example: 1127-2013 -->
-			<std-designation content-type="std-num-tm"><xsl:value-of select="concat($number,$trademark,'-',$year)"/></std-designation> <!-- Example:  1127&#x2122;-2013-->
+			<!-- <std-designation content-type="full"><xsl:value-of select="concat($std_prefix,$number,'-',$year)"/></std-designation> --> <!-- Example: IEEE Std 1127-2013 -->
+			<std-designation content-type="full"><xsl:value-of select="$number"/></std-designation> <!-- Example: IEEE Std 1127-2013 -->
+			
+			<!-- <std-designation content-type="full-tm"><xsl:value-of select="concat($std_prefix,$number,$trademark,'-',$year)"/></std-designation> --> <!-- Example: IEEE Std 1127&#x2122;-2013 -->
+			<!-- add TM after number and before year -->
+			<xsl:variable name="regex_number_year">(\d)(-\d{4})$</xsl:variable>
+			<std-designation content-type="full-tm"><xsl:value-of select="java:replaceAll(java:java.lang.String.new($number),$regex_number_year,concat('$1',$trademark,'$2'))"/></std-designation> <!-- Example: IEEE Std 1127&#x2122;-2013 -->
+			
+			<!-- <std-designation content-type="std-num"><xsl:value-of select="concat($number,'-',$year)"/></std-designation> --> <!-- Example: 1127-2013 -->
+			<!-- remove IEEE Std before number -->
+			<xsl:variable name="regex_number">^\D*(.+)</xsl:variable>
+			<xsl:variable name="number_before_prefix" select="java:replaceAll(java:java.lang.String.new($number),$regex_number,'$1')"/>
+			<std-designation content-type="std-num"><xsl:value-of select="$number_before_prefix"/></std-designation> <!-- Example: 1127-2013 -->
+			
+			<!-- <std-designation content-type="std-num-tm"><xsl:value-of select="concat($number,$trademark,'-',$year)"/></std-designation>  --><!-- Example:  1127&#x2122;-2013-->
+			<std-designation content-type="std-num-tm"><xsl:value-of select="java:replaceAll(java:java.lang.String.new($number_before_prefix),$regex_number_year,concat('$1',$trademark,'$2'))"/></std-designation> <!-- Example:  1127&#x2122;-2013-->
 			<std-designation content-type="norm"/>
 			
 			<xplore-article-id><xsl:value-of select="../metanorma-extension/semantic-metadata/xplore-article-id"/></xplore-article-id>
@@ -143,16 +155,24 @@
 				</xsl:call-template>
 			</xsl:variable>
 			
-			<xsl:variable name="title">
+			<!-- <!ENTITY % std-title-group-model
+											"(std-intro-title*, std-main-title, 
+												std-full-title, alt-title*)"               > -->
+			<!-- <xsl:variable name="title">
 				<xsl:text>IEEE </xsl:text>
 				<xsl:value-of select="$doctype_str"/>
 				<xsl:text> for </xsl:text>
 				<xsl:apply-templates select="title[not(@type='provenance')]/node()"/>
-			</xsl:variable>
+			</xsl:variable> -->
+			<xsl:variable name="title_intro"><xsl:apply-templates select="title[@type='intro']/node()"/></xsl:variable>
+			<xsl:variable name="title_main"><xsl:apply-templates select="title[@type='main']/node()"/></xsl:variable>
 			
 			<std-title-group>
-				<std-main-title><xsl:copy-of select="$title"/></std-main-title>
-				<std-full-title><xsl:copy-of select="$title"/></std-full-title>
+				<xsl:if test="normalize-space($title_intro) != ''">
+					<std-intro-title><xsl:copy-of select="$title_intro"/></std-intro-title>
+				</xsl:if>
+				<std-main-title><xsl:copy-of select="$title_main"/></std-main-title>
+				<std-full-title><xsl:copy-of select="$title_main"/></std-full-title>
 				<xsl:if test="relation[@type = 'updates'] or ../metanorma-extension/semantic-metadata/related-article-edition">
 					<alt-title>
 						<!-- <related-article related-article-type="revision-of">(Revision of <std>IEEE Std 1127-1998</std>)</related-article> -->
