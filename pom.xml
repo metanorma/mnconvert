@@ -17,7 +17,7 @@
 		<exec.mainClass>org.metanorma.mnconvert</exec.mainClass>
 		<junit.version>5.13.4</junit.version>
 		<maven.surefire.plugin>3.5.3</maven.surefire.plugin>
-		<native.maven.plugin.version>0.11.0</native.maven.plugin.version>
+		<native.maven.plugin.version>0.11.2</native.maven.plugin.version>
 	</properties>
 	<distributionManagement>
 		<repository>
