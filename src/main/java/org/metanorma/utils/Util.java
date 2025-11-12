@@ -1,20 +1,13 @@
 package org.metanorma.utils;
 
 import static org.metanorma.Constants.*;
+
 import org.metanorma.mnconvert;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.io.StringWriter;
+
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,7 +34,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.w3c.dom.Element;
+
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
@@ -72,16 +65,7 @@ public class Util {
         
         return version;
     }
- 
-    // get file from classpath, resources folder
-    public static InputStream getStreamFromResources(ClassLoader classLoader, String fileName) throws IOException {        
-        InputStream stream = classLoader.getResourceAsStream(fileName);
-        if (stream == null) {
-            throw new IOException("Cannot get resource \"" + fileName + "\" from Jar file.");
-        }
-        return stream;
-    }
-    
+
     public static void FlushTempFolder(Path tmpfilepath) {
         if (Files.exists(tmpfilepath)) {
             //Files.deleteIfExists(tmpfilepath);
@@ -254,6 +238,7 @@ public class Util {
             return "docx";
         } else {
             DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
+
             try {
                 if (isIgnoreDTD.length > 0 && isIgnoreDTD[0]) {
                     fact.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);

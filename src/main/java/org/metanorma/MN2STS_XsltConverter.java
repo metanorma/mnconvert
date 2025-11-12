@@ -3,7 +3,7 @@ package org.metanorma;
 import static org.metanorma.Constants.*;
 import static org.metanorma.mnconvert.VER;
 
-import org.metanorma.utils.Util;
+import org.metanorma.utils.ResourcesUtils;
 import org.metanorma.validator.CheckAgainstEnum;
 
 import java.io.BufferedWriter;
@@ -190,7 +190,7 @@ public class MN2STS_XsltConverter extends XsltConverter {
             srcXSL = new StreamSource(fileXSL);
         } else { // internal xsl
             String xslname = (outputFormat.toUpperCase().equals("IEEE") ? "mn2ieee.xsl" : "mn2sts.xsl");
-            srcXSL = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), xslname));
+            srcXSL = new StreamSource(ResourcesUtils.getStreamFromResources(getClass().getClassLoader(), xslname));
             // for xsl:include processing (load xsl from jar)
             factory.setURIResolver(new XSLT_ResourceResolver());
         }

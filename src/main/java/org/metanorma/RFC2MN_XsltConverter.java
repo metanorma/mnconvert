@@ -25,7 +25,8 @@ import static org.metanorma.Constants.INPUT_NOT_FOUND;
 import static org.metanorma.Constants.OUTPUT_LOG_RFC2MN;
 import static org.metanorma.Constants.XML_INPUT;
 import static org.metanorma.Constants.XSL_INPUT;
-import static org.metanorma.XsltConverter.logger;
+
+import org.metanorma.utils.ResourcesUtils;
 import org.metanorma.utils.Util;
 import static org.metanorma.utils.Util.writeBuffer;
 import org.metanorma.validator.RELAXNGValidator;
@@ -153,7 +154,7 @@ public class RFC2MN_XsltConverter extends XsltConverter {
         if (fileXSL != null) { //external xsl
             srcXSL = new StreamSource(fileXSL);
         } else { // internal xsl
-            srcXSL = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), "rfc2mn.adoc.xsl"));
+            srcXSL = new StreamSource(ResourcesUtils.getStreamFromResources(getClass().getClassLoader(), "rfc2mn.adoc.xsl"));
         }
         
         transformer = factory.newTransformer(srcXSL);

@@ -1,10 +1,10 @@
 package org.metanorma.validator;
 
 import org.metanorma.utils.ResourceResolver;
+import org.metanorma.utils.ResourcesUtils;
 import org.metanorma.utils.Util;
 import org.metanorma.utils.LoggerHelper;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.StringReader;
 import java.util.List;
 import java.util.logging.Level;
@@ -51,7 +51,7 @@ public class XSDValidator extends Validator {
         try {
             Source schemaFile;
             if (checkAgainst instanceof CheckAgainstEnum) {
-                schemaFile = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), checkSrc.replaceAll("\\\\", "/")));
+                schemaFile = new StreamSource(ResourcesUtils.getStreamFromResources(getClass().getClassLoader(), checkSrc.replaceAll("\\\\", "/")));
             } else {
                 schemaFile = new StreamSource(new File(filepathDTDorXSD));
             }

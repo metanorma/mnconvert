@@ -5,7 +5,8 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
-import org.metanorma.utils.Util;
+
+import org.metanorma.utils.ResourcesUtils;
 
 /**
  *
@@ -19,7 +20,7 @@ public class XSLT_ResourceResolver implements URIResolver {
         try {
             //InputStream is = ClassLoader.getSystemResourceAsStream(href);
             //return new StreamSource(is, href);
-            return new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), href));
+            return new StreamSource(ResourcesUtils.getStreamFromResources(getClass().getClassLoader(), href));
         }
         catch (Exception ex) {
             throw new TransformerException(ex);
