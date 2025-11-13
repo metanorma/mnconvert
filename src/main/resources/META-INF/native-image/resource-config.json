@@ -13,6 +13,8 @@
   }, {
     "pattern":".*/*.xsl$"
   }, {
+    "pattern":"\\QOMML2MML.XSL\\E"
+  }, {
     "pattern":".*NISO-STS-.*"
   }, {
     "pattern":".*ISO-STS-.*"

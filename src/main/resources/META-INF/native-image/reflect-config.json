@@ -159,6 +159,10 @@
   "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setName","parameterTypes":["org.apache.xml.utils.QName"] }, {"name":"setSelect","parameterTypes":["org.apache.xpath.XPath"] }]
 },
 {
+  "name":"org.apache.xalan.templates.FuncDocument",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
   "name":"org.apache.xalan.templates.FuncFormatNumb",
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
