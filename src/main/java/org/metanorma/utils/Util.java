@@ -381,4 +381,8 @@ public class Util {
         transformer.transform(source, result);
         return result.getWriter().toString();
       }
+
+      public static String encodeURL(String value) throws UnsupportedEncodingException {
+          return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
+      }
 }
