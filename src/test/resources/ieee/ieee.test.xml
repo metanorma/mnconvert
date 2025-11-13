@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<metanorma xmlns="https://www.metanorma.org/ns/standoc" type="semantic" version="1.0.4">
+<metanorma xmlns="https://www.metanorma.org/ns/standoc" type="presentation" version="1.5.2" schema-version="v2.1.0" flavor="ieee">
 	<bibdata type="standard">
 		<title language="en" format="text/plain">IEEE Standards Draft</title>
 		<docidentifier type="IEEE">123.4</docidentifier>
@@ -8,6 +8,35 @@
 		<docidentifier type="ISBN" scope="PDF">978-0-XXXX-XXXX-X</docidentifier>
 		<docidentifier type="ISBN" scope="print">978-0-XXXX-XXXX-X</docidentifier>
 		<docnumber>123.4</docnumber>
+		<contributor>
+				<role type="author" />
+				<organization>
+						<name>Institute of Electrical and Electronic Engineers</name>
+						<abbreviation>IEEE</abbreviation>
+				</organization>
+		</contributor>
+		<contributor>
+				<role type="authorizer">
+						<description>committee</description>
+				</role>
+				<organization>
+						<name>Institute of Electrical and Electronic Engineers</name>
+						<subdivision type="Society">
+								<name>Template Society</name>
+						</subdivision>
+						<subdivision subtype="individual"
+												 type="Balloting group">
+								<name>Balloting Group Name</name>
+						</subdivision>
+						<subdivision type="Working group">
+								<name>Working Group Name</name>
+						</subdivision>
+						<subdivision type="Committee">
+								<name>Standards Staff Engineering Committee</name>
+						</subdivision>
+						<abbreviation>IEEE</abbreviation>
+				</organization>
+		</contributor>
 		<contributor>
 			<role type="publisher"/>
 			<organization>
@@ -42,12 +71,6 @@
 		<ext>
 			<doctype>standard</doctype>
 			<subdoctype>document</subdoctype>
-			<editorialgroup>
-				<society>Society</society>
-				<balloting-group type="individual">Balloting Group Name</balloting-group>
-				<working-group>Working Group Name</working-group>
-				<committee>Standards Staff Engineering Committee</committee>
-			</editorialgroup>
 			<structuredidentifier>
 				<docnumber>123.4</docnumber>
 				<agency>IEEE</agency>
