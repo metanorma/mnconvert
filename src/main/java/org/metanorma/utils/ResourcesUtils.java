@@ -47,7 +47,6 @@ public class ResourcesUtils {
                 String scheme = "resource:/";
                 String root = basePath; // "/"
                 Map<String, String> env = new HashMap<>();
-                System.out.println("targetPath=" + targetPath);
                 try (FileSystem fileSystem = FileSystems.newFileSystem(URI.create(scheme), env)) {
                     Path rootPath = fileSystem.getPath(root);
                     try (Stream<Path> files = Files.walk(rootPath)) {
