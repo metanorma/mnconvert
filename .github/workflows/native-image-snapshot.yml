@@ -1,4 +1,4 @@
-name: Native Image - Snapshot
+name: Native Image - Release
 
 on:
   push:
@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   clean_release:
-    name: 'Clean the snapshot-native pre-release'
+    name: 'Clean the native release'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
@@ -23,8 +23,8 @@ jobs:
  
       - name: Clean release and tag
         run: |
-          gh release delete snapshot-native --cleanup-tag -y || true
-          echo "::notice title=release snapshot-native::snapshot - Native Image at ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/snapshot-native"
+          gh release delete release-native --cleanup-tag -y || true
+          echo "::notice title=release release-native::release - Native Image at ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/release-native"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -33,16 +33,16 @@ jobs:
     needs: clean_release
     strategy:
       matrix:
-        os: [ windows-latest ] #[ macos-latest, windows-latest, ubuntu-latest ]
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
         include:
-          #- os: 'ubuntu-latest'
-          #  platform: 'linux-amd64'
-          #- os: 'ubuntu-24.04-arm'
-          #  platform: 'linux-arm64'
-          #- os: 'macos-latest'
-          #  platform: 'darwin-arm64'
-          #- os: 'macos-13'
-          #  platform: 'darwin-amd64'
+          - os: 'ubuntu-latest'
+            platform: 'linux-amd64'
+          - os: 'ubuntu-24.04-arm'
+            platform: 'linux-arm64'
+          - os: 'macos-latest'
+            platform: 'darwin-arm64'
+          - os: 'macos-13'
+            platform: 'darwin-amd64'
           - os: 'windows-latest'
             platform: 'win-amd64'
           #- os: 'windows-11-arm' # TO DO: check later, see https://github.com/metanorma/mnconvert/issues/431#issuecomment-3113974980
@@ -75,36 +75,20 @@ jobs:
         uses: thedoctor0/zip-release@0.7.6
         with:
           type: 'zip'
-          filename: "mnconvert-${{ matrix.platform }}-SNAPSHOT.zip"
+          filename: "mnconvert-${{ matrix.platform }}-v${{ env.VERSION }}.zip"
           directory: target/native/nativeCompile/
-
-      #- name: Archive Full Release
-      #  uses: thedoctor0/zip-release@0.7.6
-      #  with:
-      #    type: 'zip'
-      #    filename: "plantuml-full-${{ matrix.platform }}-SNAPSHOT.zip"
-      #    directory: plantuml-gplv2/build/native/nativeFullCompile/
-
-      #- name: Archive Headless Release
-      #  uses: thedoctor0/zip-release@0.7.6
-      #  with:
-      #    type: 'zip'
-      #    filename: "plantuml-headless-${{ matrix.platform }}-SNAPSHOT.zip"
-      #    directory: plantuml-gplv2/build/native/nativeHeadlessCompile/
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: "target/native/nativeCompile/mnconvert-${{ matrix.platform }}-SNAPSHOT.zip"
+          file: "target/native/nativeCompile/mnconvert-${{ matrix.platform }}-v${{ env.VERSION }}.zip"
           file_glob: true
-          tag: snapshot-native
-          release_name: snapshot - Native Image (~v${{ env.VERSION }})
+          tag: release-native
+          release_name: Release v${{ env.VERSION }} (Native Image)
           overwrite: true
           make_latest: false
           prerelease: true
           body: |
               ## Version ~v${{ env.VERSION }} of the ${{ env.DATETIME }}
-              This is a [Native Image](https://www.graalvm.org/latest/reference-manual/native-image/) pre-release of mnconvert tool.
-              ⚠️  **It is not ready for general use** ⚠️
-              ⏱  _Snapshot taken the ${{ env.DATETIME }}_
+              This is a [Native Image](https://www.graalvm.org/latest/reference-manual/native-image/) release of mnconvert tool.
