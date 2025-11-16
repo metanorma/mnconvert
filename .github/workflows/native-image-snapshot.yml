@@ -88,7 +88,6 @@ jobs:
           release_name: Release v${{ env.VERSION }} (Native Image)
           overwrite: true
           make_latest: false
-          prerelease: true
+          prerelease: false
           body: |
-              ## Version ~v${{ env.VERSION }} of the ${{ env.DATETIME }}
               This is a [Native Image](https://www.graalvm.org/latest/reference-manual/native-image/) release of mnconvert tool.
