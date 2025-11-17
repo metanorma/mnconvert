@@ -2,11 +2,9 @@ name: Native Image - Release
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    paths-ignore:
-      - .github/workflows/release.yml
+    # Sequence of patterns matched against refs/tags
+    tags:
+    - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 permissions:
   contents: write
