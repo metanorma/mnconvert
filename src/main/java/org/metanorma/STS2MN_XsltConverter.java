@@ -1,5 +1,6 @@
 package org.metanorma;
 
+import org.metanorma.utils.ResourcesUtils;
 import org.metanorma.utils.Task;
 import org.metanorma.utils.Util;
 import static org.metanorma.Constants.*;
@@ -8,18 +9,14 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -212,7 +209,7 @@ public class STS2MN_XsltConverter extends XsltConverter {
             if (fileXSL != null) { //external xsl
                 srcXSL = new StreamSource(fileXSL);
             } else { // internal xsl
-                srcXSL = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), "sts2mn.xsl"));
+                srcXSL = new StreamSource(ResourcesUtils.getStreamFromResources(getClass().getClassLoader(), "sts2mn.xsl"));
                 // for xsl:include processing (load xsl from jar)
                 factory.setURIResolver(new XSLT_ResourceResolver());
             }
@@ -265,7 +262,7 @@ public class STS2MN_XsltConverter extends XsltConverter {
             if (fileXSL != null) { //external xsl
                 srcXSL = new StreamSource(fileXSL);
             } else { // internal xsl
-                srcXSL = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), "sts2mn.adoc.xsl"));
+                srcXSL = new StreamSource(ResourcesUtils.getStreamFromResources(getClass().getClassLoader(), "sts2mn.adoc.xsl"));
                 // for xsl:include processing (load xsl from jar)
                 factory.setURIResolver(new XSLT_ResourceResolver());
             }

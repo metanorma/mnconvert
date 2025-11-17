@@ -224,105 +224,98 @@ public class mnconvert {
     };
     
     static final String USAGE = getUsage();
-    
-    /**
-     * Main method.
-     *
-     * @param args command-line arguments
-     * @throws org.apache.commons.cli.ParseException
-     */
-    public static void main(String[] args) throws ParseException {
 
-        LoggerHelper.setupLogger();
-        
+    public static int run(String[] args) {
         CommandLineParser parser = new DefaultParser();
-               
+
         boolean cmdFail = false;
-        
+
         try {
             CommandLine cmdInfo = parser.parse(optionsInfo, args);
-            printVersion(cmdInfo.hasOption("version"));            
+            printVersion(cmdInfo.hasOption("version"));
         } catch (ParseException exp) {
             cmdFail = true;
         }
-        
+
         if(cmdFail) {
             try {
                 CommandLine cmdSTSCheckOnly = parser.parse(optionsSTSCheckOnly, args);
                 System.out.print(APP_NAME + " ");
                 printVersion(cmdSTSCheckOnly.hasOption("version"));
                 System.out.println("\n");
-                
+
                 List<String> arglist = cmdSTSCheckOnly.getArgList();
                 if (arglist.isEmpty() || arglist.get(0).trim().length() == 0) {
                     throw new ParseException("");
                 }
 
                 String argXmlIn = arglist.get(0);
-                
+
                 STSValidator validator = new STSValidator(argXmlIn, cmdSTSCheckOnly.getOptionValue("check-type"));
                 validator.setTagset(cmdSTSCheckOnly.getOptionValue("tagset"));
                 validator.setMathmlVersion(cmdSTSCheckOnly.getOptionValue("mathml"));
                 validator.setDebugMode(cmdSTSCheckOnly.hasOption("debug"));
                 validator.setIdRefChecking(cmdSTSCheckOnly.hasOption("idrefchecking"));
-                
+
                 if (!validator.check()) {
-                    System.exit(ERROR_EXIT_CODE);
+                    //System.exit(ERROR_EXIT_CODE);
+                    return ERROR_EXIT_CODE;
                 }
-                
+
                 cmdFail = false;
             } catch (ParseException exp) {
                 cmdFail = true;
             }
         }
-        
-         if(cmdFail) {
+
+        if(cmdFail) {
             try {
                 CommandLine cmdSTSCheckOnlyExternal = parser.parse(optionsSTSCheckOnlyExternal, args);
                 System.out.print(APP_NAME + " ");
                 printVersion(cmdSTSCheckOnlyExternal.hasOption("version"));
                 System.out.println("\n");
-                
+
                 List<String> arglist = cmdSTSCheckOnlyExternal.getArgList();
                 if (arglist.isEmpty() || arglist.get(0).trim().length() == 0) {
                     throw new ParseException("");
                 }
 
                 String argXmlIn = arglist.get(0);
-                
+
                 STSValidator validator = new STSValidator(argXmlIn);
                 validator.setFilepathDTDorXSD(cmdSTSCheckOnlyExternal.getOptionValue("validation-against"));
-                
+
                 validator.setDebugMode(cmdSTSCheckOnlyExternal.hasOption("debug"));
                 validator.setIdRefChecking(cmdSTSCheckOnlyExternal.hasOption("idrefchecking"));
-                
+
                 if (!validator.check()) {
-                    System.exit(ERROR_EXIT_CODE);
+                    //System.exit(ERROR_EXIT_CODE);
+                    return ERROR_EXIT_CODE;
                 }
-                
+
                 cmdFail = false;
             } catch (ParseException exp) {
                 cmdFail = true;
             }
         }
-        
-        if(cmdFail) {            
+
+        if(cmdFail) {
             try {
                 CommandLine cmdMain = parser.parse(optionsMain, args);
-                
+
                 System.out.print(APP_NAME + " ");
                 printVersion(cmdMain.hasOption("version"));
                 System.out.println("\n");
-                
+
                 List<String> arglist = cmdMain.getArgList();
                 if (arglist.isEmpty() || arglist.get(0).trim().length() == 0) {
                     throw new ParseException("");
                 }
-                
+
                 String argXmlIn = arglist.get(0);
 
                 File fXMLin = new File(argXmlIn);
-                
+
                 boolean isFileNotFound = false;
                 if (argXmlIn.toLowerCase().startsWith("http") || argXmlIn.toLowerCase().startsWith("www.")) {
                     if (!Util.isUrlExists(argXmlIn)) {
@@ -333,9 +326,10 @@ public class mnconvert {
                 }
                 if (isFileNotFound) {
                     logger.severe(String.format(INPUT_NOT_FOUND, XML_INPUT, fXMLin));
-                    System.exit(ERROR_EXIT_CODE);
+                    //System.exit(ERROR_EXIT_CODE);
+                    return ERROR_EXIT_CODE;
                 }
-                
+
                 String inputFormat = cmdMain.getOptionValue("input-format");
                 if (inputFormat != null) {
                     inputFormat = inputFormat.toLowerCase();
@@ -349,42 +343,43 @@ public class mnconvert {
                 switch (inputFormat) {
                     case "ieee":
                     case "sts":
-                        {
-                            STS2MN_XsltConverter sts2mn = new STS2MN_XsltConverter();
-                            sts2mn.setImagesDir(cmdMain.getOptionValue("imagesdir"));
-                            sts2mn.setIsSplitBibdata(cmdMain.hasOption("split-bibdata"));
-                            sts2mn.setTypeStandard(cmdMain.getOptionValue("type"));
-                            //sts2mn.setIsSemanticXML(cmdMain.hasOption("semantic"));
-                            defaultOutputFormat = "adoc";
-                            converter = sts2mn;
-                            break;
-                        }
+                    {
+                        STS2MN_XsltConverter sts2mn = new STS2MN_XsltConverter();
+                        sts2mn.setImagesDir(cmdMain.getOptionValue("imagesdir"));
+                        sts2mn.setIsSplitBibdata(cmdMain.hasOption("split-bibdata"));
+                        sts2mn.setTypeStandard(cmdMain.getOptionValue("type"));
+                        //sts2mn.setIsSemanticXML(cmdMain.hasOption("semantic"));
+                        defaultOutputFormat = "adoc";
+                        converter = sts2mn;
+                        break;
+                    }
                     case "metanorma":
-                        {
-                            MN2STS_XsltConverter mn2sts = new MN2STS_XsltConverter();
-                            mn2sts.setCheckType(cmdMain.getOptionValue("check-type"));
-                            mn2sts.setTagset(cmdMain.getOptionValue("tagset"));
-                            mn2sts.setMathmlVersion(cmdMain.getOptionValue("mathml"));
-                            mn2sts.setFilepathDTDorXSD(cmdMain.getOptionValue("validation-against"));
-                            defaultOutputFormat = "niso";
-                            converter = mn2sts;
-                            break;
-                        }
+                    {
+                        MN2STS_XsltConverter mn2sts = new MN2STS_XsltConverter();
+                        mn2sts.setCheckType(cmdMain.getOptionValue("check-type"));
+                        mn2sts.setTagset(cmdMain.getOptionValue("tagset"));
+                        mn2sts.setMathmlVersion(cmdMain.getOptionValue("mathml"));
+                        mn2sts.setFilepathDTDorXSD(cmdMain.getOptionValue("validation-against"));
+                        defaultOutputFormat = "niso";
+                        converter = mn2sts;
+                        break;
+                    }
                     case "rfc":
-                        {
-                            RFC2MN_XsltConverter rfc2mn = new RFC2MN_XsltConverter();
-                            converter = rfc2mn;
-                            break;
-                        }
+                    {
+                        RFC2MN_XsltConverter rfc2mn = new RFC2MN_XsltConverter();
+                        converter = rfc2mn;
+                        break;
+                    }
                     case "docx":
-                        {
-                            DOCX2MN_XsltConverter docx2mn = new DOCX2MN_XsltConverter();
-                            converter = docx2mn;
-                            break;
-                        }
+                    {
+                        DOCX2MN_XsltConverter docx2mn = new DOCX2MN_XsltConverter();
+                        converter = docx2mn;
+                        break;
+                    }
                     default:
                         logger.log(Level.SEVERE, "Unknown input file format ''{0}''", inputFormat);
-                        System.exit(ERROR_EXIT_CODE);
+                        //System.exit(ERROR_EXIT_CODE);
+                        return ERROR_EXIT_CODE;
                 }
 
                 converter.setInputFilePath(argXmlIn);
@@ -393,23 +388,40 @@ public class mnconvert {
                 converter.setOutputFilePath(cmdMain.getOptionValue("output"));
                 converter.setDebugMode(cmdMain.hasOption("debug"));
                 converter.setIdRefChecking(cmdMain.hasOption("idrefchecking"));
-                
+
                 if (!converter.process()) {
-                    System.exit(ERROR_EXIT_CODE);
+                    //System.exit(ERROR_EXIT_CODE);
+                    return ERROR_EXIT_CODE;
                 }
                 cmdFail = false;
-                
+
             } catch (ParseException exp) {
                 cmdFail = true;
             }
         }
-        
-        
+
+
         if (cmdFail) {
-            System.out.println(USAGE);
-            System.exit(ERROR_EXIT_CODE);
+            //System.out.println(USAGE);
+            logger.info(USAGE);
+            //System.exit(ERROR_EXIT_CODE);
+            return ERROR_EXIT_CODE;
         }
-        
+        return 0;
+    }
+
+    /**
+     * Main method.
+     *
+     * @param args command-line arguments
+     * @throws org.apache.commons.cli.ParseException
+     */
+    public static void main(String[] args) throws ParseException {
+
+        LoggerHelper.setupLogger();
+
+        int exitCode = run(args);
+        System.exit(exitCode);
     }
     
     

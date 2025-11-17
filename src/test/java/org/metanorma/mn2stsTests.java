@@ -1,6 +1,6 @@
 package org.metanorma;
 
-import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
+//import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
 import org.junit.jupiter.api.*;
 import org.metanorma.utils.RegExHelper;
 import org.metanorma.utils.LoggerHelper;
@@ -14,6 +14,8 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
 import org.apache.commons.cli.ParseException;
+
+import static org.metanorma.Constants.*;
 
 public class mn2stsTests {
 
@@ -64,42 +66,44 @@ public class mn2stsTests {
     }
     
     @Test
-    @ExpectSystemExitWithStatus(-1)
-    public void notEnoughArguments() throws ParseException {
+    //@ExpectSystemExitWithStatus(-1)
+    public void notEnoughArguments() throws IOException {
         String[] args = new String[]{"1"};
-        mnconvert.main(args);
+        mnconvert.run(args);
+        String capturedLog = getTestCapturedLog();
+        Assumptions.assumeTrue(capturedLog.contains(String.format(INPUT_NOT_FOUND, XML_INPUT, args[0])));
         //assertTrue(systemOutRule.getLog().contains(mnconvert.USAGE));
     }
 
     @Test
-    @ExpectSystemExitWithStatus(-1)
-    public void xmlNotExists() throws ParseException {
+    //@ExpectSystemExitWithStatus(-1)
+    public void xmlNotExists() throws ParseException, IOException {
         String[] args = new String[]{"test.xml", "--output", "out.xml"};
-        mnconvert.main(args);
+        mnconvert.run(args);
 
-        /*assertTrue(systemOutRule.getLog().contains(
-                String.format(INPUT_NOT_FOUND, XML_INPUT, args[1])));*/
+        String capturedLog = getTestCapturedLog();
+        Assumptions.assumeTrue(capturedLog.contains(String.format(INPUT_NOT_FOUND, XML_INPUT, args[0])));
     }
 
     @Test
-    @ExpectSystemExitWithStatus(-1)
-    public void xslNotExists() throws ParseException {
+    //@ExpectSystemExitWithStatus(-1)
+    public void xslNotExists() throws ParseException, IOException {
         Assumptions.assumeTrue(XMLFILE_MN != null);
 
         String[] args = new String[]{XMLFILE_MN, "--xsl-file", "alternate.xsl", "--output", "out.xml"};
-        mnconvert.main(args);
+        mnconvert.run(args);
 
-        /*assertTrue(systemOutRule.getLog().contains(
-                String.format(INPUT_NOT_FOUND, XSL_INPUT, args[2])));*/
+        String capturedLog = getTestCapturedLog();
+        Assumptions.assumeTrue(capturedLog.contains(String.format(INPUT_NOT_FOUND, XSL_INPUT, args[2])));
     }
 
     @Test
-    public void successConvertAndCheckXSD() throws ParseException, Exception {
+    public void successConvertAndCheckXSD() throws ParseException, IOException {
         Assumptions.assumeTrue(XMLFILE_MN != null);
         Path xmlout = Paths.get(System.getProperty("buildDirectory"), "out.xml");
 
         String[] args = new String[]{XMLFILE_MN, "--output", xmlout.toAbsolutePath().toString()};
-        mnconvert.main(args);
+        mnconvert.run(args);
 
         Assumptions.assumeTrue(Files.exists(xmlout));
         String capturedLog = getTestCapturedLog();
@@ -108,12 +112,12 @@ public class mn2stsTests {
     }
 
     @Test
-    public void successConvertAndCheckDTD_NISO() throws ParseException, Exception {
+    public void successConvertAndCheckDTD_NISO() throws ParseException, IOException {
         Assumptions.assumeTrue(XMLFILE_MN != null);
         Path xmlout = Paths.get(System.getProperty("buildDirectory"), "out.xml");
 
         String[] args = new String[]{XMLFILE_MN, "--output", xmlout.toAbsolutePath().toString(), "--check-type", "dtd-niso"};
-        mnconvert.main(args);
+        mnconvert.run(args);
 
         Assumptions.assumeTrue(Files.exists(xmlout));
         String capturedLog = getTestCapturedLog();
@@ -122,7 +126,7 @@ public class mn2stsTests {
     }
 
     @Test
-    @ExpectSystemExitWithStatus(-1)
+    //@ExpectSystemExitWithStatus(-1)
     // Element type "code" must be declared. etc...
     public void NoSuccessConvertAndCheckDTD_ISO() throws ParseException, Exception {
         Assumptions.assumeTrue(XMLFILE_MN != null);
@@ -130,10 +134,10 @@ public class mn2stsTests {
         Path xmlout = Paths.get(System.getProperty("buildDirectory"), "out.xml");
 
         String[] args = new String[]{XMLFILE_MN, "--output", xmlout.toAbsolutePath().toString(), "--check-type", "dtd-iso"};
-        mnconvert.main(args);
+        mnconvert.run(args);
 
-        /*assertTrue(Files.exists(xmlout));
-        assertTrue(systemOutRule.getLog().contains("is NOT valid"));*/
+        String capturedLog = getTestCapturedLog();
+        Assumptions.assumeTrue(capturedLog.contains("is NOT valid"));
     }
 
     @Test
@@ -143,7 +147,7 @@ public class mn2stsTests {
         Path xmlout = Paths.get(System.getProperty("buildDirectory"), "out.xml");
 
         String[] args = new String[]{XMLFILE_MN, "--output", xmlout.toAbsolutePath().toString(), "--check-type", "dtd-iso", "--output-format", "iso"};
-        mnconvert.main(args);
+        mnconvert.run(args);
 
         Assumptions.assumeTrue(Files.exists(xmlout));
         String capturedLog = getTestCapturedLog();
@@ -157,7 +161,7 @@ public class mn2stsTests {
         Path xmlout = Paths.get(System.getProperty("buildDirectory"), "out.xml");
 
         String[] args = new String[]{XMLFILE_MN, "--output", xmlout.toAbsolutePath().toString(),"--mathml","2"};
-        mnconvert.main(args);
+        mnconvert.run(args);
 
         Assumptions.assumeTrue(Files.exists(xmlout));
         String capturedLog = getTestCapturedLog();
@@ -171,7 +175,7 @@ public class mn2stsTests {
         Path xmlout = Paths.get(System.getProperty("buildDirectory"), "out.xml");
 
         String[] args = new String[]{XMLFILE_MN, "--output", xmlout.toAbsolutePath().toString(),"--tagset", "extended", "--mathml", "2"};
-        mnconvert.main(args);
+        mnconvert.run(args);
 
         Assumptions.assumeTrue(Files.exists(xmlout));
         String capturedLog = getTestCapturedLog();
@@ -185,7 +189,7 @@ public class mn2stsTests {
         Path xmlout = Paths.get(System.getProperty("buildDirectory"), "out.xml");
 
         String[] args = new String[]{XMLFILE_MN, "--output", xmlout.toAbsolutePath().toString(),"--check-type", "dtd-niso", "--tagset", "extended", "--mathml", "2"};
-        mnconvert.main(args);
+        mnconvert.run(args);
 
         Assumptions.assumeTrue(Files.exists(xmlout));
         String capturedLog = getTestCapturedLog();

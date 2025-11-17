@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.metanorma</groupId>
 	<artifactId>mnconvert</artifactId>
-	<version>1.74.0</version>
+	<version>1.75.0</version>
 	<name>Metanorma XML to NISO STS XML two-directional, IEEE to Metanorma ADOC, Metanorma XML to IEEE XML, and XML2RFC to Metanorma Asciidoc IETF converter</name>
 	<packaging>jar</packaging>
 	<url>https://www.metanorma.org</url>
@@ -17,6 +17,7 @@
 		<exec.mainClass>org.metanorma.mnconvert</exec.mainClass>
 		<junit.version>5.13.4</junit.version>
 		<maven.surefire.plugin>3.5.3</maven.surefire.plugin>
+		<native.maven.plugin.version>0.11.2</native.maven.plugin.version>
 	</properties>
 	<distributionManagement>
 		<repository>
@@ -100,12 +101,14 @@
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<!--
+			UnsupportedOperation The Security Manager is deprecated and will be removed in a future release
 		<dependency>
 			<groupId>com.ginsberg</groupId>
 			<artifactId>junit5-system-exit</artifactId>
 			<version>1.1.2</version>
 			<scope>test</scope>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			 <groupId>commons-io</groupId>
 			 <artifactId>commons-io</artifactId>
@@ -127,4 +130,119 @@
 			 <version>1.4.01</version>
 		</dependency>
 	</dependencies>
+	<profiles>
+		 <profile>
+			 <id>native</id>
+			 <build>
+				 <plugins>
+					 <plugin>
+						 <artifactId>maven-antrun-plugin</artifactId>
+						 <version>3.1.0</version>
+						 <executions>
+							 <execution>
+								 <id>generate-directory</id>
+								 <goals>
+									 <goal>run</goal>
+								 </goals>
+								 <phase>package</phase>
+								 <configuration>
+										<target>
+												<mkdir dir="target/native/nativeCompile"/>
+										</target>
+									</configuration>
+							 </execution>
+						 </executions>
+					 </plugin>
+					 <plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>3.2.1</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+								<configuration>
+									<transformers>
+										<transformer
+											implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+										<transformer
+											implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+											<manifestEntries>
+												<Main-Class>org.metanorma.mnconvert</Main-Class>
+												<Implementation-Version>${project.version}</Implementation-Version>
+											</manifestEntries>
+										</transformer>
+									</transformers>
+								</configuration>
+							</execution>
+						</executions>
+					 </plugin>
+					 <!-- <plugin>
+							<groupId>org.codehaus.mojo</groupId>
+							<artifactId>exec-maven-plugin</artifactId>
+							<version>3.0.0</version>
+							<executions>
+									<execution>
+											<id>java-agent</id>
+											<goals>
+													<goal>exec</goal>
+											</goals>
+											<phase>test</phase>
+											<configuration>
+													<executable>java</executable>
+													<workingDirectory>${project.build.directory}</workingDirectory>
+													<arguments>
+															<argument>-classpath</argument>
+															<classpath/>
+															<argument>${exec.mainClass}</argument>
+													</arguments>
+											</configuration>
+									</execution>
+									<execution>
+										<id>test-native</id>
+										<goals>
+											<goal>test</goal>
+										</goals>
+										<phase>test</phase>
+									</execution>
+							</executions>
+					</plugin> -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${maven.surefire.plugin}</version>
+					</plugin>
+					 <plugin>
+						 <groupId>org.graalvm.buildtools</groupId>
+						 <artifactId>native-maven-plugin</artifactId>
+						 <version>${native.maven.plugin.version}</version>
+						 <extensions>true</extensions>
+						 <executions>
+							 <execution>
+								 <id>build-native</id>
+								 <goals>
+									 <goal>compile-no-fork</goal>
+								 </goals>
+								 <phase>package</phase>
+							 </execution>
+						 </executions>
+						 <configuration>
+								 <mainClass>org.metanorma.mnconvert</mainClass>
+								 <imageName>native/nativeCompile/${project.artifactId}-${project.version}</imageName>
+								 <buildArgs>
+									 <buildArg>-march=compatibility</buildArg> <!-- generate instructions for best compatibility -->
+									 <!-- <buildArg>-H:ThrowMissingRegistrationErrors=</buildArg>
+									 <buildArg>-H:MissingRegistrationReportingMode=Warn</buildArg> -->
+								 </buildArgs>
+								 <classpath>
+									 <param>${project.build.directory}/${project.artifactId}-${project.version}.jar</param>
+								 </classpath>
+						 </configuration>
+					 </plugin>
+				 </plugins>
+			 </build>
+		 </profile>
+	 </profiles>
 </project>

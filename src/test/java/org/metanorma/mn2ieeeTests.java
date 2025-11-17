@@ -58,11 +58,11 @@ public class mn2ieeeTests {
         Path xmlout = Paths.get(System.getProperty("buildDirectory"), "out.ieee.xml");
 
         String[] args = new String[]{xml, "--output-format", "ieee", "--output", xmlout.toAbsolutePath().toString(), "--validation-against", DTD_IEEE};
-        mnconvert.main(args);
+        mnconvert.run(args);
 
         Assumptions.assumeTrue(Files.exists(xmlout));
         String capturedLog = getTestCapturedLog();
-        Assumptions.assumeTrue(capturedLog.contains("Validation skipped"));
+        Assumptions.assumeTrue(capturedLog.contains(" is valid")); //Validation skipped
         
     }
 

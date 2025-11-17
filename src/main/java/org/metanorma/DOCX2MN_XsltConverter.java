@@ -1,5 +1,6 @@
 package org.metanorma;
 
+import org.metanorma.utils.ResourcesUtils;
 import org.metanorma.utils.Task;
 import org.metanorma.utils.Util;
 import static org.metanorma.Constants.*;
@@ -172,7 +173,7 @@ public class DOCX2MN_XsltConverter extends XsltConverter {
         if (fileXSL != null) { //external xsl
             srcXSL = new StreamSource(fileXSL);
         } else { // internal xsl
-            srcXSL = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), "docx2mn.adoc.xsl"));
+            srcXSL = new StreamSource(ResourcesUtils.getStreamFromResources(getClass().getClassLoader(), "docx2mn.adoc.xsl"));
             // for xsl:include processing (load xsl from jar)
             factory.setURIResolver(new XSLT_ResourceResolver());
         }

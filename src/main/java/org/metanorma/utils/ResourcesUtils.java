@@ -4,15 +4,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.JarURLConnection;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
+import java.nio.file.*;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Stream;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.metanorma.mnconvert;
 
 public class ResourcesUtils {
     
@@ -36,24 +39,51 @@ public class ResourcesUtils {
          * Copy resources either from inside jar or from project folder.
          */
         if (urlConnection instanceof JarURLConnection) {
-            copyJarResourceToPath((JarURLConnection) urlConnection, targetPath);        
+            copyJarResourceToPath((JarURLConnection) urlConnection, targetPath);
         } else {
-            File file = new File(resourceUrl.getPath());
-            if (file.isDirectory()) {
-                for (File resourceFile : FileUtils.listFiles(file, null, true)) {
-                    String resourceFilePath = resourceFile.getPath().replaceAll("\\\\", "/");
-                    //int index = resourceFile.getPath().lastIndexOf(targetPath.getName()) + targetPath.getName().length();
-                    int index = resourceFilePath.lastIndexOf(basePath);
-                    File targetFile = new File(targetPath, resourceFile.getPath().substring(index));
-                    if (!targetFile.exists() || targetFile.length() != resourceFile.length() || targetFile.lastModified() != resourceFile.lastModified()) {
-                        if (resourceFile.isFile()) {
-                            FileUtils.copyFile(resourceFile, targetFile, true);
-                        }
+            URL path4 =  mnconvert.class.getResource(basePath);
+            String protocol = path4.getProtocol();
+            if (path4 != null && protocol != null && protocol.equals("resource")) { //  && protocol.equals("resource")
+                String scheme = "resource:/";
+                String root = basePath; // "/"
+                Map<String, String> env = new HashMap<>();
+                try (FileSystem fileSystem = FileSystems.newFileSystem(URI.create(scheme), env)) {
+                    Path rootPath = fileSystem.getPath(root);
+                    try (Stream<Path> files = Files.walk(rootPath)) {
+                        files.forEach(filePath -> {
+                            String filePathStr = filePath.toString();
+                            String resourceFilePath = filePathStr.replaceAll("\\\\", "/");
+                            int index = resourceFilePath.lastIndexOf(basePath);
+                            File targetFile = new File(targetPath, filePathStr.substring(index));
+                            try {
+                                Files.copy(filePath, targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                            } catch (IOException e) {
+                                System.out.println(e.toString());
+                            }
+                        });
                     }
                 }
+                catch (IOException exc) {
+                    System.out.println(exc.toString());
+                }
             } else {
-                if (!targetPath.exists() || targetPath.length() != file.length() || targetPath.lastModified() != file.lastModified()) {
-                    FileUtils.copyFile(file, targetPath, true);
+                File file = new File(resourceUrl.getPath());
+                if (file.isDirectory()) {
+                    for (File resourceFile : FileUtils.listFiles(file, null, true)) {
+                        String resourceFilePath = resourceFile.getPath().replaceAll("\\\\", "/");
+                        //int index = resourceFile.getPath().lastIndexOf(targetPath.getName()) + targetPath.getName().length();
+                        int index = resourceFilePath.lastIndexOf(basePath);
+                        File targetFile = new File(targetPath, resourceFile.getPath().substring(index));
+                        if (!targetFile.exists() || targetFile.length() != resourceFile.length() || targetFile.lastModified() != resourceFile.lastModified()) {
+                            if (resourceFile.isFile()) {
+                                FileUtils.copyFile(resourceFile, targetFile, true);
+                            }
+                        }
+                    }
+                } else {
+                    if (!targetPath.exists() || targetPath.length() != file.length() || targetPath.lastModified() != file.lastModified()) {
+                        FileUtils.copyFile(file, targetPath, true);
+                    }
                 }
             }
         }
@@ -102,5 +132,15 @@ public class ResourcesUtils {
         } catch (IOException e) {
             System.err.println(e.getMessage());            
         }
+    }
+
+    // get file from classpath, resources folder
+    public static InputStream getStreamFromResources(ClassLoader classLoader, String fileName) throws IOException {
+        InputStream stream = classLoader.getResourceAsStream(fileName);
+
+        if (stream == null) {
+            throw new IOException("Cannot get resource \"" + fileName + "\" from Jar file.");
+        }
+        return stream;
     }
 }

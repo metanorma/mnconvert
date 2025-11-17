@@ -9,7 +9,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import org.metanorma.utils.ResourceResolver;
-import org.metanorma.utils.Util;
+import org.metanorma.utils.ResourcesUtils;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -75,7 +75,7 @@ public class RELAXNGValidator {
             
             
             
-            Source srcRNG = new StreamSource(Util.getStreamFromResources(getClass().getClassLoader(), "RFC/" + rngFilename));
+            Source srcRNG = new StreamSource(ResourcesUtils.getStreamFromResources(getClass().getClassLoader(), "RFC/" + rngFilename));
             Schema schema = factory.newSchema(srcRNG);
             Validator validator = schema.newValidator();
             

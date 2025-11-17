@@ -1,5 +1,6 @@
 package org.metanorma.validator;
 
+import org.metanorma.mnconvert;
 import org.metanorma.utils.ResourcesUtils;
 import org.metanorma.utils.Util;
 import org.metanorma.utils.LoggerHelper;
@@ -8,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -48,10 +50,12 @@ public class DTDValidator extends Validator {
             checkSrc = filepathDTDorXSD;
         }
         
-        String checkSrcPath = "/" + new File(checkSrc).getParentFile();
-        
+        String checkSrcPath = "/" + new File(checkSrc).getParentFile().toString();
+
         logger.log(Level.INFO, "Validate XML against DTD {0}...", checkSrc);
-        
+
+        final Path tmpfilepath = Paths.get(Util.getJavaTempDir(), UUID.randomUUID().toString());
+
         try {        
             DocumentBuilderFactory dbfactory = DocumentBuilderFactory.newInstance();
             dbfactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
@@ -59,7 +63,7 @@ public class DTDValidator extends Validator {
             DocumentBuilder builder = dbfactory.newDocumentBuilder();
             
             // copy dtd folder and xml file into the temp folder
-            final Path tmpfilepath = Paths.get(Util.getJavaTempDir(), UUID.randomUUID().toString());
+
             Files.createDirectories(tmpfilepath);
             
             // to debug jar
@@ -104,13 +108,14 @@ public class DTDValidator extends Validator {
             builder.setErrorHandler(errorHandler);
             builder.parse(new InputSource(reader));
 
+        } catch (Exception ex) {
+            exceptions.add("Validation error: " + ex.toString());
+        }
+        finally {
             // flush temporary folder
             if (!DEBUG) {
                 Util.FlushTempFolder(tmpfilepath);
             }
-        
-        } catch (Exception ex) {
-            exceptions.add("Validation error: " + ex.toString());
         }
         return exceptions;        
     }

@@ -1,15 +1,31 @@
 package org.metanorma;
 
-import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
+//import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
 import org.junit.jupiter.api.*;
 import org.metanorma.utils.LoggerHelper;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Handler;
+import java.util.logging.Logger;
+import java.util.logging.StreamHandler;
+
 import org.apache.commons.cli.ParseException;
 
+import static org.metanorma.Constants.*;
+import static org.metanorma.mnconvert.USAGE;
+
 public class sts2mnTests {
+
+    private static final Logger logger = Logger.getLogger(LoggerHelper.LOGGER_NAME);
+
+    private static OutputStream logCapturingStream;
+    private static StreamHandler customLogHandler;
 
     static String XMLFILE_MN;// = "test.mn.xml";
     //final String XMLFILE_STS = "test.sts.xml";
@@ -24,37 +40,58 @@ public class sts2mnTests {
     @BeforeEach
     void setUp(TestInfo testInfo) {
         System.out.println(testInfo.getDisplayName());
+        attachLogCapturer();
+    }
+
+    public void attachLogCapturer()
+    {
+        logCapturingStream = new ByteArrayOutputStream();
+        Handler[] handlers = logger.getParent().getHandlers();
+        customLogHandler = new StreamHandler(logCapturingStream, handlers[0].getFormatter());
+        logger.addHandler(customLogHandler);
+    }
+
+    public String getTestCapturedLog() throws IOException
+    {
+        customLogHandler.flush();
+        return logCapturingStream.toString();
     }
 
     @Test
-    @ExpectSystemExitWithStatus(-1)
-    public void notEnoughArguments() throws ParseException {
+    //@ExpectSystemExitWithStatus(-1)
+    public void notEnoughArguments() throws ParseException, IOException {
         String[] args = new String[]{""};
-        mnconvert.main(args);
+        mnconvert.run(args);
 
+        String capturedLog = getTestCapturedLog();
+        Assumptions.assumeTrue(capturedLog.contains("usage:"));
         //assertTrue(systemOutRule.getLog().contains(mnconvert.USAGE));
     }
 
     
     @Test
-    @ExpectSystemExitWithStatus(-1)
-    public void xmlNotExists() throws ParseException {
+    //@ExpectSystemExitWithStatus(-1)
+    public void xmlNotExists() throws ParseException, IOException {
 
         String[] args = new String[]{"nonexist.xml"};
-        mnconvert.main(args);
+        mnconvert.run(args);
 
+        String capturedLog = getTestCapturedLog();
+        Assumptions.assumeTrue(capturedLog.contains(String.format(INPUT_NOT_FOUND, XML_INPUT, args[0])));
         /*assertTrue(systemOutRule.getLog().contains(
                 String.format(INPUT_NOT_FOUND, XML_INPUT, args[1])));*/
     }
 
     @Test
-    @ExpectSystemExitWithStatus(-1)
-    public void unknownOutputFormat() throws ParseException {
+    //@ExpectSystemExitWithStatus(-1)
+    public void unknownOutputFormat() throws ParseException, IOException {
         Assumptions.assumeTrue(XMLFILE_MN != null);
 
         String[] args = new String[]{"--output-format", "abc", XMLFILE_MN};
-        mnconvert.main(args);
+        mnconvert.run(args);
 
+        String capturedLog = getTestCapturedLog();
+        Assumptions.assumeTrue(capturedLog.contains(String.format(UNKNOWN_OUTPUT_FORMAT, args[1])));
         /*assertTrue(systemOutRule.getLog().contains(
                 String.format(UNKNOWN_OUTPUT_FORMAT, args[1])));*/
     }
@@ -70,7 +107,7 @@ public class sts2mnTests {
         fileout.toFile().delete();
         
         String[] args = new String[]{XMLFILE_MN};
-        mnconvert.main(args);
+        mnconvert.run(args);
 
         Assumptions.assumeTrue(Files.exists(fileout));
     }
@@ -84,7 +121,7 @@ public class sts2mnTests {
         fileout.toFile().delete();
         
         String[] args = new String[]{"--output-format", "adoc", XMLFILE_MN};
-        mnconvert.main(args);
+        mnconvert.run(args);
 
         Assumptions.assumeTrue(Files.exists(fileout));
     }
@@ -96,7 +133,7 @@ public class sts2mnTests {
         fileout.toFile().delete();
         
         String[] args = new String[]{"--output-format", "adoc", "--output", fileout.toAbsolutePath().toString(), XMLFILE_MN};
-        mnconvert.main(args);
+        mnconvert.run(args);
 
         Assumptions.assumeTrue(Files.exists(fileout));
     }
@@ -126,7 +163,7 @@ public class sts2mnTests {
 
         String[] args = new String[]{"--output-format", "adoc", "--output", filename,
                 Paths.get(System.getProperty("buildDirectory"), "..", XMLFILE_MN).normalize().toString()};
-        mnconvert.main(args);
+        mnconvert.run(args);
         System.setProperty("user.dir", user_dir); // we should restore value for another tests
         Assumptions.assumeTrue(Files.exists(fileout));
     }
@@ -173,7 +210,7 @@ public class sts2mnTests {
             imageout.toFile().delete();
 
             String[] args = new String[]{"--output-format", "adoc", "--imagesdir", "img", "--output", outFileName, XMLFILE_MN_WITH_IMGLINK};
-            mnconvert.main(args);
+            mnconvert.run(args);
 
             Assumptions.assumeTrue(Files.exists(fileout));
             Assumptions.assumeTrue(Files.exists(imageout));
@@ -215,7 +252,7 @@ public class sts2mnTests {
         fileoutRxl.toFile().delete();
         
         String[] args = new String[]{"--split-bibdata", XMLFILE_MN};
-        mnconvert.main(args);
+        mnconvert.run(args);
 
         Assumptions.assumeTrue(Files.exists(fileoutAdoc));
         Assumptions.assumeTrue(Files.exists(fileoutRxl));
