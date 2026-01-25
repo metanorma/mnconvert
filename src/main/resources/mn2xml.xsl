@@ -713,119 +713,124 @@
 			
 			<!-- <xsl:for-each select="*[local-name() = 'title'][generate-id(.)=generate-id(key('klang',@language)[1])]"> -->
 			<xsl:for-each select="xalan:nodeset($languages)/*">
-				<title-wrap xml:lang="{@language}">
-				
-					<xsl:variable name="titles-components">
-						<xsl:variable name="title-intro">
-							 <!-- <xsl:apply-templates select="/*/*[local-name() = 'bibdata']/*[local-name() = 'title'][@language = current()/@language and @type = 'title-intro']" mode="front"/> -->
-							 <xsl:apply-templates select="xalan:nodeset($bibdata)/*/title[@language = current()/@language and @type = 'title-intro']" mode="front"/>
-						</xsl:variable>
-						
-						<xsl:variable name="title-main">					
-							<!-- <xsl:apply-templates select="/*/*[local-name() = 'bibdata']/*[local-name() = 'title'][@language = current()/@language and @type = 'title-main']" mode="front"/> -->
-							<xsl:apply-templates select="xalan:nodeset($bibdata)/*/title[@language = current()/@language and @type = 'title-main']" mode="front"/>
-						</xsl:variable>
-						
-						<xsl:choose>
-							<xsl:when test="normalize-space($title-main) = '' and normalize-space($title-intro) != ''">
-								<main>
-									<xsl:copy-of select="$title-intro"/>
-								</main>
-							</xsl:when>
-							<xsl:otherwise>
-								<intro><xsl:copy-of select="$title-intro"/></intro>
-								<main><xsl:copy-of select="$title-main"/></main>
-							</xsl:otherwise>
-						</xsl:choose>
-						
-						<xsl:variable name="title-amd">
-							<!-- <xsl:apply-templates select="/*/*[local-name() = 'bibdata']/*[local-name() = 'title'][@language = current()/@language and @type = 'title-amd']" mode="front"/> -->
-							<xsl:apply-templates select="xalan:nodeset($bibdata)/*/title[@language = current()/@language and @type = 'title-amd']" mode="front"/>
-						</xsl:variable>
-						
-						<xsl:variable name="title-part">
-							<!-- <xsl:apply-templates select="/*/*[local-name() = 'bibdata']/*[local-name() = 'title'][@language = current()/@language and @type = 'title-part']" mode="front"/> -->
-							<xsl:apply-templates select="xalan:nodeset($bibdata)/*/title[@language = current()/@language and @type = 'title-part']" mode="front"/>
-						</xsl:variable>
-						
-						<xsl:variable name="part">
-							<!-- <xsl:apply-templates select="/*/*[local-name() = 'bibdata']/*[local-name() = 'ext']/*[local-name() = 'structuredidentifier']/*[local-name() = 'project-number']/@part" mode="front"/> -->
-							<xsl:apply-templates select="xalan:nodeset($bibdata)/*/ext/structuredidentifier/project-number/@part" mode="front"/>
-						</xsl:variable>
-						<part>
-							<xsl:if test="self::compl and $part != ''">
-								<xsl:choose>
-									<xsl:when test="current()/@language = 'en'"><xsl:text>Part </xsl:text></xsl:when>
-									<xsl:when test="current()/@language = 'fr'"><xsl:text>Partie </xsl:text></xsl:when>
-								</xsl:choose>
-								<xsl:value-of select="$part"/>
-								<xsl:choose>
-									<xsl:when test="normalize-space($title-part) = ''">
-										<xsl:text>. </xsl:text>
-									</xsl:when>
-									<xsl:otherwise>
-										<xsl:text>: </xsl:text>
-									</xsl:otherwise>
-								</xsl:choose>
-							</xsl:if>
-						</part>
-						
-						<!-- <xsl:if test="normalize-space($title-part) != ''"> -->
-						<compl>
-							<xsl:copy-of select="$title-part"/>
-							<xsl:if test="normalize-space($title-amd) != ''">
-								<xsl:if test="normalize-space($title-part) != ''">
-									<xsl:text> — </xsl:text>
-								</xsl:if>
-								<xsl:copy-of select="$title-amd"/>
-							</xsl:if>
-						</compl>
-						<!-- </xsl:if> -->
-						
-						
-					</xsl:variable>
-				
+				<xsl:variable name="title_wrap">
+					<title-wrap xml:lang="{@language}">
 					
-					<xsl:for-each select="xalan:nodeset($titles-components)/*[normalize-space() != '' and not(self::part)]">
-						<xsl:copy-of select="."/>
-					</xsl:for-each>
-
-					<xsl:variable name="full-title">
-						<!-- <xsl:if test="normalize-space($title-intro) != ''">
-							<xsl:copy-of select="$title-intro"/>
-							<xsl:text> — </xsl:text>
-						</xsl:if> -->
-						
-						<xsl:for-each select="xalan:nodeset($titles-components)/*[normalize-space() != '']">
-							<xsl:value-of select="."/>
-							<xsl:if test="normalize-space() != '' and position() != last()">
-								<xsl:text> — </xsl:text>
-							</xsl:if>
-						</xsl:for-each>
-						
-						<!-- <xsl:copy-of select="$title-main"/>
-						<xsl:if test="normalize-space($title-part) != ''">
-							<xsl:if test="$part != ''">
-								<xsl:text> — </xsl:text>
+						<xsl:variable name="titles-components">
+							<xsl:variable name="title-intro">
+								 <!-- <xsl:apply-templates select="/*/*[local-name() = 'bibdata']/*[local-name() = 'title'][@language = current()/@language and @type = 'title-intro']" mode="front"/> -->
+								 <xsl:apply-templates select="xalan:nodeset($bibdata)/*/title[@language = current()/@language and @type = 'title-intro']" mode="front"/>
+							</xsl:variable>
+							
+							<xsl:variable name="title-main">					
+								<!-- <xsl:apply-templates select="/*/*[local-name() = 'bibdata']/*[local-name() = 'title'][@language = current()/@language and @type = 'title-main']" mode="front"/> -->
+								<xsl:apply-templates select="xalan:nodeset($bibdata)/*/title[@language = current()/@language and @type = 'title-main']" mode="front"/>
+							</xsl:variable>
+							
+							<xsl:choose>
+								<xsl:when test="normalize-space($title-main) = '' and normalize-space($title-intro) != ''">
+									<main>
+										<xsl:copy-of select="$title-intro"/>
+									</main>
+								</xsl:when>
+								<xsl:otherwise>
+									<intro><xsl:copy-of select="$title-intro"/></intro>
+									<main><xsl:copy-of select="$title-main"/></main>
+								</xsl:otherwise>
+							</xsl:choose>
+							
+							<xsl:variable name="title-amd">
+								<!-- <xsl:apply-templates select="/*/*[local-name() = 'bibdata']/*[local-name() = 'title'][@language = current()/@language and @type = 'title-amd']" mode="front"/> -->
+								<xsl:apply-templates select="xalan:nodeset($bibdata)/*/title[@language = current()/@language and @type = 'title-amd']" mode="front"/>
+							</xsl:variable>
+							
+							<xsl:variable name="title-part">
+								<!-- <xsl:apply-templates select="/*/*[local-name() = 'bibdata']/*[local-name() = 'title'][@language = current()/@language and @type = 'title-part']" mode="front"/> -->
+								<xsl:apply-templates select="xalan:nodeset($bibdata)/*/title[@language = current()/@language and @type = 'title-part']" mode="front"/>
+							</xsl:variable>
+							
+							<xsl:variable name="part">
+								<!-- <xsl:apply-templates select="/*/*[local-name() = 'bibdata']/*[local-name() = 'ext']/*[local-name() = 'structuredidentifier']/*[local-name() = 'project-number']/@part" mode="front"/> -->
+								<xsl:apply-templates select="xalan:nodeset($bibdata)/*/ext/structuredidentifier/project-number/@part" mode="front"/>
+							</xsl:variable>
+							<part>
+								<xsl:if test="self::compl and $part != ''">
 									<xsl:choose>
 										<xsl:when test="current()/@language = 'en'"><xsl:text>Part </xsl:text></xsl:when>
 										<xsl:when test="current()/@language = 'fr'"><xsl:text>Partie </xsl:text></xsl:when>
 									</xsl:choose>
 									<xsl:value-of select="$part"/>
-									<xsl:text>: </xsl:text>															
-							</xsl:if>
-							<xsl:if test="normalize-space($title-part) = ''">. </xsl:if>
-							<xsl:copy-of select="$title-part"/>
-						</xsl:if>
-						<xsl:if test="normalize-space($title-amd) != ''">
-							<xsl:copy-of select="$title-amd"/>
-						</xsl:if> -->
+									<xsl:choose>
+										<xsl:when test="normalize-space($title-part) = ''">
+											<xsl:text>. </xsl:text>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:text>: </xsl:text>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:if>
+							</part>
+							
+							<!-- <xsl:if test="normalize-space($title-part) != ''"> -->
+							<compl>
+								<xsl:copy-of select="$title-part"/>
+								<xsl:if test="normalize-space($title-amd) != ''">
+									<xsl:if test="normalize-space($title-part) != ''">
+										<xsl:text> — </xsl:text>
+									</xsl:if>
+									<xsl:copy-of select="$title-amd"/>
+								</xsl:if>
+							</compl>
+							<!-- </xsl:if> -->
+							
+							
+						</xsl:variable>
+					
 						
-					</xsl:variable>
-					<full><xsl:copy-of select="$full-title"/></full>
-					
-					
-				</title-wrap>
+						<xsl:for-each select="xalan:nodeset($titles-components)/*[normalize-space() != '' and not(self::part)]">
+							<xsl:copy-of select="."/>
+						</xsl:for-each>
+
+						<xsl:variable name="full-title">
+							<!-- <xsl:if test="normalize-space($title-intro) != ''">
+								<xsl:copy-of select="$title-intro"/>
+								<xsl:text> — </xsl:text>
+							</xsl:if> -->
+							
+							<xsl:for-each select="xalan:nodeset($titles-components)/*[normalize-space() != '']">
+								<xsl:value-of select="."/>
+								<xsl:if test="normalize-space() != '' and position() != last()">
+									<xsl:text> — </xsl:text>
+								</xsl:if>
+							</xsl:for-each>
+							
+							<!-- <xsl:copy-of select="$title-main"/>
+							<xsl:if test="normalize-space($title-part) != ''">
+								<xsl:if test="$part != ''">
+									<xsl:text> — </xsl:text>
+										<xsl:choose>
+											<xsl:when test="current()/@language = 'en'"><xsl:text>Part </xsl:text></xsl:when>
+											<xsl:when test="current()/@language = 'fr'"><xsl:text>Partie </xsl:text></xsl:when>
+										</xsl:choose>
+										<xsl:value-of select="$part"/>
+										<xsl:text>: </xsl:text>															
+								</xsl:if>
+								<xsl:if test="normalize-space($title-part) = ''">. </xsl:if>
+								<xsl:copy-of select="$title-part"/>
+							</xsl:if>
+							<xsl:if test="normalize-space($title-amd) != ''">
+								<xsl:copy-of select="$title-amd"/>
+							</xsl:if> -->
+							
+						</xsl:variable>
+						<full><xsl:copy-of select="$full-title"/></full>
+						
+						
+					</title-wrap>
+				</xsl:variable>
+				<xsl:if test="normalize-space($title_wrap) != ''">
+					<xsl:copy-of select="$title_wrap"/>
+				</xsl:if>
 			</xsl:for-each>
 			
 			<!-- <part-number> -->
@@ -1387,7 +1392,7 @@
 	
 	<xsl:template match="keyword">
 		<xsl:param name="process">false</xsl:param>
-		<xsl:if test="$process = 'true'">
+		<xsl:if test="$process = 'true' and $format = 'NISO'">
 			<kwd-group kwd-group-type="AuthorFree">
 				<xsl:for-each select=". | following-sibling::keyword">
 					<kwd><xsl:value-of select="."/></kwd>
@@ -1793,6 +1798,7 @@
 	<xsl:template match="bibdata/title[@type = 'title-intro'] |
 																bibdata/title[@type = 'title-main'] |
 																bibdata/title[@type = 'title-part'] |
+																bibdata/title[@type = 'title-part-prefix'] |
 																bibdata/title[@type = 'main'] |
 																bibdata/title[@type = 'title-amd'] |
 																contributor[role/@type='author']/organization/abbreviation |																
