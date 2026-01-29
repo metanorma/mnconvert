@@ -2693,6 +2693,17 @@
 		<publisher-loc><xsl:apply-templates/></publisher-loc>
 	</xsl:template>
 	
+	<xsl:template match="bibitem/place/city">
+		<xsl:choose>
+			<xsl:when test="$format = 'ISO'">
+				<xsl:apply-templates/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy><xsl:apply-templates/></xsl:copy>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
 	<xsl:template match="bibitem/contributor[role/@type = 'publisher']" priority="2">
 		<publisher-name><xsl:apply-templates/></publisher-name>
 	</xsl:template>
