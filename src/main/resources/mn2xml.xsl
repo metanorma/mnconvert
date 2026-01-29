@@ -248,8 +248,16 @@
 	</xsl:template>
 		
 	<xsl:template name="getId">
+		<xsl:variable name="element_id">
+			<xsl:choose>
+				<xsl:when test="@id"><xsl:value-of select="@id"/></xsl:when>
+				<xsl:when test="@original-id"><xsl:value-of select="@original-id"/></xsl:when>
+			</xsl:choose>
+		</xsl:variable>
 		<xsl:choose>
-			<xsl:when test="@id"><xsl:value-of select="translate(@id,'()', '__')"/></xsl:when> <!-- replace '(' and ')' for valid id -->
+			<xsl:when test="normalize-space($element_id) != ''">
+				<xsl:value-of select="translate($element_id,'()', '__')"/><!-- replace '(' and ')' for valid id -->
+			</xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="generate-id(.)"/>
 			</xsl:otherwise>
@@ -5362,9 +5370,18 @@
 		<def-item>
 			<!-- <xsl:copy-of select="@id"/> -->
 			<xsl:variable name="dt_id" select="normalize-space(translate(@id, ':', '_'))"/>
-			<xsl:if test="$dt_id != ''">
-				<xsl:attribute name="id"><xsl:value-of select="$dt_id"/></xsl:attribute>
-			</xsl:if>
+			<xsl:choose>
+				<xsl:when test="$dt_id != ''">
+					<xsl:attribute name="id"><xsl:value-of select="$dt_id"/></xsl:attribute>
+				</xsl:when>
+				<xsl:otherwise>
+				<!-- https://github.com/metanorma/mnconvert/issues/446#issuecomment-3816408545 -->
+					<xsl:variable name="dt_original_id" select="normalize-space(translate(@original-id, ':', '_'))"/>
+					<xsl:if test="$dt_original_id != ''">
+						<xsl:attribute name="id"><xsl:value-of select="$dt_original_id"/></xsl:attribute>
+					</xsl:if>
+				</xsl:otherwise>
+			</xsl:choose>
 			<term>
 				<xsl:apply-templates />
 			</term>

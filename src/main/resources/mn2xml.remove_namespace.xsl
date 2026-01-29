@@ -201,7 +201,7 @@
 	
 	<!-- <xsl:template match="*[local-name() = 'p']/@keep-with-next" mode="remove_namespace" priority="3"/> -->
 	<xsl:template match="@original-id" mode="remove_namespace" priority="3">
-		<xsl:if test="parent::*[local-name() = 'callout-annotation']">
+		<xsl:if test="parent::*[local-name() = 'callout-annotation' or local-name() = 'dt']">
 			<!-- <xsl:attribute name="id"><xsl:value-of select="."/></xsl:attribute> -->
 			<xsl:copy-of select="."/>
 		</xsl:if>
