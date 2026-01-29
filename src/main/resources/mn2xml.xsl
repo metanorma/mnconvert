@@ -5466,7 +5466,8 @@
 					<xsl:apply-templates select="*[not(self::image)]"/>
 				</graphic>
 			</xsl:when>
-			<xsl:otherwise>	
+			<xsl:otherwise>
+				<!-- <debug><xsl:copy-of select="."/></debug> -->
 				<fig id="{$id}">
 					<xsl:if test="$outputformat != 'IEEE'">
 						<xsl:attribute name="fig-type">figure</xsl:attribute>
@@ -5476,19 +5477,21 @@
 					</xsl:if>
 					<xsl:call-template name="addSectionAttribute"/>
 					
-					<label>
-						<xsl:choose>
-							<!-- <xsl:when test="$figure_presentation/node()">
-								<xsl:value-of select="$figure_presentation/@section_prefix"/><xsl:value-of select="$figure_presentation/@section"/>
-							</xsl:when> -->
-							<xsl:when test="ancestor::amend/autonumber[@type = 'figure']">
-								<xsl:value-of select="ancestor::amend/autonumber[@type = 'figure']/text()"/>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:value-of select="@section_prefix"/><xsl:value-of select="@section"/>
-							</xsl:otherwise>
-						</xsl:choose>
-					</label>
+					<xsl:if test="not(@unnumbered = 'true')">
+						<label>
+							<xsl:choose>
+								<!-- <xsl:when test="$figure_presentation/node()">
+									<xsl:value-of select="$figure_presentation/@section_prefix"/><xsl:value-of select="$figure_presentation/@section"/>
+								</xsl:when> -->
+								<xsl:when test="ancestor::amend/autonumber[@type = 'figure']">
+									<xsl:value-of select="ancestor::amend/autonumber[@type = 'figure']/text()"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="@section_prefix"/><xsl:value-of select="@section"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</label>
+					</xsl:if>
 					<xsl:apply-templates />
 				</fig>
 			</xsl:otherwise>
