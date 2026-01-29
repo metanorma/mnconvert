@@ -248,8 +248,16 @@
 	</xsl:template>
 		
 	<xsl:template name="getId">
+		<xsl:variable name="element_id">
+			<xsl:choose>
+				<xsl:when test="@id"><xsl:value-of select="@id"/></xsl:when>
+				<xsl:when test="@original-id"><xsl:value-of select="@original-id"/></xsl:when>
+			</xsl:choose>
+		</xsl:variable>
 		<xsl:choose>
-			<xsl:when test="@id"><xsl:value-of select="translate(@id,'()', '__')"/></xsl:when> <!-- replace '(' and ')' for valid id -->
+			<xsl:when test="normalize-space($element_id) != ''">
+				<xsl:value-of select="translate($element_id,'()', '__')"/><!-- replace '(' and ')' for valid id -->
+			</xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="generate-id(.)"/>
 			</xsl:otherwise>
@@ -2338,7 +2346,7 @@
 					<xsl:apply-templates select="docidentifier"/>
 					<xsl:apply-templates select="title" mode="mixed_citation"/>
 				</xsl:when>
-				<xsl:when test="(@type = 'standard' or @type = 'international-standard' or docnumber) and $outputformat != 'IEEE'"> <!--  or fetched -->
+				<xsl:when test="(@type = 'standard' or @type = 'international-standard' or (docnumber and not(@type = 'book'))) and $outputformat != 'IEEE'"> <!--  or fetched -->
 					<std>
 						<xsl:variable name="urn" select="docidentifier[@type = 'URN']"/>
 						<xsl:variable name="docidentifier_URN" select="$bibitems_URN/bibitem[@id = $id]/urn"/>
@@ -2632,7 +2640,18 @@
 	</xsl:template>
 	
 	<xsl:template match="bibitem/contributor/person/name/forename | bibitem/contributor/person/name/formatted-initials">
-		<given-names><xsl:apply-templates/></given-names>
+		<xsl:choose>
+			<xsl:when test="self::forename and preceding-sibling::*[1][self::forename]"><!-- skip multiple --></xsl:when>
+			<xsl:otherwise>
+				<given-names>
+					<xsl:apply-templates/>
+					<xsl:if test="self::forename and following-sibling::forename">
+						<xsl:text> </xsl:text>
+						<xsl:apply-templates select="following-sibling::forename/node()"/>
+					</xsl:if>
+				</given-names>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="bibitem/extent">
@@ -2672,6 +2691,17 @@
 	
 	<xsl:template match="bibitem/place">
 		<publisher-loc><xsl:apply-templates/></publisher-loc>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/place/city">
+		<xsl:choose>
+			<xsl:when test="$format = 'ISO'">
+				<xsl:apply-templates/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy><xsl:apply-templates/></xsl:copy>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="bibitem/contributor[role/@type = 'publisher']" priority="2">
@@ -3671,7 +3701,8 @@
 	<xsl:template match="note" name="note">
 		<xsl:param name="skip_in_bibitem">true</xsl:param>
 		<xsl:choose>
-			<xsl:when test="$skip_in_bibitem = 'true' and parent::references"></xsl:when>
+			<!-- last note in formattedref -->
+			<xsl:when test="$skip_in_bibitem = 'true' and (parent::references or (parent::formattedref and count(following-sibling::*[not(local-name() = 'note')]) = 0))"></xsl:when>
 			<xsl:when test="parent::table and @type = 'units'">
 				<p content-type="Dimension">
 					<xsl:apply-templates/>
@@ -5362,9 +5393,18 @@
 		<def-item>
 			<!-- <xsl:copy-of select="@id"/> -->
 			<xsl:variable name="dt_id" select="normalize-space(translate(@id, ':', '_'))"/>
-			<xsl:if test="$dt_id != ''">
-				<xsl:attribute name="id"><xsl:value-of select="$dt_id"/></xsl:attribute>
-			</xsl:if>
+			<xsl:choose>
+				<xsl:when test="$dt_id != ''">
+					<xsl:attribute name="id"><xsl:value-of select="$dt_id"/></xsl:attribute>
+				</xsl:when>
+				<xsl:otherwise>
+				<!-- https://github.com/metanorma/mnconvert/issues/446#issuecomment-3816408545 -->
+					<xsl:variable name="dt_original_id" select="normalize-space(translate(@original-id, ':', '_'))"/>
+					<xsl:if test="$dt_original_id != ''">
+						<xsl:attribute name="id"><xsl:value-of select="$dt_original_id"/></xsl:attribute>
+					</xsl:if>
+				</xsl:otherwise>
+			</xsl:choose>
 			<term>
 				<xsl:apply-templates />
 			</term>
@@ -5437,7 +5477,8 @@
 					<xsl:apply-templates select="*[not(self::image)]"/>
 				</graphic>
 			</xsl:when>
-			<xsl:otherwise>	
+			<xsl:otherwise>
+				<!-- <debug><xsl:copy-of select="."/></debug> -->
 				<fig id="{$id}">
 					<xsl:if test="$outputformat != 'IEEE'">
 						<xsl:attribute name="fig-type">figure</xsl:attribute>
@@ -5447,19 +5488,21 @@
 					</xsl:if>
 					<xsl:call-template name="addSectionAttribute"/>
 					
-					<label>
-						<xsl:choose>
-							<!-- <xsl:when test="$figure_presentation/node()">
-								<xsl:value-of select="$figure_presentation/@section_prefix"/><xsl:value-of select="$figure_presentation/@section"/>
-							</xsl:when> -->
-							<xsl:when test="ancestor::amend/autonumber[@type = 'figure']">
-								<xsl:value-of select="ancestor::amend/autonumber[@type = 'figure']/text()"/>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:value-of select="@section_prefix"/><xsl:value-of select="@section"/>
-							</xsl:otherwise>
-						</xsl:choose>
-					</label>
+					<xsl:if test="not(@unnumbered = 'true')">
+						<label>
+							<xsl:choose>
+								<!-- <xsl:when test="$figure_presentation/node()">
+									<xsl:value-of select="$figure_presentation/@section_prefix"/><xsl:value-of select="$figure_presentation/@section"/>
+								</xsl:when> -->
+								<xsl:when test="ancestor::amend/autonumber[@type = 'figure']">
+									<xsl:value-of select="ancestor::amend/autonumber[@type = 'figure']/text()"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="@section_prefix"/><xsl:value-of select="@section"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</label>
+					</xsl:if>
 					<xsl:apply-templates />
 				</fig>
 			</xsl:otherwise>

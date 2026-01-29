@@ -272,15 +272,22 @@
 			</xsl:if>
 			
 			<xsl:if test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">
-				<xsl:attribute name="id_new">
+				<xsl:variable name="id_new">
 					<xsl:choose>
 						<xsl:when test="@content-type = 'ace-table' and ancestor::sec[@sec-type = 'publication_info']"><xsl:value-of select="@id"/></xsl:when>
 						<xsl:when test="not(contains(@content-type , '-index'))"> <!-- no need id for formula-index and figure-index tables -->
-							<xsl:text>tab_</xsl:text>
-							<xsl:number level="any" format="a" count="array"/>
+							<xsl:variable name="num"><xsl:number level="any" format="a" count="array"/></xsl:variable>
+							<xsl:if test="normalize-space($num) != ''">
+								<xsl:value-of select="concat('tab_', tab_)"/>
+							</xsl:if>
 						</xsl:when>
 					</xsl:choose>
-				</xsl:attribute>
+				</xsl:variable>
+				<xsl:if test="normalize-space($id_new) != ''">
+					<xsl:attribute name="id_new">
+						<xsl:value-of select="$id_new"/>
+					</xsl:attribute>
+				</xsl:if>
 			</xsl:if>
 			
 			<xsl:apply-templates select="node()" mode="id_generate" />
