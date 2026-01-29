@@ -2346,7 +2346,7 @@
 					<xsl:apply-templates select="docidentifier"/>
 					<xsl:apply-templates select="title" mode="mixed_citation"/>
 				</xsl:when>
-				<xsl:when test="(@type = 'standard' or @type = 'international-standard' or docnumber) and $outputformat != 'IEEE'"> <!--  or fetched -->
+				<xsl:when test="(@type = 'standard' or @type = 'international-standard' or (docnumber and not(@type = 'book'))) and $outputformat != 'IEEE'"> <!--  or fetched -->
 					<std>
 						<xsl:variable name="urn" select="docidentifier[@type = 'URN']"/>
 						<xsl:variable name="docidentifier_URN" select="$bibitems_URN/bibitem[@id = $id]/urn"/>
@@ -2640,7 +2640,18 @@
 	</xsl:template>
 	
 	<xsl:template match="bibitem/contributor/person/name/forename | bibitem/contributor/person/name/formatted-initials">
-		<given-names><xsl:apply-templates/></given-names>
+		<xsl:choose>
+			<xsl:when test="self::forename and preceding-sibling::*[1][self::forename]"><!-- skip multiple --></xsl:when>
+			<xsl:otherwise>
+				<given-names>
+					<xsl:apply-templates/>
+					<xsl:if test="self::forename and following-sibling::forename">
+						<xsl:text> </xsl:text>
+						<xsl:apply-templates select="following-sibling::forename/node()"/>
+					</xsl:if>
+				</given-names>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="bibitem/extent">

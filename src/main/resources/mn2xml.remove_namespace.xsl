@@ -177,7 +177,8 @@
 				ancestor::*[local-name() = 'concept'] or
 				ancestor::*[local-name() = 'termsource'] or 
 				ancestor::*[local-name() = 'source'] or 
-				ancestor::*[local-name() = 'figure'])]" mode="remove_namespace" priority="3"/>
+				ancestor::*[local-name() = 'figure'] or
+				ancestor::*[local-name() = 'bibitem'])]" mode="remove_namespace" priority="3"/>
 	<xsl:template match="*[local-name() = 'fmt-link']" mode="remove_namespace" priority="3">
 		<xsl:element name="link">
 			<xsl:copy-of select="@*"/>
