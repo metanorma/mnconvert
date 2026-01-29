@@ -3690,7 +3690,8 @@
 	<xsl:template match="note" name="note">
 		<xsl:param name="skip_in_bibitem">true</xsl:param>
 		<xsl:choose>
-			<xsl:when test="$skip_in_bibitem = 'true' and parent::references"></xsl:when>
+			<!-- last note in formattedref -->
+			<xsl:when test="$skip_in_bibitem = 'true' and (parent::references or (parent::formattedref and count(following-sibling::*[not(local-name() = 'note')]) = 0))"></xsl:when>
 			<xsl:when test="parent::table and @type = 'units'">
 				<p content-type="Dimension">
 					<xsl:apply-templates/>
