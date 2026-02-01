@@ -1353,6 +1353,9 @@
 					<xsl:when test="../metanorma-extension/presentation-metadata[name = 'HTML TOC Heading Levels']"><xsl:apply-templates select="../metanorma-extension/presentation-metadata[name = 'HTML TOC Heading Levels']" mode="custom_meta"/></xsl:when>
 					<xsl:when test="../metanorma-extension/presentation-metadata[name = 'DOC TOC Heading Levels']"><xsl:apply-templates select="../metanorma-extension/presentation-metadata[name = 'DOC TOC Heading Levels']" mode="custom_meta"/></xsl:when>
 					<xsl:when test="../metanorma-extension/presentation-metadata[name = 'TOC Heading Levels']"><xsl:apply-templates select="../metanorma-extension/presentation-metadata[name = 'TOC Heading Levels']" mode="custom_meta"/></xsl:when>
+					<xsl:when test="../metanorma-extension/presentation-metadata/html-toc-heading-levels"><xsl:apply-templates select="../metanorma-extension/presentation-metadata/html-toc-heading-levels" mode="custom_meta"/></xsl:when>
+					<xsl:when test="../metanorma-extension/presentation-metadata/doc-toc-heading-levels"><xsl:apply-templates select="../metanorma-extension/presentation-metadata/doc-toc-heading-levels" mode="custom_meta"/></xsl:when>
+					<xsl:when test="../metanorma-extension/presentation-metadata/toc-heading-levels"><xsl:apply-templates select="../metanorma-extension/presentation-metadata/toc-heading-levels" mode="custom_meta"/></xsl:when>
 				</xsl:choose>
 				
 				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/upi" mode="custom_meta"/>
@@ -1687,10 +1690,13 @@
 	
 	<xsl:template match="metanorma-extension/presentation-metadata[name = 'TOC Heading Levels'] |
 						metanorma-extension/presentation-metadata[name = 'HTML TOC Heading Levels'] |
-						metanorma-extension/presentation-metadata[name = 'DOC TOC Heading Levels']" mode="custom_meta">
+						metanorma-extension/presentation-metadata[name = 'DOC TOC Heading Levels'] |
+						metanorma-extension/presentation-metadata/toc-heading-levels |
+						metanorma-extension/presentation-metadata/html-toc-heading-levels |
+						metanorma-extension/presentation-metadata/doc-toc-heading-levels" mode="custom_meta">
 		<custom-meta>
 			<meta-name>TOC Heading Level</meta-name>
-			<meta-value><xsl:value-of select="value"/></meta-value>
+			<meta-value><xsl:value-of select="value | ."/></meta-value>
 		</custom-meta>
 	</xsl:template>
 	
@@ -3178,7 +3184,7 @@
 					<p keep-with-next="true">where</p>
 					<dl id="_1888cb29-de0b-4b5e-1580-9df5170d10a7" key="true" class="formula_dl">
 				-->
-				<xsl:when test="@keep-with-next and preceding-sibling::*[1][self::stem] and normalize-space() = $i18n_where and following-sibling::*[1][self::dl]">
+				<xsl:when test="@keep-with-next and preceding-sibling::*[1][self::stem] and normalize-space() = $i18n_where and following-sibling::*[1][self::dl or self::key]">
 					<break />
 					<xsl:apply-templates />
 				</xsl:when>
@@ -4937,7 +4943,16 @@
 					<xsl:apply-templates select="name" mode="table"/>
 				</xsl:if>
 				<table>
-					<xsl:copy-of select="@*[not(local-name() = 'id' or local-name() = 'autonum' or local-name() = 'unnumbered' or local-name() = 'section' or local-name() = 'section_prefix' or local-name() = 'width' or local-name() = 'class' or local-name() = 'type' or local-name() = 'presentation')]"/>
+					<xsl:copy-of select="@*[not(local-name() = 'id' or 
+							local-name() = 'autonum' or 
+							local-name() = 'unnumbered' or 
+							local-name() = 'section' or 
+							local-name() = 'section_prefix' 
+							or local-name() = 'width' or 
+							local-name() = 'class' or 
+							local-name() = 'type' or 
+							local-name() = 'presentation' or
+							local-name() = 'plain')]"/>
 					<xsl:if test="$outputformat = 'IEEE'">
 					 <xsl:attribute name="cellpadding">5</xsl:attribute>
 					 <xsl:attribute name="frame">box</xsl:attribute>
@@ -4970,7 +4985,7 @@
 			<!-- </table-wrap> -->
 			</xsl:element>
 			
-			<xsl:if test="(note or dl or source) and $wrap-element = 'array'">
+			<xsl:if test="(note or dl or source or key) and $wrap-element = 'array'">
 				<xsl:call-template name="insertTableFootNote"/>
 			</xsl:if>
 			
@@ -4987,7 +5002,7 @@
 				</p>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:for-each select="dl">
+				<xsl:for-each select="dl | key/dl">
 					<p>
 						<xsl:call-template name="dl"/>
 					</p>
@@ -5107,7 +5122,7 @@
 	</xsl:template>
 	
 	<xsl:template match="table/note" priority="2"/>
-	<xsl:template match="table/dl" priority="2"/>
+	<xsl:template match="table/dl | table/key" priority="2"/>
 	<xsl:template match="table/source" priority="2"/>
 	
 	<xsl:template match="name"/>
@@ -5250,11 +5265,15 @@
 	<xsl:template match="dl" name="dl">
 		<xsl:param name="skip">true</xsl:param>
 		<xsl:choose>
+			<!-- 'key' or 'where', in <key></key> element -->
+			<!-- <xsl:when test="parent::key">
+				<xsl:call-template name="create_array"/>
+			</xsl:when> -->
 			<!-- 'key' or 'where' -->
-			<xsl:when test="preceding-sibling::*[1][self::figure] or preceding-sibling::*[1][self::stem] or (@key = 'true' and @class = 'formula_dl')">
+			<xsl:when test="preceding-sibling::*[1][self::figure] or preceding-sibling::*[1][self::stem] or (@key = 'true' and @class = 'formula_dl') or parent::key">
 				<xsl:call-template name="create_array"/>
 			</xsl:when>
-			<xsl:when test="$metanorma_type = 'ISO' and @key = 'true'">
+			<xsl:when test="$metanorma_type = 'ISO' and (@key = 'true' or parent::key)">
 				<table-wrap content-type="fig-index">
 					<xsl:if test="not(starts-with(@id,'_'))">
 						<xsl:copy-of select="@id"/>
@@ -5276,7 +5295,7 @@
 							<xsl:copy-of select="@id"/>
 						</xsl:if>
 						
-						<xsl:if test="$metanorma_type = 'IEC' and @key = 'true'">
+						<xsl:if test="$metanorma_type = 'IEC' and (@key = 'true' or parent::key)">
 							<xsl:attribute name="list-content">figure</xsl:attribute>
 						</xsl:if>
 						
@@ -5290,7 +5309,7 @@
 							</xsl:attribute>
 						</xsl:if>
 						
-						<xsl:if test="$metanorma_type = 'IEC' and @key = 'true'">
+						<xsl:if test="$metanorma_type = 'IEC' and (@key = 'true' or parent::key)">
 							<label><xsl:value-of select="$i18n_key"/></label>
 						</xsl:if>
 						
@@ -5321,17 +5340,29 @@
 
 	<xsl:template name="create_array">
 		<!-- <xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable> -->
-		<xsl:if test="preceding-sibling::*[1][self::stem] and not(ancestor::formula)">
+		<xsl:if test="(preceding-sibling::*[1][self::stem] or (parent::key and ../preceding-sibling::*[1][self::stem])) and not(ancestor::formula)">
 			<p>where:</p>
 		</xsl:if>
 		<array> <!-- id="{$id}" -->
-			<xsl:copy-of select="@id"/>
-			<xsl:if test="preceding-sibling::*[1][self::figure] or (preceding-sibling::*[1][self::p] and preceding-sibling::*[2][self::image])">
+			<xsl:choose>
+				<xsl:when test="parent::key and starts-with(@id,'_')"><!-- no need add id="_..." for key/dl --></xsl:when>
+				<xsl:otherwise>
+					<xsl:copy-of select="@id"/>
+				</xsl:otherwise>
+			</xsl:choose>
+			
+			<xsl:if test="(preceding-sibling::*[1][self::figure] or (parent::key and ../preceding-sibling::*[1][self::figure]))  or 
+					(preceding-sibling::*[1][self::p] and preceding-sibling::*[2][self::image]) or
+					(parent::key and ../preceding-sibling::*[1][self::p] and ../preceding-sibling::*[2][self::image])">
 				<xsl:attribute name="content-type">figure-index</xsl:attribute>
 			</xsl:if>
-			<xsl:if test="preceding-sibling::*[1][self::stem] or preceding-sibling::*[2][self::stem]">
+			<xsl:if test="(preceding-sibling::*[1][self::stem] or preceding-sibling::*[2][self::stem]) or
+					(parent::key and (../preceding-sibling::*[1][self::stem] or ../preceding-sibling::*[2][self::stem]))">
 				<xsl:attribute name="content-type">formula-index</xsl:attribute>
 			</xsl:if>
+			
+			<!-- label -->
+			<!-- old, to be removed -->
 			<xsl:if test="@key = 'true'">
 				<label>
 					<xsl:if test="preceding-sibling::image">
@@ -5342,6 +5373,17 @@
 					</xsl:if>
 				</label>
 			</xsl:if>
+			<xsl:if test="parent::key">
+				<label>
+					<xsl:if test="../preceding-sibling::image">
+						<xsl:choose>
+							<xsl:when test="../preceding-sibling::*[1][self::p][@keep-with-next]"><xsl:value-of select="normalize-space(../preceding-sibling::*[1][self::p][@keep-with-next])"/></xsl:when>
+							<xsl:otherwise><xsl:value-of select="$i18n_key"/></xsl:otherwise>
+						</xsl:choose>
+					</xsl:if>
+				</label>
+			</xsl:if>
+			
 			<table>
 				<tbody>
 					<xsl:apply-templates />
@@ -5643,6 +5685,10 @@
 		<graphic xlink:href="data:image/svg+xml;base64,{$svg_string_base64}" mimetype="image/svg+xml"/>
 	</xsl:template>
 	
+	<xsl:template match="figure/key">
+		<xsl:apply-templates />
+	</xsl:template>
+	
 	<xsl:template match="formula">
 		<xsl:param name="skip">true</xsl:param>
 		
@@ -5691,6 +5737,10 @@
 				<xsl:text disable-output-escaping="yes">&lt;bold&gt;</xsl:text>
 			</xsl:if>
 		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="formula/key">
+		<xsl:apply-templates />
 	</xsl:template>
 	
 	<xsl:template match="formula/stem" priority="2">
