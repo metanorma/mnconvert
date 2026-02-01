@@ -278,7 +278,7 @@
 						<xsl:when test="not(contains(@content-type , '-index'))"> <!-- no need id for formula-index and figure-index tables -->
 							<xsl:variable name="num"><xsl:number level="any" format="a" count="array"/></xsl:variable>
 							<xsl:if test="normalize-space($num) != ''">
-								<xsl:value-of select="concat('tab_', tab_)"/>
+								<xsl:value-of select="concat('tab_', $num)"/>
 							</xsl:if>
 						</xsl:when>
 					</xsl:choose>
