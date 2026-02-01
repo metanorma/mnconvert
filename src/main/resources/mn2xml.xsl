@@ -1353,6 +1353,9 @@
 					<xsl:when test="../metanorma-extension/presentation-metadata[name = 'HTML TOC Heading Levels']"><xsl:apply-templates select="../metanorma-extension/presentation-metadata[name = 'HTML TOC Heading Levels']" mode="custom_meta"/></xsl:when>
 					<xsl:when test="../metanorma-extension/presentation-metadata[name = 'DOC TOC Heading Levels']"><xsl:apply-templates select="../metanorma-extension/presentation-metadata[name = 'DOC TOC Heading Levels']" mode="custom_meta"/></xsl:when>
 					<xsl:when test="../metanorma-extension/presentation-metadata[name = 'TOC Heading Levels']"><xsl:apply-templates select="../metanorma-extension/presentation-metadata[name = 'TOC Heading Levels']" mode="custom_meta"/></xsl:when>
+					<xsl:when test="../metanorma-extension/presentation-metadata/html-toc-heading-levels"><xsl:apply-templates select="../metanorma-extension/presentation-metadata/html-toc-heading-levels" mode="custom_meta"/></xsl:when>
+					<xsl:when test="../metanorma-extension/presentation-metadata/doc-toc-heading-levels"><xsl:apply-templates select="../metanorma-extension/presentation-metadata/doc-toc-heading-levels" mode="custom_meta"/></xsl:when>
+					<xsl:when test="../metanorma-extension/presentation-metadata/toc-heading-levels"><xsl:apply-templates select="../metanorma-extension/presentation-metadata/toc-heading-levels" mode="custom_meta"/></xsl:when>
 				</xsl:choose>
 				
 				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/upi" mode="custom_meta"/>
@@ -1687,10 +1690,13 @@
 	
 	<xsl:template match="metanorma-extension/presentation-metadata[name = 'TOC Heading Levels'] |
 						metanorma-extension/presentation-metadata[name = 'HTML TOC Heading Levels'] |
-						metanorma-extension/presentation-metadata[name = 'DOC TOC Heading Levels']" mode="custom_meta">
+						metanorma-extension/presentation-metadata[name = 'DOC TOC Heading Levels'] |
+						metanorma-extension/presentation-metadata/toc-heading-levels |
+						metanorma-extension/presentation-metadata/html-toc-heading-levels |
+						metanorma-extension/presentation-metadata/doc-toc-heading-levels" mode="custom_meta">
 		<custom-meta>
 			<meta-name>TOC Heading Level</meta-name>
-			<meta-value><xsl:value-of select="value"/></meta-value>
+			<meta-value><xsl:value-of select="value | ."/></meta-value>
 		</custom-meta>
 	</xsl:template>
 	
