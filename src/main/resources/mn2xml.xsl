@@ -6105,7 +6105,8 @@
 				<xsl:call-template name="p"/>
 			</xsl:when>
 			<xsl:otherwise>
-				<p id="{@id}">
+				<p>
+					<xsl:copy-of select="@id"/>
 					<xsl:if test="ancestor::amend/@change">
 						<xsl:attribute name="content-type">
 							<xsl:value-of select="ancestor::amend/@change"/>

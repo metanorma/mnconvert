@@ -241,12 +241,17 @@
 	<xsl:template match="table-wrap[label]" mode="id_generate">
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="id_generate" />
-			<xsl:attribute name="id_new">
-				<xsl:choose>
-					<xsl:when test="$metanorma_type = 'IEC'">tab-<xsl:value-of select="@section"/></xsl:when>
-					<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">tab_<xsl:value-of select="@section"/></xsl:when>
-				</xsl:choose>
-			</xsl:attribute>
+			
+			<xsl:variable name="id_new" select="translate(@section, '() ', '___')"/>
+			<xsl:if test="normalize-space($id_new) != ''">
+				<xsl:attribute name="id_new">					
+					<xsl:choose>
+						<xsl:when test="$metanorma_type = 'IEC'">tab-</xsl:when>
+						<xsl:when test="$metanorma_type = 'ISO' or $metanorma_type = 'BSI'">tab_</xsl:when>
+					</xsl:choose>
+					<xsl:value-of select="$id_new"/>
+				</xsl:attribute>
+			</xsl:if>
 			<xsl:apply-templates select="node()" mode="id_generate" />
 		</xsl:copy>
 	</xsl:template>
