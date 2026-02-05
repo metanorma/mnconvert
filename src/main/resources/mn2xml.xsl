@@ -791,6 +791,12 @@
 							</compl>
 							<!-- </xsl:if> -->
 							
+							<xsl:variable name="title-complementary">					
+								<xsl:apply-templates select="xalan:nodeset($bibdata)/*/title[@language = current()/@language and @type = 'title-complementary']" mode="front"/>
+							</xsl:variable>
+							<compl>
+								<xsl:copy-of select="$title-complementary"/>
+							</compl>
 							
 						</xsl:variable>
 					
@@ -1829,6 +1835,7 @@
 																bibdata/title[@type = 'title-part-prefix'] |
 																bibdata/title[@type = 'main'] |
 																bibdata/title[@type = 'title-amd'] |
+																bibdata/title[@type = 'title-complementary'] |
 																contributor[role/@type='author']/organization/abbreviation |																
 																contributor[role/@type='author']/organization/name |
 																contributor/organization/subdivision |
