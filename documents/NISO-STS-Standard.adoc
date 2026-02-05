@@ -1,0 +1,51 @@
+= Z39.102
+:docnumber: Z39.102
+:docidentifier: ANSI/NISO Z39.102-2017
+:publisher: NISO
+:pub-address: NISO + \
+3600 Clipper Mill Road + \
+Suite 302 + \
+Baltimore, MD 21211-1948 + \
+www.niso.org
+:draft: 1.0
+:issued-date: 2017-10-06
+:language: en
+:title-main-en: STS: Standards Tag Suite
+:doctype: standard
+:semantic-metadata-accrediting-organization: American National Standards Institute
+:authorizer: An American National Standard, ANS
+:semantic-metadata-copyright-statement: Copyright © 2017 by the National Information Standards Organization
+:semantic-metadata-license: All rights reserved under International and Pan-American Copyright Conventions. For noncommercial purposes only, this publication may be reproduced or transmitted in any form or by any means without prior permission in writing from the publisher, provided it is reproduced accurately, the source of the material is identified, and the NISO copyright status is acknowledged. All inquiries regarding translations into other languages or commercial reproduction or distribution should be addressed to: NISO, 3600 Clipper Mill Road, Suite 302, Baltimore, MD 21211-1948.
+:isbn: 978-1-937522-78-0
+:semantic-metadata-isbn-html: 978-1-937522-77-3
+:semantic-metadata-issn: 1041-5653
+:mn-document-class: iso
+:mn-output-extensions: xml,html,doc,pdf,rxl
+:local-cache-only:
+:data-uri-image: false
+:imagesdir: images
+
+include::sections/00-abstract.adoc[]
+
+include::sections/00-meta-notes.adoc[]
+
+include::sections/00-01-foreword.adoc[]
+
+include::sections/01-purpose.adoc[]
+
+include::sections/02-background.adoc[]
+
+include::sections/03-scope.adoc[]
+
+include::sections/04-application.adoc[]
+
+include::sections/05-normrefs.adoc[]
+
+include::sections/06-references.adoc[]
+
+include::sections/07-definitions.adoc[]
+
+include::sections/08-ansi_niso.adoc[]
+
+include::sections/99-bibliography.adoc[]
+
