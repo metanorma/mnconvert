@@ -3284,6 +3284,14 @@
 					</xsl:if>
 				</xsl:for-each>
 			</xsl:when>
+			<xsl:when test="parent::th">
+				<p>
+					<xsl:copy-of select="$paragraph/p/@*"/>
+					<bold>
+						<xsl:copy-of select="$paragraph/p/node()"/>
+					</bold>
+				</p>
+			</xsl:when>
 			<xsl:otherwise>
 				<xsl:copy-of select="$paragraph"/>
 			</xsl:otherwise>
@@ -3427,6 +3435,12 @@
 	</xsl:template> <!-- ul -->
 	<xsl:template match="ul/@type"/>
 	
+	<xsl:template match="amend//ul[parent::description]">
+		<p>
+			<xsl:call-template name="ul"/>
+		</p>
+	</xsl:template>
+	
 	<xsl:template match="ol" name="ol">
 		<xsl:param name="skip">true</xsl:param>
 		
@@ -3491,6 +3505,12 @@
 	<xsl:template match="ol/@type"/>
 	<xsl:template match="ol/@start"/>
 	<xsl:template match="ol/text()[normalize-space() = '']"/> <!-- linearization -->
+
+	<xsl:template match="amend//ol[parent::description]">
+		<p>
+			<xsl:call-template name="ol"/>
+		</p>
+	</xsl:template>
 
 	<xsl:template match="ul/note | ol/note" priority="2"/>
 	
@@ -4967,7 +4987,8 @@
 							local-name() = 'class' or 
 							local-name() = 'type' or 
 							local-name() = 'presentation' or
-							local-name() = 'plain')]"/>
+							local-name() = 'plain' or
+							local-name() = 'number')]"/>
 					<xsl:if test="$outputformat = 'IEEE'">
 					 <xsl:attribute name="cellpadding">5</xsl:attribute>
 					 <xsl:attribute name="frame">box</xsl:attribute>
@@ -5005,6 +5026,12 @@
 			</xsl:if>
 			
 		</xsl:if>
+	</xsl:template>
+
+	<xsl:template match="amend//table">
+		<p>
+			<xsl:call-template name="table"/>
+		</p>
 	</xsl:template>
 
 	<xsl:template name="insertTableFootNote">
@@ -5233,6 +5260,9 @@
 									</bold>
 								</xsl:if>
 							</xsl:for-each>
+						</xsl:when>
+						<xsl:when test="$th_text/p">
+							<xsl:copy-of select="$th_text"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<bold>
