@@ -791,6 +791,12 @@
 							</compl>
 							<!-- </xsl:if> -->
 							
+							<xsl:variable name="title-complementary">					
+								<xsl:apply-templates select="xalan:nodeset($bibdata)/*/title[@language = current()/@language and @type = 'title-complementary']" mode="front"/>
+							</xsl:variable>
+							<compl>
+								<xsl:copy-of select="$title-complementary"/>
+							</compl>
 							
 						</xsl:variable>
 					
@@ -1373,7 +1379,8 @@
 				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/metadata-update" mode="custom_meta"/>
 				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/international" mode="custom_meta"/>
 				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/isoviennaagreement" mode="custom_meta"/>
-
+				
+				<xsl:apply-templates select="../metanorma-extension/attachment" mode="custom_meta"/>
 			</xsl:variable>
 			<xsl:variable name="custom-meta-group" select="xalan:nodeset($custom-meta-group_)"/>
 			
@@ -1796,6 +1803,19 @@
 		</custom-meta>
 	</xsl:template>
 	
+	<xsl:template match="metanorma-extension/attachment" mode="custom_meta">
+		<custom-meta>
+			<meta-name>attachment</meta-name>
+			<meta-value>
+				<inline-supplementary-material>
+					<xsl:attribute name="xlink:href">
+						<xsl:value-of select="@name"/>
+					</xsl:attribute>
+					<xsl:value-of select="."/>
+				</inline-supplementary-material>
+			</meta-value>
+		</custom-meta>
+	</xsl:template>
 	<!-- =============== -->
 	<!-- END custom-meta -->
 	<!-- =============== -->
@@ -1815,6 +1835,7 @@
 																bibdata/title[@type = 'title-part-prefix'] |
 																bibdata/title[@type = 'main'] |
 																bibdata/title[@type = 'title-amd'] |
+																bibdata/title[@type = 'title-complementary'] |
 																contributor[role/@type='author']/organization/abbreviation |																
 																contributor[role/@type='author']/organization/name |
 																contributor/organization/subdivision |
@@ -1896,7 +1917,8 @@
 																metanorma-extension/presentation-metadata/* |
 																metanorma-extension/table[@id = '_misccontainer_anchor_aliases'] |
 																metanorma-extension/*[local-name() = 'UnitsML'] |
-																metanorma-extension/toc"
+																metanorma-extension/toc |
+																metanorma-extension/attachment"
 																mode="front_check"/>
 
 	<!-- skip processed structure and deep down -->
@@ -3269,6 +3291,14 @@
 					</xsl:if>
 				</xsl:for-each>
 			</xsl:when>
+			<xsl:when test="parent::th">
+				<p>
+					<xsl:copy-of select="$paragraph/p/@*"/>
+					<bold>
+						<xsl:copy-of select="$paragraph/p/node()"/>
+					</bold>
+				</p>
+			</xsl:when>
 			<xsl:otherwise>
 				<xsl:copy-of select="$paragraph"/>
 			</xsl:otherwise>
@@ -3412,6 +3442,12 @@
 	</xsl:template> <!-- ul -->
 	<xsl:template match="ul/@type"/>
 	
+	<xsl:template match="amend//ul[parent::description]">
+		<p>
+			<xsl:call-template name="ul"/>
+		</p>
+	</xsl:template>
+	
 	<xsl:template match="ol" name="ol">
 		<xsl:param name="skip">true</xsl:param>
 		
@@ -3476,6 +3512,12 @@
 	<xsl:template match="ol/@type"/>
 	<xsl:template match="ol/@start"/>
 	<xsl:template match="ol/text()[normalize-space() = '']"/> <!-- linearization -->
+
+	<xsl:template match="amend//ol[parent::description]">
+		<p>
+			<xsl:call-template name="ol"/>
+		</p>
+	</xsl:template>
 
 	<xsl:template match="ul/note | ol/note" priority="2"/>
 	
@@ -4952,7 +4994,8 @@
 							local-name() = 'class' or 
 							local-name() = 'type' or 
 							local-name() = 'presentation' or
-							local-name() = 'plain')]"/>
+							local-name() = 'plain' or
+							local-name() = 'number')]"/>
 					<xsl:if test="$outputformat = 'IEEE'">
 					 <xsl:attribute name="cellpadding">5</xsl:attribute>
 					 <xsl:attribute name="frame">box</xsl:attribute>
@@ -4990,6 +5033,12 @@
 			</xsl:if>
 			
 		</xsl:if>
+	</xsl:template>
+
+	<xsl:template match="amend//table">
+		<p>
+			<xsl:call-template name="table"/>
+		</p>
 	</xsl:template>
 
 	<xsl:template name="insertTableFootNote">
@@ -5218,6 +5267,9 @@
 									</bold>
 								</xsl:if>
 							</xsl:for-each>
+						</xsl:when>
+						<xsl:when test="$th_text/p">
+							<xsl:copy-of select="$th_text"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<bold>
@@ -6060,7 +6112,8 @@
 				<xsl:call-template name="p"/>
 			</xsl:when>
 			<xsl:otherwise>
-				<p id="{@id}">
+				<p>
+					<xsl:copy-of select="@id"/>
 					<xsl:if test="ancestor::amend/@change">
 						<xsl:attribute name="content-type">
 							<xsl:value-of select="ancestor::amend/@change"/>
