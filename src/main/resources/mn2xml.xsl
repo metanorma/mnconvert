@@ -1373,7 +1373,8 @@
 				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/metadata-update" mode="custom_meta"/>
 				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/international" mode="custom_meta"/>
 				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/isoviennaagreement" mode="custom_meta"/>
-
+				
+				<xsl:apply-templates select="../metanorma-extension/attachment" mode="custom_meta"/>
 			</xsl:variable>
 			<xsl:variable name="custom-meta-group" select="xalan:nodeset($custom-meta-group_)"/>
 			
@@ -1796,6 +1797,19 @@
 		</custom-meta>
 	</xsl:template>
 	
+	<xsl:template match="metanorma-extension/attachment" mode="custom_meta">
+		<custom-meta>
+			<meta-name>attachment</meta-name>
+			<meta-value>
+				<inline-supplementary-material>
+					<xsl:attribute name="xlink:href">
+						<xsl:value-of select="@name"/>
+					</xsl:attribute>
+					<xsl:value-of select="."/>
+				</inline-supplementary-material>
+			</meta-value>
+		</custom-meta>
+	</xsl:template>
 	<!-- =============== -->
 	<!-- END custom-meta -->
 	<!-- =============== -->
@@ -1896,7 +1910,8 @@
 																metanorma-extension/presentation-metadata/* |
 																metanorma-extension/table[@id = '_misccontainer_anchor_aliases'] |
 																metanorma-extension/*[local-name() = 'UnitsML'] |
-																metanorma-extension/toc"
+																metanorma-extension/toc |
+																metanorma-extension/attachment"
 																mode="front_check"/>
 
 	<!-- skip processed structure and deep down -->
