@@ -2769,6 +2769,11 @@
 		<comment><xsl:apply-templates/></comment>
 	</xsl:template>
 	
+	<xsl:template match="bibitem[@type != '' and @type != 'standard']/note/p" priority="3">
+		<xsl:apply-templates/>
+		<!-- if there are cases with multiple 'p' in bibitem/note, then need change 'comment' to 'annotation' that allows 'p' -->
+	</xsl:template>
+	
 	<xsl:template match="bibitem/series">
 		<italic><xsl:apply-templates/></italic>
 	</xsl:template>
