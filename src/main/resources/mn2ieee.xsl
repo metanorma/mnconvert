@@ -844,10 +844,12 @@
 	</xsl:template>
 	
 	<xsl:template match="p">
+		<xsl:param name="process_always">false</xsl:param>
 		<xsl:variable name="parent_name" select="local-name(..)"/>
 		
 		<xsl:variable name="paragraph_">
 			<xsl:choose>
+				<xsl:when test="@keep-with-next and following-sibling::*[1][self::key] and $process_always =  'false'"><!-- skip --></xsl:when>
 				<xsl:when test="$parent_name = 'termexample' or 
 															$parent_name = 'definition'  or 
 															$parent_name = 'verbaldefinition'  or 
@@ -872,7 +874,7 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<p>
-						<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
+						<xsl:apply-templates select="@*[not(local-name() = 'id' or local-name() = 'keep-with-next')]"/>
 						<xsl:apply-templates />
 						
 						<!-- if paragraph ends with ':', then move next 'formula' inside 'p' -->
@@ -1047,7 +1049,7 @@
 		
 		<xsl:if test="$process = 'true'">
 			<xsl:choose>
-				<xsl:when test="parent::formula">
+				<xsl:when test="parent::key and ../parent::formula">
 					<xsl:call-template name="create_variable-list"/>
 				</xsl:when>
 				<xsl:when test="preceding-sibling::*[1][self::figure] or preceding-sibling::*[1][self::stem]">
@@ -1075,8 +1077,10 @@
 	
 	<xsl:template name="create_variable-list">
 		<variable-list>
-			<xsl:if test="preceding-sibling::*[1][self::stem]">
-				<p>where</p>
+			<xsl:if test="parent::key and ../preceding-sibling::*[1][self::p][@keep-with-next] and ../preceding-sibling::*[2][self::stem]">
+				<xsl:apply-templates select="../preceding-sibling::*[1][self::p][@keep-with-next]">
+					<xsl:with-param name="process_always">true</xsl:with-param>
+				</xsl:apply-templates>
 				<xsl:apply-templates select="dt" mode="variable-list"/>
 			</xsl:if>
 		</variable-list>
