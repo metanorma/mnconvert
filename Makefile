@@ -79,8 +79,7 @@ deploy:
 	mvn --settings settings.xml -Dmaven.test.skip=true clean deploy shade:shade
 
 documents/%.sts.html: documents/%.sts.xml saxon.jar isosts2html_standalone.xsl isosts2html.xsl
-	echo skip
-	#java -jar saxon.jar -s:$< -xsl:isosts2html_standalone.xsl -o:$@
+	java -jar saxon.jar -s:$< -xsl:isosts2html_standalone.xsl -o:$@
 
 documents/%.sts.xml: documents/%.mn.xml | target/$( JAR_FILE) documents
 	java -jar target/$(JAR_FILE) $< --output $@ --output-format iso
