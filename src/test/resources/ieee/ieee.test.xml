@@ -394,7 +394,37 @@ readers context, including background, key themes, history, etc.</p>
 		
 	</sections>
 	<annex id="_sample_bibliography" inline-header="false" obligation="informative">
-		<title>Sample bibliography</title>
+		<title id="_988f4a9c-cc16-1ee6-7ae8-53a40e55b4e4" semx-id="_0f2f03c5-2272-1398-0b44-5390ca7d2d74">Sample bibliography</title>
+		<fmt-title id="_c6827334-4f10-a350-8818-d3cf6fb15bad">
+			<strong>
+				<span class="fmt-caption-label">
+					<span class="fmt-element-name">Annex</span>
+					<semx element="autonum" source="_508f2cf9-8ad4-1cda-010e-fc8840ef29f7">A</semx>
+				</span>
+			</strong>
+			<br/>
+			<span class="fmt-obligation">(informative)</span>
+			<span class="fmt-caption-delim">
+				<br/>
+			</span>
+			<semx element="title" source="_988f4a9c-cc16-1ee6-7ae8-53a40e55b4e4">
+				<strong>Sample bibliography</strong>
+			</semx>
+		</fmt-title>
+		<fmt-xref-label>
+			<span class="fmt-element-name">Annex</span>
+			<semx element="autonum" source="_508f2cf9-8ad4-1cda-010e-fc8840ef29f7">A</semx>
+		</fmt-xref-label>
+		<variant-title type="toc">
+			<span class="fmt-caption-label">
+				<span class="fmt-element-name">Annex</span>
+				<semx element="autonum" source="_508f2cf9-8ad4-1cda-010e-fc8840ef29f7">A</semx>
+			</span>
+			<span class="fmt-caption-delim">
+				<tab/>
+			</span>
+			<semx element="title" source="_988f4a9c-cc16-1ee6-7ae8-53a40e55b4e4">Sample bibliography</semx>
+		</variant-title>
 		<p>Text</p>
 	</annex>
 	
