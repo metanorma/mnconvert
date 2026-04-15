@@ -40,6 +40,8 @@ jobs:
 
       - run: sudo snap install yq
 
+      - run: bundle update
+
 #      - run: sudo gem install metanorma-cli
 
       # - run: gem install metanorma-cli
