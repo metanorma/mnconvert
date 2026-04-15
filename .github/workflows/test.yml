@@ -67,11 +67,13 @@ jobs:
       - if: matrix.os == 'ubuntu-latest'
         run: sudo snap install yq
 
-      - if: matrix.os == 'ubuntu-latest'
-        run: gem install metanorma-cli
+      - run: bundle update
 
-      - if: matrix.os != 'ubuntu-latest'
-        run: gem install metanorma-cli
+      #- if: matrix.os == 'ubuntu-latest'
+      #  run: gem install metanorma-cli
+
+      #- if: matrix.os != 'ubuntu-latest'
+      #  run: gem install metanorma-cli
 
       - if: matrix.os == 'ubuntu-latest'
         run: |
