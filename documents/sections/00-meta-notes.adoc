@@ -1,0 +1,15 @@
+
+[.preface,type=cover-address]
+== {blank}
+
+Published by the National Information Standards Organization
+
+Baltimore, Maryland, U.S.A.
+
+[.preface,type=title-page]
+=== About NISO Standards
+
+NISO standards are developed by Working Groups of the National Information Standards Organization under the oversight of a Topic Committee. The development process is a strenuous one that includes a rigorous peer review of proposed standards open to each NISO Voting Member and any other interested party. Final approval of the standard involves verification by the American National Standards Institute that its requirements for due process, consensus, and other approval criteria have been met by NISO. Once verified and approved, NISO Standards also become American National Standards.
+
+These standards may be revised or withdrawn at any time. For current information on the status of this standard contact the NISO office or visit the NISO website at: https://www.niso.org[https://www.niso.org]
+
