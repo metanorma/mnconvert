@@ -1833,6 +1833,7 @@
 																bibdata/title[@type = 'title-main'] |
 																bibdata/title[@type = 'title-part'] |
 																bibdata/title[@type = 'title-part-prefix'] |
+																bibdata/title[@type = 'title-amendment-prefix'] |
 																bibdata/title[@type = 'main'] |
 																bibdata/title[@type = 'title-amd'] |
 																bibdata/title[@type = 'title-complementary'] |
@@ -2719,6 +2720,10 @@
 	
 	<xsl:template match="bibitem/place">
 		<publisher-loc><xsl:apply-templates/></publisher-loc>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/place/formattedPlace">
+		<xsl:apply-templates/>
 	</xsl:template>
 	
 	<xsl:template match="bibitem/place/city">
