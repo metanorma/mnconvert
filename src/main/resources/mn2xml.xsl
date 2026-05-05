@@ -2721,6 +2721,10 @@
 		<publisher-loc><xsl:apply-templates/></publisher-loc>
 	</xsl:template>
 	
+	<xsl:template match="bibitem/place/formattedPlace">
+		<xsl:apply-templates/>
+	</xsl:template>
+	
 	<xsl:template match="bibitem/place/city">
 		<xsl:choose>
 			<xsl:when test="$format = 'ISO'">
