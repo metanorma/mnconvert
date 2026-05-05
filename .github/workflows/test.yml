@@ -82,6 +82,11 @@ jobs:
 
       - run: bundle update
 
+      # for fixing https://github.com/metanorma/mn2pdf/issues/427
+      # JDK 8u492b09 Azul Zulu: 8.94.0.17
+      - if: matrix.os == 'macos-latest'
+        run: echo "JAVA_HOME=$JAVA_HOME/Contents/Home" >> $GITHUB_ENV
+
       - run: make testMN2STS
 
       - run: make testSTS2MN
