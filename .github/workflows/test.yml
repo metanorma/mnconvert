@@ -37,7 +37,7 @@ jobs:
 
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.1
+          ruby-version: 4.0
           rubygems: latest
 #          bundler: 2.5.10
 
