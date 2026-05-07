@@ -5716,6 +5716,19 @@
 		</graphic>
   </xsl:template>
   
+	<xsl:template match="sourcecode//image">
+		<inline-graphic>
+			<xsl:choose>
+				<xsl:when test="$outputformat = 'IEEE'">
+					<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates select="@*"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</inline-graphic>
+	</xsl:template>
+	
 	<xsl:template match="image/@src">
 		<xsl:attribute name="xlink:href">
 			<xsl:choose>
