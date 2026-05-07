@@ -1,0 +1,1182 @@
+= Dynamic Subscription to YANG Events and Datastores over RESTCONF
+:doctype: internet-draft
+:abbrev: RESTCONF Transport for Event Notifications
+:name: draft-ietf-netconf-restconf-notif-15
+:status: standard
+:intended-series: standard
+:submission-type: IETF
+:ipr: trust200902
+:instance: https://dx.doi.org/10.17487/rfc8650
+:instance: urn:issn:2070-1721
+:revdate: 2019-01-01T00:00:00Z
+:area: Operations & Management
+:workgroup: NETCONF
+:keyword: YANG-Push
+:xml-lang: en
+:consensus: true
+:index-include: true
+:sort-refs: true
+:sym-refs: true
+:toc-include: true
+:toc-depth: 3
+:show-on-front-page: true
+:fullname: Eric Voit
+:initials: E.
+:surname: Voit
+:affiliation: Cisco Systems
+:email: evoit@cisco.com
+:fullname_2: Reshad Rahman
+:initials_2: R.
+:surname_2: Rahman
+:affiliation_2: Cisco Systems
+:email_2: rrahman@cisco.com
+:fullname_3: Einar Nilsen-Nygaard
+:initials_3: E.
+:surname_3: Nilsen-Nygaard
+:affiliation_3: Cisco Systems
+:email_3: einarnn@cisco.com
+:fullname_4: Alexander Clemm
+:initials_4: A.
+:surname_4: Clemm
+:affiliation_4: Futurewei
+:email_4: ludwig@clemm.org
+:fullname_5: Andy Bierman
+:initials_5: A.
+:surname_5: Bierman
+:affiliation_5: YumaWorks
+:email_5: andy@yumaworks.com
+
+[abstract]
+== Abstract
+This document provides a RESTCONF binding to the dynamic subscription capability of both subscribed notifications and YANG-Push.
+
+[[status-of-memo]]
+[numbered=false,removeInRFC=false,toc=exclude]
+== Status of This Memo
+
+This is an Internet Standards Track document.
+
+This document is a product of the Internet Engineering Task Force (IETF). It represents the consensus of the IETF community. It has received public review and has been approved for publication by the Internet Engineering Steering Group (IESG). Further information on Internet Standards is available in Section 2 of RFC 7841.
+
+Information about the current status of this document, any errata, and how to provide feedback on it may be obtained at  https://www.rfc-editor.org/info/rfc8650.
+
+[[copyright]]
+[numbered=false,removeInRFC=false,toc=exclude]
+== Copyright Notice
+
+Copyright (c) 2019 IETF Trust and the persons identified as the document authors. All rights reserved.
+
+This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents ( https://trustee.ietf.org/license-info) in effect on the date of publication of this document. Please review these documents carefully, as they describe your rights and restrictions with respect to this document. Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.
+
+[[toc]]
+[numbered=false,removeInRFC=false,toc=exclude]
+== Table of Contents
+
+[nobullet=true,spacing=compact]
+* <<section-1,format=counter>>.  <<name-introduction,format=title: Introduction>>
+* <<section-2,format=counter>>.  <<name-terminology,format=title: Terminology>>
+* <<section-3,format=counter>>.  <<name-dynamic-subscriptions,format=title: Dynamic Subscriptions>>
+[nobullet=true,spacing=compact]
+** <<section-3.1,format=counter>>.  <<name-transport-connectivity,format=title: Transport Connectivity>>
+** <<section-3.2,format=counter>>.  <<name-discovery,format=title: Discovery>>
+** <<section-3.3,format=counter>>.  <<name-restconf-rpcs-and-http-stat,format=title: RESTCONF RPCs and HTTP Status Codes>>
+** <<section-3.4,format=counter>>.  <<name-call-flow-for-server-sent-e,format=title: Call Flow for Server-Sent Events>>
+* <<section-4,format=counter>>.  <<name-qos-treatment,format=title: QoS Treatment>>
+* <<section-5,format=counter>>.  <<name-notification-messages,format=title: Notification Messages>>
+* <<section-6,format=counter>>.  <<name-yang-tree,format=title: YANG Tree>>
+* <<section-7,format=counter>>.  <<name-yang-module,format=title: YANG Module>>
+* <<section-8,format=counter>>.  <<name-iana-considerations,format=title: IANA Considerations>>
+* <<section-9,format=counter>>.  <<name-security-considerations,format=title: Security Considerations>>
+* <<section-10,format=counter>>. <<name-references,format=title: References>>
+[nobullet=true,spacing=compact]
+** <<section-10.1,format=counter>>.  <<name-normative-references,format=title: Normative References>>
+** <<section-10.2,format=counter>>.  <<name-informative-references,format=title: Informative References>>
+* <<section-appendix.a,format=default>>.  <<name-examples,format=title: Examples>>
+[nobullet=true,spacing=compact]
+** <<section-a.1,format=counter>>.  <<name-dynamic-subscriptions-2,format=title: Dynamic Subscriptions>>
+[nobullet=true,spacing=compact]
+*** <<section-a.1.1,format=counter>>.  <<name-establishing-dynamic-subscr,format=title: Establishing Dynamic Subscriptions>>
+*** <<section-a.1.2,format=counter>>.  <<name-modifying-dynamic-subscript,format=title: Modifying Dynamic Subscriptions>>
+*** <<section-a.1.3,format=counter>>.  <<name-deleting-dynamic-subscripti,format=title: Deleting Dynamic Subscriptions>>
+** <<section-a.2,format=counter>>.  <<name-subscription-state-notifica,format=title: Subscription State Notifications>>
+[nobullet=true,spacing=compact]
+*** <<section-a.2.1,format=counter>>.  <<name-subscription-modified,format=title: "subscription-modified">>
+*** <<section-a.2.2,format=counter>>.  <<name-subscription-completed-subs,format=title: "subscription-completed", "subscription-resumed", and "replay-completed">>
+*** <<section-a.2.3,format=counter>>.  <<name-subscription-terminated-and,format=title: "subscription-terminated" and "subscription-suspended">>
+** <<section-a.3,format=counter>>.  <<name-filter-example,format=title: Filter Example>>
+* <<section-appendix.b,format=none>><<name-acknowledgments,format=title: Acknowledgments>>
+* <<section-appendix.c,format=none>><<name-authors-addresses,format=title: Authors' Addresses>>
+
+[numbered=true,removeInRFC=false,toc=include]
+== Introduction
+
+Mechanisms to support event subscription and YANG-Push are defined in <<RFC8639,format=default>>. Enhancements to <<RFC8639,format=default>> that enable YANG datastore subscription and YANG-Push are defined in <<RFC8641,format=default>>. This document provides a transport specification for dynamic subscriptions over RESTCONF <<RFC8040,format=default>>. Requirements for these mechanisms are captured in <<RFC7923,format=default>>.
+
+The streaming of notifications that encapsulate the resulting information push is done via the mechanism described in <<RFC8040,format=default>>.
+
+[numbered=true,removeInRFC=false,toc=include]
+== Terminology
+
+The key words "[bcp14]#MUST#", "[bcp14]#MUST NOT#", "[bcp14]#REQUIRED#", "[bcp14]#SHALL#", "[bcp14]#SHALL NOT#", "[bcp14]#SHOULD#", "[bcp14]#SHOULD NOT#", "[bcp14]#RECOMMENDED#", "[bcp14]#NOT RECOMMENDED#", "[bcp14]#MAY#", and "[bcp14]#OPTIONAL#" in this document are to be interpreted as described in BCP 14 <<RFC2119,format=default>> <<RFC8174,format=default>> when, and only when, they appear in all capitals, as shown here.
+
+The following terms use the definitions from <<RFC8639,format=default>>: dynamic subscription, event stream, notification message, publisher, receiver, subscriber, and subscription.
+
+Other terms reused include datastore, which is defined in <<RFC8342,format=default>>, and HTTP/2 stream, which maps to the definition of "stream" within <<RFC7540,format=default>>.
+
+[[dyn-subs]]
+[numbered=true,removeInRFC=false,toc=include]
+== Dynamic Subscriptions
+
+This section provides specifics on how to establish and maintain dynamic subscriptions over RESTCONF <<RFC8040,format=default>>. Subscribing to event streams is accomplished in this way via RPCs defined within <<RFC8639,format=default>>. The RPCs are done via RESTCONF POSTs. YANG datastore subscription is accomplished via augmentations to <<RFC8639,format=default>> as described within <<RFC8641,format=default>>.
+
+As described in <<RFC8040,format=default>>, a GET needs to be performed on a specific URI on the publisher. Subscribers cannot predetermine the URI against which a subscription might exist on a publisher, as the URI will only exist after the "establish-subscription" RPC has been accepted. Therefore, the POST for the "establish-subscription" RPC replaces the GET request for the "location" leaf that is used in <<RFC8040,format=default>> to obtain the URI. The subscription URI will be determined and sent as part of the response to the "establish-subscription" RPC, and a subsequent GET to this URI will be done in order to start the flow of notification messages back to the subscriber. As specified in <<RFC8639,format=default>>, a subscription does not move to the active state until the GET is received.
+
+[numbered=true,removeInRFC=false,toc=include]
+=== Transport Connectivity
+
+For a dynamic subscription, when a RESTCONF session doesn't already exist, a new RESTCONF session is initiated from the subscriber.
+
+As stated in <<RFC8040,format=default>>, a subscriber [bcp14]#MUST# establish the HTTP session over TLS <<RFC8446,format=default>> in order to secure the content in transit.
+
+Without the involvement of additional protocols, HTTP sessions by themselves do not support quick recognition of the loss of the communication path to the publisher. Where quick recognition of the loss of a publisher is required, a subscriber [bcp14]#SHOULD# use a TLS heartbeat <<RFC6520,format=default>>, just from subscriber to publisher, to track HTTP session continuity.
+
+Loss of the heartbeat [bcp14]#MUST# result in the teardown of any subscription-related TCP sessions between those endpoints. A subscriber can then attempt to re-establish the dynamic subscription by using the procedure described in <<SSE,format=default>>.
+
+[numbered=true,removeInRFC=false,toc=include]
+=== Discovery
+
+Subscribers can learn which event streams a RESTCONF server supports by querying the "streams" container of ietf-subscribed-notifications.yang in <<RFC8639,format=default>>. Support for the "streams" container of ietf-restconf-monitoring.yang in <<RFC8040,format=default>> is not required. In the case when the RESTCONF binding specified by this document is used to convey the "streams" container from ietf-restconf-monitoring.yang (i.e., that feature is supported), any event streams contained therein are also expected to be present in the "streams" container of ietf-restconf-monitoring.yang.
+
+Subscribers can learn which datastores a RESTCONF server supports by following <<RFC8527,format=default>>.
+
+[numbered=true,removeInRFC=false,toc=include]
+=== RESTCONF RPCs and HTTP Status Codes
+
+Specific HTTP response codes as defined in <<RFC7231,format=default>> will indicate the result of RESTCONF RPC requests with the publisher. An HTTP status code of 200 is the proper response to any successful RPC defined within <<RFC8639,format=default>> or <<RFC8641,format=default>>.
+
+If a publisher fails to serve the RPC request for one of the reasons indicated in <<RFC8639,format=default>> or <<RFC8641,format=default>>, this will be indicated by an appropriate error code, as shown below, transported in the HTTP response.
+
+When an HTTP error code is returned, the RPC reply [bcp14]#MUST# include an <rpc-error> element per <<RFC8040,format=default>> with the following parameter values:
+
+[nobullet=false,spacing=normal]
+* an "error-type" node of "application".
+* an "error-tag" node whose value is a string that corresponds to an identity associated with the error. This "error-tag" will come from one of two places and will correspond to the error identities either within<<RFC8639,format=default>>for general subscription errors (<<gen-sub-errors,format=default>>) or within<<RFC8641,format=default>>for subscription errors specific to YANG datastores (<<datastore-specific-errors,format=default>>).
+* an "error-app-tag" node whose value is a string that corresponds to an identity associated with the error, as defined in<<RFC8639,format=default>>for general subscriptions or<<RFC8641,format=default>>for subscription errors specific to YANG datastores. The tag to use depends on the RPC for which the error occurred. Viable errors for different RPCs are found in<<rpc-errors,format=default>>.
+
+[[gen-sub-errors]]
+.General Subscription Error Identities and Associated "error-tag" Use
+[align=center]
+|===
+h|Error identity | Uses "error-tag" | HTTP code
+|:--- | :--- | :---
+
+|dscp-unavailable | invalid-value | 400
+|encoding-unsupported | invalid-value | 400
+|filter-unsupported | invalid-value | 400
+|insufficient-resources | resource-denied | 409
+|no-such-subscription | invalid-value | 404
+|replay-unsupported | operation-not-supported | 501
+|===
+
+[[datastore-specific-errors]]
+.Datastore-Specific Error Identities and Associated "error-tag" Use
+[align=center]
+|===
+h|Error identity | Uses "error-tag" | HTTP code
+|:--- | :--- | :---
+
+|cant-include | operation-not-supported | 501
+|datastore-not-subscribable | invalid-value | 400
+|no-such-subscription-resync | invalid-value | 404
+|on-change-unsupported | operation-not-supported | 501
+|on-change-sync-unsupported | operation-not-supported | 501
+|period-unsupported | invalid-value | 400
+|update-too-big | too-big | 400
+|sync-too-big | too-big | 400
+|unchanging-selection | operation-failed | 500
+|===
+
+[[rpc-errors]]
+.RPC Errors and Associated Error Identities
+[align=center]
+|===
+h|RPC | Select an identity with a base
+|:--- | :---
+
+|establish-subscription | establish-subscription-error
+|modify-subscription | modify-subscription-error
+|delete-subscription | delete-subscription-error
+|kill-subscription | delete-subscription-error
+|resync-subscription | resync-subscription-error
+|===
+
+Each error identity will be inserted as the "error-app-tag" using JSON encoding following the form <modulename>:<identityname>. An example of such a valid encoding would be "ietf-subscribed-notifications:no-such-subscription".
+
+In the case of error responses to an "establish-subscription" or "modify-subscription" request, there is the option to include an "error-info" node. This node may contain hints for parameter settings that might lead to successful RPC requests in the future. Tables <<error-info-estab-sub,format=counter>> and <<error-info-mod-sub,format=counter>> show the yang-data structures that may be returned.
+
+[[error-info-estab-sub]]
+.Optional "error-info" Node Hints for an "establish-subscription" Request
+[align=center]
+|===
+h|Target: | Return hints in yang-data structure
+|:--- | :---
+
+|event stream | establish-subscription-stream-error-info
+|datastore | establish-subscription-datastore-error-info
+|===
+
+[[error-info-mod-sub]]
+.Optional "error-info" Node Hints for an "modify-subscription" Request
+[align=center]
+|===
+h|Target: | Returns hints in yang-data structure
+|:--- | :---
+
+|event stream | modify-subscription-stream-error-info
+|datastore | modify-subscription-datastore-error-info
+|===
+
+The yang-data included within "error-info" [bcp14]#SHOULD NOT# include the optional leaf "reason", as such a leaf would be redundant with information that is already placed within the "error-app-tag".
+
+In case of an <rpc-error> as a result of a "delete-subscription", a "kill-subscription", or a "resync-subscription" request, no "error-info" needs to be included, as the "subscription-id" is the only RPC input parameter, and no hints regarding this RPC input parameters need to be provided.
+
+Note that "error-path" <<RFC8040,format=default>> does not need to be included with the <rpc-error> element, as subscription errors are generally associated with the choice of RPC input parameters.
+
+[[SSE]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Call Flow for Server-Sent Events
+
+The call flow for Server-Sent Events (SSE) is defined in <<dyn-sse,format=default>>. The logical connections denoted by (a) and (b) can be a TCP connection or an HTTP/2 stream (if HTTP/2 is used, multiple HTTP/2 streams can be carried in one TCP connection). Requests to RPCs as defined in <<RFC8639,format=default>> or <<RFC8641,format=default>> are sent on a connection indicated by (a). A successful "establish-subscription" will result in an RPC response returned with both a subscription identifier that uniquely identifies a subscription, as well as a URI that uniquely identifies the location of subscription on the publisher (b). This URI is defined via the "uri" leaf in the data model in <<YANG-module,format=default>>.
+
+An HTTP GET is then sent on a separate logical connection (b) to the URI on the publisher. This signals the publisher to initiate the flow of notification messages that are sent in SSE <<W3C-20150203,format=default>> as a response to the GET. There cannot be two or more simultaneous GET requests on a subscription URI: any GET request received while there is a current GET request on the same URI [bcp14]#MUST# be rejected with HTTP error code 409.
+
+As described in <<RFC8040,format=default>>, RESTCONF servers [bcp14]#SHOULD NOT# send the "event" or "id" fields in the SSE event notifications.
+
+[[dyn-sse]]
+[suppress-title=false,align=left,alt=]
+.Dynamic Subscriptions with Server-Sent Events
+[align=left,alt=,]
+....
++--------------+                             +--------------+
+|  Subscriber  |                             |   Publisher  |
+|              |                             |              |
+|    Logical   |                             |     Logical  |
+|  Connection  |                             |   Connection |
+|  (a)  (b)    |                             |    (a)  (b)  |
++--------------+                             +--------------+
+    | RESTCONF POST (RPC:establish-subscription)   |
+    |--------------------------------------------->|
+    |                          HTTP 200 OK (ID,URI)|
+    |<---------------------------------------------|
+    |    |HTTP GET (URI)                                |
+    |    |--------------------------------------------->|
+    |    |                                   HTTP 200 OK|
+    |    |<---------------------------------------------|
+    |    |                           SSE (notif-message)|
+    |    |<---------------------------------------------|
+    | RESTCONF POST (RPC:modify-subscription)      |    |
+    |--------------------------------------------->|    |
+    |    |                              HTTP 200 OK|    |
+    |<---------------------------------------------|    |
+    |    |                   SSE (subscription-modified)|
+    |    |<------------------------------------------(c)|
+    |    |                           SSE (notif-message)|
+    |    |<---------------------------------------------|
+    | RESTCONF POST (RPC:delete-subscription)      |    |
+    |--------------------------------------------->|    |
+    |    |                              HTTP 200 OK|    |
+    |<---------------------------------------------|    |
+    |    |                                         |    |
+    |    |                                         |    |
+    (a) (b)                                       (a)  (b) 
+....
+
+Additional requirements for dynamic subscriptions over SSE include:
+
+[nobullet=false,spacing=normal]
+* A publisher[bcp14]#MUST#return all subscription state notifications in a separate SSE message used by the subscription to which the state change refers.
+* Subscription RPCs[bcp14]#MUST NOT#use the connection currently providing notification messages for that subscription.
+* In addition to an RPC response for a "modify-subscription" RPC traveling over (a), a "subscription-modified" state change notification[bcp14]#MUST#be sent within (b). This allows the receiver to know exactly when, within the stream of events, the new terms of the subscription have been applied to the notification messages. See arrow (c).
+* In addition to any required access permissions (e.g., Network Configuration Access Control Model (NACM)), the RPCs "modify-subscription", "resync-subscription", and "delete-subscription"[bcp14]#SHOULD#only be allowed by the same RESTCONF username<<RFC8040,format=default>>that invoked "establish-subscription". Such a restriction generally serves to preserve users' privacy, but exceptions might be made for administrators that may need to modify or delete other users' subscriptions.
+* The "kill-subscription" RPC can be invoked by any RESTCONF username with the required administrative permissions.
+
+A publisher [bcp14]#MUST# terminate a subscription in the following cases:
+
+[nobullet=false,spacing=normal]
+* Receipt of a "delete-subscription" or a "kill-subscription" RPC for that subscription
+* Loss of TLS heartbeat
+
+A publisher [bcp14]#MAY# terminate a subscription at any time as stated in <<RFC8639,format=default>>.
+
+[numbered=true,removeInRFC=false,toc=include]
+== QoS Treatment
+
+Qos treatment for event streams is described in <<RFC8639,format=default>>. In addition, if HTTP/2 is used, the publisher [bcp14]#MUST#:
+
+[nobullet=false,spacing=normal]
+* Take the "weighting" leaf node in<<RFC8639,format=default>>and copy it into the HTTP/2 stream weight,<<RFC7540,format=default>>, and
+* Take any existing subscription "dependency", as specified by the "dependency" leaf node in<<RFC8639,format=default>>, and use the HTTP/2 stream for the parent subscription as the HTTP/2 stream dependency (as described in<<RFC7540,format=default>>) of the dependent subscription.
+* Set the exclusive flag (<<RFC7540,format=default>>) to 0.
+
+For dynamic subscriptions with the same Differentiated Services Code Point (DSCP) value to a specific publisher, it is recommended that the subscriber sends all URI GET requests on a common HTTP/2 session (if HTTP/2 is used). Conversely, a subscriber cannot use a common HTTP/2 session for subscriptions with different DSCP values.
+
+[numbered=true,removeInRFC=false,toc=include]
+== Notification Messages
+
+Notification messages transported over RESTCONF will be encoded according to <<RFC8040,format=default>>.
+
+[[YANG-tree]]
+[numbered=true,removeInRFC=false,toc=include]
+== YANG Tree
+
+The YANG module defined in <<YANG-module,format=default>> has one leaf that augments three nodes of <<RFC8639,format=default>>.
+
+[source,markers=false,filename=,yangtree]
+----
+module: ietf-restconf-subscribed-notifications
+  augment /sn:establish-subscription/sn:output:
+    +--ro uri?   inet:uri
+  augment /sn:subscriptions/sn:subscription:
+    +--ro uri?   inet:uri
+  augment /sn:subscription-modified:
+    +--ro uri?   inet:uri 
+----
+
+[[YANG-module]]
+[numbered=true,removeInRFC=false,toc=include]
+== YANG Module
+
+This module references <<RFC8639,format=default>>.
+
+[source,markers=true,filename=ietf-restconf-subscribed-notifications@2019-11-17.yang,yang]
+----
+module ietf-restconf-subscribed-notifications {
+  yang-version 1.1;
+  namespace "urn:ietf:params:xml:ns:yang:"
+          + "ietf-restconf-subscribed-notifications";
+  prefix rsn;
+
+  import ietf-subscribed-notifications {
+    prefix sn;
+  }
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  organization
+    "IETF NETCONF (Network Configuration) Working Group";
+  contact
+    "WG Web:   <https://datatracker.ietf.org/wg/netconf/>
+     WG List:  <mailto:netconf@ietf.org>
+
+     Editor:   Eric Voit
+               <mailto:evoit@cisco.com>
+
+     Editor:   Alexander Clemm
+               <mailto:ludwig@clemm.org>
+
+     Editor:   Reshad Rahman
+               <mailto:rrahman@cisco.com>";
+  description
+    "Defines RESTCONF as a supported transport for subscribed
+     event notifications.
+
+     Copyright (c) 2019 IETF Trust and the persons identified
+     as authors of the code.  All rights reserved.
+
+     Redistribution and use in source and binary forms, with or
+     without modification, is permitted pursuant to, and subject to
+     the license terms contained in, the Simplified BSD License set
+     forth in Section 4.c of the IETF Trust's Legal Provisions 
+     Relating to IETF Documents
+     (https://trustee.ietf.org/license-info). 
+
+     This version of this YANG module is part of RFC 8650; see the
+     RFC itself for full legal notices.";
+
+  revision 2019-11-17 {
+    description
+      "Initial version";
+    reference
+      "RFC 8650: Dynamic Subscription to YANG Events and Datastores
+       over RESTCONF";
+  }
+
+  grouping uri {
+    description
+      "Provides a reusable description of a URI.";
+    leaf uri {
+      type inet:uri;
+      config false;
+      description
+        "Location of a subscription-specific URI on the publisher.";
+    }
+  }
+
+  augment "/sn:establish-subscription/sn:output" {
+    description
+      "This augmentation allows RESTCONF-specific parameters for a
+       response to a publisher's subscription request.";
+    uses uri;
+  }
+
+  augment "/sn:subscriptions/sn:subscription" {
+    description
+      "This augmentation allows RESTCONF-specific parameters to be
+       exposed for a subscription.";
+    uses uri;
+  }
+
+  augment "/sn:subscription-modified" {
+    description
+      "This augmentation allows RESTCONF-specific parameters to be
+       included as part of the notification that a subscription has
+       been modified.";
+    uses uri;
+  }
+}
+----
+
+[numbered=true,removeInRFC=false,toc=include]
+== IANA Considerations
+
+This document registers the following namespace URI in the "ns" subregistry of the "IETF XML Registry" <<RFC3688,format=default>>:
+
+[newline=false,spacing=normal]
+URI::: urn:ietf:params:xml:ns:yang:ietf-restconf-subscribed-notifications
+Registrant Contact::: The IESG.
+XML::: N/A; the requested URI is an XML namespace.
+
+This document registers the following YANG module in the "YANG Module Names" registry <<RFC6020,format=default>>:
+
+[newline=false,spacing=normal]
+Name::: ietf-restconf-subscribed-notifications
+Namespace::: urn:ietf:params:xml:ns:yang:ietf-restconf-subscribed-notifications
+Prefix::: rsn
+Reference::: RFC 8650
+
+[[security]]
+[numbered=true,removeInRFC=false,toc=include]
+== Security Considerations
+
+The YANG module specified in this document defines a schema for data that is designed to be accessed via network management transports such as NETCONF <<RFC6241,format=default>> or RESTCONF <<RFC8040,format=default>>. The lowest NETCONF layer is the secure transport layer, and the mandatory-to-implement secure transport is Secure Shell (SSH) <<RFC6242,format=default>>. The lowest RESTCONF layer is HTTPS, and the mandatory-to-implement secure transport is TLS <<RFC8446,format=default>>.
+
+The Network Configuration Access Control Model (NACM) <<RFC8341,format=default>> provides the means to restrict access for particular NETCONF or RESTCONF users to a preconfigured subset of all available NETCONF or RESTCONF protocol operations and content.
+
+The one new data node introduced in this YANG module may be considered sensitive or vulnerable in some network environments. It is thus important to control read access (e.g., via get, get-config, or notification) to this data node. These are the subtrees and data nodes and their sensitivity/vulnerability:
+
+Container: "/subscriptions"
+
+[nobullet=false,spacing=normal]
+* "uri": leaf will show where subscribed resources might be located on a publisher. Access control must be set so that only someone with proper access permissions, i.e., the same RESTCONF<<RFC8040,format=default>>user credentials that invoked the corresponding "establish-subscription", has the ability to access this resource.
+
+The subscription URI is implementation specific and is encrypted via the use of TLS. Therefore, even if an attacker succeeds in guessing the subscription URI, a RESTCONF username <<RFC8040,format=default>> with the required administrative permissions must be used to be able to access or modify that subscription. It is recommended that the subscription URI values not be easily predictable.
+
+The access permission considerations for the RPCs "modify-subscription", "resync-subscription", "delete-subscription", and "kill-subscription" are described in <<SSE,format=default>>.
+
+If a buggy or compromised RESTCONF subscriber sends a number of "establish-subscription" requests, then these subscriptions accumulate and may use up system resources. In such a situation, the publisher [bcp14]#MAY# also suspend or terminate a subset of the active subscriptions from that RESTCONF subscriber in order to reclaim resources and preserve normal operation for the other subscriptions.
+
+[bibliography]
+== Normative References
+++++
+<reference anchor="RFC2119" derivedAnchor="RFC2119" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc2119"><front><title>Key words for use in RFCs to Indicate Requirement Levels</title>
+<author fullname="S. Bradner" initials="S." surname="Bradner"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="March" year="1997"></date>
+<abstract><t>In many standards track documents several words are used to signify the requirements in the specification.  These words are often capitalized. This document defines these words as they should be interpreted in IETF documents.  This document specifies an Internet Best Current Practices for the Internet Community, and requests discussion and suggestions for improvements.</t>
+</abstract>
+</front>
+<seriesInfo name="BCP" value="14"></seriesInfo>
+<seriesInfo name="RFC" value="2119"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC2119"></seriesInfo>
+</reference>
+<reference anchor="RFC3688" derivedAnchor="RFC3688" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc3688"><front><title>The IETF XML Registry</title>
+<author fullname="M. Mealling" initials="M." surname="Mealling"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="January" year="2004"></date>
+<abstract><t>This document describes an IANA maintained registry for IETF standards which use Extensible Markup Language (XML) related items such as Namespaces, Document Type Declarations (DTDs), Schemas, and Resource Description Framework (RDF) Schemas.</t>
+</abstract>
+</front>
+<seriesInfo name="BCP" value="81"></seriesInfo>
+<seriesInfo name="RFC" value="3688"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC3688"></seriesInfo>
+</reference>
+<reference anchor="RFC6020" derivedAnchor="RFC6020" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc6020"><front><title>YANG - A Data Modeling Language for the Network Configuration Protocol (NETCONF)</title>
+<author fullname="M. Bjorklund" initials="M." role="editor" surname="Bjorklund"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="October" year="2010"></date>
+<abstract><t>YANG is a data modeling language used to model configuration and state data manipulated by the Network Configuration Protocol (NETCONF), NETCONF remote procedure calls, and NETCONF notifications. [STANDARDS-TRACK]</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="6020"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC6020"></seriesInfo>
+</reference>
+<reference anchor="RFC6241" derivedAnchor="RFC6241" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc6241"><front><title>Network Configuration Protocol (NETCONF)</title>
+<author fullname="R. Enns" initials="R." role="editor" surname="Enns"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="M. Bjorklund" initials="M." role="editor" surname="Bjorklund"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="J. Schoenwaelder" initials="J." role="editor" surname="Schoenwaelder"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="A. Bierman" initials="A." role="editor" surname="Bierman"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="June" year="2011"></date>
+<abstract><t>The Network Configuration Protocol (NETCONF) defined in this document provides mechanisms to install, manipulate, and delete the configuration of network devices.  It uses an Extensible Markup Language (XML)-based data encoding for the configuration data as well as the protocol messages.  The NETCONF protocol operations are realized as remote procedure calls (RPCs).  This document obsoletes RFC 4741.  [STANDARDS-TRACK]</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="6241"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC6241"></seriesInfo>
+</reference>
+<reference anchor="RFC6242" derivedAnchor="RFC6242" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc6242"><front><title>Using the NETCONF Protocol over Secure Shell (SSH)</title>
+<author fullname="M. Wasserman" initials="M." surname="Wasserman"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="June" year="2011"></date>
+<abstract><t>This document describes a method for invoking and running the Network Configuration Protocol (NETCONF) within a Secure Shell (SSH) session as an SSH subsystem.  This document obsoletes RFC 4742.  [STANDARDS-TRACK]</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="6242"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC6242"></seriesInfo>
+</reference>
+<reference anchor="RFC6520" derivedAnchor="RFC6520" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc6520"><front><title>Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS) Heartbeat Extension</title>
+<author fullname="R. Seggelmann" initials="R." surname="Seggelmann"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="M. Tuexen" initials="M." surname="Tuexen"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="M. Williams" initials="M." surname="Williams"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="February" year="2012"></date>
+<abstract><t>This document describes the Heartbeat Extension for the Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS) protocols.</t>
+<t>The Heartbeat Extension provides a new protocol for TLS/DTLS allowing the usage of keep-alive functionality without performing a renegotiation and a basis for path MTU (PMTU) discovery for DTLS.   [STANDARDS-TRACK]</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="6520"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC6520"></seriesInfo>
+</reference>
+<reference anchor="RFC7540" derivedAnchor="RFC7540" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc7540"><front><title>Hypertext Transfer Protocol Version 2 (HTTP/2)</title>
+<author fullname="M. Belshe" initials="M." surname="Belshe"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="R. Peon" initials="R." surname="Peon"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="M. Thomson" initials="M." role="editor" surname="Thomson"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="May" year="2015"></date>
+<abstract><t>This specification describes an optimized expression of the semantics of the Hypertext Transfer Protocol (HTTP), referred to as HTTP version 2 (HTTP/2).  HTTP/2 enables a more efficient use of network resources and a reduced perception of latency by introducing header field compression and allowing multiple concurrent exchanges on the same connection.  It also introduces unsolicited push of representations from servers to clients.</t>
+<t>This specification is an alternative to, but does not obsolete, the HTTP/1.1 message syntax.  HTTP's existing semantics remain unchanged.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="7540"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC7540"></seriesInfo>
+</reference>
+<reference anchor="RFC8040" derivedAnchor="RFC8040" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8040"><front><title>RESTCONF Protocol</title>
+<author fullname="A. Bierman" initials="A." surname="Bierman"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="M. Bjorklund" initials="M." surname="Bjorklund"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="K. Watsen" initials="K." surname="Watsen"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="January" year="2017"></date>
+<abstract><t>This document describes an HTTP-based protocol that provides a programmatic interface for accessing data defined in YANG, using the datastore concepts defined in the Network Configuration Protocol (NETCONF).</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="8040"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8040"></seriesInfo>
+</reference>
+<reference anchor="RFC8174" derivedAnchor="RFC8174" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8174"><front><title>Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words</title>
+<author fullname="B. Leiba" initials="B." surname="Leiba"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="May" year="2017"></date>
+<abstract><t>RFC 2119 specifies common key words that may be used in protocol  specifications.  This document aims to reduce the ambiguity by clarifying that only UPPERCASE usage of the key words have the  defined special meanings.</t>
+</abstract>
+</front>
+<seriesInfo name="BCP" value="14"></seriesInfo>
+<seriesInfo name="RFC" value="8174"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8174"></seriesInfo>
+</reference>
+<reference anchor="RFC8341" derivedAnchor="RFC8341" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8341"><front><title>Network Configuration Access Control Model</title>
+<author fullname="A. Bierman" initials="A." surname="Bierman"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="M. Bjorklund" initials="M." surname="Bjorklund"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="March" year="2018"></date>
+<abstract><t>The standardization of network configuration interfaces for use with the Network Configuration Protocol (NETCONF) or the RESTCONF protocol requires a structured and secure operating environment that promotes human usability and multi-vendor interoperability.  There is a need for standard mechanisms to restrict NETCONF or RESTCONF protocol access for particular users to a preconfigured subset of all available NETCONF or RESTCONF protocol operations and content.  This document defines such an access control model.</t>
+<t>This document obsoletes RFC 6536.</t>
+</abstract>
+</front>
+<seriesInfo name="STD" value="91"></seriesInfo>
+<seriesInfo name="RFC" value="8341"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8341"></seriesInfo>
+</reference>
+<reference anchor="RFC8342" derivedAnchor="RFC8342" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8342"><front><title>Network Management Datastore Architecture (NMDA)</title>
+<author fullname="M. Bjorklund" initials="M." surname="Bjorklund"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="J. Schoenwaelder" initials="J." surname="Schoenwaelder"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="P. Shafer" initials="P." surname="Shafer"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="K. Watsen" initials="K." surname="Watsen"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="R. Wilton" initials="R." surname="Wilton"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="March" year="2018"></date>
+<abstract><t>Datastores are a fundamental concept binding the data models written in the YANG data modeling language to network management protocols such as the Network Configuration Protocol (NETCONF) and RESTCONF. This document defines an architectural framework for datastores based on the experience gained with the initial simpler model, addressing requirements that were not well supported in the initial model.  This document updates RFC 7950.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="8342"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8342"></seriesInfo>
+</reference>
+<reference anchor="RFC8446" derivedAnchor="RFC8446" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8446"><front><title>The Transport Layer Security (TLS) Protocol Version 1.3</title>
+<author fullname="E. Rescorla" initials="E." surname="Rescorla"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="August" year="2018"></date>
+<abstract><t>This document specifies version 1.3 of the Transport Layer Security (TLS) protocol.  TLS allows client/server applications to communicate over the Internet in a way that is designed to prevent eavesdropping, tampering, and message forgery.</t>
+<t>This document updates RFCs 5705 and 6066, and obsoletes RFCs 5077, 5246, and 6961.  This document also specifies new requirements for TLS 1.2 implementations.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="8446"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8446"></seriesInfo>
+</reference>
+<reference anchor="RFC8639" derivedAnchor="RFC8639" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8639"><front><title>Subscription to YANG Notifications</title>
+<author fullname="E. Voit" initials="E." surname="Voit"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="A. Clemm" initials="A." surname="Clemm"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="A. Gonzalez Prieto" initials="A." surname="Gonzalez Prieto"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="E. Nilsen-Nygaard" initials="E." surname="Nilsen-Nygaard"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="A. Tripathy" initials="A." surname="Tripathy"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="September" year="2019"></date>
+<abstract><t>This document defines a YANG data model and associated mechanisms enabling subscriber-specific subscriptions to a publisher's event streams.  Applying these elements allows a subscriber to request and receive a continuous, customized feed of publisher-generated information.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="8639"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8639"></seriesInfo>
+</reference>
+<reference anchor="RFC8641" derivedAnchor="RFC8641" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8641"><front><title>Subscription to YANG Notifications for Datastore Updates</title>
+<author fullname="A. Clemm" initials="A." surname="Clemm"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="E. Voit" initials="E." surname="Voit"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="September" year="2019"></date>
+<abstract><t>This document describes a mechanism that allows subscriber applications to request a continuous and customized stream of updates from a YANG datastore.  Providing such visibility into updates enables new capabilities based on the remote mirroring and monitoring of configuration and operational state.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="8641"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8641"></seriesInfo>
+</reference>
+<reference anchor="W3C-20150203" derivedAnchor="W3C-20150203" quoteTitle="true" target="https://www.w3.org/TR/2015/REC-eventsource-20150203/"><front><title>Server-Sent Events</title>
+<author fullname="I Hickson" initials="I" surname="Hickson"><organization showOnFrontPage="true"></organization>
+</author>
+<date day="03" month="February" year="2015"></date>
+</front>
+<seriesInfo name="W3C" value="Recommendation"></seriesInfo>
+<annotation>Latest version available at <<eref target="https://www.w3.org/TR/eventsource/"></eref>
+>.</annotation>
+</reference>
+++++
+
+[bibliography]
+== Informative References
+++++
+<reference anchor="RFC7231" derivedAnchor="RFC7231" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc7231"><front><title>Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content</title>
+<author fullname="R. Fielding" initials="R." role="editor" surname="Fielding"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="J. Reschke" initials="J." role="editor" surname="Reschke"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="June" year="2014"></date>
+<abstract><t>The Hypertext Transfer Protocol (HTTP) is a stateless \%application- level protocol for distributed, collaborative, hypertext information systems.  This document defines the semantics of HTTP/1.1 messages, as expressed by request methods, request header fields, response status codes, and response header fields, along with the payload of messages (metadata and body content) and mechanisms for content negotiation.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="7231"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC7231"></seriesInfo>
+</reference>
+<reference anchor="RFC7923" derivedAnchor="RFC7923" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc7923"><front><title>Requirements for Subscription to YANG Datastores</title>
+<author fullname="E. Voit" initials="E." surname="Voit"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="A. Clemm" initials="A." surname="Clemm"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="A. Gonzalez Prieto" initials="A." surname="Gonzalez Prieto"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="June" year="2016"></date>
+<abstract><t>This document provides requirements for a service that allows client applications to subscribe to updates of a YANG datastore.  Based on criteria negotiated as part of a subscription, updates will be pushed to targeted recipients.  Such a capability eliminates the need for periodic polling of YANG datastores by applications and fills a functional gap in existing YANG transports (i.e., Network Configuration Protocol (NETCONF) and RESTCONF).  Such a service can be summarized as a "pub/sub" service for YANG datastore updates. Beyond a set of basic requirements for the service, various refinements are addressed.  These refinements include: periodicity of object updates, filtering out of objects underneath a requested a subtree, and delivery QoS guarantees.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="7923"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC7923"></seriesInfo>
+</reference>
+<reference anchor="RFC7951" derivedAnchor="RFC7951" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc7951"><front><title>JSON Encoding of Data Modeled with YANG</title>
+<author fullname="L. Lhotka" initials="L." surname="Lhotka"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="August" year="2016"></date>
+<abstract><t>This document defines encoding rules for representing configuration data, state data, parameters of Remote Procedure Call (RPC) operations or actions, and notifications defined using YANG as JavaScript Object Notation (JSON) text.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="7951"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC7951"></seriesInfo>
+</reference>
+<reference anchor="RFC8347" derivedAnchor="RFC8347" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8347"><front><title>A YANG Data Model for the Virtual Router Redundancy Protocol (VRRP)</title>
+<author fullname="X. Liu" initials="X." role="editor" surname="Liu"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="A. Kyparlis" initials="A." surname="Kyparlis"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="R. Parikh" initials="R." surname="Parikh"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="A. Lindem" initials="A." surname="Lindem"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="M. Zhang" initials="M." surname="Zhang"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="March" year="2018"></date>
+<abstract><t>This document describes a data model for the Virtual Router Redundancy Protocol (VRRP).  Both versions 2 and 3 of VRRP are covered.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="8347"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8347"></seriesInfo>
+</reference>
+<reference anchor="RFC8527" derivedAnchor="RFC8527" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8527"><front><title>RESTCONF Extensions to Support the Network Management Datastore Architecture</title>
+<author fullname="M. Bjorklund" initials="M." surname="Bjorklund"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="J. Schoenwaelder" initials="J." surname="Schoenwaelder"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="P. Shafer" initials="P." surname="Shafer"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="K. Watsen" initials="K." surname="Watsen"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="R. Wilton" initials="R." surname="Wilton"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="March" year="2019"></date>
+<abstract><t>This document extends the RESTCONF protocol defined in RFC 8040 in order to support the Network Management Datastore Architecture (NMDA) defined in RFC 8342.</t>
+<t>This document updates RFC 8040 by introducing new datastore resources, adding a new query parameter, and requiring the usage of the YANG library (described in RFC 8525) by RESTCONF servers implementing the NMDA.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="8527"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8527"></seriesInfo>
+</reference>
+<reference anchor="RFC8640" derivedAnchor="RFC8640" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8640"><front><title>Dynamic Subscription to YANG Events and Datastores over NETCONF</title>
+<author fullname="E. Voit" initials="E." surname="Voit"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="A. Clemm" initials="A." surname="Clemm"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="A. Gonzalez Prieto" initials="A." surname="Gonzalez Prieto"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="E. Nilsen-Nygaard" initials="E." surname="Nilsen-Nygaard"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="A. Tripathy" initials="A." surname="Tripathy"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="September" year="2019"></date>
+<abstract><t>This document provides a Network Configuration Protocol (NETCONF) binding to the dynamic subscription capability of both subscribed notifications and YANG-Push.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="8640"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8640"></seriesInfo>
+</reference>
+<reference anchor="XPATH" derivedAnchor="XPATH" quoteTitle="true" target="http://www.w3.org/TR/1999/REC-xpath-19991116"><front><title>XML Path Language (XPath) Version 1.0</title>
+<author fullname="J Clark" initials="J" surname="Clark"></author>
+<author fullname="S DeRose" initials="S" surname="DeRose"></author>
+<date day="16" month="November" year="1999"></date>
+</front>
+<seriesInfo name="W3C" value="Recommendation"></seriesInfo>
+<annotation>Latest version available at <<eref target="https://www.w3.org/TR/xpath/"></eref>
+>.</annotation>
+</reference>
+++++
+
+[appendix,numbered=true,removeInRFC=false,toc=include]
+== Examples
+
+This section is non-normative. To allow easy comparison, this section mirrors the functional examples shown with NETCONF over XML within <<RFC8640,format=default>>. In addition, HTTP/2 vs HTTP/1.1 headers are not shown as the contents of the JSON encoded objects are identical within.
+
+The subscription URI values used in the examples in this section are purely illustrative, and are not indicative of the expected usage that is described in <<security,format=default>>.
+
+The DSCP values are only for example purposes and are all indicated in decimal since the encoding is JSON <<RFC7951,format=default>>.
+
+[appendix,numbered=true,removeInRFC=false,toc=include]
+=== Dynamic Subscriptions
+
+[appendix,numbered=true,removeInRFC=false,toc=include]
+==== Establishing Dynamic Subscriptions
+
+The following figure shows two successful "establish-subscription" RPC requests as per <<RFC8639,format=default>>. The first request is given a subscription identifier of 22, and the second, an identifier of 23.
+
+[[mess-flow-establishment]]
+[suppress-title=false,align=left,alt=]
+.Multiple Subscriptions over RESTCONF/HTTP
+[align=left,alt=,]
+....
+   +------------+                  +-----------+
+   | Subscriber |                  | Publisher |
+   +------------+                  +-----------+
+         |                               |
+         |establish-subscription         |
+         |------------------------------>|  (a)
+         |     HTTP 200 OK, id#22, URI#1 |
+         |<------------------------------|  (b)
+         |GET (URI#1)                    |
+         |------------------------------>|  (c)
+         | HTTP 200 OK,notif-mesg (id#22)|
+         |<------------------------------|
+         |                               |
+         |                               |
+         |establish-subscription         |
+         |------------------------------>|
+         |      HTTP 200 OK, id#23, URI#2|
+         |<------------------------------|
+         |GET (URI#2)                    |
+         |------------------------------>|
+         |                               |
+         |                               |
+         |             notif-mesg (id#22)|
+         |<------------------------------|
+         | HTTP 200 OK,notif-mesg (id#23)|
+         |<------------------------------|
+         |                               | 
+....
+
+To provide examples of the information being transported, example messages for interactions in <<mess-flow-establishment,format=default>> are detailed below:
+
+[[establish-subs]]
+.ex-establish-subscription.json
+[suppress-title=false,align=left,alt=]
+."establish-subscription" Request (a)
+[align=left,alt=,]
+....
+POST /restconf/operations
+     /ietf-subscribed-notifications:establish-subscription
+
+{
+   "ietf-subscribed-notifications:input": {
+      "stream-xpath-filter": "/example-module:foo/",
+      "stream": "NETCONF",
+      "dscp": 10
+   }
+} 
+....
+
+As the publisher was able to fully satisfy the request, the publisher sends the subscription identifier of the accepted subscription and the URI:
+
+[[positive-establish-subs]]
+[suppress-title=false,align=left,alt=]
+."establish-subscription" Success (b)
+[align=left,alt=,]
+....
+HTTP status code - 200
+
+{
+   "id": 22,
+   "uri": "https://example.com/restconf/subscriptions/22"
+} 
+....
+
+Upon receipt of the successful response, the subscriber does a GET to the provided URI to start the flow of notification messages. When the publisher receives this, the subscription is moved to the active state (c).
+
+[[positive-establish-post]]
+[suppress-title=false,align=left,alt=]
+."establish-subscription" Subsequent POST
+[align=left,alt=,]
+....
+GET /restconf/subscriptions/22 
+....
+
+While not shown in <<mess-flow-establishment,format=default>>, if the publisher had not been able to fully satisfy the request, or the subscriber has no authorization to establish the subscription, the publisher would have sent an RPC error response. For instance, if the "dscp" value of 10 asserted by the subscriber in <<establish-subs,format=default>> proved unacceptable, the publisher may have returned:
+
+[[negative-establish-subs]]
+[suppress-title=false,align=left,alt=]
+.An Unsuccessful "establish-subscription"
+[align=left,alt=,]
+....
+HTTP status code - 400
+
+{ "ietf-restconf:errors" : {
+    "error" : [
+      {
+        "error-type": "application",
+        "error-tag": "invalid-value",
+        "error-severity": "error",
+        "error-app-tag":
+            "ietf-subscribed-notifications:dscp-unavailable"
+      }
+    ]
+  }
+} 
+....
+
+The subscriber can use this information in future attempts to establish a subscription.
+
+[appendix,numbered=true,removeInRFC=false,toc=include]
+==== Modifying Dynamic Subscriptions
+
+An existing subscription may be modified. The following exchange shows a negotiation of such a modification via several exchanges between a subscriber and a publisher. This negotiation consists of a failed RPC modification request/response followed by a successful one.
+
+[[mess-flow-subs-modification]]
+[suppress-title=false,align=left,alt=]
+.Interaction Model for Successful Subscription Modification
+[align=left,alt=,]
+....
+   +------------+                 +-----------+
+   | Subscriber |                 | Publisher |
+   +------------+                 +-----------+
+         |                              |
+         |  notification message (id#23)|
+         |<-----------------------------|
+         |                              |
+         |modify-subscription (id#23)   |
+         |----------------------------->|  (d)
+         |    HTTP 400 error (with hint)|
+         |<-----------------------------|  (e)
+         |                              |
+         |modify-subscription (id#23)   |
+         |----------------------------->|
+         |                  HTTP 200 OK |
+         |<-----------------------------|
+         |                              |
+         |            notif-mesg (id#23)|
+         |<-----------------------------|
+         |                              | 
+....
+
+If the subscription being modified in <<mess-flow-subs-modification,format=default>> is a datastore subscription as per <<RFC8641,format=default>>, the modification request made in (d) may look like that shown in <<simple-modify-subs,format=default>>. As can be seen, the modifications being attempted are the application of a new XML Path Language (XPath) filter as well as the setting of a new periodic time interval.
+
+[[simple-modify-subs]]
+.ex-modify-subscription.json
+[suppress-title=false,align=left,alt=]
+.Subscription Modification Request (c)
+[align=left,alt=,]
+....
+POST /restconf/operations
+     /ietf-subscribed-notifications:modify-subscription
+
+{
+ "ietf-subscribed-notifications:input": {
+    "id": 23,
+    "ietf-yang-push:datastore-xpath-filter": 
+       "/example-module:foo/example-module:bar",
+    "ietf-yang-push:periodic": {
+       "ietf-yang-push:period": 500
+    }
+  }
+} 
+....
+
+If the publisher can satisfy both changes, the publisher sends a positive result for the RPC. If the publisher cannot satisfy either of the proposed changes, the publisher sends an RPC error response (e). The following is an example RPC error response for (e) that includes a hint. This hint is an alternative time period value that might have resulted in a successful modification:
+
+[[negative-modify-subs]]
+[suppress-title=false,align=left,alt=]
+."modify-subscription" Failure with Hint (e)
+[align=left,alt=,]
+....
+HTTP status code - 400
+
+{ "ietf-restconf:errors" : {
+    "error" : [
+      "error-type": "application",
+      "error-tag": "invalid-value",
+      "error-severity": "error",
+      "error-app-tag": "ietf-yang-push:period-unsupported",
+      "error-info": {
+        "ietf-yang-push":
+        "modify-subscription-datastore-error-info": {
+           "period-hint": 3000
+        }
+      }
+    ]
+  }
+} 
+....
+
+[appendix,numbered=true,removeInRFC=false,toc=include]
+==== Deleting Dynamic Subscriptions
+
+The following demonstrates deleting a subscription. This subscription may have been to either a stream or a datastore.
+
+[[simple-delete-subs]]
+.ex-delete-subscription.json
+[suppress-title=false,align=left,alt=]
+."delete-subscription" Request
+[align=left,alt=,]
+....
+POST /restconf/operations
+     /ietf-subscribed-notifications:delete-subscription
+
+{
+ "delete-subscription": {
+    "id": "22"
+ }
+} 
+....
+
+If the publisher can satisfy the request, the publisher replies with success to the RPC request.
+
+If the publisher cannot satisfy the request, the publisher sends an <rpc-error> element indicating the modification didn't work. <<negative-delete-subs,format=default>> shows a valid response for an existing valid subscription identifier, but that subscription identifier was created on a different transport session:
+
+[[negative-delete-subs]]
+[suppress-title=false,align=left,alt=]
+.Unsuccessful "delete-subscription"
+[align=left,alt=,]
+....
+HTTP status code - 404
+
+{
+  "ietf-restconf:errors" : {
+    "error" : [
+      "error-type": "application",
+      "error-tag": "invalid-value",
+      "error-severity": "error",
+      "error-app-tag":
+         "ietf-subscribed-notifications:no-such-subscription"
+    ]
+  }
+} 
+....
+
+[appendix,numbered=true,removeInRFC=false,toc=include]
+=== Subscription State Notifications
+
+A publisher will send subscription state notifications according to the definitions within <<RFC8639,format=default>>.
+
+[appendix,numbered=true,removeInRFC=false,toc=include]
+==== "subscription-modified"
+
+A "subscription-modified" encoded in JSON would look like:
+
+[[subscription-modified-ctrl-plane-notif]]
+[suppress-title=false]
+."subscription-modified" Subscription State Notification
+====
+
+[source,markers=false,filename=,json]
+----
+{
+  "ietf-restconf:notification" : {
+    "eventTime": "2007-09-01T10:00:00Z",
+    "ietf-subscribed-notifications:subscription-modified": {
+      "id": 39,
+      "uri": "https://example.com/restconf/subscriptions/22"
+      "stream-xpath-filter": "/example-module:foo",
+      "stream": {
+         "ietf-netconf-subscribed-notifications" : "NETCONF"
+      }
+    }
+  }
+} 
+----
+====
+
+[appendix,numbered=true,removeInRFC=false,toc=include]
+==== "subscription-completed", "subscription-resumed", and "replay-completed"
+
+A "subscription-completed" notification would look like:
+
+[[subscription-completed]]
+[suppress-title=false]
+."subscription-completed" Notification in JSON
+====
+
+[source,markers=false,filename=ex-subscription-completed.json,json]
+----
+{
+  "ietf-restconf:notification" : {
+    "eventTime": "2007-09-01T10:00:00Z",
+    "ietf-subscribed-notifications:subscription-completed": {
+      "id": 39,
+    }
+  }
+} 
+----
+====
+
+The "subscription-resumed" and "replay-complete" are virtually identical, with "subscription-completed" simply being replaced by "subscription-resumed" and "replay-complete".
+
+[appendix,numbered=true,removeInRFC=false,toc=include]
+==== "subscription-terminated" and "subscription-suspended"
+
+A "subscription-terminated" would look like:
+
+[[subscription-terminated]]
+[suppress-title=false]
+."subscription-terminated" Subscription State Notification
+====
+
+[source,markers=false,filename=ex-subscription-terminated.json,json]
+----
+{
+  "ietf-restconf:notification" : {
+    "eventTime": "2007-09-01T10:00:00Z",
+    "ietf-subscribed-notifications:subscription-terminated": {
+      "id": 39,
+      "error-id": "suspension-timeout"
+    }
+  }
+} 
+----
+====
+
+The "subscription-suspended" is virtually identical, with "subscription-terminated" simply being replaced by "subscription-suspended".
+
+[appendix,numbered=true,removeInRFC=false,toc=include]
+=== Filter Example
+
+This section provides an example that illustrates the method of filtering event record contents. The example is based on the YANG notification "vrrp-protocol-error-event" as defined per the ietf-vrrp.yang module within <<RFC8347,format=default>>. Event records based on this specification that are generated by the publisher might appear as:
+
+[[VRRP-notification]]
+[suppress-title=false,align=left,alt=]
+.RFC 8347 (VRRP) - Example Notification
+[align=left,alt=,]
+....
+data: {
+data:   "ietf-restconf:notification" : {
+data:     "eventTime" : "2018-09-14T08:22:33.44Z",
+data:     "ietf-vrrp:vrrp-protocol-error-event" : {
+data:       "protocol-error-reason" : "checksum-error"
+data:     }
+data:   }
+data: } 
+....
+
+Suppose a subscriber wanted to establish a subscription that only passes instances of event records where there is a "checksum-error" as part of a Virtual Router Redundancy Protocol (VRRP) protocol event. Also assume the publisher places such event records into the NETCONF stream. To get a continuous series of matching event records, the subscriber might request the application of an XPath filter against the NETCONF stream. An "establish-subscription" RPC to meet this objective might be:
+
+[[VRRP-XPATH]]
+.ex-establish-subscription-filter-xpath.json
+[suppress-title=false,align=left,alt=]
+.Establishing a Subscription Error Reason via XPath
+[align=left,alt=,]
+....
+POST /restconf/operations
+     /ietf-subscribed-notifications:establish-subscription
+{
+   "ietf-subscribed-notifications:input": {
+      "stream": "NETCONF",
+      "stream-xpath-filter": 
+        "/ietf-vrrp:vrrp-protocol-error-event[
+          protocol-error-reason='checksum-error']/",
+   }
+} 
+....
+
+For more examples of XPath filters, see <<XPATH,format=default>>.
+
+Suppose the "establish-subscription" in <<VRRP-XPATH,format=default>> was accepted. And suppose later a subscriber decided they wanted to broaden this subscription cover to all VRRP protocol events (i.e., not just those with a "checksum error"). The subscriber might attempt to modify the subscription in a way that replaces the XPath filter with a subtree filter that sends all VRRP protocol events to a subscriber. Such a "modify-subscription" RPC might look like:
+
+[[VRRP-Subtree]]
+.ex-modify-subscription-filter-subtree.json
+[suppress-title=false,align=left,alt=]
+.Example "modify-subscription" RPC
+[align=left,alt=,]
+....
+POST /restconf/operations
+     /ietf-subscribed-notifications:modify-subscription
+{
+   "ietf-subscribed-notifications:input": {
+      "stream": "NETCONF",
+      "stream-subtree-filter": {
+        "/ietf-vrrp:vrrp-protocol-error-event" : {}
+      }
+   }
+} 
+....
+
+For more examples of subtree filters, see <<RFC6241,format=default>>.
+
+[appendix,numbered=false,removeInRFC=false,toc=include]
+== Acknowledgments
+
+We wish to acknowledge the helpful contributions, comments, and suggestions that were received from Ambika Prasad Tripathy, Alberto Gonzalez Prieto, Susan Hares, Tim Jenkins, Balazs Lengyel, Kent Watsen, Michael Scharf, Guangying Zheng, Martin Bjorklund, Qin Wu, and Robert Wilton.

@@ -1,0 +1,30 @@
+
+[bibliography]
+[[sec_5]]
+== Normative References
+
+[NOTE,type=boilerplate]
+--
+This standard relies on the following documents. When cited in the text of this standard, a standard may be referenced solely by its number. Where no date is supplied, the most current version of the standard should be used.
+--
+
+* [[[ref_1,OASIS TR 9901:1999]]], _XML Exchange Table Model Document Type Definition_, 29 September 1999. http://www.oasis-open.org/specs/tm9901.htm[http://www.oasis-open.org/specs/tm9901.htm]
+
+* [[[ref_2]]]W3C. 
+span:title[Extensible Markup Language (XML) 1.0], 10 February 
+span:date[1998]. 
+span:uri[https://www.w3.org/TR/1998/REC-xml-19980210]
+span:type[website]
+
+* [[[ref_3]]]W3C. 
+span:title[Mathematical Markup Language (MathML) Version 2.0 (Second Edition)], 21 October 
+span:date[2003]. 
+span:uri[https://www.w3.org/TR/2003/REC-MathML2-20031021/]
+span:type[website]
+
+* [[[ref_4]]]W3C. 
+span:title[Mathematical Markup Language (MathML) Version 3.0 (Second Edition)], 10 April 
+span:date[2014]. 
+span:uri[https://www.w3.org/TR/2014/REC-MathML3-20140410/]
+span:type[website]
+

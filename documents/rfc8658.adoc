@@ -1,0 +1,1636 @@
+= RADIUS Attributes for Softwire Mechanisms Based on Address plus Port (A⁠+P)
+:doctype: internet-draft
+:abbrev: A+P RADIUS Attributes
+:name: draft-ietf-softwire-map-radius-26
+:status: standard
+:intended-series: standard
+:submission-type: IETF
+:ipr: trust200902
+:instance: https://dx.doi.org/10.17487/rfc8658
+:instance: urn:issn:2070-1721
+:revdate: 2019-01-01T00:00:00Z
+:area: Internet
+:workgroup: Softwire
+:keyword: IPv6 Transition, MAP-E, MAP-T, Lightweight 4over6, RADIUS, address sharing, authorization, AAA, provisioning
+:xml-lang: en
+:consensus: true
+:index-include: true
+:sort-refs: true
+:sym-refs: true
+:toc-include: true
+:toc-depth: 4
+:show-on-front-page: true
+:fullname: Sheng Jiang
+:initials: S.
+:surname: Jiang
+:role: editor
+:affiliation: Huawei Technologies Co., Ltd.
+:affiliation_abbrev: Huawei
+:email: jiangsheng@huawei.com
+:address: Q14, Huawei Campus, No.156 Beiqing Road + \
+Hai-Dian District, Beijing, 100095 + \
+China
+:fullname_2: Yu Fu
+:initials_2: Y.
+:surname_2: Fu
+:role_2: editor
+:affiliation_2: CNNIC
+:email_2: eleven711711@foxmail.com
+:address_2: No.4 South 4th Street, Zhongguancun + \
+Hai-Dian District, Beijing, 100190 + \
+China
+:fullname_3: Chongfeng Xie
+:initials_3: C.
+:surname_3: Xie
+:affiliation_3: China Telecom
+:email_3: xiechf.bri@chinatelecom.cn
+:address_3: Beijing + \
+China
+:fullname_4: Tianxiang Li
+:initials_4: T
+:surname_4: Li
+:affiliation_4: Tsinghua University
+:email_4: peter416733@gmail.com
+:address_4: Beijing + \
+China + \
+100084
+:fullname_5: Mohamed Boucadair
+:initials_5: M.
+:surname_5: Boucadair
+:role_5: editor
+:affiliation_5: Orange
+:email_5: mohamed.boucadair@orange.com
+:contributor-uri_5: 
+:phone_5: 
+:address_5: Rennes + \
+France + \
+35000
+
+[abstract]
+== Abstract
+IPv4-over-IPv6 transition mechanisms provide IPv4 connectivity services over IPv6 native networks during the IPv4/IPv6 coexistence period. DHCPv6 options have been defined to configure clients for Lightweight 4over6, Mapping of Address and Port with Encapsulation (MAP-E), Mapping of Address and Port using Translation (MAP-T) unicast softwire mechanisms, and multicast softwires. However, in many networks, configuration information is stored in an Authentication, Authorization, and Accounting (AAA) server, which utilizes the Remote Authentication Dial In User Service (RADIUS) protocol to provide centralized management for users. When a new transition mechanism is developed, new RADIUS attributes need to be defined correspondingly.
+
+This document defines new RADIUS attributes to carry softwire configuration parameters based on Address plus Port from a AAA server to a Broadband Network Gateway. Both unicast and multicast attributes are covered.
+
+[[status-of-memo]]
+[numbered=false,removeInRFC=false,toc=exclude]
+== Status of This Memo
+
+This is an Internet Standards Track document.
+
+This document is a product of the Internet Engineering Task Force (IETF). It represents the consensus of the IETF community. It has received public review and has been approved for publication by the Internet Engineering Steering Group (IESG). Further information on Internet Standards is available in Section 2 of RFC 7841.
+
+Information about the current status of this document, any errata, and how to provide feedback on it may be obtained at  https://www.rfc-editor.org/info/rfc8658.
+
+[[copyright]]
+[numbered=false,removeInRFC=false,toc=exclude]
+== Copyright Notice
+
+Copyright (c) 2019 IETF Trust and the persons identified as the document authors. All rights reserved.
+
+This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents ( https://trustee.ietf.org/license-info) in effect on the date of publication of this document. Please review these documents carefully, as they describe your rights and restrictions with respect to this document. Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.
+
+[[toc]]
+[numbered=false,removeInRFC=false,toc=exclude]
+== Table of Contents
+
+[nobullet=true,spacing=compact]
+* <<section-1,format=counter>>.  <<name-introduction,format=title: Introduction>>
+* <<section-2,format=counter>>.  <<name-terminology,format=title: Terminology>>
+* <<section-3,format=counter>>.  <<name-new-radius-attributes,format=title: New RADIUS Attributes>>
+[nobullet=true,spacing=compact]
+** <<section-3.1,format=counter>>.  <<name-softwire46-configuration-at,format=title: Softwire46-Configuration Attribute>>
+[nobullet=true,spacing=compact]
+*** <<section-3.1.1,format=counter>>.  <<name-softwire46-attributes,format=title: Softwire46 Attributes>>
+[nobullet=true,spacing=compact]
+**** <<section-3.1.1.1,format=counter>>.  <<name-softwire46-map-e-attribute,format=title: Softwire46-MAP-E Attribute>>
+**** <<section-3.1.1.2,format=counter>>.  <<name-softwire46-map-t-attribute,format=title: Softwire46-MAP-T Attribute>>
+**** <<section-3.1.1.3,format=counter>>.  <<name-softwire46-lightweight-4ove,format=title: Softwire46-Lightweight-4over6 Attribute>>
+*** <<section-3.1.2,format=counter>>.  <<name-softwire46-sub-attributes,format=title: Softwire46 Sub-attributes>>
+*** <<section-3.1.3,format=counter>>.  <<name-specification-of-the-softwi,format=title: Specification of the Softwire46 Sub-attributes>>
+[nobullet=true,spacing=compact]
+**** <<section-3.1.3.1,format=counter>>.  <<name-softwire46-rule-attribute,format=title: Softwire46-Rule Attribute>>
+**** <<section-3.1.3.2,format=counter>>.  <<name-softwire46-br-attribute,format=title: Softwire46-BR Attribute>>
+**** <<section-3.1.3.3,format=counter>>.  <<name-softwire46-dmr-attribute,format=title: Softwire46-DMR Attribute>>
+**** <<section-3.1.3.4,format=counter>>.  <<name-softwire46-v4v6bind-attribu,format=title: Softwire46-V4V6Bind Attribute>>
+**** <<section-3.1.3.5,format=counter>>.  <<name-softwire46-portparams-attri,format=title: Softwire46-PORTPARAMS Attribute>>
+*** <<section-3.1.4,format=counter>>.  <<name-sub-attributes-for-softwire,format=title: Sub-attributes for Softwire46-Rule>>
+[nobullet=true,spacing=compact]
+**** <<section-3.1.4.1,format=counter>>.  <<name-rule-ipv6-prefix-attribute,format=title: Rule-IPv6-Prefix Attribute>>
+**** <<section-3.1.4.2,format=counter>>.  <<name-rule-ipv4-prefix-attribute,format=title: Rule-IPv4-Prefix Attribute>>
+**** <<section-3.1.4.3,format=counter>>.  <<name-ea-length-attribute,format=title: EA-Length Attribute>>
+*** <<section-3.1.5,format=counter>>.  <<name-attributes-for-softwire46-v,format=title: Attributes for Softwire46-v4v6Bind>>
+[nobullet=true,spacing=compact]
+**** <<section-3.1.5.1,format=counter>>.  <<name-ipv4-address-attribute,format=title: IPv4-Address Attribute>>
+**** <<section-3.1.5.2,format=counter>>.  <<name-bind-ipv6-prefix-attribute,format=title: Bind-IPv6-Prefix Attribute>>
+*** <<section-3.1.6,format=counter>>.  <<name-attributes-for-softwire46-p,format=title: Attributes for Softwire46-PORTPARAMS>>
+[nobullet=true,spacing=compact]
+**** <<section-3.1.6.1,format=counter>>.  <<name-psid-offset-attribute,format=title: PSID-Offset Attribute>>
+**** <<section-3.1.6.2,format=counter>>.  <<name-psid-len-attribute,format=title: PSID-Len Attribute>>
+**** <<section-3.1.6.3,format=counter>>.  <<name-psid-attribute,format=title: PSID Attribute>>
+** <<section-3.2,format=counter>>.  <<name-softwire46-priority-attribu,format=title: Softwire46-Priority Attribute>>
+[nobullet=true,spacing=compact]
+*** <<section-3.2.1,format=counter>>.  <<name-softwire46-option-code,format=title: Softwire46-Option-Code>>
+** <<section-3.3,format=counter>>.  <<name-softwire46-multicast-attrib,format=title: Softwire46-Multicast Attribute>>
+[nobullet=true,spacing=compact]
+*** <<section-3.3.1,format=counter>>.  <<name-asm-prefix64-attribute,format=title: ASM-Prefix64 Attribute>>
+*** <<section-3.3.2,format=counter>>.  <<name-ssm-prefix64-attribute,format=title: SSM-Prefix64 Attribute>>
+*** <<section-3.3.3,format=counter>>.  <<name-u-prefix64-attribute,format=title: U-Prefix64 Attribute>>
+* <<section-4,format=counter>>.  <<name-a-sample-configuration-proc,format=title: A Sample Configuration Process with RADIUS>>
+* <<section-5,format=counter>>.  <<name-table-of-attributes,format=title: Table of Attributes>>
+* <<section-6,format=counter>>.  <<name-security-considerations,format=title: Security Considerations>>
+* <<section-7,format=counter>>.  <<name-iana-considerations,format=title: IANA Considerations>>
+[nobullet=true,spacing=compact]
+** <<section-7.1,format=counter>>.  <<name-new-radius-attributes-2,format=title: New RADIUS Attributes>>
+** <<section-7.2,format=counter>>.  <<name-radius-softwire46-configura,format=title: RADIUS Softwire46 Configuration and Multicast Attributes>>
+** <<section-7.3,format=counter>>.  <<name-softwire46-mechanisms-and-t,format=title: Softwire46 Mechanisms and Their Identifying Option Codes>>
+* <<section-8,format=counter>>.  <<name-references,format=title: References>>
+[nobullet=true,spacing=compact]
+** <<section-8.1,format=counter>>.  <<name-normative-references,format=title: Normative References>>
+** <<section-8.2,format=counter>>.  <<name-informative-references,format=title: Informative References>>
+* <<section-appendix.a,format=default>>.  <<name-dhcpv6-to-radius-field-mapp,format=title: DHCPv6 to RADIUS Field Mappings>>
+[nobullet=true,spacing=compact]
+** <<section-a.1,format=counter>>.  <<name-option_s46_rule-89-to-softw,format=title: OPTION_S46_RULE (89) to Softwire46-Rule Sub-TLV Field Mappings>>
+** <<section-a.2,format=counter>>.  <<name-option_s46_br-90-to-softwir,format=title: OPTION_S46_BR (90) to Softwire46-BR Field Mappings>>
+** <<section-a.3,format=counter>>.  <<name-option_s46_dmr-91-to-softwi,format=title: OPTION_S46_DMR (91) to Softwire46-DMR>>
+** <<section-a.4,format=counter>>.  <<name-option_s46_v4v6bind-92-to-s,format=title: OPTION_S46_V4V6BIND (92) to Softwire46-V4V6Bind>>
+** <<section-a.5,format=counter>>.  <<name-option_s46_portparams-93-to,format=title: OPTION_S46_PORTPARAMS (93) to Softwire46-PORTPARAMS Field Mappings>>
+** <<section-a.6,format=counter>>.  <<name-option_s46_priority-111-to-,format=title: OPTION_S46_PRIORITY (111) to Softwire46-PORTPARAMS Field Mappings>>
+** <<section-a.7,format=counter>>.  <<name-option_v6_prefix64-113-to-s,format=title: OPTION_V6_PREFIX64 (113) to Softwire46-Multicast Attribute Field Mappings>>
+* <<section-appendix.b,format=none>><<name-acknowledgements,format=title: Acknowledgements>>
+* <<section-appendix.c,format=none>><<name-contributors,format=title: Contributors>>
+* <<section-appendix.d,format=none>><<name-authors-addresses,format=title: Authors' Addresses>>
+
+[numbered=true,removeInRFC=false,toc=include]
+== Introduction
+
+Providers have started deploying and transitioning to IPv6. Several IPv4 service continuity mechanisms based on Address plus Port (A+P) <<RFC6346,format=default>> have been proposed for providing unicast IPv4-over-IPv6-only infrastructure, such as Mapping of Address and Port with Encapsulation (MAP-E) <<RFC7597,format=default>>, Mapping of Address and Port using Translation (MAP-T) <<RFC7599,format=default>>, and Lightweight 4over6 <<RFC7596,format=default>>. Also, <<RFC8114,format=default>> specifies a generic solution for the delivery of IPv4 multicast services to IPv4 clients over an IPv6 multicast network. For each of these mechanisms, DHCPv6 options have been specified for client configuration.
+
+In many networks, user configuration information is stored in an Authentication, Authorization, and Accounting (AAA) server. AAA servers generally communicate using the Remote Authentication Dial In User Service (RADIUS) <<RFC2865,format=default>> protocol. In a fixed broadband network, a Broadband Network Gateway (BNG) acts as the access gateway for users. That is, the BNG acts as both a AAA client to the AAA server and a DHCPv6 server for DHCPv6 messages sent by clients. Throughout this document, the term "BNG" describes a device implementing both the AAA client and DHCPv6 server functions.
+
+Since IPv4-in-IPv6 softwire configuration information is stored in a AAA server and user configuration information is mainly transmitted through DHCPv6 between the BNGs and Customer Premises Equipment (CEs, a.k.a., CPE), new RADIUS attributes are needed to propagate the information from the AAA servers to BNGs so that they can be provided to CEs using the existing DHCPv6 options.
+
+The RADIUS attributes defined in this document provide the configuration to populate the corresponding DHCPv6 options for unicast and multicast softwire configurations, specifically:
+
+[nobullet=false,spacing=normal]
+* "Mapping of Address and Port with Encapsulation (MAP-E)"<<RFC7597,format=default>>(DHCPv6 options defined in<<RFC7598,format=default>>).
+* "Mapping of Address and Port using Translation (MAP-T)"<<RFC7599,format=default>>(DHCPv6 options defined in<<RFC7598,format=default>>).
+* "Lightweight 4over6: An Extension to the Dual-Stack Lite Architecture"<<RFC7596,format=default>>(DHCPv6 options defined in<<RFC7598,format=default>>).
+* "Unified IPv4-in-IPv6 Softwire Customer Premises Equipment (CPE): A DHCPv6-Based Prioritization Mechanism"<<RFC8026,format=default>>.
+* "Delivery of IPv4 Multicast Services to IPv4 Clients over an IPv6 Multicast Network"<<RFC8114,format=default>>(DHCPv6 options defined in<<RFC8115,format=default>>).
+
+The contents of the attributes defined in this document have a 1:1 mapping into the fields of the various DHCPv6 options in <<RFC7598,format=default>>, <<RFC8026,format=default>>, and <<RFC8115,format=default>>. <<Table1,format=default>> shows how the DHCPv6 options map to the corresponding RADIUS attribute. For detailed mappings between each DHCPv6 option field and the corresponding RADIUS attribute or field, see <<tlv-field-map,format=default>>.
+
+[[Table1]]
+.Mapping between DHCPv6 Options and RADIUS Attributes
+[align=center]
+|===
+h|DHCPv6 Option | RADIUS Attribute
+|:--- | :---
+
+| OPTION_S46_RULE (89) |  Softwire46-Rule
+| OPTION_S46_BR (90) |  Softwire46-BR
+| OPTION_S46_DMR (91) |  Softwire46-DMR
+| OPTION_S46_V4V6BIND (92) |  Softwire46-V4V6Bind
+| OPTION_S46_PORTPARAMS (93) |  Softwire46-PORTPARAMS
+| OPTION_S46_PRIORITY (111) |  Softwire46-Priority
+| OPTION_V6_PREFIX64 (113) |  Softwire46-Multicast
+|===
+
+A RADIUS attribute for Dual-Stack Lite <<RFC6333,format=default>> is defined in <<RFC6519,format=default>>.
+
+This document targets deployments where a trusted relationship is in place between the RADIUS client and server.
+
+[numbered=true,removeInRFC=false,toc=include]
+== Terminology
+
+The key words "[bcp14]#MUST#", "[bcp14]#MUST NOT#", "[bcp14]#REQUIRED#", "[bcp14]#SHALL#", "[bcp14]#SHALL NOT#", "[bcp14]#SHOULD#", "[bcp14]#SHOULD NOT#", "[bcp14]#RECOMMENDED#", "[bcp14]#NOT RECOMMENDED#", "[bcp14]#MAY#", and "[bcp14]#OPTIONAL#" in this document are to be interpreted as described in BCP 14 <<RFC2119,format=default>> <<RFC8174,format=default>> when, and only when, they appear in all capitals, as shown here.
+
+The reader should be familiar with the concepts and terms defined in <<RFC7596,format=default>>, <<RFC7597,format=default>>, <<RFC7599,format=default>>, and <<RFC8026,format=default>>.
+
+The terms "multicast Basic Bridging BroadBand" element (mB4) and "multicast Address Family Transition Router" element (mAFTR) are defined in <<RFC8114,format=default>>.
+
+Softwire46 (S46) is used throughout to denote any of the IPv4-in-IPv6 softwire mechanisms listed above. Additionally, the following abbreviations are used within the document:
+
+[indent=10,newline=false,spacing=normal]
+BNG::: Broadband Network Gateway
+BR::: Border Relay
+CE::: Customer Edge
+CoA::: Change-of-Authorization
+DMR::: Default Mapping Rule
+EA::: Embedded Address
+lwAFTR::: Lightweight Address Family Transition Router
+MAP-E::: Mapping of Address and Port with Encapsulation
+MAP-T::: Mapping of Address and Port using Translation
+PSID::: Port Set Identifier
+TLV::: Type, Length, Value
+
+[numbered=true,removeInRFC=false,toc=include]
+== New RADIUS Attributes
+
+This section defines the following attributes:
+
+[spacing=normal,start=1,format=arabic]
+. Softwire46-Configuration Attribute (<<conf-attr,format=default>>):This attribute carries the configuration information for MAP-E, MAP-T, and Lightweight 4over6. The configuration information for each Softwire46 mechanism is carried in the corresponding Softwire46 attributes. Different attributes are required for each Softwire46 mechanism.
+. Softwire46-Priority Attribute (<<s46-prio-attr,format=default>>):Depending on the deployment scenario, a client may support several different Softwire46 mechanisms. Therefore, a client may request configuration for more than one Softwire46 mechanism at a time. The Softwire46-Priority Attribute contains information allowing the client to prioritize which mechanism to use, corresponding to OPTION_S46_PRIORITY defined in <<RFC8026,format=default>>.
+. Softwire46-Multicast Attribute (<<s46-mcast-attr,format=default>>):This attribute conveys the IPv6 prefixes to be used in <<RFC8114,format=default>> to synthesize IPv4-embedded IPv6 addresses. The BNG uses the IPv6 prefixes returned in the RADIUS Softwire46-Multicast Attribute to populate the DHCPv6 PREFIX64 Option <<RFC8115,format=default>>.
+
+All of these attributes are allocated from the RADIUS "Extended Type" code space per <<RFC6929,format=default>>.
+
+All of these attribute designs follow <<RFC6158,format=default>> and <<RFC6929,format=default>>.
+
+This document adheres to the guidance in <<RFC8044,format=default>> for defining new RADIUS attributes.
+
+[[conf-attr]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Softwire46-Configuration Attribute
+
+This attribute is of type "tlv", as defined in "Remote Authentication Dial-In User Service (RADIUS) Protocol Extensions" <<RFC6929,format=default>>. It contains some sub-attributes, with the following requirements:
+
+[nobullet=false,spacing=normal]
+* The Softwire46-Configuration Attribute[bcp14]#MUST#contain one or more of the following attributes: Softwire46-MAP-E, Softwire46-MAP-T, and/or Softwire46-Lightweight-4over6.
+* The Softwire46-Configuration Attribute conveys the configuration information for MAP-E, MAP-T, or Lightweight 4over6. The BNG[bcp14]#SHALL#use the configuration information returned in the RADIUS attribute to populate the DHCPv6 Softwire46 container option(s) defined in<<RFC7598,format=default>>.
+* The Softwire46-Configuration Attribute[bcp14]#MAY#appear in an Access-Accept packet. It[bcp14]#MAY#also appear in an Access-Request packet to indicate a preferred Softwire46 configuration. However, the server is not required to honor such a preference.
+* The Softwire46-Configuration Attribute[bcp14]#MAY#appear in a CoA-Request packet.
+* The Softwire46-Configuration Attribute[bcp14]#MAY#appear in an Accounting-Request packet.
+* The Softwire46-Configuration Attribute[bcp14]#MUST NOT#appear in any other RADIUS packet.
+
+The Softwire46-Configuration Attribute is structured as follows:
+
+[newline=true,spacing=normal]
+Type:: 241
+Length:: Indicates the total length, in bytes, of all fields of this attribute, including the Type, Length, Extended-Type, and the entire length of the embedded attributes.
+Extended-Type:: 9
+Value:: 
+Contains one or more of the following attributes. Each attribute type may appear once at most:
+
+[newline=true,spacing=normal]
+Softwire46-MAP-E:: For configuring MAP-E clients. For the construction of this attribute, refer to <<etlv,format=default>>.
+Softwire46-MAP-T:: For configuring MAP-T clients. For the construction of this attribute, refer to <<ttlv,format=default>>.
+Softwire46-Lightweight-4over6:: For configuring Lightweight 4over6 clients. For the construction of this attribute, refer to <<ltlv,format=default>>.
+
+
+The Softwire46-Configuration Attribute is associated with the following identifier: 241.9.
+
+[[s46-tlvs]]
+[numbered=true,removeInRFC=false,toc=include]
+==== Softwire46 Attributes
+
+The Softwire46 attributes can only be encapsulated in the Softwire46-Configuration Attribute. Depending on the deployment scenario, a client might request more than one transition mechanism at a time. There [bcp14]#MUST# be at least one Softwire46 attribute encapsulated in one Softwire46-Configuration Attribute. There [bcp14]#MUST# be at most one instance of each type of Softwire46 attribute encapsulated in one Softwire46-Configuration Attribute.
+
+There are three types of Softwire46 attributes, namely:
+
+[spacing=normal,start=1,format=arabic]
+. Softwire46-MAP-E (<<etlv,format=default>>)
+. Softwire46-MAP-T (<<ttlv,format=default>>)
+. Softwire46-Lightweight 4over6 (<<ltlv,format=default>>)
+
+Each type of Softwire46 attribute contains a number of sub-attributes, defined in <<s46-sub-tlv-format,format=default>>. The hierarchy of the Softwire46 attributes is shown in <<Hierar,format=default>>. <<s46-sub-tlvs,format=default>> describes which sub-attributes are mandatory, optional, or not permitted for each defined Softwire46 attribute.
+
+[[Hierar]]
+[suppress-title=false,align=left,alt=]
+.Softwire46 Attribute Hierarchy
+[align=left,alt=,]
+....
+                                            /1.Rule-IPv6-Prefix
+S                      /                    |
+o  /                  | 1.Softwire46-Rule --+ 2.Rule-IPv4-Prefix
+f | Softwire46-MAP-E--+                     |
+t |                   | 2.Softwire46-BR     | 3.EA-Length
+w |                   |                      \
+i |                   |                               /1.PSID-Offset
+r |                   |                              |
+e |                   | 3.Softwire46-PORTPARAMS -----+ 2.PSID-Len
+4 |                    \                             |
+6 |                                                  | 3.PSID
+- |                                                   \
+C |
+o |                                          /1.Rule-IPv6-Prefix
+n |                    /                    |
+f |                   | 1.Softwire46-Rule---+ 2.Rule-IPv4-Prefix
+i | Softwire46-MAP-T--+                     |
+g |                   | 2.Softwire46-DMR    | 3.EA-Length
+u |                   |                      \
+r |                   |                               /1.PSID-Offset
+a |                   |                              |
+t |                   | 3.Softwire46-PORTPARAMS------+ 2.PSID-Len
+i |                    \                             |
+o |                                                  | 3.PSID
+n |                                                   \
+  |
+A |                                              /1.IPv4-Address
+t |                    /                        |
+t |                   | 1.Softwire46-V4V6Bind --+ 2.Bind-IPv6-Prefix
+r | Softwire46-       |                          \
+i | Lightweight-4over6+ 2.Softwire46-BR               /1.PSID-Offset
+b  \                  |                              |
+u                     | 3.Softwire46-PORTPARAMS  ----+ 2.PSID-Len
+t                      \                             |
+e                                                    | 3.PSID
+                                                      \ 
+....
+
+[[etlv]]
+[numbered=true,removeInRFC=false,toc=include]
+===== Softwire46-MAP-E Attribute
+
+The Softwire46-MAP-E attribute is designed to carry the configuration information for MAP-E. The structure of Softwire46-MAP-E is shown below:
+
+[newline=true,spacing=normal]
+TLV-Type:: 1
+TLV-Length:: Indicates the length of this attribute, including the TLV-Type, TLV-Length, and TLV-Value fields.
+TLV-Value:: 
+Contains a set of sub-attributes, with the following requirements:
+
+It [bcp14]#MUST# contain Softwire46-Rule, defined in <<s46-rule-sub-tlv,format=default>>.
+
+It [bcp14]#MUST# contain Softwire46-BR, defined in <<s46br,format=default>>.
+
+It [bcp14]#MAY# contain Softwire46-PORTPARAMS, defined in <<s46param,format=default>>.
+
+
+[[ttlv]]
+[numbered=true,removeInRFC=false,toc=include]
+===== Softwire46-MAP-T Attribute
+
+The Softwire46-MAP-T attribute is designed to carry the configuration information for MAP-T. The structure of Softwire46-MAP-T is shown below:
+
+[newline=true,spacing=normal]
+TLV-Type:: 2
+TLV-Length:: Indicates the length of this attribute, including the TLV-Type, TLV-Length, and TLV-Value fields.
+TLV-Value:: 
+Contains a set of sub-attributes, with the following requirements:
+
+It [bcp14]#MUST# contain Softwire46-Rule, defined in <<s46-rule-sub-tlv,format=default>>.
+
+It [bcp14]#MUST# contain Softwire46-DMR, defined in <<s46dmr,format=default>>.
+
+It [bcp14]#MAY# contain Softwire46-PORTPARAMS, defined in <<s46param,format=default>>.
+
+
+[[ltlv]]
+[numbered=true,removeInRFC=false,toc=include]
+===== Softwire46-Lightweight-4over6 Attribute
+
+The Softwire46-Lightweight-4over6 attribute is designed to carry the configuration information for Lightweight 4over6. The structure of Softwire46-Lightweight-4over6 is shown below:
+
+[newline=true,spacing=normal]
+TLV-Type:: 3
+TLV-Length:: Indicates the length of this attribute, including the TLV-Type, TLV-Length, and TLV-Value fields.
+TLV-Value:: 
+Contains a set of sub-attributes as follows:
+
+It [bcp14]#MUST# contain Softwire46-BR, defined in <<s46br,format=default>>.
+
+It [bcp14]#MUST# contain Softwire46-V4V6Bind, defined in <<s46bind,format=default>>.
+
+It [bcp14]#MAY# contain Softwire46-PORTPARAMS, defined in <<s46param,format=default>>.
+
+
+[[s46-sub-tlvs]]
+[numbered=true,removeInRFC=false,toc=include]
+==== Softwire46 Sub-attributes
+
+<<Table2,format=default>> shows which encapsulated sub-attributes are mandatory, optional, or not permitted for each defined Softwire46 attribute.
+
+[[Table2]]
+.Softwire46 Sub-attributes
+[align=center]
+|===
+h|Sub-attributes | MAP-E | MAP-T | Lightweight 4over6
+|:--- | :--- | :--- | :---
+
+|Softwire46-BR |  1+ |  0 |  1+
+|Softwire46-Rule |  1 |  1 |  0
+|Softwire46-DMR |  0 |  1 |  0
+| Softwire46-V4V6Bind |  0 |  0 |  1
+| Softwire46-PORTPARAMS |  0-1 |  0-1 |  0-1
+|===
+
+The following list defines the meaning of the <<Table2,format=default>> entries.
+
+[indent=6,newline=false,spacing=compact]
+0:: Not permitted
+0-1:: Optional; zero or one instance of the attribute may be present.
+1:: Mandatory; only one instance of the attribute must be present.
+1+:: Mandatory; one or more instances of the attribute may be present.
+
+[[s46-sub-tlv-format]]
+[numbered=true,removeInRFC=false,toc=include]
+==== Specification of the Softwire46 Sub-attributes
+
+[[s46-rule-sub-tlv]]
+[numbered=true,removeInRFC=false,toc=include]
+===== Softwire46-Rule Attribute
+
+Softwire46-Rule can only be encapsulated in Softwire46-MAP-E (<<etlv,format=default>>) or Softwire46-MAP-T (<<ttlv,format=default>>). Depending on the deployment scenario, one Basic Mapping Rule (BMR) and zero or more Forwarding Mapping Rules (FMRs) [bcp14]#MUST# be included in Softwire46-MAP-E and Softwire46-MAP-T.
+
+Each type of Softwire46-Rule also contains a number of sub-attributes, including Rule-IPv6-Prefix, Rule-IPv4-Prefix, and EA-Length. The structure of the sub-attributes for Softwire46-Rule is defined in <<s46-rule-sub-tlvs,format=default>>.
+
+Defining multiple TLV types achieves the same design goals as the "Softwire46 Rule Flags" defined in <<RFC7598,format=default>>. Using a TLV type set to 5 is equivalent to setting the F flag in the OPTION_S46_RULE S46 Rule Flags field.
+
+[newline=true,spacing=normal]
+TLV-Type:: 
+4 Basic Mapping Rule only (not to be used for forwarding)
+
+5 Forwarding Permitted Mapping Rule
+
+TLV-Length:: Indicates the length of this attribute, including the TLV-Type, TLV-Length, and TLV-Value fields.
+Data Type:: The attribute Softwire46-Rule is of type "tlv" (<<RFC8044,format=default>>).
+TLV-Value:: 
+This field contains a set of attributes as follows:
+
+[newline=true,spacing=normal]
+Rule-IPv6-Prefix:: This attribute contains the IPv6 prefix for use in the MAP rule. Refer to <<v6prefix,format=default>>.
+Rule-IPv4-Prefix:: This attribute contains the IPv4 prefix for use in the MAP rule. Refer to <<v4prefix,format=default>>.
+EA-Length:: This attribute contains the Embedded Address (EA) bit length. Refer to <<ea-length,format=default>>.
+
+
+[[s46br]]
+[numbered=true,removeInRFC=false,toc=include]
+===== Softwire46-BR Attribute
+
+Softwire46-BR can only be encapsulated in Softwire46-MAP-E (<<etlv,format=default>>) or Softwire46-Lightweight-4over6 (<<ltlv,format=default>>).
+
+There [bcp14]#MUST# be at least one Softwire46-BR included in each Softwire46-MAP-E or Softwire46-Lightweight-4over6.
+
+The structure of Softwire46-BR is shown below:
+
+[newline=true,spacing=normal]
+TLV-Type:: 6
+TLV-Length:: 18 octets
+Data Type:: The attribute Softwire46-BR is of type "ipv6addr" (<<RFC8044,format=default>>).
+TLV-Value:: br-ipv6-address. A fixed-length field of 16 octets that specifies the IPv6 address for the Softwire46 Border Relay (BR).
+
+[[s46dmr]]
+[numbered=true,removeInRFC=false,toc=include]
+===== Softwire46-DMR Attribute
+
+Softwire46-DMR may only appear in Softwire46-MAP-T (<<ttlv,format=default>>). There [bcp14]#MUST# be exactly one Softwire46-DMR included in one Softwire46-MAP-T.
+
+The structure of Softwire46-DMR is shown below:
+
+[newline=true,spacing=normal]
+TLV-Type:: 7
+TLV-Length:: 4 + length of dmr-ipv6-prefix specified in octets.
+Data Type:: The attribute Softwire46-DMR is of type "ipv6prefix" (<<RFC8044,format=default>>).
+TLV-Value:: A variable-length (dmr-prefix6-len) field specifying the IPv6 prefix (dmr-ipv6-prefix) for the BR. This field is right-padded with zeros to the nearest octet boundary when dmr-prefix6-len is not divisible by 8. Prefixes with lengths from 0 to 96 are allowed.
+
+[[s46bind]]
+[numbered=true,removeInRFC=false,toc=include]
+===== Softwire46-V4V6Bind Attribute
+
+Softwire46-V4V6Bind may only be encapsulated in Softwire46-Lightweight-4over6 (<<ltlv,format=default>>). There [bcp14]#MUST# be exactly one Softwire46-V4V6Bind included in each Softwire46-Lightweight-4over6.
+
+The structure of Softwire46-V4V6Bind is shown below:
+
+[newline=true,spacing=normal]
+TLV-Type:: 8
+TLV-Length:: Indicates the length of this attribute, including the TLV-Type, TLV-Length, and TLV-Value fields.
+Data Type:: The attribute Softwire46-V4V6Bind is of type "tlv" (<<RFC8044,format=default>>).
+TLV-Value:: 
+This field contains a set of attributes as follows:
+
+[newline=true,spacing=normal]
+IPv4-Address:: This attribute contains an IPv4 address, used to specify the full or shared IPv4 address of the CE. Refer to <<v4address,format=default>>.
+Bind-IPv6-Prefix:: This attribute contains an IPv6 prefix used to indicate which configured prefix the Softwire46 CE should use for constructing the softwire. Refer to <<bindv6,format=default>>.
+
+
+[[s46param]]
+[numbered=true,removeInRFC=false,toc=include]
+===== Softwire46-PORTPARAMS Attribute
+
+Softwire46-PORTPARAMS is optional. It is used to specify port set information for IPv4 address sharing between clients. Softwire46-PORTPARAMS [bcp14]#MAY# be included in any of the Softwire46 attributes.
+
+The structure of Softwire46-PORTPARAMS is shown below:
+
+[newline=true,spacing=normal]
+TLV-Type:: 9
+TLV-Length:: Indicates the length of this attribute, including the TLV-Type, TLV-Length, and TLV-Value fields.
+Data Type:: The attribute Softwire46-PORTPARAMS is of type "tlv" (<<RFC8044,format=default>>).
+TLV-Value:: 
+This field contains a set of attributes as follows:
+
+[newline=true,spacing=normal]
+PSID-Offset:: This attribute specifies the numeric value for the Softwire46 algorithm's excluded port range/offset bits (a bits). Refer to <<psid-offset,format=default>>.
+PSID-Len:: This attribute specifies the number of significant bits in the PSID field (also known as 'k'). Refer to <<psid-len,format=default>>.
+PSID:: This attribute specifies the PSID value. Refer to <<psid,format=default>>.
+
+
+[[s46-rule-sub-tlvs]]
+[numbered=true,removeInRFC=false,toc=include]
+==== Sub-attributes for Softwire46-Rule
+
+There are two types of Softwire46-Rule: the Basic Mapping Rule and the Forwarding Mapping Rule, indicated by the value in the TLV-Type field of Softwire46-Rule (<<s46-rule-sub-tlv,format=default>>).
+
+Each type of Softwire46-Rule also contains a number of sub-attributes as detailed in the following subsections.
+
+[[v6prefix]]
+[numbered=true,removeInRFC=false,toc=include]
+===== Rule-IPv6-Prefix Attribute
+
+Rule-IPv6-Prefix is [bcp14]#REQUIRED# for every Softwire46-Rule. There [bcp14]#MUST# be exactly one Rule-IPv6-Prefix encapsulated in each type of Softwire46-Rule.
+
+Rule-IPv6-Prefix follows the framed IPv6 prefix designed in <<RFC3162,format=default>> and <<RFC8044,format=default>>.
+
+The structure of Rule-IPv6-Prefix is shown below:
+
+[newline=true,spacing=normal]
+TLV-Type:: 10
+TLV-Length:: 4 + length of rule-ipv6-prefix specified in octets.
+Data Type:: The attribute Rule-IPv6-Prefix is of type "ipv6prefix" (<<RFC8044,format=default>>).
+TLV-Value:: A variable-length field that specifies an IPv6 prefix (rule-ipv6-prefix) appearing in the MAP rule.
+
+[[v4prefix]]
+[numbered=true,removeInRFC=false,toc=include]
+===== Rule-IPv4-Prefix Attribute
+
+This attribute is used to convey the MAP Rule IPv4 prefix. The structure of Rule-IPv4-Prefix is shown below:
+
+[newline=true,spacing=normal]
+TLV-Type:: 11
+TLV-Length:: 4 + length of rule-ipv4-prefix specified in octets.
+Data Type:: The attribute Rule-IPv4-Prefix is of type "ipv4prefix" (<<RFC8044,format=default>>).
+TLV-Value:: A variable-length field that specifies an IPv4 prefix (rule-ipv4-prefix) appearing in the MAP rule.
+
+[[ea-length]]
+[numbered=true,removeInRFC=false,toc=include]
+===== EA-Length Attribute
+
+This attribute is used to convey the Embedded Address (EA) bit length. The structure of EA-Length is shown below:
+
+[newline=true,spacing=normal]
+TLV-Type:: 12
+TLV-Length:: 6 octets
+Data Type:: The attribute EA-Length is of type "integer" (<<RFC8044,format=default>>).
+TLV-Value:: EA-len; 32 bits long. Specifies the Embedded Address (EA) bit length. Allowed values range from 0 to 48.
+
+[numbered=true,removeInRFC=false,toc=include]
+==== Attributes for Softwire46-v4v6Bind
+
+[[v4address]]
+[numbered=true,removeInRFC=false,toc=include]
+===== IPv4-Address Attribute
+
+The IPv4-Address [bcp14]#MAY# be used to specify the full or shared IPv4 address of the CE.
+
+The structure of IPv4-Address is shown below:
+
+[newline=true,spacing=normal]
+TLV-Type:: 13
+TLV-Length:: 6 octets
+Data Type:: The attribute IPv4-Address is of type "ipv4addr" (<<RFC8044,format=default>>).
+TLV-Value:: 32 bits long. Specifies the IPv4 address (ipv4-address) to appear in Softwire46-V4V6Bind (<<s46bind,format=default>>).
+
+[[bindv6]]
+[numbered=true,removeInRFC=false,toc=include]
+===== Bind-IPv6-Prefix Attribute
+
+The Bind-IPv6-Prefix is used by the CE to identify the correct IPv6 prefix to be used as the tunnel source.
+
+The structure of Bind-IPv6-Prefix is shown below:
+
+[newline=true,spacing=normal]
+TLV-Type:: 14
+TLV-Length:: 4 + length of bind-ipv6-prefix specified in octets.
+Data Type:: The attribute Bind-IPv6-Prefix is of type "ipv6prefix" (<<RFC8044,format=default>>).
+TLV-Value:: A variable-length field specifying the IPv6 prefix or address for the Softwire46 CE (bind-ipv6-prefix). This field is right-padded with zeros to the nearest octet boundary when the prefix length is not divisible by 8.
+
+[numbered=true,removeInRFC=false,toc=include]
+==== Attributes for Softwire46-PORTPARAMS
+
+[[psid-offset]]
+[numbered=true,removeInRFC=false,toc=include]
+===== PSID-Offset Attribute
+
+This attribute is used to convey the Port Set Identifier offset as defined in <<RFC7597,format=default>>. This attribute is encoded in 32 bits as per the recommendation in <<RFC6158,format=default>>.
+
+The structure of PSID-Offset is shown below:
+
+[newline=true,spacing=normal]
+TLV-Type:: 15
+TLV-Length:: 6 octets
+Data Type:: The attribute PSID-Offset is of type "integer" (<<RFC8044,format=default>>).
+TLV-Value:: 
+Contains the PSID-Offset (8 bits) right justified, and the unused bits in this field [bcp14]#MUST# be set to zero. This field specifies the numeric value for the Softwire46 algorithm's excluded port range/offset bits (a bits), as per <<RFC7597,format=default>>.
+
+Default values for this field are specific to the softwire mechanism being implemented and are defined in the relevant specification document.
+
+
+[[psid-len]]
+[numbered=true,removeInRFC=false,toc=include]
+===== PSID-Len Attribute
+
+This attribute is used to convey the PSID length as defined in <<RFC7597,format=default>>. This attribute is encoded in 32 bits as per the recommendation in <<RFC6158,format=default>>.
+
+The structure of PSID-Len is shown below:
+
+[newline=true,spacing=normal]
+TLV-Type:: 16
+TLV-Length:: 6 octets
+Data Type:: The attribute PSID-Len is of type "integer" (<<RFC8044,format=default>>).
+TLV-Value:: Contains the PSID-len (8 bits) right justified, and the unused bits in this field [bcp14]#MUST# be set to zero. This field specifies the number of significant bits in the PSID field (also known as 'k'). When set to 0, the PSID field is to be ignored. After the first a bits, there are k bits in the port number representing the value of the PSID. Subsequently, the address-sharing ratio would be 2^k.
+
+[[psid]]
+[numbered=true,removeInRFC=false,toc=include]
+===== PSID Attribute
+
+This attribute is used to convey the PSID as defined in <<RFC7597,format=default>>. This attribute is encoded in 32 bits as per the recommendation in <<RFC6158,format=default>>.
+
+The structure of PSID is shown below:
+
+[newline=true,spacing=normal]
+TLV-Type:: 17
+TLV-Length:: 6 octets
+Data Type:: The attribute PSID is of type "integer" (<<RFC8044,format=default>>).
+TLV-Value:: 
+Contains the PSID (16 bits) right justified, and the unused bits in this field [bcp14]#MUST# be set to zero.
+
+The PSID value algorithmically identifies a set of ports assigned to a CE. The first k bits on the left of this 2-octet field are the PSID value. The remaining (16-k) bits on the right are padding zeros.
+
+
+[[s46-prio-attr]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Softwire46-Priority Attribute
+
+The Softwire46-Priority Attribute includes an ordered list of Softwire46 mechanisms allowing the client to prioritize which mechanism to use, corresponding to OPTION_S46_PRIORITY defined in <<RFC8026,format=default>>. The following requirements apply:
+
+[nobullet=true,spacing=normal]
+* The Softwire46-Priority Attribute[bcp14]#MAY#appear in an Access-Accept packet. It[bcp14]#MAY#also appear in an Access-Request packet.
+* The Softwire46-Priority Attribute[bcp14]#MAY#appear in a CoA-Request packet.
+* The Softwire46-Priority Attribute[bcp14]#MAY#appear in an Accounting-Request packet.
+* The Softwire46-Priority Attribute[bcp14]#MUST NOT#appear in any other RADIUS packet.
+
+The Softwire46-Priority Attribute is structured as follows:
+
+[newline=true,spacing=normal]
+Type:: 241
+Length:: Indicates the length of this attribute, including the Type, Length, Extended-Type and Value fields.
+Extended-Type:: 10
+TLV-Value:: 
+The attribute includes one or more Softwire46-Option-Code TLVs: A Softwire46-Priority Attribute [bcp14]#MUST# contain at least one Softwire46-Option-Code TLV (<<opc,format=default>>).
+
+Softwire46 mechanisms are prioritized in the appearance order in the Softwire46-Priority Attribute. That is, the first-appearing mechanism is most preferred.
+
+
+The Softwire46-Priority Attribute is associated with the following identifier: 241.10.
+
+[[opc]]
+[numbered=true,removeInRFC=false,toc=include]
+==== Softwire46-Option-Code
+
+This attribute is used to convey an option code assigned to a Softwire46 mechanism <<RFC8026,format=default>>. This attribute is encoded in 32 bits as per the recommendation in <<RFC6158,format=default>>.
+
+The structure of Softwire46-Option-Code is shown below:
+
+[newline=true,spacing=normal]
+TLV-Type:: 18
+TLV-Length:: 6 octets
+Data Type:: The attribute Softwire46-Option-Code is of type "integer" (<<RFC8044,format=default>>).
+TLV-Value:: A 32-bit IANA-registered option code representing a Softwire46 mechanism (Softwire46-option-code). The codes and their corresponding Softwire46 mechanisms are listed in <<s46option,format=default>>.
+
+[[s46-mcast-attr]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Softwire46-Multicast Attribute
+
+The Softwire46-Multicast Attribute conveys the IPv6 prefixes to be used to synthesize multicast and unicast IPv4-embedded IPv6 addresses as per <<RFC8114,format=default>>. This attribute is of type "tlv" and contains additional TLVs. The following requirements apply:
+
+[nobullet=false,spacing=normal]
+* The BNG[bcp14]#SHALL#use the IPv6 prefixes returned in the RADIUS Softwire46-Multicast Attribute to populate the DHCPv6 PREFIX64 Option<<RFC8115,format=default>>.
+* This attribute[bcp14]#MAY#be used in Access-Request packets as a hint to the RADIUS server. For example, if the BNG is preconfigured for Softwire46-Multicast, these prefixes may be inserted in the attribute. The RADIUS server[bcp14]#MAY#ignore the hint sent by the BNG, and it[bcp14]#MAY#assign a different Softwire46-Multicast Attribute.
+* The Softwire46-Multicast Attribute[bcp14]#MAY#appear in an Access-Request, Access-Accept, CoA-Request, and Accounting-Request packet.
+* The Softwire46-Multicast Attribute[bcp14]#MUST NOT#appear in any other RADIUS packet.
+* The Softwire46-Multicast Attribute[bcp14]#MAY#contain ASM-Prefix64 (<<TLV0,format=default>>), SSM-Prefix64 (<<TLV1,format=default>>), and U-Prefix64 (<<TLV2,format=default>>).
+* The Softwire46-Multicast Attribute[bcp14]#MUST#include ASM-Prefix64 or SSM-Prefix64, and it[bcp14]#MAY#include both.
+* The U-Prefix64[bcp14]#MUST#be present when SSM-Prefix64 is present. U-Prefix64[bcp14]#MAY#be present when ASM-Prefix64 is present.
+
+The Softwire46-Multicast Attribute is structured as follows:
+
+[newline=true,spacing=normal]
+Type:: 241
+Length:: This field indicates the total length in bytes of all fields of this attribute, including the Type, Length, Extended-Type, and the entire length of the embedded attributes.
+Extended-Type:: 11
+Value:: 
+This field contains a set of attributes as follows:
+
+[newline=true,spacing=normal]
+ASM-Prefix64:: This attribute contains the Any-Source Multicast (ASM) IPv6 prefix. Refer to <<TLV0,format=default>>.
+SSM-Prefix64:: This attribute contains the Source-Source Multicast (SSM) IPv6 prefix. Refer to <<TLV1,format=default>>.
+U-Prefix64:: This attribute contains the IPv4 prefix used for address translation. Refer to <<TLV2,format=default>>.
+
+
+The Softwire46-Multicast Attribute is associated with the following identifier: 241.11.
+
+[[TLV0]]
+[numbered=true,removeInRFC=false,toc=include]
+==== ASM-Prefix64 Attribute
+
+The ASM-Prefix64 attribute is structured as follows:
+
+[newline=true,spacing=normal]
+TLV-Type:: 19
+TLV-Length:: 16 octets. The length of asm-prefix64 must be /96 <<RFC8115,format=default>>.
+Data Type:: The attribute ASM-Prefix64 is of type "ipv6prefix" (<<RFC8044,format=default>>).
+TLV-Value:: This field specifies the IPv6 multicast prefix (asm-prefix64) to be used to synthesize the IPv4-embedded IPv6 addresses of the multicast groups in the ASM mode. The conveyed multicast IPv6 prefix [bcp14]#MUST# belong to the ASM range.
+
+[[TLV1]]
+[numbered=true,removeInRFC=false,toc=include]
+==== SSM-Prefix64 Attribute
+
+The SSM-Prefix64 attribute is structured as follows:
+
+[newline=true,spacing=normal]
+Type:: 20
+TLV-Length:: 16 octets. The length of ssm-prefix64 must be /96 <<RFC8115,format=default>>.
+Data Type:: The attribute SSM-Prefix64 is of type "ipv6prefix" (<<RFC8044,format=default>>).
+TLV-Type:: This field specifies the IPv6 multicast prefix (ssm-prefix64) to be used to synthesize the IPv4-embedded IPv6 addresses of the multicast groups in the SSM mode. The conveyed multicast IPv6 prefix [bcp14]#MUST# belong to the SSM range.
+
+[[TLV2]]
+[numbered=true,removeInRFC=false,toc=include]
+==== U-Prefix64 Attribute
+
+The structure of U-Prefix64 is shown below:
+
+[newline=true,spacing=normal]
+TLV-Type:: 21
+TLV-Length:: 4 + length of unicast-prefix. As specified in <<RFC6052,format=default>>, the unicast-prefix prefix length [bcp14]#MUST# be set to 32, 40, 48, 56, 64, or 96.
+Data Type:: The attribute U-Prefix64 is of type "ipv6prefix" (<<RFC8044,format=default>>).
+TLV-Value:: This field identifies the IPv6 unicast prefix (u-prefix64) to be used in the SSM mode for constructing the IPv4-embedded IPv6 addresses representing the IPv4 multicast sources in the IPv6 domain. It may also be used to extract the IPv4 address from the received multicast data flows.
+
+[numbered=true,removeInRFC=false,toc=include]
+== A Sample Configuration Process with RADIUS
+
+<<example,format=default>> illustrates how the RADIUS and DHCPv6 protocols interwork to provide CE with softwire configuration information.
+
+[[example]]
+[suppress-title=false,align=left,alt=]
+.Interaction between DHCPv6 and AAA Server with RADIUS Authentication
+[align=left,alt=,]
+....
+ 
+CE                             BNG                     AAA Server
+|                               |                               |
+|-------1.DHCPv6 Solicit------->|                               |
+|(ORO with unicast and/or       |                               |
+|    multicast container option |                               |
+|    codes(s))                  |                               |
+|                               |-------2.Access-Request------->|
+|                               |   (Softwire46-Configuration   |
+|                               |       Attribute and/or        |
+|                               |Softwire46-Multicast Attribute)|
+|                               |                               |
+|                               |<------3.Access-Accept---------|
+|                               |   (Softwire46-Configuration   |
+|                               |       Attribute and/or        |
+|                               |Softwire46-Multicast Attribute)|
+|                               |                               |
+|<----4.DHCPv6 Advertisement----|                               |
+|     (container option(s))     |                               |
+|                               |                               |
+|-------5.DHCPv6  Request------>|                               |
+|     (container option(s))     |                               |
+|                               |                               |
+|<--------6.DHCPv6 Reply--------|                               |
+|     (container option(s))     |                               |
+|                               |                               |
+             DHCPv6                         RADIUS
+....
+
+[spacing=normal,start=1,format=arabic]
+. The CE creates a DHCPv6 Solicit message. For unicast softwire configuration, the message includes an OPTION_REQUEST_OPTION (6) with the Softwire46 Container option code(s) as defined in<<RFC7598,format=default>>. OPTION_S46_CONT_MAPE (94) should be included for MAP-E, OPTION_S46_CONT_MAPT (95) for MAP-T, and OPTION_S46_CONT_LW (96) for Lightweight 4over6. For multicast configuration, the option number for OPTION_V6_PREFIX64 (113) is included in the client's Option Request Option (ORO). The message is sent to the BNG.
+. On receipt of the DHCPv6 Solicit message, the BNG constructs a RADIUS Access-Request message containing a User-Name Attribute (1) (containing either a CE Media Access Control (MAC) address, interface-id, or both) and a User-Password Attribute (2) (with a preconfigured shared password between the CE and AAA server as defined in<<RFC2865,format=default>>). The Softwire46-Configuration Attribute and/or Softwire46-Multicast Attribute are also included (as requested by the client). The resulting message is sent to the AAA server.
+. The AAA server authenticates the request. If this is successful, and a suitable configuration is available, an Access-Accept message is sent to the BNG containing the requested Softwire46-Configuration Attribute or Softwire46-Multicast Attribute. It is the responsibility of the AAA server to ensure the consistency of the provided configuration.
+. The BNG maps the received softwire configuration into the corresponding fields in the DHCPv6 softwire configuration option(s). These are included in the DHCPv6 Advertise message, which is sent to the CE.
+. The CE sends a DHCPv6 Request message. In the ORO, the option codes of any of the required softwire options that were received in the DHCPv6 Advertise message are included.
+. The BNG sends a DHCPv6 Reply message to the client containing the softwire container option(s) enumerated in the ORO.
+
+The authorization operation could be done independently after the authentication process. In this case, steps 1-5 are completed as above, then the following steps are performed:
+
+[indent=5,newline=false,spacing=normal]
+6a.:: When the BNG receives the DHCPv6 Request, it constructs a RADIUS Access-Request message, which contains a Service-Type Attribute (6) with the value "Authorize Only" (17), the corresponding Softwire46-Configuration Attribute, and a State Attribute obtained from the previous authentication process according to <<RFC5080,format=default>>. The resulting message is sent to the AAA server.
+7a.:: The AAA server checks the authorization request. If it is approved, an Access-Accept message is returned to the BNG with the corresponding Softwire46-Configuration Attribute.
+8a.:: The BNG sends a Reply message to the client containing the softwire container options enumerated in the ORO.
+
+In addition to the above, the following points need to be considered:
+
+[nobullet=false,spacing=normal]
+* In the configuration message flows described above, the Message-Authenticator (type 80)<<RFC2869,format=default>>should be used to protect both Access-Request and Access-Accept messages.
+* If the BNG does not receive the corresponding Softwire46-Configuration Attribute in the Access-Accept message, it may fall back to creating the DHCPv6 softwire configuration options using the preconfigured Softwire46 configuration if this is present.
+* If the BNG receives an Access-Reject from the AAA server, then the Softwire46 configuration must not be supplied to the client.
+* As specified in<<RFC8415,format=default>>("Creation and Transmission of Rebind Messages") if the DHCPv6 server to which the DHCPv6 Renew message was sent at time T1 has not responded by time T2, the CE (DHCPv6 client) should enter the Rebind state and attempt to contact any available server. In this situation, a secondary BNG receiving the DHCPv6 message must initiate a new Access-Request message towards the AAA server. The secondary BNG includes the Softwire46-Configuration Attribute in this Access-Request message.
+* For Lightweight 4over6, the CE's binding state needs to be synchronized between the clients and the Lightweight AFTR (lwAFTR)/BR. This can be achieved in two ways: static preconfiguration of the bindings on both the AAA server and lwAFTR or on demand, whereby the AAA server updates the lwAFTR with the CE's binding state as it is created or deleted.
+
+In some deployments, the DHCP server may use the Accounting-Request to report the softwire configuration returned to a requesting host to a AAA server. It is the responsibility of the DHCP server to ensure the consistency of the configuration provided to the requesting hosts. Reported data to a AAA server may be required for various operational purposes (e.g., regulatory).
+
+A configuration change (e.g., BR address) may result in an exchange of CoA-Requests between the BNG and the AAA server, as shown in <<coa,format=default>>. Concretely, when the BNG receives a CoA-Request message containing Softwire46 attributes, it sends a DHCPv6 Reconfigure message to the appropriate CE to inform that CE that an updated configuration is available. Upon receipt of such a message, the CE sends a DHCPv6 Renew or Information-Request in order to receive the updated Softwire46 configuration. In deployments where the BNG embeds a DHCPv6 relay, CoA-Requests can be used following the procedure specified in <<RFC6977,format=default>>.
+
+[[coa]]
+[suppress-title=false,align=left,alt=]
+.Change of Configuration Example
+[align=left,alt=,]
+....
+        CE                          BNG                    AAA Server
+        |                           |                            |
+        |---DHCPv6 Solicit--------->|                            |
+        |                           |---Access-Request---------->|
+        |                           |<--Access-Accept------------|
+        |                           |(Softwire46-Configuration   |
+        |                           |    Attribute ...)          |
+                                  ....
+        |                           |                            |
+        |                           |<-----CoA-Request-----------|
+        |                           |(Softwire46-Configuration   |
+        |                           |    Attribute ...)          |
+        |                           |------CoA-Response--------->|
+        |<--DHCPv6 Reconfigure------|                            |
+        |                           |                            |
+                                  ....
+....
+
+[numbered=true,removeInRFC=false,toc=include]
+== Table of Attributes
+
+This document specifies three new RADIUS attributes, and their formats are as follows:
+
+[nobullet=false,spacing=normal]
+* Softwire46-Configuration Attribute: 241.9
+* Softwire46-Priority Attribute: 241.10
+* Softwire46-Multicast Attribute: 241.11
+
+<<Table3,format=default>> describes which attributes may be found in which kinds of packets and in what quantity.
+
+[[Table3]]
+.Table of Attributes
+[align=center]
+|===
+h|Request | Accept | Reject | Challenge | Acct Req | CoA-Req | # | Attribute
+|:--- | :--- | :--- | :--- | :--- | :--- | :--- | :---
+
+| 0-1 |  0-1 | 0 |  0 |  0-1 |  0-1 |  241.9 | Softwire46-​Configuration
+| 0-1 |  0-1 | 0 |  0 |  0-1 |  0-1 |  241.10 | Softwire46-​Priority
+| 0-1 |  0-1 | 0 |  0 |  0-1 |  0-1 |  241.11 | Softwire46-​Multicast
+|===
+
+[[Security]]
+[numbered=true,removeInRFC=false,toc=include]
+== Security Considerations
+
+<<RFC7596,format=default>> discusses security issues related to Lightweight 4over6; <<RFC7597,format=default>> discusses security issues related to MAP-E; <<RFC7599,format=default>> discusses security issues related to MAP-T; and <<RFC8114,format=default>> discusses security issues related to the delivery of IPv4 multicast services to IPv4 clients over an IPv6 multicast network.
+
+This document does not introduce any security issues inherently different from those already identified in <<RFC2865,format=default>> and <<RFC5176,format=default>> for CoA messages. Known security vulnerabilities of the RADIUS protocol discussed in <<RFC2607,format=default>> and <<RFC2869,format=default>> apply to this specification. These well-established properties of the RADIUS protocol place some limitations on how it can safely be used, since there is some inherent requirement to trust the counterparty to not misbehave.
+
+Accordingly, this document targets deployments where a trusted relationship is in place between the RADIUS client and server, with communication optionally secured by IPsec or Transport Layer Security (TLS) <<RFC6614,format=default>>. The use of IPsec <<RFC4301,format=default>> for providing security when RADIUS is carried in IPv6 is discussed in <<RFC3162,format=default>>.
+
+Security considerations for interactions between a Softwire46 CE and the BNG are discussed in <<RFC7598,format=default>> (DHCPv6 options for the configuration of Softwire46 address and port-mapped clients), <<RFC8026,format=default>> (a DHCPv6-based Softwire46 prioritization mechanism), and <<RFC8115,format=default>> (DHCPv6 options for configuration of IPv4-embedded IPv6 prefixes).
+
+[[IANA]]
+[numbered=true,removeInRFC=false,toc=include]
+== IANA Considerations
+
+IANA has made new code point assignments for RADIUS attributes as described in the following subsections. The assignments should use the RADIUS registry available at < https://www.iana.org/assignments/radius-types/>.
+
+[numbered=true,removeInRFC=false,toc=include]
+=== New RADIUS Attributes
+
+IANA has assigned the attribute types defined in this document from the RADIUS namespace as described in Section <<RFC3575,format=default: IANA Considerations>> of <<RFC3575,format=default>>, in accordance with BCP 26 <<RFC8126,format=default>>.
+
+IANA has registered three new RADIUS attributes from the "Short Extended Space" section of <<RFC6929,format=default>>. The attributes are the Softwire46-Configuration Attribute, Softwire46-Priority Attribute, and Softwire46-Multicast Attribute:
+
+[[Table4]]
+.New RADIUS Attributes
+[align=center]
+|===
+h|Type | Description | Data Type | Reference
+|:--- | :--- | :--- | :---
+
+| 241.9 |  Softwire46-Configuration |  tlv | <<conf-attr,format=default>>
+| 241.10 |  Softwire46-Priority |  tlv | <<s46-prio-attr,format=default>>
+| 241.11 |  Softwire46-Multicast |  tlv | <<s46-mcast-attr,format=default>>
+|===
+
+[numbered=true,removeInRFC=false,toc=include]
+=== RADIUS Softwire46 Configuration and Multicast Attributes
+
+IANA has created a new registry called "RADIUS Softwire46 Configuration and Multicast Attributes".
+
+All attributes in this registry have one or more parent RADIUS attributes in nesting (refer to <<RFC6929,format=default>>).
+
+This registry has been initially populated with the following values:
+
+[[Table5]]
+.RADIUS Softwire46 Configuration and Multicast Attributes
+[align=center]
+|===
+h|Value | Description | Data Type | Reference
+|:--- | :--- | :--- | :---
+
+| 0 |  Reserved |   |  
+| 1 |  Softwire46-MAP-E |  tlv | <<etlv,format=default>>
+| 2 |  Softwire46-MAP-T |  tlv | <<ttlv,format=default>>
+| 3 |  Softwire46-Lightweight-4over6 |  tlv | <<ltlv,format=default>>
+| 4 |  Softwire46-Rule (BMR) |  tlv | <<s46-rule-sub-tlv,format=default>>
+| 5 |  Softwire46-Rule (FMR) |  tlv | <<s46-rule-sub-tlv,format=default>>
+| 6 |  Softwire46-BR |  ipv6addr | <<s46br,format=default>>
+| 7 |  Softwire46-DMR |  ipv6prefix | <<s46dmr,format=default>>
+| 8 |  Softwire46-V4V6Bind |  tlv | <<s46bind,format=default>>
+| 9 |  Softwire46-PORTPARAMS |  tlv | <<s46param,format=default>>
+| 10 |  Rule-IPv6-Prefix |  ipv6prefix | <<v6prefix,format=default>>
+| 11 |  Rule-IPv4-Prefix |  ipv4prefix | <<v4prefix,format=default>>
+| 12 |  EA-Length |  integer | <<ea-length,format=default>>
+| 13 |  IPv4-Address |  ipv4addr | <<v4address,format=default>>
+| 14 |  Bind-IPv6-Prefix |  ipv6prefix | <<bindv6,format=default>>
+| 15 |  PSID-Offset |  integer | <<psid-offset,format=default>>
+| 16 |  PSID-Len |  integer | <<psid-len,format=default>>
+| 17 |  PSID |  integer | <<psid,format=default>>
+| 18 |  Softwire46-Option-Code |  integer | <<opc,format=default>>
+| 19 |  ASM-Prefix64 |  ipv6prefix | <<TLV0,format=default>>
+| 20 |  SSM-Prefix64 |  ipv6prefix | <<TLV1,format=default>>
+| 21 |  U-Prefix64 |  ipv6prefix | <<TLV2,format=default>>
+| 22-255 |  Unassigned |   |  
+|===
+
+The registration procedure for this registry is Standards Action as defined in <<RFC8126,format=default>>.
+
+[[s46option]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Softwire46 Mechanisms and Their Identifying Option Codes
+
+The Softwire46-Priority Attribute conveys an ordered list of option codes assigned to Softwire46 mechanisms, for which IANA has created and will maintain a new registry titled "Option Codes Permitted in the Softwire46-Priority Attribute".
+
+<<Table6,format=default>> shows the initial version of allowed option codes and the Softwire46 mechanisms that they represent. The option code for DS-Lite is derived from the IANA-allocated RADIUS Attribute Type value for DS-Lite <<RFC6519,format=default>>. The option codes for MAP-E, MAP-T, and Lightweight 4over6 are the TLV-Type values for the MAP-E, MAP-T, and Lightweight 4over6 attributes defined in <<s46-tlvs,format=default>>.
+
+[[Table6]]
+.Option Codes to S46 Mechanisms
+[align=center]
+|===
+h|Option Code | Softwire46 Mechanism | Reference
+|:--- | :--- | :---
+
+| 1 |  MAP-E | <<RFC7597,format=default>>
+| 2 |  MAP-T | <<RFC7599,format=default>>
+| 3 |  Lightweight 4over6 | <<RFC7596,format=default>>
+| 144 |  DS-Lite | <<RFC6519,format=default>>
+|===
+
+Additional option codes may be added to this list in the future using the IETF Review process described in <<RFC8126,format=default>>.
+
+[bibliography]
+== Normative References
+++++
+<reference anchor="RFC2119" derivedAnchor="RFC2119" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc2119"><front><title>Key words for use in RFCs to Indicate Requirement Levels</title>
+<author fullname="S. Bradner" initials="S." surname="Bradner"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="March" year="1997"></date>
+<abstract><t>In many standards track documents several words are used to signify the requirements in the specification.  These words are often capitalized. This document defines these words as they should be interpreted in IETF documents.  This document specifies an Internet Best Current Practices for the Internet Community, and requests discussion and suggestions for improvements.</t>
+</abstract>
+</front>
+<seriesInfo name="BCP" value="14"></seriesInfo>
+<seriesInfo name="RFC" value="2119"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC2119"></seriesInfo>
+</reference>
+<reference anchor="RFC2865" derivedAnchor="RFC2865" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc2865"><front><title>Remote Authentication Dial In User Service (RADIUS)</title>
+<author fullname="C. Rigney" initials="C." surname="Rigney"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="S. Willens" initials="S." surname="Willens"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="A. Rubens" initials="A." surname="Rubens"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="W. Simpson" initials="W." surname="Simpson"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="June" year="2000"></date>
+<abstract><t>This document describes a protocol for carrying authentication, authorization, and configuration information between a Network Access Server which desires to authenticate its links and a shared Authentication Server.  [STANDARDS-TRACK]</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="2865"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC2865"></seriesInfo>
+</reference>
+<reference anchor="RFC3162" derivedAnchor="RFC3162" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc3162"><front><title>RADIUS and IPv6</title>
+<author fullname="B. Aboba" initials="B." surname="Aboba"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="G. Zorn" initials="G." surname="Zorn"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="D. Mitton" initials="D." surname="Mitton"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="August" year="2001"></date>
+<abstract><t>This document specifies the operation of RADIUS (Remote Authentication Dial In User Service) when run over IPv6 as well as the RADIUS attributes used to support IPv6 network access.  [STANDARDS-TRACK]</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="3162"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC3162"></seriesInfo>
+</reference>
+<reference anchor="RFC3575" derivedAnchor="RFC3575" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc3575"><front><title>IANA Considerations for RADIUS (Remote Authentication Dial In User Service)</title>
+<author fullname="B. Aboba" initials="B." surname="Aboba"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="July" year="2003"></date>
+<abstract><t>This document describes the IANA considerations for the Remote Authentication Dial In User Service (RADIUS).  [STANDARDS-TRACK]</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="3575"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC3575"></seriesInfo>
+</reference>
+<reference anchor="RFC5080" derivedAnchor="RFC5080" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc5080"><front><title>Common Remote Authentication Dial In User Service (RADIUS) Implementation Issues and Suggested Fixes</title>
+<author fullname="D. Nelson" initials="D." surname="Nelson"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="A. DeKok" initials="A." surname="DeKok"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="December" year="2007"></date>
+<abstract><t>This document describes common issues seen in Remote Authentication Dial In User Service (RADIUS) implementations and suggests some fixes. Where applicable, ambiguities and errors in previous RADIUS specifications are clarified.  [STANDARDS-TRACK]</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="5080"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC5080"></seriesInfo>
+</reference>
+<reference anchor="RFC5176" derivedAnchor="RFC5176" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc5176"><front><title>Dynamic Authorization Extensions to Remote Authentication Dial In User Service (RADIUS)</title>
+<author fullname="M. Chiba" initials="M." surname="Chiba"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="G. Dommety" initials="G." surname="Dommety"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="M. Eklund" initials="M." surname="Eklund"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="D. Mitton" initials="D." surname="Mitton"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="B. Aboba" initials="B." surname="Aboba"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="January" year="2008"></date>
+<abstract><t>This document describes a currently deployed extension to the Remote Authentication Dial In User Service (RADIUS) protocol, allowing dynamic changes to a user session, as implemented by network access server products.  This includes support for disconnecting users and changing authorizations applicable to a user session. This memo provides information for the Internet community.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="5176"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC5176"></seriesInfo>
+</reference>
+<reference anchor="RFC6052" derivedAnchor="RFC6052" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc6052"><front><title>IPv6 Addressing of IPv4/IPv6 Translators</title>
+<author fullname="C. Bao" initials="C." surname="Bao"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="C. Huitema" initials="C." surname="Huitema"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="M. Bagnulo" initials="M." surname="Bagnulo"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="M. Boucadair" initials="M." surname="Boucadair"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="X. Li" initials="X." surname="Li"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="October" year="2010"></date>
+<abstract><t>This document discusses the algorithmic translation of an IPv6 address to a corresponding IPv4 address, and vice versa, using only statically configured information.  It defines a well-known prefix for use in algorithmic translations, while allowing organizations to also use network-specific prefixes when appropriate.  Algorithmic translation is used in IPv4/IPv6 translators, as well as other types of proxies and gateways (e.g., for DNS) used in IPv4/IPv6 scenarios. [STANDARDS-TRACK]</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="6052"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC6052"></seriesInfo>
+</reference>
+<reference anchor="RFC6158" derivedAnchor="RFC6158" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc6158"><front><title>RADIUS Design Guidelines</title>
+<author fullname="A. DeKok" initials="A." role="editor" surname="DeKok"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="G. Weber" initials="G." surname="Weber"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="March" year="2011"></date>
+<abstract><t>This document provides guidelines for the design of attributes used by the Remote Authentication Dial In User Service (RADIUS) protocol. It is expected that these guidelines will prove useful to authors and reviewers of future RADIUS attribute specifications, within the IETF as well as other Standards Development Organizations (SDOs). This memo documents an Internet Best Current Practice.</t>
+</abstract>
+</front>
+<seriesInfo name="BCP" value="158"></seriesInfo>
+<seriesInfo name="RFC" value="6158"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC6158"></seriesInfo>
+</reference>
+<reference anchor="RFC6929" derivedAnchor="RFC6929" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc6929"><front><title>Remote Authentication Dial In User Service (RADIUS) Protocol Extensions</title>
+<author fullname="A. DeKok" initials="A." surname="DeKok"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="A. Lior" initials="A." surname="Lior"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="April" year="2013"></date>
+<abstract><t>The Remote Authentication Dial-In User Service (RADIUS) protocol is nearing exhaustion of its current 8-bit Attribute Type space.  In addition, experience shows a growing need for complex grouping, along with attributes that can carry more than 253 octets of data.  This document defines changes to RADIUS that address all of the above problems.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="6929"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC6929"></seriesInfo>
+</reference>
+<reference anchor="RFC8026" derivedAnchor="RFC8026" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8026"><front><title>Unified IPv4-in-IPv6 Softwire Customer Premises Equipment (CPE): A DHCPv6-Based Prioritization Mechanism</title>
+<author fullname="M. Boucadair" initials="M." surname="Boucadair"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="I. Farrer" initials="I." surname="Farrer"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="November" year="2016"></date>
+<abstract><t>In IPv6-only provider networks, transporting IPv4 packets encapsulated in IPv6 is a common solution to the problem of IPv4 service continuity.  A number of differing functional approaches have been developed for this, each having their own specific characteristics.  As these approaches share a similar functional architecture and use the same data plane mechanisms, this memo specifies a DHCPv6 option, whereby a single instance of Customer Premises Equipment (CPE) can interwork with all of the standardized and proposed approaches to providing encapsulated IPv4-in-IPv6 services by providing a prioritization mechanism.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="8026"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8026"></seriesInfo>
+</reference>
+<reference anchor="RFC8044" derivedAnchor="RFC8044" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8044"><front><title>Data Types in RADIUS</title>
+<author fullname="A. DeKok" initials="A." surname="DeKok"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="January" year="2017"></date>
+<abstract><t>RADIUS specifications have used data types for two decades without defining them as managed entities.  During this time, RADIUS implementations have named the data types and have used them in attribute definitions.  This document updates the specifications to better follow established practice.  We do this by naming the data types defined in RFC 6158, which have been used since at least the publication of RFC 2865.  We provide an IANA registry for the data types and update the "RADIUS Attribute Types" registry to include a Data Type field for each attribute.  Finally, we recommend that authors of RADIUS specifications use these types in preference to existing practice.  This document updates RFCs 2865, 3162, 4072, 6158, 6572, and 7268.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="8044"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8044"></seriesInfo>
+</reference>
+<reference anchor="RFC8115" derivedAnchor="RFC8115" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8115"><front><title>DHCPv6 Option for IPv4-Embedded Multicast and Unicast IPv6 Prefixes</title>
+<author fullname="M. Boucadair" initials="M." surname="Boucadair"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="J. Qin" initials="J." surname="Qin"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="T. Tsou" initials="T." surname="Tsou"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="X. Deng" initials="X." surname="Deng"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="March" year="2017"></date>
+<abstract><t>This document defines a Dynamic Host Configuration Protocol version 6 (DHCPv6) Option for multicast IPv4 service continuity solutions, which is used to carry the IPv6 prefixes to be used to build unicast and multicast IPv4-embedded IPv6 addresses.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="8115"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8115"></seriesInfo>
+</reference>
+<reference anchor="RFC8126" derivedAnchor="RFC8126" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8126"><front><title>Guidelines for Writing an IANA Considerations Section in RFCs</title>
+<author fullname="M. Cotton" initials="M." surname="Cotton"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="B. Leiba" initials="B." surname="Leiba"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="T. Narten" initials="T." surname="Narten"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="June" year="2017"></date>
+<abstract><t>Many protocols make use of points of extensibility that use constants to identify various protocol parameters.  To ensure that the values in these fields do not have conflicting uses and to promote interoperability, their allocations are often coordinated by a central record keeper.  For IETF protocols, that role is filled by the Internet Assigned Numbers Authority (IANA).</t>
+<t>To make assignments in a given registry prudently, guidance describing the conditions under which new values should be assigned, as well as when and how modifications to existing values can be made, is needed.  This document defines a framework for the documentation of these guidelines by specification authors, in order to assure that the provided guidance for the IANA Considerations is clear and addresses the various issues that are likely in the operation of a registry.</t>
+<t>This is the third edition of this document; it obsoletes RFC 5226.</t>
+</abstract>
+</front>
+<seriesInfo name="BCP" value="26"></seriesInfo>
+<seriesInfo name="RFC" value="8126"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8126"></seriesInfo>
+</reference>
+<reference anchor="RFC8174" derivedAnchor="RFC8174" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8174"><front><title>Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words</title>
+<author fullname="B. Leiba" initials="B." surname="Leiba"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="May" year="2017"></date>
+<abstract><t>RFC 2119 specifies common key words that may be used in protocol  specifications.  This document aims to reduce the ambiguity by clarifying that only UPPERCASE usage of the key words have the  defined special meanings.</t>
+</abstract>
+</front>
+<seriesInfo name="BCP" value="14"></seriesInfo>
+<seriesInfo name="RFC" value="8174"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8174"></seriesInfo>
+</reference>
+<reference anchor="RFC8415" derivedAnchor="RFC8415" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8415"><front><title>Dynamic Host Configuration Protocol for IPv6 (DHCPv6)</title>
+<author fullname="T. Mrugalski" initials="T." surname="Mrugalski"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="M. Siodelski" initials="M." surname="Siodelski"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="B. Volz" initials="B." surname="Volz"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="A. Yourtchenko" initials="A." surname="Yourtchenko"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="M. Richardson" initials="M." surname="Richardson"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="S. Jiang" initials="S." surname="Jiang"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="T. Lemon" initials="T." surname="Lemon"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="T. Winters" initials="T." surname="Winters"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="November" year="2018"></date>
+<abstract><t>This document describes the Dynamic Host Configuration Protocol for IPv6 (DHCPv6): an extensible mechanism for configuring nodes with network configuration parameters, IP addresses, and prefixes. Parameters can be provided statelessly, or in combination with stateful assignment of one or more IPv6 addresses and/or IPv6 prefixes.  DHCPv6 can operate either in place of or in addition to stateless address autoconfiguration (SLAAC).</t>
+<t>This document updates the text from RFC 3315 (the original DHCPv6 specification) and incorporates prefix delegation (RFC 3633), stateless DHCPv6 (RFC 3736), an option to specify an upper bound for how long a client should wait before refreshing information (RFC 4242), a mechanism for throttling DHCPv6 clients when DHCPv6 service is not available (RFC 7083), and relay agent handling of unknown messages (RFC 7283).  In addition, this document clarifies the interactions between models of operation (RFC 7550).  As such, this document obsoletes RFC 3315, RFC 3633, RFC 3736, RFC 4242, RFC 7083, RFC 7283, and RFC 7550.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="8415"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8415"></seriesInfo>
+</reference>
+++++
+
+[bibliography]
+== Informative References
+++++
+<reference anchor="I-D.sun-softwire-lw4over6-radext" derivedAnchor="LIGHTWEIGHT-4OVER6" quoteTitle="true" target="https://tools.ietf.org/html/draft-sun-softwire-lw4over6-radext-01"><front><title>Radius Extension for Lightweight 4over6</title>
+<author fullname="Chongfeng Xie" initials="C" surname="Xie"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="Qi Sun" initials="Q" surname="Sun"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="Qiong" initials="Q" surname="Qiong"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="Cathy Zhou" initials="C" surname="Zhou"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="Tina Tsou" initials="T" surname="Tsou"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="ZiLong Liu" initials="Z" surname="Liu"><organization showOnFrontPage="true"></organization>
+</author>
+<date day="6" month="March" year="2014"></date>
+<abstract><t>lightweight 4over6(lw4over6) [I-D.ietf-softwire-lw4over6] is an extension to DS-Lite in which the amount of state maintained in lwAFTR has been reduced to per-subscriber-level.  The lwB4 needs to be provisioned with the public IPv4 address and port set it is allowed to use.  The DHCPv4 over DHCPv6 Transport [I.D-ietf-dhc- dhcpv4-over-dhcpv6] and Dynamic Host Configuration Protocol (DHCP) Option for Port Set [I.D-sun-dhc-port-set-option] can be used for lwB4 to provison with the public IPv4 address and port set.  However, in many networks, the configuration information may be stored in Authentication Authorization and Accounting (AAA) servers while user configuration is mainly from Broadband Network Gateway (BNG).  This document defines a Remote Authentication Dial In User Service (RADIUS) attribute that carries lightweight 4over6 configuration information from AAA server to BNG.</t>
+</abstract>
+</front>
+<seriesInfo name="Internet-Draft" value="draft-sun-softwire-lw4over6-radext-01"></seriesInfo>
+<format target="http://www.ietf.org/internet-drafts/draft-sun-softwire-lw4over6-radext-01.txt" type="TXT"></format>
+<refcontent>Work in Progress</refcontent>
+</reference>
+<reference anchor="I-D.wang-radext-multicast-radius-ext" derivedAnchor="RADIUS-EXT" quoteTitle="true" target="https://tools.ietf.org/html/draft-wang-radext-multicast-radius-ext-00"><front><title>RADIUS Extensions for IPv4-Embedded Multicast and Unicast IPv6 Prefixes</title>
+<author fullname="Qian Wang" initials="Q" surname="Wang"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="Wei Meng" initials="W" surname="Meng"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="Cui Wang" initials="C" surname="Wang"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="Mohamed Boucadair" initials="M" surname="Boucadair"><organization showOnFrontPage="true"></organization>
+</author>
+<date day="2" month="December" year="2015"></date>
+<abstract><t>This document specifies a new Remote Authentication Dial-In User Service (RADIUS) attribute to carry the Multicast-Prefixes-64 information, aiming to delivery the Multicast and Unicast IPv6 Prefixes to be used to build multicast and unicast IPv4-Embedded IPv6 addresses. this RADIUS attribute is defined based on the equivalent DHCPv6 OPTION_v6_PREFIX64 option.</t>
+</abstract>
+</front>
+<seriesInfo name="Internet-Draft" value="draft-wang-radext-multicast-radius-ext-00"></seriesInfo>
+<format target="http://www.ietf.org/internet-drafts/draft-wang-radext-multicast-radius-ext-00.txt" type="TXT"></format>
+<refcontent>Work in Progress</refcontent>
+</reference>
+<reference anchor="RFC2607" derivedAnchor="RFC2607" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc2607"><front><title>Proxy Chaining and Policy Implementation in Roaming</title>
+<author fullname="B. Aboba" initials="B." surname="Aboba"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="J. Vollbrecht" initials="J." surname="Vollbrecht"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="June" year="1999"></date>
+<abstract><t>This document describes how proxy chaining and policy implementation can be supported in roaming systems.  This memo provides information for the Internet community.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="2607"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC2607"></seriesInfo>
+</reference>
+<reference anchor="RFC2869" derivedAnchor="RFC2869" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc2869"><front><title>RADIUS Extensions</title>
+<author fullname="C. Rigney" initials="C." surname="Rigney"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="W. Willats" initials="W." surname="Willats"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="P. Calhoun" initials="P." surname="Calhoun"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="June" year="2000"></date>
+<abstract><t>This document describes additional attributes for carrying authentication, authorization and accounting information between a Network Access Server (NAS) and a shared Accounting Server using the Remote Authentication Dial In User Service (RADIUS) protocol described in RFC 2865 and RFC 2866.  This memo provides information for the Internet community.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="2869"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC2869"></seriesInfo>
+</reference>
+<reference anchor="RFC4301" derivedAnchor="RFC4301" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc4301"><front><title>Security Architecture for the Internet Protocol</title>
+<author fullname="S. Kent" initials="S." surname="Kent"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="K. Seo" initials="K." surname="Seo"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="December" year="2005"></date>
+<abstract><t>This document describes an updated version of the "Security Architecture for IP", which is designed to provide security services for traffic at the IP layer.  This document obsoletes RFC 2401 (November 1998).  [STANDARDS-TRACK]</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="4301"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC4301"></seriesInfo>
+</reference>
+<reference anchor="RFC6333" derivedAnchor="RFC6333" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc6333"><front><title>Dual-Stack Lite Broadband Deployments Following IPv4 Exhaustion</title>
+<author fullname="A. Durand" initials="A." surname="Durand"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="R. Droms" initials="R." surname="Droms"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="J. Woodyatt" initials="J." surname="Woodyatt"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="Y. Lee" initials="Y." surname="Lee"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="August" year="2011"></date>
+<abstract><t>This document revisits the dual-stack model and introduces the Dual- Stack Lite technology aimed at better aligning the costs and benefits of deploying IPv6 in service provider networks.  Dual-Stack Lite enables a broadband service provider to share IPv4 addresses among customers by combining two well-known technologies: IP in IP (IPv4- in-IPv6) and Network Address Translation (NAT).  [STANDARDS-TRACK]</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="6333"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC6333"></seriesInfo>
+</reference>
+<reference anchor="RFC6346" derivedAnchor="RFC6346" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc6346"><front><title>The Address plus Port (A+P) Approach to the IPv4 Address Shortage</title>
+<author fullname="R. Bush" initials="R." role="editor" surname="Bush"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="August" year="2011"></date>
+<abstract><t>We are facing the exhaustion of the IANA IPv4 free IP address pool. Unfortunately, IPv6 is not yet deployed widely enough to fully replace IPv4, and it is unrealistic to expect that this is going to change before the depletion of IPv4 addresses.  Letting hosts seamlessly communicate in an IPv4 world without assigning a unique globally routable IPv4 address to each of them is a challenging problem.</t>
+<t>This document proposes an IPv4 address sharing scheme, treating some of the port number bits as part of an extended IPv4 address (Address plus Port, or A+P).  Instead of assigning a single IPv4 address to a single customer device, we propose to extend the address field by using bits from the port number range in the TCP/UDP header as additional endpoint identifiers, thus leaving a reduced range of ports available to applications.  This means assigning the same IPv4 address to multiple clients (e.g., Customer Premises Equipment (CPE), mobile phones), each with its assigned port range.  In the face of IPv4 address exhaustion, the need for addresses is stronger than the need to be able to address thousands of applications on a single host.  If address translation is needed, the end-user should be in control of the translation process -- not some smart boxes in the core.  This document defines an Experimental Protocol for the Internet community.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="6346"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC6346"></seriesInfo>
+</reference>
+<reference anchor="RFC6519" derivedAnchor="RFC6519" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc6519"><front><title>RADIUS Extensions for Dual-Stack Lite</title>
+<author fullname="R. Maglione" initials="R." surname="Maglione"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="A. Durand" initials="A." surname="Durand"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="February" year="2012"></date>
+<abstract><t>Dual-Stack Lite is a solution to offer both IPv4 and IPv6 connectivity to customers that are addressed only with an IPv6 prefix.  Dual-Stack Lite requires pre-configuration of the Dual-Stack Lite Address Family Transition Router (AFTR) tunnel information on the Basic Bridging BroadBand (B4) element.  In many networks, the customer profile information may be stored in Authentication, Authorization, and Accounting (AAA) servers, while client configurations are mainly provided through the Dynamic Host Configuration Protocol (DHCP).  This document specifies a new Remote Authentication Dial-In User Service (RADIUS) attribute to carry the Dual-Stack Lite AFTR tunnel name; the RADIUS attribute is defined based on the equivalent DHCPv6 OPTION_AFTR_NAME option.  This RADIUS attribute is meant to be used between the RADIUS server and the Network Access Server (NAS); it is not intended to be used directly between the B4 element and the RADIUS server.  [STANDARDS-TRACK]</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="6519"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC6519"></seriesInfo>
+</reference>
+<reference anchor="RFC6614" derivedAnchor="RFC6614" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc6614"><front><title>Transport Layer Security (TLS) Encryption for RADIUS</title>
+<author fullname="S. Winter" initials="S." surname="Winter"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="M. McCauley" initials="M." surname="McCauley"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="S. Venaas" initials="S." surname="Venaas"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="K. Wierenga" initials="K." surname="Wierenga"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="May" year="2012"></date>
+<abstract><t>This document specifies a transport profile for RADIUS using Transport Layer Security (TLS) over TCP as the transport protocol. This enables dynamic trust relationships between RADIUS servers.   [STANDARDS-TRACK]</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="6614"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC6614"></seriesInfo>
+</reference>
+<reference anchor="RFC6977" derivedAnchor="RFC6977" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc6977"><front><title>Triggering DHCPv6 Reconfiguration from Relay Agents</title>
+<author fullname="M. Boucadair" initials="M." surname="Boucadair"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="X. Pougnard" initials="X." surname="Pougnard"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="July" year="2013"></date>
+<abstract><t>This document defines two new DHCPv6 messages: Reconfigure-Request and Reconfigure-Reply.  The Reconfigure-Request message is sent by a DHCPv6 relay agent to notify a DHCPv6 server about a configuration information change, so that the DHCPv6 server can send a Reconfigure message accordingly.  The Reconfigure-Reply message is used by the server to acknowledge the receipt of the Reconfigure-Request message.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="6977"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC6977"></seriesInfo>
+</reference>
+<reference anchor="RFC7596" derivedAnchor="RFC7596" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc7596"><front><title>Lightweight 4over6: An Extension to the Dual-Stack Lite Architecture</title>
+<author fullname="Y. Cui" initials="Y." surname="Cui"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="Q. Sun" initials="Q." surname="Sun"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="M. Boucadair" initials="M." surname="Boucadair"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="T. Tsou" initials="T." surname="Tsou"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="Y. Lee" initials="Y." surname="Lee"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="I. Farrer" initials="I." surname="Farrer"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="July" year="2015"></date>
+<abstract><t>Dual-Stack Lite (DS-Lite) (RFC 6333) describes an architecture for transporting IPv4 packets over an IPv6 network.  This document specifies an extension to DS-Lite called "Lightweight 4over6", which moves the Network Address and Port Translation (NAPT) function from the centralized DS-Lite tunnel concentrator to the tunnel client located in the Customer Premises Equipment (CPE).  This removes the requirement for a Carrier Grade NAT function in the tunnel concentrator and reduces the amount of centralized state that must be held to a per-subscriber level.  In order to delegate the NAPT function and make IPv4 address sharing possible, port-restricted IPv4 addresses are allocated to the CPEs.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="7596"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC7596"></seriesInfo>
+</reference>
+<reference anchor="RFC7597" derivedAnchor="RFC7597" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc7597"><front><title>Mapping of Address and Port with Encapsulation (MAP-E)</title>
+<author fullname="O. Troan" initials="O." role="editor" surname="Troan"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="W. Dec" initials="W." surname="Dec"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="X. Li" initials="X." surname="Li"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="C. Bao" initials="C." surname="Bao"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="S. Matsushima" initials="S." surname="Matsushima"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="T. Murakami" initials="T." surname="Murakami"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="T. Taylor" initials="T." role="editor" surname="Taylor"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="July" year="2015"></date>
+<abstract><t>This document describes a mechanism for transporting IPv4 packets across an IPv6 network using IP encapsulation.  It also describes a generic mechanism for mapping between IPv6 addresses and IPv4 addresses as well as transport-layer ports.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="7597"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC7597"></seriesInfo>
+</reference>
+<reference anchor="RFC7598" derivedAnchor="RFC7598" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc7598"><front><title>DHCPv6 Options for Configuration of Softwire Address and Port-Mapped Clients</title>
+<author fullname="T. Mrugalski" initials="T." surname="Mrugalski"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="O. Troan" initials="O." surname="Troan"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="I. Farrer" initials="I." surname="Farrer"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="S. Perreault" initials="S." surname="Perreault"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="W. Dec" initials="W." surname="Dec"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="C. Bao" initials="C." surname="Bao"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="L. Yeh" initials="L." surname="Yeh"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="X. Deng" initials="X." surname="Deng"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="July" year="2015"></date>
+<abstract><t>This document specifies DHCPv6 options, termed Softwire46 options, for the provisioning of Softwire46 Customer Edge (CE) devices. Softwire46 is a collective term used to refer to architectures based on the notion of IPv4 Address plus Port (A+P) for providing IPv4 connectivity across an IPv6 network.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="7598"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC7598"></seriesInfo>
+</reference>
+<reference anchor="RFC7599" derivedAnchor="RFC7599" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc7599"><front><title>Mapping of Address and Port using Translation (MAP-T)</title>
+<author fullname="X. Li" initials="X." surname="Li"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="C. Bao" initials="C." surname="Bao"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="W. Dec" initials="W." role="editor" surname="Dec"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="O. Troan" initials="O." surname="Troan"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="S. Matsushima" initials="S." surname="Matsushima"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="T. Murakami" initials="T." surname="Murakami"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="July" year="2015"></date>
+<abstract><t>This document specifies the solution architecture based on "Mapping                             of Address and Port" stateless IPv6-IPv4 Network Address Translation (NAT64) for providing shared or non-shared IPv4 address connectivity to and across an IPv6 network.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="7599"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC7599"></seriesInfo>
+</reference>
+<reference anchor="RFC8114" derivedAnchor="RFC8114" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8114"><front><title>Delivery of IPv4 Multicast Services to IPv4 Clients over an IPv6 Multicast Network</title>
+<author fullname="M. Boucadair" initials="M." surname="Boucadair"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="C. Qin" initials="C." surname="Qin"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="C. Jacquenet" initials="C." surname="Jacquenet"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="Y. Lee" initials="Y." surname="Lee"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="Q. Wang" initials="Q." surname="Wang"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="March" year="2017"></date>
+<abstract><t>This document specifies a solution for the delivery of IPv4 multicast services to IPv4 clients over an IPv6 multicast network.  The solution relies upon a stateless IPv4-in-IPv6 encapsulation scheme and uses an IPv6 multicast distribution tree to deliver IPv4 multicast traffic.  The solution is particularly useful for the delivery of multicast service offerings to customers serviced by Dual-Stack Lite (DS-Lite).</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="8114"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8114"></seriesInfo>
+</reference>
+++++
+
+[[tlv-field-map]]
+[appendix,numbered=true,removeInRFC=false,toc=include]
+== DHCPv6 to RADIUS Field Mappings
+
+The following sections detail the mappings between the softwire DHCPv6 option fields and the relevant RADIUS attributes as defined in this document.
+
+[appendix,numbered=true,removeInRFC=false,toc=include]
+=== OPTION_S46_RULE (89) to Softwire46-Rule Sub-TLV Field Mappings
+
+.OPTION_S46_RULE to Softwire46-Rule Sub-TLV Field Mappings
+[align=center]
+|===
+h|OPTION_S46_RULE Field | Softwire46-Rule Name | TLV Subfield
+|:--: | :--: | :--:
+
+|flags | N/A | TLV-type (4, 5)
+|ea-len | EA-Length | EA-len
+|prefix4-len | Rule-IPv4-Prefix | Prefix-Length
+|ipv4-prefix | Rule-IPv4-Prefix | rule-ipv4-prefix
+|prefix6-len | Rule-IPv6-Prefix | Prefix-Length
+|ipv6-prefix | Rule-IPv6-Prefix | rule-ipv6-prefix
+|===
+
+[appendix,numbered=true,removeInRFC=false,toc=include]
+=== OPTION_S46_BR (90) to Softwire46-BR Field Mappings
+
+.OPTION_S46_BR to Softwire46-BR Field Mappings
+[align=center]
+|===
+h|OPTION_S46_BR Field | Softwire46-BR Subfield
+|:--: | :--:
+
+|br-ipv6-address | br-ipv6-address
+|===
+
+[appendix,numbered=true,removeInRFC=false,toc=include]
+=== OPTION_S46_DMR (91) to Softwire46-DMR
+
+.OPTION_S46_DMR to Softwire46-DMR Field Mappings
+[align=center]
+|===
+h|OPTION_S46_DMR Field | Softwire46-DMR Subfield
+|:--: | :--:
+
+|dmr-prefix6-len | dmr-prefix6-len
+|dmr-ipv6-prefix | dmr-ipv6-prefix
+|===
+
+[appendix,numbered=true,removeInRFC=false,toc=include]
+=== OPTION_S46_V4V6BIND (92) to Softwire46-V4V6Bind
+
+.OPTION_S46_V4V6BIND to Softwire46-V4V6Bind Field Mappings
+[align=center]
+|===
+h|OPTION_S46_V4V6BIND Field | Softwire46-V4V6Bind Name | TLV Subfield
+|:--: | :--: | :--:
+
+|ipv4-address | IPv4-Address | ipv4-address
+|bindprefix6-len | Bind-IPv6-Prefix | Prefix-Length
+|bind-ipv6-prefix | Bind-IPv6-Prefix | bind-ipv6-prefix
+|===
+
+[appendix,numbered=true,removeInRFC=false,toc=include]
+=== OPTION_S46_PORTPARAMS (93) to Softwire46-PORTPARAMS Field Mappings
+
+.OPTION_S46_PORTPARAMS to Softwire46-PORTPARAMS Field Mappings
+[align=center]
+|===
+h|OPTION_S46_PORTPARAMS Field | Softwire46-PORTPARAMS Name | TLV Subfield
+|:--: | :--: | :--:
+
+|offset | PSID-Offset | PSID-Offset
+|PSID-len | PSID-Len | PSID-len
+|PSID | PSID | PSID
+|===
+
+[appendix,numbered=true,removeInRFC=false,toc=include]
+=== OPTION_S46_PRIORITY (111) to Softwire46-PORTPARAMS Field Mappings
+
+.OPTION_S46_PRIORITY to Softwire46-PORTPARAMS Field Mappings
+[align=center]
+|===
+h|OPTION_S46_PRIORITY Field | Softwire46-Priority Attribute Subfield
+|:--: | :--:
+
+|s46-option-code | Softwire46-option-code
+|===
+
+[appendix,numbered=true,removeInRFC=false,toc=include]
+=== OPTION_V6_PREFIX64 (113) to Softwire46-Multicast Attribute Field Mappings
+
+.OPTION_V6_PREFIX64 to Softwire46-Multicast Field Mappings
+[align=center]
+|===
+h|OPTION_V6_PREFIX64 Field | Softwire46-Multicast Attribute TLV Name | TLV Subfield
+|:--: | :--: | :--:
+
+|asm-length | ASM-Prefix64 | Prefix-Length
+|ASM_mPrefix64 | ASM-Prefix64 | asm-prefix64
+|ssm-length | SSM-Prefix64 | Prefix-Length
+|SSM_mPrefix64 | SSM-Prefix64 | ssm-prefix64
+|unicast-length | U-Prefix64 | Prefix-Length
+|uPrefix64 | U-Prefix64 | u-prefix64
+|===
+
+[[Acknowledgements]]
+[appendix,numbered=false,removeInRFC=false,toc=include]
+== Acknowledgements
+
+The authors would like to thank Peter Lothberg, Wojciech Dec, Ian Farrer, Suresh Krishnan, Qian Wang, Wei Meng, Cui Wang, Alan Dekok, Stefan Winter, and Yu Tianpeng for their valuable comments regarding this document.
+
+This document was merged with <<I-D.sun-softwire-lw4over6-radext,format=default: LIGHTWEIGHT-4OVER6>> and <<I-D.wang-radext-multicast-radius-ext,format=default: RADIUS-EXT>>. Thanks to everyone who contributed to this document.
+
+Many thanks to Al Morton, Bernie Volz, Joel Halpern, and Donald Eastlake for the review.
+
+[appendix,numbered=false,removeInRFC=false,toc=include]
+== Contributors
+[align=left,alt=,]
+....
+Bing Liu 
+Huawei Technologies Co., Ltd. 
+China 
+
+Email: leo.liubing@huawei.com
+....
+
+[align=left,alt=,]
+....
+Peter Deacon 
+IEA Software, Inc. 
+United States of America 
+
+Email: peterd@iea-software.com
+....
+
+[align=left,alt=,]
+....
+Qiong Sun 
+China Telecom 
+China 
+
+Email: sunqiong@ctbri.com.cn
+....
+
+[align=left,alt=,]
+....
+Qi Sun 
+Tsinghua University 
+China 
+
+Email: sunqibupt@gmail.com
+....
+
+[align=left,alt=,]
+....
+Cathy Zhou 
+Huawei Technologies 
+China 
+   
+Email: cathy.zhou@huawei.com
+....
+
+[align=left,alt=,]
+....
+Tina Tsou 
+Huawei Technologies (USA) 
+United States of America 
+
+Email: Tina.Tsou.Zouting@huawei.com
+....
+
+[align=left,alt=,]
+....
+ZiLong Liu 
+Tsinghua University 
+China 
+
+Email: liuzilong8266@126.com
+....
+
+[align=left,alt=,]
+....
+Yong Cui 
+Tsinghua University 
+China 
+
+Email: yong@csnet1.cs.tsinghua.edu.cn
+....

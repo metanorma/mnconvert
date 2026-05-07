@@ -1,0 +1,78 @@
+
+[[sec_4]]
+== Specifications
+
+[[sec_4.1]]
+=== General, organoleptic and health characteristics
+
+Kernels of rice, whether parboiled, husked or milled, and whether whole or broken, shall be sound, clean and free from foreign odours or odour which indicates deterioration.
+
+The levels of additives and pesticide residues and other contaminants shall not exceed the maximum limits permitted in the country of destination.
+
+The presence of living insects which are visible to the naked eye is not permitted. This should be determined before separating the bulk sample into test samples.
+
+[[sec_4.2]]
+=== Physical and chemical characteristics
+
+[[sec_4.2.1]]
+==== {blank}
+
+The mass fraction of moisture, determined in accordance with <<ISO_712>>, using an oven complying with the requirements of <<ref_9,IEC 61010-2:1998>>, shall not be greater than 15 %. footnote:[Formerly denoted as 15 % (m/m).]
+
+The mass fraction of extraneous matter and defective kernels in husked and milled rice, whether or not parboiled, determined in accordance with <<sec_A>>, shall not be greater than the values specified in <<tab_1>>.
+
+NOTE: Lower mass fractions of moisture are sometimes needed for certain destinations depending on the climate, duration of transport and storage. For further details, see <<ref_4,ISO 6322-1>>, <<ref_5,ISO 6322-2>> and <<ref_6,ISO 6322-3>>.
+
+[[sec_4.2.2]]
+==== {blank}
+
+The defect tolerance for the categories considered, and determined in accordance with the method given in <<sec_A>>, shall not exceed the limits given in <<tab_1>>.
+
+[[tab_1]]
+.Maximum permissible mass fraction of defects
+[cols="1,1,1,1,1",options="header,footer",headerrows=2,width=100%]
+|===
+.2+^|Defect 4+^|Maximum permissible mass fraction of defects in husked rice +
+
+
+[stem]
+++++
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<msub>
+<mi>w</mi>
+<mi>max</mi>
+</msub>
+</math>
+++++
+
+ +
+ %
+|in husked rice ^|in milled rice (non-glutinous) ^|in husked parboiled rice ^|in milled parboiled rice
+
+|Extraneous matter: organic footnote:[Organic extraneous matter includes foreign seeds, husks, bran, parts of straw, etc.] ^|1,0 ^|0,5 ^|1,0 ^|0,5
+|Extraneous matter: inorganic footnote:[Inorganic extraneous matter includes stones, sand, dust, etc.] ^|0,5 ^|0,5 ^|0,5 ^|0,5
+|Paddy ^|2,5 ^|0,3 ^|2,5 ^|0,3
+|Husked rice, non-parboiled ^|Not applicable ^|1,0 ^|1,0 ^|1,0
+|Milled rice, non-parboiled ^|1,0 ^|Not applicable ^|1,0 ^|1,0
+|Husked rice, parboiled ^|1,0 ^|1,0 ^|Not applicable ^|1,0
+|Milled rice, parboiled ^|1,0 ^|1,0 ^|1,0 ^|Not applicable
+|Chips ^|0,1 ^|0,1 ^|0,1 ^|0,1
+|HDK ^|2,0 footnote:[The maximum permissible mass fraction of defects shall be determined with respect to the mass fraction obtained after milling.] ^|2,0 ^|2,0 footnote:[The maximum permissible mass fraction of defects shall be determined with respect to the mass fraction obtained after milling.] ^|2,0
+|Damaged kernels ^|4,0 ^|3,0 ^|4,0 ^|3,0
+|Immature and/or malformed kernels ^|8,0 ^|2,0 ^|8,0 ^|2,0
+|Chalky kernels ^|5,0 footnote:[The maximum permissible mass fraction of defects shall be determined with respect to the mass fraction obtained after milling.] ^|5,0 ^|Not applicable ^|Not applicable
+|Red kernels and red-streaked kernels ^|12,0 ^|12,0 ^|12,0 footnote:[The maximum permissible mass fraction of defects shall be determined with respect to the mass fraction obtained after milling.] ^|12,0
+|Partly gelatinized kernels ^|Not applicable ^|Not applicable ^|11,0 footnote:[The maximum permissible mass fraction of defects shall be determined with respect to the mass fraction obtained after milling.] ^|11,0
+|Pecks ^|Not applicable ^|Not applicable ^|4,0 ^|2,0
+|Waxy rice ^|1,0 footnote:[The maximum permissible mass fraction of defects shall be determined with respect to the mass fraction obtained after milling.] ^|1,0 ^|1,0 footnote:[The maximum permissible mass fraction of defects shall be determined with respect to the mass fraction obtained after milling.] ^|1,0
+
+5+|Live insects shall not be present. Dead insects shall be included in extraneous matter.
+
+|===
+
+NOTE: This table is based on <<ref_7,clause=1>>.
+
+NOTE: Some commercial contracts require information in addition to that provided in this table.
+
+NOTE: Only full red husked (cargo) rice is considered in this table.
+

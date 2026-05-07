@@ -1,0 +1,30 @@
+
+[[sec_E]]
+[appendix,obligation=informative]
+== Extraneous information
+
+__This appendix is not in the original Rice model document, and is inserted to illustrate elements absent from that document: block quotes, source code, and examples.__
+
+[quote, ISO, ISO 7301:2011, Clause 1]
+_____
+This International Standard gives the minimum specifications for rice (__Oryza sativa__ L.) which is subject to international trade. It is applicable to the following types: husked rice and milled rice, parboiled or not, intended for direct human consumption. It is neither applicable to other products derived from rice, nor to waxy rice (glutinous rice).
+_____
+
+[[_sample_code]]
+=== Sample code
+
+====
+
+
+[source%unnumbered,ruby]
+--
+puts "Hello, world."
+%w{a b c}.each do |x| <1>
+  puts x
+end
+<1> This is an annotation
+
+--
+
+====
+
