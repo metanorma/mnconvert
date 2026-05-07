@@ -5825,11 +5825,17 @@
 	</xsl:template>
 	
 	
-	<xsl:template match="stem">
+	<xsl:template match="stem" name="stem">
 		<inline-formula>
 			<xsl:copy-of select="@id"/>
 			<xsl:apply-templates />
 		</inline-formula>
+	</xsl:template>
+	
+	<xsl:template match="sourcecode//stem">
+		<styled-content>
+			<xsl:call-template name="stem"/>
+		</styled-content>
 	</xsl:template>
 	
 	<xsl:template match="mml:*">
