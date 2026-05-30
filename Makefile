@@ -145,7 +145,8 @@ clean:
 	rm -rf documents
 
 publish: published
-published: documents.html documents.adoc xml2rfc.adoc
+# xml2rfc.adoc
+published: documents.html documents.adoc
 	mkdir $@
 	cp -a documents $@
 #ifeq ($(OS),Windows_NT)
