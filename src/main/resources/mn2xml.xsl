@@ -6020,6 +6020,12 @@
 	
 	<xsl:template match="sourcecode/@unnumbered"/>
 	
+	<xsl:template match="sourcecode/@keep-lines-together">
+		<xsl:if test=". = 'true'">
+			<xsl:attribute name="specific-use">keep-lines-together</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+	
 	<xsl:template match="sourcecode/body">
 		<xsl:apply-templates/>
 	</xsl:template>

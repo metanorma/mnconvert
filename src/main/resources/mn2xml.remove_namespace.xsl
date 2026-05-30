@@ -213,6 +213,8 @@
 	
 	<xsl:template match="*[local-name() = 'source-highlighter-css']" mode="remove_namespace" priority="3"/>
 	
+	<xsl:template match="*[local-name() = 'hr']" mode="remove_namespace" priority="3"/>
+	
 	<xsl:template match="@semx-id" mode="remove_namespace" priority="3"/>
 	
 	<xsl:template match="*[local-name() = 'semx']/@source" mode="remove_namespace" priority="3"/>
