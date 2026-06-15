@@ -3254,27 +3254,67 @@
 			</xsl:when>
 			
 			<xsl:otherwise> -->
-				<xsl:text>&lt;&lt;</xsl:text>
-				
+			
+			<xsl:variable name="reference_by_std-id_">
+				<xsl:variable name="std-id" select="normalize-space(@std-id)"/>
+				<xsl:if test="$std-id != ''"><xsl:value-of select="$refs//ref[@id = $std-id or @id2 = $std-id or @id3 = $std-id or @id4 = $std-id or @id5 = $std-id]/@id"/></xsl:if>
+				<xsl:variable name="std-id2" select="normalize-space(@std-id2)"/>
+				<xsl:if test="$std-id2 != ''"><xsl:value-of select="$refs//ref[@id = $std-id2 or @id2 = $std-id2 or @id3 = $std-id2 or @id4 = $std-id2 or @id5 = $std-id2]/@id"/></xsl:if>
+				<xsl:variable name="std-id3" select="normalize-space(@std-id3)"/>
+				<xsl:if test="$std-id3 != ''"><xsl:value-of select="$refs//ref[@id = $std-id3 or @id2 = $std-id3 or @id3 = $std-id3 or @id4 = $std-id3 or @id5 = $std-id3]/@id"/></xsl:if>
+			</xsl:variable>
+			<xsl:variable name="reference_by_std-id" select="normalize-space($reference_by_std-id_)"/>
+						
+			<!-- reference's text -->
+			<xsl:variable name="referenceText_">
+				<xsl:for-each select="$model_std/referenceText">
+					<xsl:if test="position() != 1">
+						<xsl:text>,</xsl:text>
+					</xsl:if>
+					<xsl:value-of select="."/>
+				</xsl:for-each>
+			</xsl:variable>
+			<xsl:variable name="referenceText" select="normalize-space(translate($referenceText_, '&#xA0;‑–', ' --'))"/>
+			
+			<xsl:variable name="ref_text">
+				<xsl:choose>
+					<xsl:when test="contains(normalize-space(), 'series') or contains(normalize-space(), 'parts')">
+						<xsl:value-of select="translate(normalize-space(), '&#xA0;‑–', ' --')"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="translate(.//std-ref/text(), '&#xA0;‑–', ' --')"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
+			<!-- add BSI prefix for PAS -->
+			<xsl:variable name="referenceText2" select="normalize-space(java:replaceAll(java:java.lang.String.new($ref_text), $regex_add_bsi_prefix, $regex_add_bsi_prefix_result))"/>
+			
+			<!-- regarding normalize-space(@doi) = '', see comment https://github.com/metanorma/mnconvert/issues/130#issuecomment-4702643953 -->
+			<xsl:variable name="is_std-link" select="normalize-space($reference_by_std-id = '' and normalize-space(@doi) = '' and ($referenceText != '' or $referenceText2 != ''))"/> 
+			<xsl:choose>
+				<xsl:when test="$is_std-link = 'true'"> <!-- https://github.com/metanorma/mnconvert/issues/130 (std-link:[ISO 123]) -->
+					<xsl:text>std-link:[</xsl:text>
+					
+					<!-- add BSI prefix for PAS -->
+					<xsl:value-of select="normalize-space(java:replaceAll(java:java.lang.String.new($referenceText), $regex_add_bsi_prefix, $regex_add_bsi_prefix_result))"/>
+					
+					<xsl:if test="normalize-space($referenceText) = ''">
+						<xsl:value-of select="$referenceText2"/>
+					</xsl:if>
+					
+					<xsl:value-of select="$localities"/>
+					
+					<xsl:text>]</xsl:text>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:text>&lt;&lt;</xsl:text>
 					<!-- put reference -->
 					<xsl:value-of select="java:replaceAll(java:java.lang.String.new($model_std/reference),'_{2,}','_')"/>
 					
 					<xsl:value-of select="$localities"/>
-					
-					
+
 					<xsl:if test="normalize-space($localities) = ''"> <!-- omit reference text if there is locality, otherwise reference text override localities  -->
-						
-						<!-- reference's text -->
-						<xsl:variable name="referenceText_">
-							<xsl:for-each select="$model_std/referenceText">
-								<xsl:if test="position() != 1">
-									<xsl:text>,</xsl:text>
-								</xsl:if>
-								<xsl:value-of select="."/>
-							</xsl:for-each>
-						</xsl:variable>
-						<xsl:variable name="referenceText" select="translate($referenceText_, '&#xA0;‑', ' -')"/>
-						
+					
 						<!-- find reference in Bibliography/Normative References section -->
 						<xsl:variable name="ref_by_id_" select="$refs//ref[@id = $model_std/reference or 
 											@id2 = $model_std/reference or @id3 = $model_std/reference or @id4 = $model_std/reference or @id5 = $model_std/reference]"/>
@@ -3305,11 +3345,10 @@
 						</xsl:if>
 						
 					</xsl:if>
-			
-				<xsl:text>&gt;&gt;</xsl:text>
-			<!-- </xsl:otherwise>
-		</xsl:choose> -->
-		
+					<xsl:text>&gt;&gt;</xsl:text>
+
+				</xsl:otherwise>
+			</xsl:choose>
 		
 		<xsl:if test="italic[std-ref]">_</xsl:if>
 		<xsl:if test="italic2[std-ref]">__</xsl:if>
@@ -5142,7 +5181,7 @@
 			
 				<xsl:if test="1 = 1"> <!-- skip -->
 				<!-- std reference iteration -->
-				<xsl:for-each select="$updated_xml//std[not(parent::ref)][normalize-space(@std-id) != '' or normalize-space(@std-id2) != '' or normalize-space(@std-id3) != '']">
+				<xsl:for-each select="$updated_xml//std[not(parent::ref)][(normalize-space(@std-id) != '' or normalize-space(@std-id2) != '' or normalize-space(@std-id3) != '') and @doi]">
 					<xsl:variable name="std-id" select="normalize-space(@std-id)"/>
 					<xsl:variable name="std-id2" select="normalize-space(@std-id2)"/>
 					<xsl:variable name="std-id3" select="normalize-space(@std-id3)"/>
