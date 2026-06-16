@@ -104,7 +104,7 @@ xml2rfc.adoc: target/$(JAR_FILE) rfcsources documents
 #endif
 
 rfcsources:
-	for id in 8650 8651 8652 8653 8654 8655 8656 8657 8658 8659; do wget -P ${SRCRFCDIR} "https://www.rfc-editor.org/rfc/rfc${id}.xml"; done
+	for id in 8650 8651 8652 8653 8654 8655 8656 8657 8658 8659; do wget -P ${SRCRFCDIR} "https://www.rfc-editor.org/rfc/rfc{id}.xml"; done
 	#wget -r -l 1 -nd -erobots=off -A ${SRCRFCMASK} -R rfc-*.xml -P ${SRCRFCDIR} https://www.rfc-editor.org/rfc/
 
 
