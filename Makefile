@@ -104,7 +104,8 @@ xml2rfc.adoc: target/$(JAR_FILE) rfcsources documents
 #endif
 
 rfcsources:
-	wget -r -l 1 -nd -erobots=off -A ${SRCRFCMASK} -R rfc-*.xml -P ${SRCRFCDIR} https://www.rfc-editor.org/rfc/
+	for id in 8650 8651 8652 8653 8654 8655 8656 8657 8658 8659; do wget -P ${SRCRFCDIR} "https://www.rfc-editor.org/rfc/rfc${id}.xml"; done
+	#wget -r -l 1 -nd -erobots=off -A ${SRCRFCMASK} -R rfc-*.xml -P ${SRCRFCDIR} https://www.rfc-editor.org/rfc/
 
 
 isosts2html_standalone.xsl:
@@ -145,8 +146,8 @@ clean:
 	rm -rf documents
 
 publish: published
-# xml2rfc.adoc
-published: documents.html documents.adoc
+
+published: documents.html documents.adoc xml2rfc.adoc
 	mkdir $@
 	cp -a documents $@
 #ifeq ($(OS),Windows_NT)
