@@ -104,7 +104,7 @@ xml2rfc.adoc: target/$(JAR_FILE) rfcsources documents
 #endif
 
 rfcsources:
-	curl --insecure --output-dir ${SRCRFCDIR} -O https://www.rfc-editor.org/rfc/rfc[8650-8659].xml
+	curl --insecure --create-dirs --output-dir ${SRCRFCDIR} -O https://www.rfc-editor.org/rfc/rfc[8650-8659].xml
 	#wget -r -l 1 -nd -erobots=off -A ${SRCRFCMASK} -R rfc-*.xml -P ${SRCRFCDIR} https://www.rfc-editor.org/rfc/
 
 
