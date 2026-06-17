@@ -4746,6 +4746,58 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<xsl:template name="insertTableRowStyles">
+		<xsl:if test="not(following-sibling::*)"><!-- after latest cell in the row -->
+			<xsl:apply-templates select="ancestor::tr[1]/@style"/>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template name="insertTableCellStyles">
+		<xsl:apply-templates select="@style"/>
+	</xsl:template>
+	
+	<xsl:template match="tr/@style">
+		<xsl:call-template name="getTableRowCellStyles">
+			<xsl:with-param name="adocPropertyName"> tr-style</xsl:with-param>
+		</xsl:call-template>
+	</xsl:template>
+	
+	<xsl:template match="td/@style | th/@style">
+		<xsl:call-template name="getTableRowCellStyles"/>
+	</xsl:template>
+	
+	<xsl:template name="getTableRowCellStyles">
+		<xsl:param name="adocPropertyName">td-style</xsl:param>
+		<xsl:variable name="styles__">
+			<xsl:call-template name="split">
+				<xsl:with-param name="pText" select="concat(.,';')"/>
+				<xsl:with-param name="sep" select="';'"/>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name="quot">"</xsl:variable>
+		<xsl:variable name="styles_">
+			<xsl:for-each select="xalan:nodeset($styles__)/item">
+				<xsl:variable name="key" select="normalize-space(substring-before(., ':'))"/>
+				<xsl:variable name="value" select="normalize-space(substring-after(translate(.,$quot,''), ':'))"/>
+				<xsl:if test="$key = 'background-color' or 
+											$key = 'color'">
+					<style name="{$key}"><xsl:value-of select="$value"/></style>
+				</xsl:if>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:variable name="styles" select="xalan:nodeset($styles_)"/>
+		<xsl:if test="$styles/style">
+			<xsl:value-of select="$adocPropertyName"/>
+			<xsl:text>:[</xsl:text>
+			<xsl:for-each select="$styles/style">
+				<xsl:value-of select="concat(@name, ': ', .)"/>
+				<xsl:if test="position() != last()">; </xsl:if>
+			</xsl:for-each>
+			<xsl:text>] </xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	
 	<xsl:template match="table/@width" mode="table_header">
 		<xsl:text>,width=</xsl:text><xsl:value-of select="."/>
 		<xsl:if test="not(contains(., '%')) and not(contains(., 'px'))">px</xsl:if>
@@ -4865,6 +4917,7 @@
 	
 	<xsl:template match="th">
 		<xsl:call-template name="insertTableCellProperties"/>
+		<xsl:call-template name="insertTableCellStyles"/>
 		<xsl:apply-templates />
 		<xsl:call-template name="insertTableHeaderCellEnd"/>
 	</xsl:template>
@@ -4878,6 +4931,7 @@
 	</xsl:template>
 	
 	<xsl:template name="insertTableHeaderCellEnd">
+		<xsl:call-template name="insertTableRowStyles"/>
 		<xsl:choose>
 			<xsl:when test="following-sibling::*"><xsl:text> </xsl:text></xsl:when>
 			<xsl:otherwise><xsl:text>&#xa;</xsl:text></xsl:otherwise>
@@ -4911,17 +4965,15 @@
 	</xsl:template>
 	
 	<xsl:template match="td">
-		<xsl:call-template name="spanProcessing"/>		
-		<xsl:call-template name="alignmentProcessing"/>
-		<xsl:call-template name="complexFormatProcessing"/>
-		<xsl:call-template name="insertCellSeparator"/>
-		<xsl:call-template name="alignmentProcessingP"/>
+		<xsl:call-template name="insertTableCellProperties"/>
+		<xsl:call-template name="insertTableCellStyles"/>
 		<xsl:choose>
 			<xsl:when test="position() = last() and normalize-space() = '' and not(*)"></xsl:when>
 			<xsl:otherwise>
 				<xsl:apply-templates />
 			</xsl:otherwise>
 		</xsl:choose>
+		<xsl:call-template name="insertTableRowStyles"/>
 		<xsl:choose>
 			<xsl:when test="position() = last() and ../following-sibling::tr">
 				<xsl:text>&#xa;</xsl:text>
