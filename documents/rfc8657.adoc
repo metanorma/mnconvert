@@ -1,0 +1,389 @@
+= Certification Authority Authorization (CAA) Record Extensions for Account URI and Automatic Certificate Management Environment (ACME) Method Binding
+:doctype: internet-draft
+:abbrev: ACME-CAA
+:name: draft-ietf-acme-caa-10
+:status: standard
+:intended-series: standard
+:submission-type: IETF
+:ipr: trust200902
+:instance: https://dx.doi.org/10.17487/rfc8657
+:instance: urn:issn:2070-1721
+:revdate: 2019-01-01T00:00:00Z
+:xml-lang: en
+:consensus: true
+:index-include: true
+:sort-refs: true
+:sym-refs: true
+:toc-include: true
+:toc-depth: 3
+:show-on-front-page: true
+:fullname: Hugo Landau
+:initials: H.
+:surname: Landau
+:affiliation: 
+:email: hlandau@devever.net
+
+[abstract]
+== Abstract
+The Certification Authority Authorization (CAA) DNS record allows a domain to communicate an issuance policy to Certification Authorities (CAs) but only allows a domain to define a policy with CA-level granularity. However, the CAA specification (RFC 8659) also provides facilities for an extension to admit a more granular, CA-specific policy. This specification defines two such parameters: one allowing specific accounts of a CA to be identified by URIs and one allowing specific methods of domain control validation as defined by the Automatic Certificate Management Environment (ACME) protocol to be required.
+
+[[status-of-memo]]
+[numbered=false,removeInRFC=false,toc=exclude]
+== Status of This Memo
+
+This is an Internet Standards Track document.
+
+This document is a product of the Internet Engineering Task Force (IETF). It represents the consensus of the IETF community. It has received public review and has been approved for publication by the Internet Engineering Steering Group (IESG). Further information on Internet Standards is available in Section 2 of RFC 7841.
+
+Information about the current status of this document, any errata, and how to provide feedback on it may be obtained at  https://www.rfc-editor.org/info/rfc8657.
+
+[[copyright]]
+[numbered=false,removeInRFC=false,toc=exclude]
+== Copyright Notice
+
+Copyright (c) 2019 IETF Trust and the persons identified as the document authors. All rights reserved.
+
+This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents ( https://trustee.ietf.org/license-info) in effect on the date of publication of this document. Please review these documents carefully, as they describe your rights and restrictions with respect to this document. Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.
+
+[[toc]]
+[numbered=false,removeInRFC=false,toc=exclude]
+== Table of Contents
+
+[nobullet=true,spacing=compact]
+* <<section-1,format=counter>>.  <<name-introduction,format=title: Introduction>>
+* <<section-2,format=counter>>.  <<name-terminology,format=title: Terminology>>
+* <<section-3,format=counter>>.  <<name-extensions-to-the-caa-recor,format=title: Extensions to the CAA Record: The "accounturi" Parameter>>
+[nobullet=true,spacing=compact]
+** <<section-3.1,format=counter>>.  <<name-use-with-acme,format=title: Use with ACME>>
+** <<section-3.2,format=counter>>.  <<name-use-without-acme,format=title: Use without ACME>>
+* <<section-4,format=counter>>.  <<name-extensions-to-the-caa-record,format=title: Extensions to the CAA Record: The "validationmethods" Parameter>>
+* <<section-5,format=counter>>.  <<name-security-considerations,format=title: Security Considerations>>
+[nobullet=true,spacing=compact]
+** <<section-5.1,format=counter>>.  <<name-limited-to-cas-processing-c,format=title: Limited to CAs Processing CAA Records>>
+** <<section-5.2,format=counter>>.  <<name-restrictions-ineffective-wi,format=title: Restrictions Ineffective without CA Recognition>>
+** <<section-5.3,format=counter>>.  <<name-mandatory-consistency-in-ca,format=title: Mandatory Consistency in CA Recognition>>
+** <<section-5.4,format=counter>>.  <<name-uri-ambiguity,format=title: URI Ambiguity>>
+** <<section-5.5,format=counter>>.  <<name-authorization-freshness,format=title: Authorization Freshness>>
+** <<section-5.6,format=counter>>.  <<name-use-with-and-without-dnssec,format=title: Use with and without DNSSEC>>
+** <<section-5.7,format=counter>>.  <<name-restrictions-supersedable-b,format=title: Restrictions Supersedable by DNS Delegation>>
+** <<section-5.8,format=counter>>.  <<name-misconfiguration-hazards,format=title: Misconfiguration Hazards>>
+** <<section-5.9,format=counter>>.  <<name-revelation-of-account-uris,format=title: Revelation of Account URIs>>
+* <<section-6,format=counter>>.  <<name-iana-considerations,format=title: IANA Considerations>>
+* <<section-7,format=counter>>.  <<name-normative-references,format=title: Normative References>>
+* <<section-appendix.a,format=default>>.  <<name-examples,format=title: Examples>>
+* <<section-appendix.b,format=none>><<name-authors-address,format=title: Author's Address>>
+
+[#introduction]
+[numbered=true,removeInRFC=false,toc=include]
+== Introduction
+
+This specification defines two parameters for the "issue" and "issuewild" Properties of the Certification Authority Authorization (CAA) DNS resource record <<RFC8659,format=default>>. The first, "accounturi", allows authorization conferred by a CAA policy to be restricted to specific accounts of a Certification Authority (CA), which are identified by URIs. The second, "validationmethods", allows the set of validation methods supported by a CA to validate domain control to be limited to a subset of the full set of methods that it supports.
+
+[[terminology]]
+[numbered=true,removeInRFC=false,toc=include]
+== Terminology
+
+The key words "[bcp14]#MUST#", "[bcp14]#MUST NOT#", "[bcp14]#REQUIRED#", "[bcp14]#SHALL#", "[bcp14]#SHALL NOT#", "[bcp14]#SHOULD#", "[bcp14]#SHOULD NOT#", "[bcp14]#RECOMMENDED#", "[bcp14]#NOT RECOMMENDED#", "[bcp14]#MAY#", and "[bcp14]#OPTIONAL#" in this document are to be interpreted as described in BCP 14 <<RFC2119,format=default>> <<RFC8174,format=default>> when, and only when, they appear in all capitals, as shown here.
+
+[[extensions-to-the-caa-record-accounturi-parameter]]
+[numbered=true,removeInRFC=false,toc=include]
+== Extensions to the CAA Record: The "accounturi" Parameter
+
+This document defines the "accounturi" CAA parameter for the "issue" and "issuewild" Properties defined by <<RFC8659,format=default>>. The value of this parameter, if specified, [bcp14]#MUST# be a URI <<RFC3986,format=default>> identifying a specific CA account.
+
+"CA account" means an object that is maintained by a specific CA, that may request the issuance of certificates, and that represents a specific entity or group of related entities.
+
+The presence of this parameter constrains the Property to which it is attached. Where a CAA Property has an "accounturi" parameter, a CA [bcp14]#MUST# only consider that Property to authorize issuance in the context of a given certificate issuance request if the CA recognizes the URI specified in the value portion of that parameter as identifying the account making that request.
+
+A Property without an "accounturi" parameter matches any account. A Property with an invalid or unrecognized "accounturi" parameter is unsatisfiable. A Property with multiple "accounturi" parameters is unsatisfiable.
+
+The presence of an "accounturi" parameter does not replace or supersede the need to validate the domain name specified in an "issue" or "issuewild" record in the manner described in the CAA specification <<RFC8659,format=default>>. CAs [bcp14]#MUST# still perform such validation. For example, a CAA "issue" Property that specifies a domain name belonging to CA A and an "accounturi" parameter identifying an account at CA B is unsatisfiable.
+
+[[use-with-acme]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Use with ACME
+
+An Automatic Certificate Management Environment (ACME) <<RFC8555,format=default>> account object [bcp14]#MAY# be identified by setting the "accounturi" parameter to the URI of the ACME account object.
+
+Implementations of this specification that also implement ACME [bcp14]#MUST# recognize such URIs.
+
+[[use-without-acme]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Use without ACME
+
+The "accounturi" specification provides a general mechanism to identify entities that may request certificate issuance via URIs. The use of specific kinds of URIs may be specified in future RFCs, and CAs not implementing ACME [bcp14]#MAY# assign and recognize their own URIs arbitrarily.
+
+[[extensions-to-the-caa-record-validationmethods-parameter]]
+[numbered=true,removeInRFC=false,toc=include]
+== Extensions to the CAA Record: The "validationmethods" Parameter
+
+This document also defines the "validationmethods" CAA parameter for the "issue" and "issuewild" Properties. The value of this parameter, if specified, [bcp14]#MUST# be a comma-separated string of zero or more validation method labels.
+
+A validation method label identifies a validation method. A validation method is a particular way in which a CA can validate control over a domain.
+
+The presence of this parameter constrains the Property to which it is attached. A CA [bcp14]#MUST# only consider a Property with the "validationmethods" parameter to authorize issuance where the validation method being used is identified by one of the validation method labels listed in the comma-separated list.
+
+Each validation method label [bcp14]#MUST# be either the label of a method defined in the "ACME Validation Methods" IANA registry <<RFC8555,format=default>> or a CA‑specific non-ACME validation method label as defined below.
+
+Where a CA supports both the "validationmethods" parameter and one or more non-ACME validation methods, it [bcp14]#MUST# assign labels to those methods. If appropriate non-ACME labels are not present in the "ACME Validation Methods" IANA registry, the CA [bcp14]#MUST# use labels beginning with the string "ca-", which are defined to have CA-specific meaning.
+
+The value of the "validationmethods" parameter [bcp14]#MUST# comply with the following ABNF <<RFC5234,format=default>>:
+
+[source,markers=false,filename=abnf-for-validationmethods,abnf]
+----
+   value = [*(label ",") label]
+   label = 1*(ALPHA / DIGIT / "-") 
+----
+
+[[security-considerations]]
+[numbered=true,removeInRFC=false,toc=include]
+== Security Considerations
+
+This specification describes an extension to the CAA record specification, increasing the granularity at which a CAA policy can be expressed. This allows the set of entities capable of successfully requesting issuance of certificates for a given domain to be restricted beyond the set of entities would otherwise be possible, while still allowing issuance for specific accounts of a CA. This improves the security of issuance for domains that choose to employ it, when combined with a CA that implements this specification.
+
+[[limited-to-cas-processing-caa-records]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Limited to CAs Processing CAA Records
+
+All of the security considerations listed in <<RFC8659,format=default>> are inherited by this document. This specification merely enables a domain with an existing relationship with a CA to further constrain that CA in its issuance practices, where that CA implements this specification. In particular, it provides no additional security above that provided by using the unextended CAA specification alone as concerns matters relating to any other CA. The capacity of any other CA to issue certificates for the given domain is completely unchanged.
+
+As such, a domain that, via CAA records, authorizes only CAs adopting this specification and that constrains its policy by means of this specification, remains vulnerable to unauthorized issuance by CAs that do not honor CAA records or that honor them only on an advisory basis. Where a domain uses DNSSEC, it also remains vulnerable to CAs that honor CAA records but that do not validate CAA records by means of a trusted DNSSEC-validating resolver.
+
+[[restrictions-ineffective-without-ca-recognition]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Restrictions Ineffective without CA Recognition
+
+Because the parameters of "issue" or "issuewild" CAA Properties constitute a CA-specific namespace, the CA identified by an "issue" or "issuewild" Property decides what parameters to recognize and their semantics. Accordingly, the CAA parameters defined in this specification rely on their being recognized by the CA named by an "issue" or "issuewild" CAA Property and are not an effective means of control over issuance unless a CA's support for the parameters is established beforehand.
+
+CAs that implement this specification [bcp14]#SHOULD# make available documentation indicating as such, including explicit statements as to which parameters are supported. Domains configuring CAA records for a CA [bcp14]#MUST NOT# assume that the restrictions implied by the "accounturi" and "validationmethods" parameters are effective in the absence of explicit indication as such from that CA.
+
+CAs [bcp14]#SHOULD# also document whether they implement DNSSEC validation for DNS lookups done for validation purposes, as this affects the security of the "accounturi" and "validationmethods" parameters.
+
+[[mandatory-consistency-in-ca-recognition]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Mandatory Consistency in CA Recognition
+
+A CA [bcp14]#MUST# ensure that its support for the "accounturi" and "validationmethods" parameters is fully consistent for a given domain name that a CA recognizes as identifying itself in a CAA "issue" or "issuewild" Property. If a CA has multiple issuance systems (for example, an ACME-based issuance system and a non-ACME-based issuance system, or two different issuance systems resulting from a corporate merger), it [bcp14]#MUST# ensure that all issuance systems recognize the same parameters.
+
+A CA that is unable to do this [bcp14]#MAY# still implement the parameters by splitting the CA into two domain names for the purposes of CAA processing. For example, a CA "example.com" with an ACME-based issuance system and a non-ACME-based issuance system could recognize only "acme.example.com" for the former and "example.com" for the latter, and then implement support for the "accounturi" and "validationmethods" parameters for "acme.example.com" only.
+
+A CA that is unable to ensure consistent processing of the "accounturi" parameter or the "validationmethods" parameter for a given CA domain name as specifiable in CAA "issue" or "issuewild" Properties [bcp14]#MUST NOT# implement support for these parameters. Failure to do so would result in an implementation of these parameters that does not provide effective security.
+
+[[uri-ambiguity]]
+[numbered=true,removeInRFC=false,toc=include]
+=== URI Ambiguity
+
+Suppose that CA A recognizes "a.example.com" as identifying itself and CA B is a subsidiary of CA A that recognizes both "a.example.com" and "b.example.com" as identifying itself.
+
+Suppose that both CA A and CA B issue account URIs of the form:
+[align=left,alt=,]
+....
+   "urn:example:account-id:1234" 
+....
+
+
+If the CA domain name in a CAA record is specified as "a.example.com", then this could be construed as identifying account number 1234 at CA A or at CA B. These may be different accounts, creating ambiguity.
+
+Thus, CAs [bcp14]#MUST# ensure that the URIs they recognize as pertaining to a specific account of that CA are unique within the scope of all domain names that they recognize as identifying that CA for the purpose of CAA record validation.
+
+CAs [bcp14]#SHOULD# satisfy this requirement by using URIs that include an authority (see <<RFC3986,format=default>>):
+[align=left,alt=,]
+....
+   "https://a.example.com/account/1234" 
+....
+
+[[authorization-freshness]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Authorization Freshness
+
+The CAA specification <<RFC8659,format=default>> governs the act of issuance by a CA. In some cases, a CA may establish authorization for an account to request certificate issuance for a specific domain separately from the act of issuance itself. Such authorization may occur substantially prior to a certificate issuance request. The CAA policy expressed by a domain may have changed in the meantime, creating the risk that a CA will issue certificates in a manner inconsistent with the presently published CAA policy.
+
+CAs [bcp14]#SHOULD# adopt practices to reduce the risk of such circumstances. Possible countermeasures include issuing authorizations with very limited validity periods, such as an hour, or revalidating the CAA policy for a domain at certificate issuance time.
+
+[[use-with-and-without-dnssec]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Use with and without DNSSEC
+
+The "domain validation" model of validation commonly used for certificate issuance cannot ordinarily protect against adversaries who can conduct global man-in-the-middle attacks against a particular domain. A global man-in-the-middle attack is an attack that can intercept traffic to or from a given domain, regardless of the origin or destination of that traffic. Such an adversary can intercept all validation traffic initiated by a CA and thus appear to have control of the given domain.
+
+Where a domain is signed using DNSSEC, the authenticity of its DNS data can be assured, providing that a given CA makes all DNS resolutions via a trusted DNSSEC-validating resolver. A domain can use this Property to protect itself from the threat posed by an adversary capable of performing a global man-in-the-middle attack against that domain.
+
+In order to facilitate this, a CA validation process must either rely solely on information obtained via DNSSEC or meaningfully bind the other parts of the validation transaction using material obtained via DNSSEC.
+
+The CAA parameters described in this specification can be used to ensure that only validation methods meeting these criteria are used. In particular, a domain secured via DNSSEC [bcp14]#SHOULD# either:
+
+[spacing=normal,start=1,format=arabic]
+. Use the "accounturi" parameter to ensure that only accounts that it controls are authorized to obtain certificates, or
+. Exclusively use validation methods that rely solely on information obtained via DNSSEC and use the "validationmethods" parameter to ensure that only such methods are used.
+
+A CA supporting the "accounturi" parameter or the "validationmethods" parameter [bcp14]#MUST# perform CAA validation using a trusted DNSSEC‑validating resolver.
+
+"Trusted" in this context means that the CA both trusts the resolver itself and ensures that the communications path between the resolver and the system performing CAA validation is secure. It is [bcp14]#RECOMMENDED# that a CA ensure this by using a DNSSEC-validating resolver running on the same machine as the system performing CAA validation.
+
+The use of the "accounturi" parameter or the "validationmethods" parameter does not confer additional security against an attacker capable of performing a man-in-the-middle attack against all validation attempts made by a given CA that is authorized by CAA where:
+
+[spacing=normal,start=1,format=arabic]
+. A domain does not secure its nameservers using DNSSEC, or
+. That CA does not perform CAA validation using a trusted DNSSEC‑validating resolver.
+
+Moreover, the use of the "accounturi" parameter or the "validationmethods" parameter does not mitigate man-in-the-middle attacks against CAs that do not validate CAA records or that do not do so using a trusted DNSSEC-validating resolver, regardless of whether or not those CAs are authorized by CAA; see <<limited-to-cas-processing-caa-records,format=default>>.
+
+In these cases, the "accounturi" and "validationmethods" parameters still provide an effective means of administrative control over issuance, except where control over DNS is subdelegated (see below).
+
+[[restrictions-supersedable-by-dns-delegation]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Restrictions Supersedable by DNS Delegation
+
+CAA records are located during validation by walking up the DNS hierarchy until one or more records are found. CAA records are therefore not an effective way of restricting or controlling issuance for subdomains of a domain, where control over those subdomains is delegated to another party (such as via DNS delegation or by providing limited access to manage subdomain DNS records).
+
+[[misconfiguration-hazards]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Misconfiguration Hazards
+
+Because the "accounturi" and "validationmethods" parameters express restrictive security policies, misconfiguration of said parameters may result in legitimate issuance requests being refused.
+
+[[revelation-of-account-uris]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Revelation of Account URIs
+
+Because CAA records are publicly accessible, the use of the "accounturi" parameter enables third parties to observe the authorized account URIs for a domain. This may allow third parties to identify a correlation between domains if those domains use the same account URIs.
+
+CAs are encouraged to select and process account URIs under the assumption that untrusted third parties may learn of them.
+
+[[iana-considerations]]
+[numbered=true,removeInRFC=false,toc=include]
+== IANA Considerations
+
+This document has no IANA actions. As per <<RFC8659,format=default>>, the parameter namespace for the CAA "issue" and "issuewild" Properties has CA-defined semantics, and the identifiers within that namespace may be freely and arbitrarily assigned by a CA. This document merely specifies recommended semantics for parameters of the names "accounturi" and "validationmethods", which CAs may choose to adopt.
+
+[bibliography]
+== Normative References
+++++
+<reference anchor="RFC2119" derivedAnchor="RFC2119" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc2119"><front><title>Key words for use in RFCs to Indicate Requirement Levels</title>
+<author fullname="S. Bradner" initials="S." surname="Bradner"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="March" year="1997"></date>
+<abstract><t>In many standards track documents several words are used to signify the requirements in the specification.  These words are often capitalized. This document defines these words as they should be interpreted in IETF documents.  This document specifies an Internet Best Current Practices for the Internet Community, and requests discussion and suggestions for improvements.</t>
+</abstract>
+</front>
+<seriesInfo name="BCP" value="14"></seriesInfo>
+<seriesInfo name="RFC" value="2119"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC2119"></seriesInfo>
+</reference>
+<reference anchor="RFC3986" derivedAnchor="RFC3986" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc3986"><front><title>Uniform Resource Identifier (URI): Generic Syntax</title>
+<author fullname="T. Berners-Lee" initials="T." surname="Berners-Lee"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="R. Fielding" initials="R." surname="Fielding"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="L. Masinter" initials="L." surname="Masinter"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="January" year="2005"></date>
+<abstract><t>A Uniform Resource Identifier (URI) is a compact sequence of characters that identifies an abstract or physical resource.  This specification defines the generic URI syntax and a process for resolving URI references that might be in relative form, along with guidelines and security considerations for the use of URIs on the Internet.  The URI syntax defines a grammar that is a superset of all valid URIs, allowing an implementation to parse the common components of a URI reference without knowing the scheme-specific requirements of every possible identifier.  This specification does not define a generative grammar for URIs; that task is performed by the individual specifications of each URI scheme.  [STANDARDS-TRACK]</t>
+</abstract>
+</front>
+<seriesInfo name="STD" value="66"></seriesInfo>
+<seriesInfo name="RFC" value="3986"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC3986"></seriesInfo>
+</reference>
+<reference anchor="RFC5234" derivedAnchor="RFC5234" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc5234"><front><title>Augmented BNF for Syntax Specifications: ABNF</title>
+<author fullname="D. Crocker" initials="D." role="editor" surname="Crocker"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="P. Overell" initials="P." surname="Overell"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="January" year="2008"></date>
+<abstract><t>Internet technical specifications often need to define a formal syntax.  Over the years, a modified version of Backus-Naur Form (BNF), called Augmented BNF (ABNF), has been popular among many Internet specifications.  The current specification documents ABNF. It balances compactness and simplicity with reasonable representational power.  The differences between standard BNF and ABNF involve naming rules, repetition, alternatives, order-independence, and value ranges.  This specification also supplies additional rule definitions and encoding for a core lexical analyzer of the type common to several Internet specifications.  [STANDARDS-TRACK]</t>
+</abstract>
+</front>
+<seriesInfo name="STD" value="68"></seriesInfo>
+<seriesInfo name="RFC" value="5234"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC5234"></seriesInfo>
+</reference>
+<reference anchor="RFC8174" derivedAnchor="RFC8174" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8174"><front><title>Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words</title>
+<author fullname="B. Leiba" initials="B." surname="Leiba"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="May" year="2017"></date>
+<abstract><t>RFC 2119 specifies common key words that may be used in protocol  specifications.  This document aims to reduce the ambiguity by clarifying that only UPPERCASE usage of the key words have the  defined special meanings.</t>
+</abstract>
+</front>
+<seriesInfo name="BCP" value="14"></seriesInfo>
+<seriesInfo name="RFC" value="8174"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8174"></seriesInfo>
+</reference>
+<reference anchor="RFC8555" derivedAnchor="RFC8555" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8555"><front><title>Automatic Certificate Management Environment (ACME)</title>
+<author fullname="R. Barnes" initials="R." surname="Barnes"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="J. Hoffman-Andrews" initials="J." surname="Hoffman-Andrews"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="D. McCarney" initials="D." surname="McCarney"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="J. Kasten" initials="J." surname="Kasten"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="March" year="2019"></date>
+<abstract><t>Public Key Infrastructure using X.509 (PKIX) certificates are used for a number of purposes, the most significant of which is the authentication of domain names.  Thus, certification authorities (CAs) in the Web PKI are trusted to verify that an applicant for a certificate legitimately represents the domain name(s) in the certificate.  As of this writing, this verification is done through a collection of ad hoc mechanisms.  This document describes a protocol that a CA and an applicant can use to automate the process of verification and certificate issuance.  The protocol also provides facilities for other certificate management functions, such as certificate revocation.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="8555"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8555"></seriesInfo>
+</reference>
+<reference anchor="RFC8659" derivedAnchor="RFC8659" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8659"><front><title>DNS Certification Authority Authorization (CAA) Resource Record</title>
+<seriesInfo name="RFC" value="8659"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8659"></seriesInfo>
+<author fullname="Phillip Hallam-Baker" initials="P" surname="Hallam-Baker"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="Rob Stradling" initials="R" surname="Stradling"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="Jacob Hoffman-Andrews" initials="J" surname="Hoffman-Andrews"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="November" year="2019"></date>
+</front>
+</reference>
+++++
+
+[[examples]]
+[appendix,numbered=true,removeInRFC=false,toc=include]
+== Examples
+
+The following shows an example DNS zone file fragment that nominates two account URIs as authorized to issue certificates for the domain "example.com". Issuance is restricted to the CA "example.net".
+[align=left,alt=,]
+....
+example.com. IN CAA 0 issue "example.net; \
+  accounturi=https://example.net/account/1234"
+example.com. IN CAA 0 issue "example.net; \
+  accounturi=https://example.net/account/2345" 
+....
+
+
+The following shows a zone file fragment that restricts the ACME methods that can be used; only ACME methods "dns-01" and "xyz-01" can be used.
+[align=left,alt=,]
+....
+example.com. IN CAA 0 issue "example.net; \
+  validationmethods=dns-01,xyz-01" 
+....
+
+
+The following shows an equivalent way of expressing the same restriction:
+[align=left,alt=,]
+....
+example.com. IN CAA 0 issue "example.net; validationmethods=dns-01"
+example.com. IN CAA 0 issue "example.net; validationmethods=xyz-01" 
+....
+
+
+The following shows a zone file fragment in which one account can be used to issue with the "dns-01" method and one account can be used to issue with the "http-01" method.
+[align=left,alt=,]
+....
+example.com. IN CAA 0 issue "example.net; \
+  accounturi=https://example.net/account/1234; \
+  validationmethods=dns-01"
+example.com. IN CAA 0 issue "example.net; \
+  accounturi=https://example.net/account/2345; \
+  validationmethods=http-01" 
+....
+
+
+The following shows a zone file fragment in which only ACME method "dns-01" or a CA-specific method "ca-foo" can be used.
+[align=left,alt=,]
+....
+example.com. IN CAA 0 issue "example.net; \
+  validationmethods=dns-01,ca-foo" 
+....
