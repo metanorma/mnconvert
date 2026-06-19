@@ -4775,12 +4775,18 @@
 			</xsl:call-template>
 		</xsl:variable>
 		<xsl:variable name="quot">"</xsl:variable>
+		<xsl:variable name="tableTopLevelBorders" select="normalize-space(ancestor::table-wrap[1]/@topLevelBorders)"/>
 		<xsl:variable name="styles_">
 			<xsl:for-each select="xalan:nodeset($styles__)/item">
 				<xsl:variable name="key" select="normalize-space(substring-before(., ':'))"/>
 				<xsl:variable name="value" select="normalize-space(substring-after(translate(.,$quot,''), ':'))"/>
 				<xsl:if test="$key = 'background-color' or 
-											$key = 'color'">
+											$key = 'color' or
+											(($key = 'border' or
+											$key = 'border-left' or
+											$key = 'border-top' or
+											$key = 'border-right' or
+											$key = 'border-bottom') and $tableTopLevelBorders = '')">
 					<style name="{$key}"><xsl:value-of select="$value"/></style>
 				</xsl:if>
 			</xsl:for-each>
@@ -4884,6 +4890,12 @@
 			<xsl:text>options="header"</xsl:text>
 		</xsl:if> -->
 		<xsl:apply-templates select="@width" mode="table_header"/>
+		
+		<xsl:if test="ancestor::table-wrap[1]/@topLevelBorders">
+			<xsl:text>,css-style="</xsl:text>
+			<xsl:value-of select="ancestor::table-wrap[1]/@topLevelBorders"/>
+			<xsl:text>"</xsl:text>
+		</xsl:if>
 		<xsl:text>]</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		
@@ -7519,11 +7531,35 @@
 	<!-- END: convert array in sec with the title 'Abbreviated terms' to def-list -->
 	<!-- ================== -->
 	
+	
+	<xsl:template match="table-wrap" mode="linearize">
+		<xsl:copy>
+			<xsl:copy-of select="@*"/>
+			<xsl:call-template name="addTableTopLevelBorders"/>
+			<xsl:apply-templates mode="linearize"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template name="addTableTopLevelBorders">
+		<xsl:variable name="firstCellStyle" select="(.//*[local-name() = 'td' or local-name() = 'th'])[1]/@style"/>
+		<xsl:if test="$firstCellStyle != ''">
+			<xsl:variable name="addTopLevelBorders">
+				<xsl:for-each select=".//*[local-name() = 'td' or local-name() = 'th']">
+					<xsl:if test="@style != $firstCellStyle or not(@style)">false</xsl:if>
+				</xsl:for-each>
+			</xsl:variable>
+			<xsl:if test="not(contains($addTopLevelBorders, 'false'))">
+				<xsl:attribute name="topLevelBorders"><xsl:value-of select="$firstCellStyle"/></xsl:attribute>
+			</xsl:if>
+		</xsl:if>
+	</xsl:template>
+	
 	<!-- Move "Table #n —" from table-wrap/caption to table-wrap/label -->
 	<xsl:variable name="regexTableN" select="'^Table((\s|\h)[0-9]+)*(\s|\h)—(\s|\h)'"/>
 	<xsl:template match="table-wrap[not(label)][java:replaceAll(java:java.lang.String.new(caption/title),$regexTableN,'') != caption/title]" mode="linearize">
 		<xsl:copy>
 			<xsl:copy-of select="@*"/>
+			<xsl:call-template name="addTableTopLevelBorders"/>
 			<label><xsl:value-of select="substring-before(caption/title, '—')"/></label>
 			<!-- <label><xsl:value-of select="java:replaceAll(java:java.lang.String.new(caption/title),$regexTableN,'')"/></label> -->
 			<xsl:apply-templates mode="linearize"/>
