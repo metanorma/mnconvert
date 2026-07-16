@@ -2365,7 +2365,11 @@
 			
 			<xsl:call-template name="addSectionAttribute"/>
 			
-			<xsl:apply-templates select="docidentifier[@type = 'metanorma-ordinal' or @type = 'metanorma']" mode="docidentifier_metanorma"/>
+			<xsl:apply-templates select="docidentifier[@type = 'metanorma']" mode="docidentifier_metanorma"/>
+			<xsl:if test="not(docidentifier[@type = 'metanorma'])">
+				<xsl:apply-templates select="docidentifier[@type = 'metanorma-ordinal']" mode="docidentifier_metanorma"/>
+			</xsl:if>
+			
 			<xsl:if test="not(docidentifier[@type='metanorma'])">
 				<!-- <label><xsl:number format="[1]"/></label> --> <!-- see docidentifier @type="metanorma" -->
 			</xsl:if>
