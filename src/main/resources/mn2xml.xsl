@@ -2664,6 +2664,12 @@
 		</string-name>
 	</xsl:template>
 	
+	<xsl:template match="bibitem/contributor/person/uri">
+		<xsl:processing-instruction name="uri">
+			<xsl:value-of select="."/>
+		</xsl:processing-instruction>
+	</xsl:template>
+	
 	<xsl:template match="bibitem/contributor/person/name/completename">
 		<xsl:apply-templates />
 	</xsl:template>
