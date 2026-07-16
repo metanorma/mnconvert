@@ -4994,6 +4994,9 @@
 				<xsl:if test="$isKeyTable = 'false' and $isWhereTable = 'false'">
 					<xsl:apply-templates select="name" mode="table"/>
 				</xsl:if>
+				<xsl:if test="normalize-space(@alt) != ''">
+					<alt-text><xsl:value-of select="@alt"/></alt-text>
+				</xsl:if>
 				<table>
 					<xsl:copy-of select="@*[not(local-name() = 'id' or 
 							local-name() = 'autonum' or 
@@ -5005,7 +5008,8 @@
 							local-name() = 'type' or 
 							local-name() = 'presentation' or
 							local-name() = 'plain' or
-							local-name() = 'number')]"/>
+							local-name() = 'number' or
+							local-name() = 'alt')]"/>
 					<xsl:if test="$outputformat = 'IEEE'">
 					 <xsl:attribute name="cellpadding">5</xsl:attribute>
 					 <xsl:attribute name="frame">box</xsl:attribute>
