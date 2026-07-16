@@ -5674,12 +5674,14 @@
 			<!-- <xsl:copy-of select="@mimetype"/> -->
 			<xsl:choose>
 				<xsl:when test="$outputformat = 'IEEE'">
-					<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
+					<xsl:apply-templates select="@*[not(local-name() = 'id') and not(local-name() = 'alt') and not(local-name() = 'title')]"/>
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:apply-templates select="@*"/>
+					<xsl:apply-templates select="@*[not(local-name() = 'alt') and not(local-name() = 'title')]"/>
 				</xsl:otherwise>
 			</xsl:choose>
+			<xsl:apply-templates select="@alt"/>
+			<xsl:apply-templates select="@title"/>
 			<!-- https://github.com/metanorma/mn-samples-bsi/issues/25 -->
 			<!-- <xsl:processing-instruction name="isoimg-id">
 				<xsl:value-of select="@src"/>
@@ -5749,6 +5751,11 @@
 	</xsl:template> <!-- created image processing -->
 	<xsl:template match="image/@alt">
 		<xsl:element name="alt-text">
+			<xsl:value-of select="."/>
+		</xsl:element>
+	</xsl:template>
+	<xsl:template match="image/@title">
+		<xsl:element name="long-desc">
 			<xsl:value-of select="."/>
 		</xsl:element>
 	</xsl:template>
