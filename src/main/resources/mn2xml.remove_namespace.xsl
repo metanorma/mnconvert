@@ -33,6 +33,7 @@
 	<xsl:template match="*[local-name() = 'metanorma-extension']/*[local-name() = 'metanorma'] | 
 											*[local-name() = 'title'][following-sibling::*[1][local-name() = 'fmt-title']] |
 											*[local-name() = 'name'][following-sibling::*[1][local-name() = 'fmt-name']] |
+											*[local-name() = 'name'][preceding-sibling::*[local-name() = 'name']] |
 											*[local-name() = 'fmt-preferred'] |
 											*[local-name() = 'fmt-admitted'] |
 											*[local-name() = 'fmt-deprecates'] |

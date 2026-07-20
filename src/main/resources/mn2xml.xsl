@@ -2365,7 +2365,11 @@
 			
 			<xsl:call-template name="addSectionAttribute"/>
 			
-			<xsl:apply-templates select="docidentifier[@type = 'metanorma-ordinal' or @type = 'metanorma']" mode="docidentifier_metanorma"/>
+			<xsl:apply-templates select="docidentifier[@type = 'metanorma']" mode="docidentifier_metanorma"/>
+			<xsl:if test="not(docidentifier[@type = 'metanorma'])">
+				<xsl:apply-templates select="docidentifier[@type = 'metanorma-ordinal']" mode="docidentifier_metanorma"/>
+			</xsl:if>
+			
 			<xsl:if test="not(docidentifier[@type='metanorma'])">
 				<!-- <label><xsl:number format="[1]"/></label> --> <!-- see docidentifier @type="metanorma" -->
 			</xsl:if>
@@ -2658,6 +2662,12 @@
 		<string-name>
 			<xsl:apply-templates />
 		</string-name>
+	</xsl:template>
+	
+	<xsl:template match="bibitem/contributor/person/uri">
+		<xsl:processing-instruction name="uri">
+			<xsl:value-of select="."/>
+		</xsl:processing-instruction>
 	</xsl:template>
 	
 	<xsl:template match="bibitem/contributor/person/name/completename">
@@ -4994,6 +5004,9 @@
 				<xsl:if test="$isKeyTable = 'false' and $isWhereTable = 'false'">
 					<xsl:apply-templates select="name" mode="table"/>
 				</xsl:if>
+				<xsl:if test="normalize-space(@alt) != ''">
+					<alt-text><xsl:value-of select="@alt"/></alt-text>
+				</xsl:if>
 				<table>
 					<xsl:copy-of select="@*[not(local-name() = 'id' or 
 							local-name() = 'autonum' or 
@@ -5005,7 +5018,8 @@
 							local-name() = 'type' or 
 							local-name() = 'presentation' or
 							local-name() = 'plain' or
-							local-name() = 'number')]"/>
+							local-name() = 'number' or
+							local-name() = 'alt')]"/>
 					<xsl:if test="$outputformat = 'IEEE'">
 					 <xsl:attribute name="cellpadding">5</xsl:attribute>
 					 <xsl:attribute name="frame">box</xsl:attribute>
@@ -5670,12 +5684,14 @@
 			<!-- <xsl:copy-of select="@mimetype"/> -->
 			<xsl:choose>
 				<xsl:when test="$outputformat = 'IEEE'">
-					<xsl:apply-templates select="@*[not(local-name() = 'id')]"/>
+					<xsl:apply-templates select="@*[not(local-name() = 'id') and not(local-name() = 'alt') and not(local-name() = 'title')]"/>
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:apply-templates select="@*"/>
+					<xsl:apply-templates select="@*[not(local-name() = 'alt') and not(local-name() = 'title')]"/>
 				</xsl:otherwise>
 			</xsl:choose>
+			<xsl:apply-templates select="@alt"/>
+			<xsl:apply-templates select="@title"/>
 			<!-- https://github.com/metanorma/mn-samples-bsi/issues/25 -->
 			<!-- <xsl:processing-instruction name="isoimg-id">
 				<xsl:value-of select="@src"/>
@@ -5745,6 +5761,11 @@
 	</xsl:template> <!-- created image processing -->
 	<xsl:template match="image/@alt">
 		<xsl:element name="alt-text">
+			<xsl:value-of select="."/>
+		</xsl:element>
+	</xsl:template>
+	<xsl:template match="image/@title">
+		<xsl:element name="long-desc">
 			<xsl:value-of select="."/>
 		</xsl:element>
 	</xsl:template>
