@@ -47,9 +47,9 @@
 		</xsl:element>
 	</xsl:template>
 	
-	<xsl:template match="*[local-name() = 'title'][following-sibling::*[1][local-name() = 'fmt-title']][.//*[local-name() = 'fmt-annotation-end']]" mode="remove_namespace" priority="3">
+	<!-- <xsl:template match="*[local-name() = 'title'][following-sibling::*[1][local-name() = 'fmt-title']][.//*[local-name() = 'fmt-annotation-end']]" mode="remove_namespace" priority="3">
 		<xsl:apply-templates select=".//*[local-name() = 'fmt-annotation-end']" mode="remove_namespace"/>
-	</xsl:template>
+	</xsl:template> -->
 
 	<!-- 
 	*[local-name() = 'preferred'][ancestor::*[local-name() = 'term'][1]//*[local-name() = 'fmt-preferred']] |
@@ -101,6 +101,8 @@
 		<xsl:element name="{substring-after(local-name(), 'fmt-')}">
 			<xsl:apply-templates select="@*|node()" mode="remove_namespace"/>
 		</xsl:element>
+		
+		<xsl:apply-templates select="preceding-sibling::*[1][local-name() = 'title']//*[local-name() = 'fmt-annotation-end']" mode="remove_namespace" />
 	</xsl:template>
 	<!--  |
 											*[local-name() = 'fmt-definition'] |
