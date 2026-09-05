@@ -1,0 +1,319 @@
+= Extended Message Support for BGP
+:doctype: internet-draft
+:abbrev: Extended Message Support for BGP
+:name: draft-ietf-idr-bgp-extended-messages-36
+:status: standard
+:intended-series: standard
+:submission-type: IETF
+:ipr: trust200902
+:updates: 4271
+:instance: https://dx.doi.org/10.17487/rfc8654
+:instance: urn:issn:2070-1721
+:revdate: 2019-01-01T00:00:00Z
+:xml-lang: en
+:consensus: true
+:index-include: true
+:sort-refs: true
+:sym-refs: true
+:toc-include: true
+:toc-depth: 3
+:show-on-front-page: true
+:fullname: Randy Bush
+:initials: R.
+:surname: Bush
+:affiliation: Arrcus & IIJ
+:email: randy@psg.com
+:address: 5147 Crystal Springs + \
+Bainbridge Island + \
+WA + \
+United States of America + \
+98110
+:fullname_2: Keyur Patel
+:initials_2: K
+:surname_2: Patel
+:affiliation_2: Arrcus, Inc.
+:email_2: keyur@arrcus.com
+:fullname_3: Dave Ward
+:initials_3: D.
+:surname_3: Ward
+:affiliation_3: Cisco Systems
+:email_3: dward@cisco.com
+:address_3: 170 W. Tasman Drive + \
+San Jose + \
+CA + \
+United States of America + \
+95134
+
+[abstract]
+== Abstract
+The BGP specification (RFC 4271) mandates a maximum BGP message size of 4,096 octets. As BGP is extended to support new Address Family Identifiers (AFIs), Subsequent AFIs (SAFIs), and other features, there is a need to extend the maximum message size beyond 4,096 octets. This document updates the BGP specification by extending the maximum message size from 4,096 octets to 65,535 octets for all messages except for OPEN and KEEPALIVE messages.
+
+[[status-of-memo]]
+[numbered=false,removeInRFC=false,toc=exclude]
+== Status of This Memo
+
+This is an Internet Standards Track document.
+
+This document is a product of the Internet Engineering Task Force (IETF). It represents the consensus of the IETF community. It has received public review and has been approved for publication by the Internet Engineering Steering Group (IESG). Further information on Internet Standards is available in Section 2 of RFC 7841.
+
+Information about the current status of this document, any errata, and how to provide feedback on it may be obtained at  https://www.rfc-editor.org/info/rfc8654.
+
+[[copyright]]
+[numbered=false,removeInRFC=false,toc=exclude]
+== Copyright Notice
+
+Copyright (c) 2019 IETF Trust and the persons identified as the document authors. All rights reserved.
+
+This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents ( https://trustee.ietf.org/license-info) in effect on the date of publication of this document. Please review these documents carefully, as they describe your rights and restrictions with respect to this document. Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.
+
+[[toc]]
+[numbered=false,removeInRFC=false,toc=exclude]
+== Table of Contents
+
+[nobullet=true,spacing=compact]
+* <<section-1,format=counter>>.  <<name-introduction,format=title: Introduction>>
+[nobullet=true,spacing=compact]
+** <<section-1.1,format=counter>>.  <<name-requirements-language,format=title: Requirements Language>>
+* <<section-2,format=counter>>.  <<name-bgp-extended-message,format=title: BGP Extended Message>>
+* <<section-3,format=counter>>.  <<name-bgp-extended-message-capabi,format=title: BGP Extended Message Capability>>
+* <<section-4,format=counter>>.  <<name-operation,format=title: Operation>>
+* <<section-5,format=counter>>.  <<name-error-handling,format=title: Error Handling>>
+* <<section-6,format=counter>>.  <<name-changes-to-rfc-4271,format=title: Changes to RFC 4271>>
+* <<section-7,format=counter>>.  <<name-iana-considerations,format=title: IANA Considerations>>
+* <<section-8,format=counter>>.  <<name-security-considerations,format=title: Security Considerations>>
+* <<section-9,format=counter>>.  <<name-references,format=title: References>>
+[nobullet=true,spacing=compact]
+** <<section-9.1,format=counter>>.  <<name-normative-references,format=title: Normative References>>
+** <<section-9.2,format=counter>>.  <<name-informative-references,format=title: Informative References>>
+* <<section-appendix.a,format=none>><<name-acknowledgments,format=title: Acknowledgments>>
+* <<section-appendix.b,format=none>><<name-authors-addresses,format=title: Authors' Addresses>>
+
+[#introduction]
+[numbered=true,removeInRFC=false,toc=include]
+== Introduction
+
+The BGP specification <<RFC4271,format=default>> mandates a maximum BGP message size of 4,096 octets. As BGP is extended to support new AFIs, SAFIs, and other capabilities (e.g., BGPsec <<RFC8205,format=default>> and BGP - Link State (BGP-LS) <<RFC7752,format=default>>), there is a need to extend the maximum message size beyond 4,096 octets. This document provides an extension to BGP to extend the message size limit from 4,096 octets to 65,535 octets for all messages except for OPEN and KEEPALIVE messages.
+
+[[sec-term]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Requirements Language
+
+The key words "[bcp14]#MUST#", "[bcp14]#MUST NOT#", "[bcp14]#REQUIRED#", "[bcp14]#SHALL#", "[bcp14]#SHALL NOT#", "[bcp14]#SHOULD#", "[bcp14]#SHOULD NOT#", "[bcp14]#RECOMMENDED#", "[bcp14]#NOT RECOMMENDED#", "[bcp14]#MAY#", and "[bcp14]#OPTIONAL#" in this document are to be interpreted as described in BCP 14 <<RFC2119,format=default>> <<RFC8174,format=default>> when, and only when, they appear in all capitals, as shown here.
+
+[[extmsg]]
+[numbered=true,removeInRFC=false,toc=include]
+== BGP Extended Message
+
+A BGP message over 4,096 octets in length is a BGP Extended Message.
+
+BGP Extended Messages have a maximum message size of 65,535 octets. The smallest message that may be sent is a BGP KEEPALIVE, which consists of 19 octets.
+
+[numbered=true,removeInRFC=false,toc=include]
+== BGP Extended Message Capability
+
+The BGP Extended Message Capability is a new BGP capability <<RFC5492,format=default>> defined with Capability Code 6 and Capability Length 0.
+
+To advertise the BGP Extended Message Capability to a peer, a BGP speaker uses BGP Capabilities Advertisement <<RFC5492,format=default>>. By advertising the BGP Extended Message Capability to a peer, a BGP speaker conveys that it is able to receive and properly handle BGP Extended Messages (see <<opns,format=default>>).
+
+Peers that wish to use the BGP Extended Message Capability [bcp14]#MUST# support error handling for BGP UPDATE messages per <<RFC7606,format=default>>.
+
+[[opns]]
+[numbered=true,removeInRFC=false,toc=include]
+== Operation
+
+The BGP Extended Message Capability applies to all messages except for OPEN and KEEPALIVE messages. These exceptions reduce the complexity of providing backward compatibility.
+
+A BGP speaker that is capable of receiving BGP Extended Messages [bcp14]#SHOULD# advertise the BGP Extended Message Capability to its peers using BGP Capabilities Advertisement <<RFC5492,format=default>>. A BGP speaker [bcp14]#MAY# send BGP Extended Messages to a peer only if the BGP Extended Message Capability was received from that peer.
+
+An implementation that advertises the BGP Extended Message Capability [bcp14]#MUST# be capable of receiving a message with a length up to and including 65,535 octets.
+
+Applications generating information that might be encapsulated within BGP messages [bcp14]#MUST# limit the size of their payload to take the maximum message size into account.
+
+If a BGP message with a length greater than 4,096 octets is received by a BGP listener who has not advertised the BGP Extended Message Capability, the listener will generate a NOTIFICATION with the Error Subcode set to Bad Message Length (<<RFC4271,format=default>>).
+
+A BGP UPDATE will (if allowed by policy, best path, etc.) typically propagate throughout the BGP-speaking Internet and hence to BGP speakers that may not support BGP Extended Messages. Therefore, an announcement in a BGP Extended Message where the size of the attribute set plus the NLRI is larger than 4,096 octets may cause lack of reachability.
+
+A BGP speaker that has advertised the BGP Extended Message Capability to its peers may receive an UPDATE from one of its peers that produces an ongoing announcement that is larger than 4,096 octets. When propagating that UPDATE onward to a neighbor that has not advertised the BGP Extended Message Capability, the speaker [bcp14]#SHOULD# try to reduce the outgoing message size by removing attributes eligible under the "attribute discard" approach of <<RFC7606,format=default>>. If the message is still too big, then it must not be sent to the neighbor (<<RFC4271,format=default>>). Additionally, if the NLRI was previously advertised to that peer, it must be withdrawn from service (<<RFC4271,format=default>>).
+
+If an Autonomous System (AS) has multiple internal BGP speakers and also has multiple external BGP neighbors, care must be taken to ensure a consistent view within the AS in order to present a consistent external view. In the context of BGP Extended Messages, a consistent view can only be guaranteed if all the Internal BGP (iBGP) speakers advertise the BGP Extended Message Capability. If that is not the case, then the operator should consider whether or not the BGP Extended Message Capability should be advertised to external peers.
+
+During the incremental deployment of BGP Extended Messages and use of the "attribute discard" approach of <<RFC7606,format=default>> in an iBGP mesh or with External BGP (eBGP) peers, the operator should monitor any routes dropped and any discarded attributes.
+
+[[error]]
+[numbered=true,removeInRFC=false,toc=include]
+== Error Handling
+
+A BGP speaker that has the ability to use BGP Extended Messages but has not advertised the BGP Extended Message Capability, presumably due to configuration, [bcp14]#MUST NOT# accept a BGP Extended Message. A speaker [bcp14]#MUST NOT# implement a more liberal policy accepting BGP Extended Messages.
+
+A BGP speaker that does not advertise the BGP Extended Message Capability might also genuinely not support BGP Extended Messages. Such a speaker will follow the error-handling procedures of <<RFC4271,format=default>> if it receives a BGP Extended Message. Similarly, any speaker that treats an improper BGP Extended Message as a fatal error [bcp14]#MUST# follow the error-handling procedures of <<RFC4271,format=default>>.
+
+Error handling for UPDATE messages, as specified in <<RFC4271,format=default>>, is unchanged. However, if a NOTIFICATION is to be sent to a BGP speaker that has not advertised the BGP Extended Message Capability, the size of the message [bcp14]#MUST NOT# exceed 4,096 octets.
+
+It is [bcp14]#RECOMMENDED# that BGP protocol developers and implementers are conservative in their application and use of BGP Extended Messages. Future protocol specifications [bcp14]#MUST# describe how to handle peers that can only accommodate 4,096 octet messages.
+
+[[rfc4171]]
+[numbered=true,removeInRFC=false,toc=include]
+== Changes to RFC 4271
+
+<<RFC4271,format=default>> states "The value of the Length field [bcp14]#MUST# always be at least 19 and no greater than 4096." This document changes the latter number to 65,535 for all messages except for OPEN and KEEPALIVE messages.
+
+<<RFC4271,format=default>> specifies raising an error if the length of a message is over 4,096 octets. For all messages except for OPEN and KEEPALIVE messages, if the receiver has advertised the BGP Extended Message Capability, this document raises that limit to 65,535.
+
+[[IANA]]
+[numbered=true,removeInRFC=false,toc=include]
+== IANA Considerations
+
+IANA has made the following allocation in the "Capability Codes" registry:
+
+[[ianaregistry]]
+.Addition to "Capability Codes" Registry
+[align=left]
+|===
+h|Value | Description | Reference
+|:--- | :--- | :---
+
+|6 | BGP Extended Message | RFC 8654
+|===
+
+[[Security]]
+[numbered=true,removeInRFC=false,toc=include]
+== Security Considerations
+
+This extension to BGP does not change BGP's underlying security issues <<RFC4272,format=default>>.
+
+Due to increased memory requirements for buffering, there may be increased exposure to resource exhaustion, intentional or unintentional.
+
+If a remote speaker is able to craft a large BGP Extended Message to send on a path where one or more peers do not support BGP Extended Messages, peers that support BGP Extended Messages may:
+
+[nobullet=false,spacing=normal]
+* act to reduce the outgoing message (see<<opns,format=default>>) and, in doing so, cause an attack by discarding attributes one or more of its peers may be expecting. The attributes eligible under the "attribute discard" approach must have no effect on route selection or installation<<RFC7606,format=default>>.
+* act to reduce the outgoing message (see<<opns,format=default>>) and, in doing so, allow a downgrade attack. This would only affect the attacker's message, where 'downgrade' has questionable meaning.
+* incur resource load (processing, message resizing, etc.) when reformatting the large messages.
+
+[bibliography]
+== Normative References
+++++
+<reference anchor="RFC2119" derivedAnchor="RFC2119" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc2119"><front><title>Key words for use in RFCs to Indicate Requirement Levels</title>
+<author fullname="S. Bradner" initials="S." surname="Bradner"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="March" year="1997"></date>
+<abstract><t>In many standards track documents several words are used to signify the requirements in the specification.  These words are often capitalized. This document defines these words as they should be interpreted in IETF documents.  This document specifies an Internet Best Current Practices for the Internet Community, and requests discussion and suggestions for improvements.</t>
+</abstract>
+</front>
+<seriesInfo name="BCP" value="14"></seriesInfo>
+<seriesInfo name="RFC" value="2119"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC2119"></seriesInfo>
+</reference>
+<reference anchor="RFC4271" derivedAnchor="RFC4271" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc4271"><front><title>A Border Gateway Protocol 4 (BGP-4)</title>
+<author fullname="Y. Rekhter" initials="Y." role="editor" surname="Rekhter"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="T. Li" initials="T." role="editor" surname="Li"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="S. Hares" initials="S." role="editor" surname="Hares"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="January" year="2006"></date>
+<abstract><t>This document discusses the Border Gateway Protocol (BGP), which is an inter-Autonomous System routing protocol.</t>
+<t>The primary function of a BGP speaking system is to exchange network reachability information with other BGP systems.  This network reachability information includes information on the list of Autonomous Systems (ASes) that reachability information traverses. This information is sufficient for constructing a graph of AS connectivity for this reachability from which routing loops may be pruned, and, at the AS level, some policy decisions may be enforced.</t>
+<t>BGP-4 provides a set of mechanisms for supporting Classless Inter-Domain Routing (CIDR).  These mechanisms include support for advertising a set of destinations as an IP prefix, and eliminating the concept of network "class" within BGP.  BGP-4 also introduces mechanisms that allow aggregation of routes, including aggregation of AS paths.</t>
+<t>This document obsoletes RFC 1771.  [STANDARDS-TRACK]</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="4271"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC4271"></seriesInfo>
+</reference>
+<reference anchor="RFC5492" derivedAnchor="RFC5492" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc5492"><front><title>Capabilities Advertisement with BGP-4</title>
+<author fullname="J. Scudder" initials="J." surname="Scudder"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="R. Chandra" initials="R." surname="Chandra"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="February" year="2009"></date>
+<abstract><t>This document defines an Optional Parameter, called Capabilities, that is expected to facilitate the introduction of new capabilities in the Border Gateway Protocol (BGP) by providing graceful capability advertisement without requiring that BGP peering be terminated.</t>
+<t>This document obsoletes RFC 3392.  [STANDARDS-TRACK]</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="5492"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC5492"></seriesInfo>
+</reference>
+<reference anchor="RFC7606" derivedAnchor="RFC7606" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc7606"><front><title>Revised Error Handling for BGP UPDATE Messages</title>
+<author fullname="E. Chen" initials="E." role="editor" surname="Chen"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="J. Scudder" initials="J." role="editor" surname="Scudder"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="P. Mohapatra" initials="P." surname="Mohapatra"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="K. Patel" initials="K." surname="Patel"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="August" year="2015"></date>
+<abstract><t>According to the base BGP specification, a BGP speaker that receives an UPDATE message containing a malformed attribute is required to reset the session over which the offending attribute was received. This behavior is undesirable because a session reset would impact not only routes with the offending attribute but also other valid routes exchanged over the session.  This document partially revises the error handling for UPDATE messages and provides guidelines for the authors of documents defining new attributes.  Finally, it revises the error handling procedures for a number of existing attributes.</t>
+<t>This document updates error handling for RFCs 1997, 4271, 4360, 4456, 4760, 5543, 5701, and 6368.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="7606"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC7606"></seriesInfo>
+</reference>
+<reference anchor="RFC8174" derivedAnchor="RFC8174" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8174"><front><title>Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words</title>
+<author fullname="B. Leiba" initials="B." surname="Leiba"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="May" year="2017"></date>
+<abstract><t>RFC 2119 specifies common key words that may be used in protocol  specifications.  This document aims to reduce the ambiguity by clarifying that only UPPERCASE usage of the key words have the  defined special meanings.</t>
+</abstract>
+</front>
+<seriesInfo name="BCP" value="14"></seriesInfo>
+<seriesInfo name="RFC" value="8174"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8174"></seriesInfo>
+</reference>
+++++
+
+[bibliography]
+== Informative References
+++++
+<reference anchor="RFC4272" derivedAnchor="RFC4272" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc4272"><front><title>BGP Security Vulnerabilities Analysis</title>
+<author fullname="S. Murphy" initials="S." surname="Murphy"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="January" year="2006"></date>
+<abstract><t>Border Gateway Protocol 4 (BGP-4), along with a host of other infrastructure protocols designed before the Internet environment became perilous, was originally designed with little consideration for protection of the information it carries.  There are no mechanisms internal to BGP that protect against attacks that modify, delete, forge, or replay data, any of which has the potential to disrupt overall network routing behavior.</t>
+<t>This document discusses some of the security issues with BGP routing data dissemination.  This document does not discuss security issues with forwarding of packets.  This memo provides information for the Internet community.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="4272"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC4272"></seriesInfo>
+</reference>
+<reference anchor="RFC7752" derivedAnchor="RFC7752" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc7752"><front><title>North-Bound Distribution of Link-State and Traffic Engineering (TE) Information Using BGP</title>
+<author fullname="H. Gredler" initials="H." role="editor" surname="Gredler"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="J. Medved" initials="J." surname="Medved"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="S. Previdi" initials="S." surname="Previdi"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="A. Farrel" initials="A." surname="Farrel"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="S. Ray" initials="S." surname="Ray"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="March" year="2016"></date>
+<abstract><t>In a number of environments, a component external to a network is called upon to perform computations based on the network topology and current state of the connections within the network, including Traffic Engineering (TE) information.  This is information typically distributed by IGP routing protocols within the network.</t>
+<t>This document describes a mechanism by which link-state and TE information can be collected from networks and shared with external components using the BGP routing protocol.  This is achieved using a new BGP Network Layer Reachability Information (NLRI) encoding format.  The mechanism is applicable to physical and virtual IGP links.  The mechanism described is subject to policy control.</t>
+<t>Applications of this technique include Application-Layer Traffic Optimization (ALTO) servers and Path Computation Elements (PCEs).</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="7752"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC7752"></seriesInfo>
+</reference>
+<reference anchor="RFC8205" derivedAnchor="RFC8205" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8205"><front><title>BGPsec Protocol Specification</title>
+<author fullname="M. Lepinski" initials="M." role="editor" surname="Lepinski"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="K. Sriram" initials="K." role="editor" surname="Sriram"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="September" year="2017"></date>
+<abstract><t>This document describes BGPsec, an extension to the Border Gateway Protocol (BGP) that provides security for the path of Autonomous Systems (ASes) through which a BGP UPDATE message passes.  BGPsec is implemented via an optional non-transitive BGP path attribute that carries digital signatures produced by each AS that propagates the UPDATE message.  The digital signatures provide confidence that every AS on the path of ASes listed in the UPDATE message has explicitly authorized the advertisement of the route.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="8205"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8205"></seriesInfo>
+</reference>
+++++
+
+[[acknowledgements]]
+[appendix,numbered=false,removeInRFC=false,toc=include]
+== Acknowledgments
+
+The authors thank Alvaro Retana for an amazing review; Enke Chen, Susan Hares, John Scudder, John Levine, and Job Snijders for their input; and Oliver Borchert and Kyehwan Lee for their implementations and testing.

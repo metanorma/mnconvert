@@ -1,0 +1,10 @@
+
+[[sec_1]]
+== Purpose
+
+The purpose of the NISO Standards Tag Suite (NISO STS) standard is to define a suite of XML elements and attributes that describes the full-text content and metadata of standards—including co-produced standards and standards bodies’ adoptions of existing standards—with the intent of providing a common format in which standards organizations, publishers, disseminators, archives, and any lawful user can publish and exchange standards content.
+
+The intent of the Tag Suite is to preserve the intellectual content of standards independent of the form in which that content was originally delivered. The Tag Suite enables the capture of structural and semantic components of material without modeling any particular sequence or textual format.
+
+This standard includes two implementations of the suite, called “Tag Sets”—the Interchange Tag Set and the Extended Tag Set. These tag sets are built from the elements and attributes defined in the Suite and are intended to provide models for standards publishing and interoperability.
+
