@@ -79,8 +79,15 @@ deploy:
 	mvn --settings settings.xml -Dmaven.test.skip=true clean deploy shade:shade
 
 documents/%.sts.html: documents/%.sts.xml saxon.jar isosts2html_standalone.xsl isosts2html.xsl
-	echo skip
-	#java -jar saxon.jar -s:$< -xsl:isosts2html_standalone.xsl -o:$@
+ifeq ($(OS),Windows_NT)
+	findstr /m /c:"<xsl:stylesheet" isosts2html_standalone.xsl >nul && findstr /m /c:"<xsl:stylesheet" isosts2html.xsl >nul && java -jar saxon.jar -s:$< -xsl:isosts2html_standalone.xsl -o:$@ || echo Skip HTML generation due the wrong XSLT.
+else	
+	if [[ grep -q "<xsl:stylesheet" isosts2html_standalone.xsl && grep -q "<xsl:stylesheet" isosts2html.xsl]]; then
+		java -jar saxon.jar -s:$< -xsl:isosts2html_standalone.xsl -o:$@
+	else
+		echo Skip HTML generation due the wrong XSLT.
+	fi
+endif
 
 documents/%.sts.xml: documents/%.mn.xml | target/$(JAR_FILE) documents
 	java -jar target/$(JAR_FILE) $< --output $@ --output-format iso
