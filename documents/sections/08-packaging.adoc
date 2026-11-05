@@ -1,0 +1,8 @@
+
+[[sec_8]]
+== Packaging
+
+The packaging shall not transmit any odour or flavour to the product and shall not contain substances which may damage the product or constitute a health risk.
+
+If bags are used, they shall comply with the requirements of <<norm_ref_3,clause=9>>, or <<norm_ref_4,ISO 8351-2>>, as appropriate.
+

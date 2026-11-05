@@ -1,0 +1,10 @@
+
+[[sec_1]]
+== Scope
+
+This document specifies minimum requirements and test methods for rice (__Oryza sativa L.__).
+
+It is applicable to husked rice, husked parboiled rice, milled rice and milled parboiled rice, suitable for human consumption, directly or after reconditioning.
+
+It is not applicable to cooked rice products.
+

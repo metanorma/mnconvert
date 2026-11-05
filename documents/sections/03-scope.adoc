@@ -1,0 +1,67 @@
+
+[[sec_3]]
+== Scope
+
+The Standards Tag Suite defines elements and attributes that describe both the metadata and the full content of published normative standards documents. The Suite, while not specifically designed to describe handbooks, guidelines, other non-normative materials, or any particular publishing formats, may be usable for XML publication of some of these document types if an individual standards organization reviews their structures and determines that they can properly be tagged with STS. While some structures in these non-standards documents may be similar to structures in standards (and journal articles, since STS is based on JATS), other structures may be distinctly different and may not be handled by existing elements and attributes defined in the Tag Suite.
+
+The Steering Committee made some early scope decisions:
+
+
+
+* Make all reasonable efforts to keep NISO STS 1.0 backwards compatible with ISO STS version 1.1
+
+* Version 1.0/Phase I of the Tag Suite will consider only normative documents (use of NISO STS for non-normative materials is not precluded, but work was not done to support non-normative documents)
+
+* Version 1.0/Phase I of the Tag Suite will only consider current content/standards, not historical or back-content standards
+
+* Work will be focused on the requirements of published documents (it will not focus on the needs of XML authoring or production, should they differ from final publication requirements)
+
+* Design will not consider formatting, branding, or publisher-specific look and feel
+
+* Supporting non-normative material for the Tag Suite will be available in DTD, XSD, and RelaxNG formats as well as Tag Library documentation (as has been the case for JATS and BITS)
+
+* NISO STS will be based on the JATS 1.1 Publishing Model
+
+* Separate tag sets will be available with MathML 2.0 and MathML 3.0 (because MathML 3.0 is not fully backwards compatible with MathML 2.0)
+
+* There will be an XHTML-table-only tag set (the Interchange Tag Set) and an XHTML-and-CALS-table tag set (the Extended Tag Set)
+
+
+The Tag Suite is the complete set of elements and attributes described in the standard. Along with these descriptions, the standard includes two discrete standards models or Tag Sets:
+
+
+
+* The Interchange Tag Set (in MathML 2.0 and MathML 3.0 variants)
+
+* The Extended Tag Set (in MathML 2.0 and MathML 3.0 variants)
+
+
+The Tag Suite has been designed to be extensible. Any of the tag sets may be extended or restricted to meet the needs of a given project. A new tag set that is a subset of one of the tag sets described in the standard should be considered “conforming” to the standard. By definition, documents valid to such a conforming subset would also be valid according to the STS model on which the subset is based.
+
+New tag sets may be built from the elements and attributes in the Tag Suite. Tag sets that add structures (elements and/or attributes) to those defined in the standard (leading to documents not valid according to one of the models in the standard) should be called “based on STS”. Such tag sets are not considered “conforming” to the standard.
+
+Similarly, tag sets that extend or loosen the models described in the standard, such that documents valid to these new tag sets may not be valid according to one of the models in the standard, should be called “based on STS”. Such tag sets are also not considered “conforming” to the standard.
+
+There are a number of items that have not been included in this standard but are included in the non-normative supporting information:
+
+
+
+. Schemas—The non-normative schemas (available in DTD, W3C Schema, and RELAX NG syntax) that represent the two Tag Sets in both MathML variants can be found on the STS hosted site: http://www.niso-sts.org[http://www.niso-sts.org]
+
+. Detailed Usage Information—A non-normative Tag Library will be produced and maintained to support the two NISO STS Tag Sets. The Tag Library will describe all of the structures in the Tag Suite. The structures that are available only in the Extended Tag Set will be identified each place that they are mentioned. The Tag Library can be found at: http://www.niso-sts.org[http://www.niso-sts.org]
+
+. Non-normative XML-tagged examples are included in the Tag Library just described.
+
+. Details concerning MathML, the OASIS XML Exchange table model (based on the CALS table elements), and TBX are described in other standards. Specific instructions for using these elements should be retrieved from the original standards referenced in Section 5, Normative References. The default table model for both the NISO STS Tag Sets is based on, and designed to be converted easily to, the XHTML 1.1 table model. Details for the elements and attributes in the XHTML-inspired NISO STS/NISO JATS tables are provided in the STS Tag Library.
+
+
+[[sec_3.1]]
+=== The Interchange Tag Set
+
+The STS Interchange Tag Set provides a format in which standards organizations and publishers can deliver content to a range of other standards bodies and disseminators and into which distributors and licensees/users can more easily translate content from many standards organizations and publishers.
+
+[[sec_3.2]]
+=== The Extended Tag Set
+
+The STS Extended Tag Set builds slightly on the Interchange Tag Set, allowing both the XHTML and CALS table models to account for legacy publishing of intensive table information.
+

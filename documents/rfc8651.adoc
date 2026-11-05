@@ -1,0 +1,557 @@
+= Dynamic Link Exchange Protocol (DLEP) Control‑Plane‑Based Pause Extension
+:doctype: internet-draft
+:abbrev: DLEP Pause Extension
+:name: draft-ietf-manet-dlep-pause-extension-08
+:status: standard
+:intended-series: standard
+:submission-type: IETF
+:ipr: trust200902
+:instance: https://dx.doi.org/10.17487/rfc8651
+:instance: urn:issn:2070-1721
+:revdate: 2019-01-01T00:00:00Z
+:keyword: DLEP, Flow control, Pause
+:xml-lang: en
+:consensus: true
+:index-include: true
+:sort-refs: true
+:sym-refs: true
+:toc-include: true
+:toc-depth: 3
+:show-on-front-page: true
+:fullname: Bow-Nan Cheng
+:initials: B.
+:surname: Cheng
+:affiliation: MIT Lincoln Laboratory
+:email: bcheng@ll.mit.edu
+:address: 244 Wood Street + \
+Lexington + \
+MA + \
+United States of America + \
+Massachusetts Institute of Technology + \
+02421-6426
+:fullname_2: David Wiggins
+:initials_2: D.
+:surname_2: Wiggins
+:affiliation_2: MIT Lincoln Laboratory
+:email_2: David.Wiggins@ll.mit.edu
+:address_2: 244 Wood Street + \
+Lexington + \
+MA + \
+United States of America + \
+Massachusetts Institute of Technology + \
+02420-9108
+:fullname_3: Lou Berger
+:initials_3: L.
+:surname_3: Berger
+:role_3: editor
+:affiliation_3: LabN Consulting, L.L.C.
+:email_3: lberger@labn.net
+
+[abstract]
+== Abstract
+This document defines an extension to the Dynamic Link Exchange Protocol (DLEP) that enables a modem to use DLEP messages to pause and resume data traffic coming from its peer router.
+
+[[status-of-memo]]
+[numbered=false,removeInRFC=false,toc=exclude]
+== Status of This Memo
+
+This is an Internet Standards Track document.
+
+This document is a product of the Internet Engineering Task Force (IETF). It represents the consensus of the IETF community. It has received public review and has been approved for publication by the Internet Engineering Steering Group (IESG). Further information on Internet Standards is available in Section 2 of RFC 7841.
+
+Information about the current status of this document, any errata, and how to provide feedback on it may be obtained at  https://www.rfc-editor.org/info/rfc8651.
+
+[[copyright]]
+[numbered=false,removeInRFC=false,toc=exclude]
+== Copyright Notice
+
+Copyright (c) 2019 IETF Trust and the persons identified as the document authors. All rights reserved.
+
+This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents ( https://trustee.ietf.org/license-info) in effect on the date of publication of this document. Please review these documents carefully, as they describe your rights and restrictions with respect to this document. Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.
+
+[[toc]]
+[numbered=false,removeInRFC=false,toc=exclude]
+== Table of Contents
+
+[nobullet=true,spacing=compact]
+* <<section-1,format=counter>>.  <<name-introduction,format=title: Introduction>>
+[nobullet=true,spacing=compact]
+** <<section-1.1,format=counter>>.  <<name-key-words,format=title: Key Words>>
+* <<section-2,format=counter>>.  <<name-extension-usage-and-identif,format=title: Extension Usage and Identification>>
+* <<section-3,format=counter>>.  <<name-extension-data-items,format=title: Extension Data Items>>
+[nobullet=true,spacing=compact]
+** <<section-3.1,format=counter>>.  <<name-queue-parameters,format=title: Queue Parameters>>
+[nobullet=true,spacing=compact]
+*** <<section-3.1.1,format=counter>>.  <<name-queue-parameter-sub-data-it,format=title: Queue Parameter Sub-Data Item>>
+** <<section-3.2,format=counter>>.  <<name-pause,format=title: Pause>>
+** <<section-3.3,format=counter>>.  <<name-restart,format=title: Restart>>
+* <<section-4,format=counter>>.  <<name-security-considerations,format=title: Security Considerations>>
+* <<section-5,format=counter>>.  <<name-iana-considerations,format=title: IANA Considerations>>
+[nobullet=true,spacing=compact]
+** <<section-5.1,format=counter>>.  <<name-extension-type-value,format=title: Extension Type Value>>
+** <<section-5.2,format=counter>>.  <<name-data-item-values,format=title: Data Item Values>>
+** <<section-5.3,format=counter>>.  <<name-queue-parameter-sub-data-ite,format=title: Queue Parameter Sub-Data Item Values>>
+* <<section-6,format=counter>>.  <<name-references,format=title: References>>
+[nobullet=true,spacing=compact]
+** <<section-6.1,format=counter>>.  <<name-normative-references,format=title: Normative References>>
+** <<section-6.2,format=counter>>.  <<name-informative-references,format=title: Informative References>>
+* <<section-appendix.a,format=none>><<name-acknowledgments,format=title: Acknowledgments>>
+* <<section-appendix.b,format=none>><<name-authors-addresses,format=title: Authors' Addresses>>
+
+[[sec-1]]
+[numbered=true,removeInRFC=false,toc=include]
+== Introduction
+
+The Dynamic Link Exchange Protocol (DLEP) is defined in <<RFC8175,format=default>>. It provides the exchange of link-related control information between a modem and a router. DLEP defines a base set of mechanisms as well as support for possible extensions. This document defines one such extension.
+
+The base DLEP specification does not include any data-plane flow‑control capability. The extension defined in this document supports flow control of data traffic based on explicit messages sent via DLEP by a modem to indicate when a router should hold off sending traffic and when it should resume. This functionality parallels the flow‑control mechanism found in PPP over Ethernet (PPPoE) per <<RFC5578,format=default>>. The extension also optionally supports DSCP-aware flow control ("DSCP" stands for "Differentiated Services Code Point") for use by Diffserv-aware modems. (For general background on Differentiated Services, see <<RFC2475,format=default>>.) This functionality is very similar to that provided by Ethernet priority‑based flow control; see <<IEEE.802.1Q_2014,format=default>>. The extension defined in this document is referred to as "Control-Plane-Based Pause". Other flow-control methods are possible with DLEP; for example, see <<I-D.ietf-manet-dlep-da-credit-extension,format=default: DLEP-DIFFSERV>> and <<I-D.ietf-manet-dlep-credit-flow-control,format=default: DLEP-CREDIT>>.
+
+Note that this mechanism only applies to traffic that is to be transmitted on the modem's attached data channel and not to DLEP control messages themselves. Furthermore, it applies only to the single subnetwork that is used to connect a modem and a router, and for traffic sent from a router to a modem.
+
+This document defines a new DLEP Extension Type Value that is used to indicate the use of the extension; see <<sec-ext-type,format=default>>. Three new DLEP Data Items are defined in <<sec-data-items,format=default>>.
+
+[[sec-1.1]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Key Words
+
+The key words "[bcp14]#MUST#", "[bcp14]#MUST NOT#", "[bcp14]#REQUIRED#", "[bcp14]#SHALL#", "[bcp14]#SHALL NOT#", "[bcp14]#SHOULD#", "[bcp14]#SHOULD NOT#", "[bcp14]#RECOMMENDED#", "[bcp14]#NOT RECOMMENDED#", "[bcp14]#MAY#", and "[bcp14]#OPTIONAL#" in this document are to be interpreted as described in BCP 14 <<RFC2119,format=default>> <<RFC8174,format=default>> when, and only when, they appear in all capitals, as shown here.
+
+[[sec-ext-type]]
+[numbered=true,removeInRFC=false,toc=include]
+== Extension Usage and Identification
+
+The use of the Control-Plane-Based Pause Extension [bcp14]#SHOULD# be configurable. To indicate that the implementation supports the use of the Control-Plane-Based Pause Extension, an implementation [bcp14]#MUST# include the Control-Plane-Based Pause Extension Type Value in the Extensions Supported Data Item. The Extensions Supported Data Item is sent and processed according to <<RFC8175,format=default>>.
+
+The Control-Plane-Based Pause Extension Type Value is 2; see <<sec-iana,format=default>>.
+
+[[sec-data-items]]
+[numbered=true,removeInRFC=false,toc=include]
+== Extension Data Items
+
+Three Data Items are defined by this extension. The Queue Parameters Data Item is used by a modem to provide information about the DSCPs it uses in forwarding. The Pause Data Item is used by a modem to indicate when a router should cease sending packets, and the Restart Data Item is used by a modem to indicate when a router can resume sending packets.
+
+[[sec-di-qp]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Queue Parameters
+
+The Queue Parameters Data Item is sent by a modem to a router to indicate DSCP values that may be independently paused. This Data Item [bcp14]#MUST# be included in a Session Initialization Response Message that also contains the Control-Plane-Based Pause Extension Type Value in the Extensions Supported Data Item. Updates to these parameters [bcp14]#MAY# be sent by a modem by including the Data Item in Session Update Messages.
+
+The Queue Parameters Data Item groups DSCPs into logical queues, each of which is identified by a "Queue Index" field. The number of logical queues is variable, as is the number of DSCPs associated with each queue. A queue size (in bytes) is provided for informational purposes. Queue Index fields are numbered sequentially from zero, where queue index zero is a special case covering DSCPs that are not otherwise associated with a Queue Index field.
+
+An implementation that does not support DSCPs would indicate one queue with zero DSCPs, and the number of bytes that may be in its associated link transmit queue. Additional logical queues are represented in a variable series of Queue Parameter Sub-Data Items.
+
+The format of the Queue Parameters Data Item is:
+[align=left,alt=,]
+....
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | Data Item Type                | Length                        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |   Num Queues  | Scale |              Reserved                 |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |               Queue Parameter Sub-Data Item 1                 |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   :                                ...                            :
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |               Queue Parameter Sub-Data Item n                 |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+....
+
+[newline=true,spacing=normal]
+Data Item Type::: 23
+Length::: 
+Variable
+
+Per <<RFC8175,format=default>>, Length is the number of octets in the Data Item, excluding the Type and Length fields.
+
+Num Queues::: An 8-bit unsigned integer indicating the number of Queue Parameter Sub‑Data Items that follow. This field [bcp14]#MUST# contain a value of at least one (1).
+Scale::: 
+A 4-bit unsigned integer indicating the scale used in the Queue Size Qn field. The valid values are:
+
+
+[[scale-table]]
+.Queue Size Qn Field Values
+[align=center]
+|===
+h|Value | Scale
+|:--- | :---
+
+|0 | B - Bytes (Octets)
+|1 | KB - Kilobytes (1024 B)
+|2 | MB - Megabytes (1024 KB)
+|3 | GB - Gigabytes (1024 MB)
+|===
+
+[newline=false,spacing=normal]
+Reserved::: A 20-bit field that [bcp14]#MUST# be set to zero (0) by the sender (a modem) and ignored by the receiver (a router).
+
+[[sec-di-qp-sub]]
+[numbered=true,removeInRFC=false,toc=include]
+==== Queue Parameter Sub-Data Item
+
+Queue Parameter Sub-Data Items are an unordered list composed of Sub‑Data Items with a common format. The format of the Queue Parameter Sub‑Data Item is patterned after the standard format for the DLEP Data Item; see <<RFC8175,format=default>>. Any errors or inconsistencies encountered in parsing Sub-Data Items are handled in the same fashion as any other Data Item parsing error encountered in DLEP. In particular, the receiving implementation [bcp14]#MUST# issue a Session Termination Message containing a Status Data Item with status code set to 130 ("Invalid Data") and transition to the Session Termination state.
+
+The format of the Queue Parameter Sub-Data Item is:
+[align=left,alt=,]
+....
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | Sub-Data Item Type (1)        | Length                        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                           Value...                            |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+....
+
+
+and Value has the format:
+[align=left,alt=,]
+....
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |  Queue Index  |             Queue Size Qn                     |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | Num DSCPs Qn  |  DS Field Qn  |              ...              :
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   :                          ...                  |  DS Field Qn  |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+....
+
+[newline=true,spacing=normal]
+Sub-Data Item Type::: A 16-bit unsigned integer that indicates the type and corresponding format of the Sub-Data Item's Value field. Sub-Data Item Types are scoped within the Data Item in which they are carried, i.e., the Sub-Data Item Type field [bcp14]#MUST# be used together with the Queue Parameters Data Item Type to identify the format of the Sub-Data Item. This field [bcp14]#MUST# be set to one (1) for the Queue Parameter Sub-Data Item.
+Length::: 
+Variable
+
+Length is the number of octets in the Sub-Data Item, excluding the Type and Length fields.
+
+Queue Index::: An 8-bit field indicating the queue index of the queue parameter represented in the Sub-Data Item. Only the first instance of a particular Queue Index value is meaningful. Subsequent Sub-Data Items containing the same Queue Index values, if present, [bcp14]#MAY# be logged via a management interface and [bcp14]#MUST# otherwise be ignored. Note that the value 255 is reserved and [bcp14]#MUST NOT# be used in this field.
+Queue Size Qn::: A 24-bit unsigned integer representing the size, in the octet scale indicated by the Scale field, of the queue that supports the traffic with the DSCPs associated with the queue index.
+Num DSCPs Qn::: An 8-bit unsigned integer indicating the number of DSCPs associated with the queue index associated with the Sub-Data Item.
+DS Field Qn::: 
+The Data Item contains a sequence of 8-bit DS fields. The number of DS fields present [bcp14]#MUST# equal the Num DSCPs Qn field value.
+
+The DS field structure is the same as the structure shown in <<RFC2474,format=default>>.
+[align=left,alt=,]
+....
+  0   1   2   3   4   5   6   7
++---+---+---+---+---+---+---+---+
+|         DSCP          |  CU   |
++---+---+---+---+---+---+---+---+
+....
+
+DSCP: Differentiated Services Code Point
+
+CU: Currently Unused; [bcp14]#MUST# be zero
+
+
+[[sec-di-pause]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Pause
+
+The Pause Data Item is sent by a modem to a router to indicate to its peer that traffic is to be suppressed, i.e., paused. The motivating use case for this Data Item is when a modem's internal queue length exceeds a particular threshold. Other use cases are possible, e.g., when there are non‑queue-related congestion points within a modem. Such cases are not explicitly described in this document.
+
+A modem can indicate that traffic is to be suppressed on a device‑wide or destination-specific basis. An example of when a modem might use device‑wide suppression is when output queues are shared across all destinations. Destination-specific suppression might be used when per‑destination queuing is used. To indicate that suppression applies to all destinations, a modem [bcp14]#MUST# send the Pause Data Item in a Session Update Message. To indicate that suppression applies to a particular destination, a modem [bcp14]#MUST# send the Pause Data Item in a Destination Update Message.
+
+Each Pause Data Item identifies the traffic to be suppressed by the Queue Index field (<<sec-di-qp,format=default>>), which in turn indicates traffic identified by one or more DSCPs. The special value of 255 is used to indicate that all traffic is to be suppressed.
+
+While there is no restriction on the number of messages containing Pause Data Items that may be sent by a modem, a modem [bcp14]#SHOULD# include multiple queue indexes in the same message when possible.
+
+A router that receives the Pause Data Item [bcp14]#MUST# cease sending the identified traffic to the modem. This may of course translate into the router's queues exceeding their own thresholds. If a received Pause Data Item contains a Queue Index value other than 255 or a queue index established by a Session Initialization or Session Update Message, the router [bcp14]#MUST# terminate the session with a Status Data Item indicating "Invalid Data".
+
+The format of the Pause Data Item is:
+[align=left,alt=,]
+....
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | Data Item Type                | Length                        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |  Queue Index  |               ...                             :
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   :                                ...            |  Queue Index  |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+....
+
+[newline=true,spacing=normal]
+Data Item Type::: 24
+Length::: 
+Variable
+
+Per <<RFC8175,format=default>>, Length is the number of octets in the Data Item, excluding the Type and Length fields. It will equal the number of Queue Index fields carried in the Data Item.
+
+Queue Index::: One or more 8-bit fields used to indicate a queue index defined by a Queue Parameters Data Item. The special value of 255 indicates that (1) all traffic to the modem is to be suppressed when the Data Item is carried in a Session Update Message or (2) all traffic to a particular destination is to be suppressed when the Data Item is carried in a Destination Update Message.
+
+[[sec-di-restart]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Restart
+
+The Restart Data Item is sent by a modem to a router to indicate to its peer that transmission of previously suppressed traffic may be resumed. An example of when a modem might send this Data Item is when an internal queue length drops below a particular threshold.
+
+The sending of this Data Item parallels the Pause Data Item (see <<sec-di-pause,format=default>>) and follows the same rules. To indicate that transmission can resume to all destinations, a modem [bcp14]#MUST# send the Restart Data Item in a Session Update Message. To indicate that transmission can resume to a particular destination, a modem [bcp14]#MUST# send the Restart Data Item in a Destination Update Message. Finally, the same rules apply to queue indexes.
+
+A router that receives the Restart Data Item [bcp14]#SHOULD# resume transmission of the identified traffic to the modem.
+
+The format of the Restart Data Item matches the Pause Data Item and is:
+[align=left,alt=,]
+....
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | Data Item Type                | Length                        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |  Queue Index  |               ...                             :
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   :                                ...            |  Queue Index  |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+....
+
+[newline=false,spacing=normal]
+Data Item Type::: 25
+Length::: See <<sec-di-pause,format=default>>.
+Queue Index::: See <<sec-di-pause,format=default>>.
+
+[[sec-sec]]
+[numbered=true,removeInRFC=false,toc=include]
+== Security Considerations
+
+The extension defined in this document introduces a new mechanism for flow control between a router and modem using DLEP. The extension does not introduce any vulnerabilities that are inherently different from those documented in <<RFC8175,format=default>>. The approach taken to security in that document applies equally when running the extension defined in this document.
+
+Implementations of the extension defined in this document [bcp14]#MUST# support the configuration and use of TLS, as described in <<RFC8175,format=default>>, in order to protect configurations where injection attacks are possible, i.e., when the link between a modem and router is not otherwise protected.
+
+Note that this extension does allow a compromised or impersonating modem to suppress transmission by the router or a switch that interconnects the modem and router. Similar attacks are generally possible with base DLEP -- for example, an impersonating modem may cause a session reset, or a compromised modem can simply drop all traffic destined for or sent by a router. <<RFC8175,format=default>> defines the use of TLS to protect against such impersonating attackers.
+
+[[sec-iana]]
+[numbered=true,removeInRFC=false,toc=include]
+== IANA Considerations
+
+This document assigns four new values and creates a new subregistry in the "Dynamic Link Exchange Protocol (DLEP) Parameters" registry.
+
+[[sec-iana-ext]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Extension Type Value
+
+This document adds a new assignment to the DLEP extensions registry named "Extension Type Values" <<RFC8175,format=default>>, per the "Specification Required" policy <<RFC8126,format=default>>. IANA has assigned the following value:
+
+
+
+[[table_et]]
+.Extension Type Value
+[align=center]
+|===
+h|Code | Description
+|:--- | :---
+
+|2 | Control-Plane-Based Pause
+|===
+
+
+
+[[sec-iana-di]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Data Item Values
+
+This document adds three new assignments to the DLEP Data Item registry named "Data Item Type Values" <<RFC8175,format=default>>, per the "Specification Required" policy <<RFC8126,format=default>>. IANA has assigned the following values:
+
+
+
+[[table_di]]
+.Data Item Values
+[align=center]
+|===
+h|Type Code | Description
+|:--- | :---
+
+|23 | Queue Parameters
+|24 | Pause
+|25 | Restart
+|===
+
+
+
+[[sec-iana-sdi]]
+[numbered=true,removeInRFC=false,toc=include]
+=== Queue Parameter Sub-Data Item Values
+
+IANA has created a new DLEP registry named "Queue Parameter Sub-Data Item Type Values".
+
+<<table_sdi,format=default>> provides initial registry values and the registration policies <<RFC8126,format=default>> that apply:
+
+[[table_sdi]]
+.Initial Registry Values
+[align=center]
+|===
+h|Type Code | Description/Policy
+|:--- | :---
+
+|0 | Reserved
+|1 | Queue Parameter
+|2-65407 | Specification Required
+|65408-65534 | Private Use
+|65535 | Reserved
+|===
+
+[bibliography]
+== Normative References
+++++
+<reference anchor="RFC2119" derivedAnchor="RFC2119" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc2119"><front><title>Key words for use in RFCs to Indicate Requirement Levels</title>
+<author fullname="S. Bradner" initials="S." surname="Bradner"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="March" year="1997"></date>
+<abstract><t>In many standards track documents several words are used to signify the requirements in the specification.  These words are often capitalized. This document defines these words as they should be interpreted in IETF documents.  This document specifies an Internet Best Current Practices for the Internet Community, and requests discussion and suggestions for improvements.</t>
+</abstract>
+</front>
+<seriesInfo name="BCP" value="14"></seriesInfo>
+<seriesInfo name="RFC" value="2119"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC2119"></seriesInfo>
+</reference>
+<reference anchor="RFC8174" derivedAnchor="RFC8174" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8174"><front><title>Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words</title>
+<author fullname="B. Leiba" initials="B." surname="Leiba"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="May" year="2017"></date>
+<abstract><t>RFC 2119 specifies common key words that may be used in protocol  specifications.  This document aims to reduce the ambiguity by clarifying that only UPPERCASE usage of the key words have the  defined special meanings.</t>
+</abstract>
+</front>
+<seriesInfo name="BCP" value="14"></seriesInfo>
+<seriesInfo name="RFC" value="8174"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8174"></seriesInfo>
+</reference>
+<reference anchor="RFC8175" derivedAnchor="RFC8175" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8175"><front><title>Dynamic Link Exchange Protocol (DLEP)</title>
+<author fullname="S. Ratliff" initials="S." surname="Ratliff"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="S. Jury" initials="S." surname="Jury"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="D. Satterwhite" initials="D." surname="Satterwhite"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="R. Taylor" initials="R." surname="Taylor"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="B. Berry" initials="B." surname="Berry"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="June" year="2017"></date>
+<abstract><t>When routing devices rely on modems to effect communications over wireless links, they need timely and accurate knowledge of the characteristics of the link (speed, state, etc.) in order to make routing decisions.  In mobile or other environments where these characteristics change frequently, manual configurations or the inference of state through routing or transport protocols does not allow the router to make the best decisions.  This document introduces a new protocol called the Dynamic Link Exchange Protocol (DLEP), which provides a bidirectional, event-driven communication channel between the router and the modem to facilitate communication of changing link characteristics.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="8175"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8175"></seriesInfo>
+</reference>
+++++
+
+[bibliography]
+== Informative References
+++++
+<reference anchor="I-D.ietf-manet-dlep-credit-flow-control" derivedAnchor="DLEP-CREDIT" quoteTitle="true" target="https://tools.ietf.org/html/draft-ietf-manet-dlep-credit-flow-control-04"><front><title>DLEP Credit-Based Flow Control Messages and Data Items</title>
+<author fullname="Bow-Nan Cheng" initials="B" surname="Cheng"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="David Wiggins" initials="D" surname="Wiggins"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="Lou Berger" initials="L" surname="Berger"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="Stan Ratliff" initials="S" surname="Ratliff"><organization showOnFrontPage="true"></organization>
+</author>
+<date day="6" month="March" year="2019"></date>
+<abstract><t>This document defines new DLEP protocol Data Items that are used to support credit-based flow control.  Credit window control is used to regulate when data may be sent to an associated virtual or physical queue.  The Data Items are defined in an extensible and reusable fashion.  Their use will be mandated in other documents defining specific DLEP extensions.</t>
+</abstract>
+</front>
+<seriesInfo name="Internet-Draft" value="draft-ietf-manet-dlep-credit-flow-control-04"></seriesInfo>
+<format target="http://www.ietf.org/internet-drafts/draft-ietf-manet-dlep-credit-flow-control-04.txt" type="TXT"></format>
+<refcontent>Work in Progress</refcontent>
+</reference>
+<reference anchor="I-D.ietf-manet-dlep-da-credit-extension" derivedAnchor="DLEP-DIFFSERV" quoteTitle="true" target="https://tools.ietf.org/html/draft-ietf-manet-dlep-da-credit-extension-07"><front><title>DLEP DiffServ Aware Credit Window Extension</title>
+<author fullname="Bow-Nan Cheng" initials="B" surname="Cheng"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="David Wiggins" initials="D" surname="Wiggins"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="Lou Berger" initials="L" surname="Berger"><organization showOnFrontPage="true"></organization>
+</author>
+<date day="6" month="March" year="2019"></date>
+<abstract><t>This document defines an extension to the DLEP protocol that enables a DiffServ aware credit-window scheme for destination-specific and shared flow control.</t>
+</abstract>
+</front>
+<seriesInfo name="Internet-Draft" value="draft-ietf-manet-dlep-da-credit-extension-07"></seriesInfo>
+<format target="http://www.ietf.org/internet-drafts/draft-ietf-manet-dlep-da-credit-extension-07.txt" type="TXT"></format>
+<refcontent>Work in Progress</refcontent>
+</reference>
+<reference anchor="IEEE.802.1Q_2014" derivedAnchor="IEEE.802.1Q_2014" quoteTitle="true" target="https://ieeexplore.ieee.org/document/6991462"><front><title>IEEE Standard for Local and metropolitan area networks--Bridges and Bridged Networks</title>
+<seriesInfo name="IEEE" value="802.1Q-2014"></seriesInfo>
+<author><organization showOnFrontPage="true">IEEE</organization>
+</author>
+</front>
+</reference>
+<reference anchor="RFC2474" derivedAnchor="RFC2474" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc2474"><front><title>Definition of the Differentiated Services Field (DS Field) in the IPv4 and IPv6 Headers</title>
+<author fullname="K. Nichols" initials="K." surname="Nichols"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="S. Blake" initials="S." surname="Blake"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="F. Baker" initials="F." surname="Baker"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="D. Black" initials="D." surname="Black"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="December" year="1998"></date>
+<abstract><t>This document defines the IP header field, called the DS (for differentiated services) field.  [STANDARDS-TRACK]</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="2474"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC2474"></seriesInfo>
+</reference>
+<reference anchor="RFC2475" derivedAnchor="RFC2475" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc2475"><front><title>An Architecture for Differentiated Services</title>
+<author fullname="S. Blake" initials="S." surname="Blake"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="D. Black" initials="D." surname="Black"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="M. Carlson" initials="M." surname="Carlson"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="E. Davies" initials="E." surname="Davies"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="Z. Wang" initials="Z." surname="Wang"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="W. Weiss" initials="W." surname="Weiss"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="December" year="1998"></date>
+<abstract><t>This document defines an architecture for implementing scalable service differentiation in the Internet.  This memo provides information for the Internet community.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="2475"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC2475"></seriesInfo>
+</reference>
+<reference anchor="RFC5578" derivedAnchor="RFC5578" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc5578"><front><title>PPP over Ethernet (PPPoE) Extensions for Credit Flow and Link Metrics</title>
+<author fullname="B. Berry" initials="B." role="editor" surname="Berry"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="S. Ratliff" initials="S." surname="Ratliff"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="E. Paradise" initials="E." surname="Paradise"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="T. Kaiser" initials="T." surname="Kaiser"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="M. Adams" initials="M." surname="Adams"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="February" year="2010"></date>
+<abstract><t>This document extends the Point-to-Point Protocol over Ethernet (PPPoE) with an optional credit-based flow control mechanism and an optional Link Quality Metric report.  These optional extensions improve the performance of PPPoE over media with variable bandwidth and limited buffering, such as mobile point-to-point radio links.   This document is not an Internet Standards Track specification; it is published for informational purposes.</t>
+</abstract>
+</front>
+<seriesInfo name="RFC" value="5578"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC5578"></seriesInfo>
+</reference>
+<reference anchor="RFC8126" derivedAnchor="RFC8126" quoteTitle="true" target="https://www.rfc-editor.org/info/rfc8126"><front><title>Guidelines for Writing an IANA Considerations Section in RFCs</title>
+<author fullname="M. Cotton" initials="M." surname="Cotton"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="B. Leiba" initials="B." surname="Leiba"><organization showOnFrontPage="true"></organization>
+</author>
+<author fullname="T. Narten" initials="T." surname="Narten"><organization showOnFrontPage="true"></organization>
+</author>
+<date month="June" year="2017"></date>
+<abstract><t>Many protocols make use of points of extensibility that use constants to identify various protocol parameters.  To ensure that the values in these fields do not have conflicting uses and to promote interoperability, their allocations are often coordinated by a central record keeper.  For IETF protocols, that role is filled by the Internet Assigned Numbers Authority (IANA).</t>
+<t>To make assignments in a given registry prudently, guidance describing the conditions under which new values should be assigned, as well as when and how modifications to existing values can be made, is needed.  This document defines a framework for the documentation of these guidelines by specification authors, in order to assure that the provided guidance for the IANA Considerations is clear and addresses the various issues that are likely in the operation of a registry.</t>
+<t>This is the third edition of this document; it obsoletes RFC 5226.</t>
+</abstract>
+</front>
+<seriesInfo name="BCP" value="26"></seriesInfo>
+<seriesInfo name="RFC" value="8126"></seriesInfo>
+<seriesInfo name="DOI" value="10.17487/RFC8126"></seriesInfo>
+</reference>
+++++
+
+[appendix,numbered=false,removeInRFC=false,toc=include]
+== Acknowledgments
+
+The format for the Sub-Data Item was inspired by Rick Taylor's "Data Item Containers" idea.

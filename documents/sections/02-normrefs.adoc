@@ -1,0 +1,24 @@
+
+[bibliography]
+[[sec_2]]
+== Normative References
+
+[NOTE,type=boilerplate]
+--
+The following documents are referred to in the text in such a way that some or all of their content constitutes requirements of this document. For dated references, only the edition cited applies. For undated references, the latest edition of the referenced document (including any amendments) applies.
+--
+
+* [[[norm_ref_1,(1)ISO 712 (all parts)]]], _Cereals and cereal products – Determination of moisture content_
+
+* [[[norm_ref_2,(2)ISO 6646 (all parts)]]], _Rice – Determination of the potential milling yield from paddy and from husked rice_
+
+* [[[norm_ref_3,(3)ISO 8351-1:1994]]], _Packaging – Method of specification for sacks – Part 1: Paper sacks_
+
+* [[[norm_ref_4,(4)ISO 8351-2]]], _Packaging – Method of specification for sacks – Part 2: Sacks made from thermoplastic flexible film_
+
+* [[[norm_ref_5,(5)ISO 16634:—]]] footnote:[ISO DATE: Under preparation. (Stage at the time of publication ISO/DIS 16634)], _Cereals, pulses, milled cereal products, oilseeds and animal feeding stuffs — Determination of the total nitrogen content by combustion according to the Dumas principle and calculation of the crude protein content_
+
+* [[[norm_ref_6,(6)ISO 20483:2013]]], _Cereals and pulses – Determination of the nitrogen content and calculation of the crude protein content – Kjeldahl method_
+
+* [[[norm_ref_7,(7)ISO 24333:2009]]], _Cereals and cereal products – Sampling_
+

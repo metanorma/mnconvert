@@ -1,0 +1,12 @@
+
+[[sec_2]]
+== Background
+
+At the end of 2011, the International Organization for Standardization (ISO) revamped its publishing systems and together with Mulberry Technologies, Inc., developed a derivative of JATS to be used for ISO standards publishing: the ISO STS (ISO Standard Tag Set). This DTD has been in full production since, with few changes. The DTD and documentation were made openly available at: http://www.iso.org/schema/isosts/[http://www.iso.org/schema/isosts/] and their open use was and is encouraged.
+
+By 2015, several XML models were in use at different organizations to tag standards and standards-type information, including multiple models based on JATS (ANSI/NISO Z39.96-2012, JATS: Journal Article Tag Suite) and a number of other XML models that had been independently developed. This proliferation of non-standardized XML models for Standards made interoperability between organizations difficult, increased development costs, and required custom tools.
+
+It was agreed that it would be beneficial to all stakeholders to move ISO STS toward standardization and create an official relationship with JATS. The two standards would then remain coupled and an XML solution for standards could be more easily adopted. It was considered that this initiative would result in greater interoperability and create a foundation for standards utility development, which in turn would aid stakeholders and end users and improve the overall future of standards publishing.
+
+The NISO STS work item was approved by the NISO Content and Collections Management Topic Committee on June 26, 2015 and by NISO Voting Members on July 31, 2015.
+
