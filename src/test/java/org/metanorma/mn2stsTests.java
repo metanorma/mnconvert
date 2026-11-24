@@ -111,6 +111,41 @@ public class mn2stsTests {
         Assumptions.assumeTrue(capturedLog.contains("is valid"));
     }
 
+    // metanorma/mnconvert#480: legacy Metanorma constructs must not make the NISO STS output invalid
+    @Test
+    public void legacyConstructsProduceValidNISOSTS() throws Exception {
+        Path xmlout = Files.createTempFile("legacy-constructs", ".sts.xml");
+        try {
+            String input = Paths.get("src", "test", "resources", "legacy-constructs.mn.xml").toAbsolutePath().toString();
+            String[] args = new String[]{input, "--output", xmlout.toAbsolutePath().toString(), "--idrefchecking"};
+            mnconvert.run(args);
+
+            String capturedLog = getTestCapturedLog();
+            Assertions.assertTrue(capturedLog.contains("is valid"), capturedLog);
+            Assertions.assertFalse(capturedLog.contains("is NOT valid"), capturedLog);
+
+            String out = new String(Files.readAllBytes(xmlout), java.nio.charset.StandardCharsets.UTF_8);
+            // diagnostic is not spliced into the output
+            Assertions.assertFalse(out.contains("WARNING! There are unprocessed elements"));
+            // unknown bibdata element is kept as custom-meta
+            Assertions.assertTrue(out.contains("<meta-name>iso-cen-parallel</meta-name>"));
+            Assertions.assertFalse(out.contains("<iso-cen-parallel>"));
+            // inline identifier is named-content
+            Assertions.assertTrue(out.contains("<named-content content-type=\"identifier\">/req/uri</named-content>"));
+            Assertions.assertFalse(out.contains("<identifier>"));
+            // generated section ids are unique
+            Assertions.assertTrue(out.contains("<sec id=\"sec_scope\""));
+            // sec_scope_2 is already taken by a quote of the document, so the suffix skips it
+            Assertions.assertTrue(out.contains("<sec id=\"sec_scope_3\""));
+            Assertions.assertTrue(out.contains("<sec id=\"sec_scope_4\""));
+            Assertions.assertFalse(out.contains("<sec id=\"sec_scope_2\""));
+            Assertions.assertTrue(out.contains("id=\"sec_scope_2\""));
+            Assertions.assertEquals(1, out.split("id=\"sec_scope_2\"", -1).length - 1);
+        } finally {
+            Files.deleteIfExists(xmlout);
+        }
+    }
+
     @Test
     public void successConvertAndCheckDTD_NISO() throws ParseException, IOException {
         Assumptions.assumeTrue(XMLFILE_MN != null);

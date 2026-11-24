@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metanorma xmlns="https://www.metanorma.org/ns/standoc" type="presentation" version="3.1.1" schema-version="v2.1.0" flavor="iso">
+<bibdata type="standard">
+<title language="en" format="text/plain" type="main">Cereals and pulses — Specifications and test methods — Rice (CD)</title>
+
+<title language="en" format="text/plain" type="title-intro">Cereals and pulses</title>
+
+<title language="en" format="text/plain" type="title-main">Specifications and test methods</title>
+
+<title language="en" format="text/plain" type="title-part">Rice (CD)</title>
+
+
+<title language="fr" format="text/plain" type="main">Céréales et légumineuses — Spécification et méthodes d’essai — Riz (CD)</title>
+
+<title language="fr" format="text/plain" type="title-intro">Céréales et légumineuses</title>
+
+<title language="fr" format="text/plain" type="title-main">Spécification et méthodes d’essai</title>
+
+<title language="fr" format="text/plain" type="title-part">Riz (CD)</title>
+<docidentifier type="ISO" primary="true">ISO/CD 17301-1:2016</docidentifier><docidentifier type="iso-reference">ISO/CD 17301-1:2016(E)</docidentifier><docidentifier type="URN">urn:iso:std:iso:17301:-1:stage-30.00:en</docidentifier><docidentifier type="iso-undated">ISO/CD 17301-1</docidentifier><docidentifier type="iso-with-lang">ISO/CD 17301-1:2016(en)</docidentifier><docidentifier type="iso-tc">17301</docidentifier><docnumber>17301</docnumber><contributor><role type="author"/><organization>
+<name>International Organization for Standardization</name>
+<abbreviation>ISO</abbreviation></organization></contributor><contributor><role type="author"><description>Technical committee</description></role><organization>
+<name>International Organization for Standardization</name>
+<subdivision>
+<name>Food products</name>
+<identifier id="_455665e8-ea74-f710-9db5-fb2bd3550350">TC 34</identifier><fmt-identifier><tt><semx element="identifier" source="_455665e8-ea74-f710-9db5-fb2bd3550350">TC 34</semx></tt></fmt-identifier></subdivision></organization></contributor><contributor><role type="author"><description>Subcommittee</description></role><organization>
+<name>International Organization for Standardization</name>
+<subdivision>
+<name>Cereals and pulses</name>
+<identifier id="_0d0238e1-4dfc-4bce-cf64-b047c53f95c9">SC 4</identifier><fmt-identifier><tt><semx element="identifier" source="_0d0238e1-4dfc-4bce-cf64-b047c53f95c9">SC 4</semx></tt></fmt-identifier></subdivision></organization></contributor><contributor><role type="author"><description>Workgroup</description></role><organization>
+<name>International Organization for Standardization</name>
+<subdivision>
+<name>Amylose in rice</name>
+<identifier id="_53b0f81b-ab49-175d-77f1-1c98b4a684db">WG 4</identifier><fmt-identifier><tt><semx element="identifier" source="_53b0f81b-ab49-175d-77f1-1c98b4a684db">WG 4</semx></tt></fmt-identifier></subdivision></organization></contributor><contributor><role type="authorizer"><description>Agency</description></role><organization>
+<name>International Organization for Standardization</name>
+<abbreviation>ISO</abbreviation></organization></contributor><contributor><role type="publisher"/><organization>
+<name>International Organization for Standardization</name>
+<abbreviation>ISO</abbreviation></organization></contributor><contributor><role type="authorizer"><description>Technical committee</description></role><organization>
+<name>International Organization for Standardization</name>
+<subdivision>
+<name>Food products</name>
+<identifier id="_0e603e9a-dd1a-a1cd-c4e0-5885e90c937e">TC 34</identifier><fmt-identifier><tt><semx element="identifier" source="_0e603e9a-dd1a-a1cd-c4e0-5885e90c937e">TC 34</semx></tt></fmt-identifier></subdivision></organization></contributor><contributor><role type="authorizer"><description>Subcommittee</description></role><organization>
+<name>International Organization for Standardization</name>
+<subdivision>
+<name>Cereals and pulses</name>
+<identifier id="_b859a4fb-33ba-5cb0-0c30-fb311fabe8eb">SC 4</identifier><fmt-identifier><tt><semx element="identifier" source="_b859a4fb-33ba-5cb0-0c30-fb311fabe8eb">SC 4</semx></tt></fmt-identifier></subdivision></organization></contributor><contributor><role type="authorizer"><description>Workgroup</description></role><organization>
+<name>International Organization for Standardization</name>
+<subdivision>
+<name>Amylose in rice</name>
+<identifier id="_d76d463a-416a-fdd5-c51d-891c544f55e2">WG 4</identifier><fmt-identifier><tt><semx element="identifier" source="_d76d463a-416a-fdd5-c51d-891c544f55e2">WG 4</semx></tt></fmt-identifier></subdivision></organization></contributor><edition language="">2</edition><edition language="en">second edition</edition><version><revision-date>2016-05-01</revision-date></version><language current="true">en</language><script current="true">Latn</script><status><stage abbreviation="CD" language="">30</stage><stage abbreviation="CD" language="en">Committee draft</stage><substage>00</substage></status><copyright><from>2016</from><owner><organization>
+<name>International Organization for Standardization</name>
+<abbreviation>ISO</abbreviation></organization></owner></copyright><ext><doctype language="">international-standard</doctype><doctype language="en">International Standard</doctype><flavor>iso</flavor><iso-cen-parallel>true</iso-cen-parallel><editorialgroup identifier="ISO/TC 34/SC 4/WG 4"><agency>ISO</agency><technical-committee number="34" type="TC">Food products</technical-committee><subcommittee number="4" type="SC">Cereals and pulses</subcommittee><workgroup number="4" type="WG">Amylose in rice</workgroup><secretariat>SAC</secretariat></editorialgroup><approvalgroup identifier="ISO/TC 34/SC 4/WG 4"><agency>ISO</agency><technical-committee number="34" type="TC">Food products</technical-committee><subcommittee number="4" type="SC">Cereals and pulses</subcommittee><workgroup number="4" type="WG">Amylose in rice</workgroup></approvalgroup><ics><code>67.060</code><text>Cereals, pulses and derived products</text></ics><structuredidentifier><project-number part="1">ISO 17301</project-number></structuredidentifier><stagename abbreviation="CD">Committee Draft International Standard</stagename></ext></bibdata>
+<sections>
+<clause id="_baa7c358-acfe-a9dc-2dc9-4a0036490cf7" type="scope" inline-header="false" obligation="normative" semx-id="_baa7c358-acfe-a9dc-2dc9-4a0036490cf7" displayorder="5">
+<title id="_ef5612fb-1e47-1246-b392-69a921308fcb" semx-id="_f70b6ff6-6131-0e24-81e1-850dbe94b63d">Scope</title><fmt-xref-label><span class="fmt-element-name">Clause</span> <semx element="autonum" source="_baa7c358-acfe-a9dc-2dc9-4a0036490cf7">1</semx></fmt-xref-label>
+<p id="_61ce453e-bf75-91d7-ddb0-cb8bc0dd3d50" semx-id="_61ce453e-bf75-91d7-ddb0-cb8bc0dd3d50">This document specifies minimum requirements and test methods for rice (<em>Oryza sativa L.</em>).</p>
+
+<p id="_8c6e23a2-4690-3b5a-7b0d-09eae18c174f" semx-id="_8c6e23a2-4690-3b5a-7b0d-09eae18c174f">It is applicable to husked rice, husked parboiled rice, milled rice and milled parboiled rice, suitable for human consumption, directly or after reconditioning.</p>
+
+<p id="_00b96019-1d2b-95b6-4703-2dc837355630" semx-id="_00b96019-1d2b-95b6-4703-2dc837355630">It is not applicable to <fmt-identifier>https://example.org/reg</fmt-identifier> cooked rice products.</p><requirement id="_r1" model="default"><fmt-provision><p id="_rp1">The URI <fmt-identifier>/req/uri</fmt-identifier> is unique.</p><quote id="sec_scope_2"><p id="_qp1">Quoted text</p></quote></fmt-provision></requirement>
+</clause><clause id="_scopedup2" type="scope" inline-header="false" obligation="normative" semx-id="_scopedup2" displayorder="5">
+<title id="_t2" semx-id="_f70b6ff6-6131-0e24-81e1-850dbe94b63d">Scope</title><fmt-xref-label><span class="fmt-element-name">Clause</span> <semx element="autonum" source="_scopedup2">1</semx></fmt-xref-label>
+<p id="_61ce453e-bf75-91d7-ddb0-cb8bc0dd3d50" semx-id="_61ce453e-bf75-91d7-ddb0-cb8bc0dd3d50">This document specifies minimum requirements and test methods for rice (<em>Oryza sativa L.</em>).</p>
+
+<p id="_8c6e23a2-4690-3b5a-7b0d-09eae18c174f" semx-id="_8c6e23a2-4690-3b5a-7b0d-09eae18c174f">It is applicable to husked rice, husked parboiled rice, milled rice and milled parboiled rice, suitable for human consumption, directly or after reconditioning.</p>
+
+<p id="_00b96019-1d2b-95b6-4703-2dc837355630" semx-id="_00b96019-1d2b-95b6-4703-2dc837355630">It is not applicable to <fmt-identifier>https://example.org/reg</fmt-identifier> cooked rice products.</p>
+</clause><clause id="_scopedup3" type="scope" inline-header="false" obligation="normative" semx-id="_scopedup3" displayorder="5">
+<title id="_t3" semx-id="_f70b6ff6-6131-0e24-81e1-850dbe94b63d">Scope</title><fmt-xref-label><span class="fmt-element-name">Clause</span> <semx element="autonum" source="_scopedup3">1</semx></fmt-xref-label>
+<p id="_61ce453e-bf75-91d7-ddb0-cb8bc0dd3d50" semx-id="_61ce453e-bf75-91d7-ddb0-cb8bc0dd3d50">This document specifies minimum requirements and test methods for rice (<em>Oryza sativa L.</em>).</p>
+
+<p id="_8c6e23a2-4690-3b5a-7b0d-09eae18c174f" semx-id="_8c6e23a2-4690-3b5a-7b0d-09eae18c174f">It is applicable to husked rice, husked parboiled rice, milled rice and milled parboiled rice, suitable for human consumption, directly or after reconditioning.</p>
+
+<p id="_00b96019-1d2b-95b6-4703-2dc837355630" semx-id="_00b96019-1d2b-95b6-4703-2dc837355630">It is not applicable to <fmt-identifier>https://example.org/reg</fmt-identifier> cooked rice products.</p>
+</clause>
+</sections>
+</metanorma>

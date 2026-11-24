@@ -44,7 +44,11 @@
 				<xsl:variable name="xml_with_id_new">
 					<xsl:apply-templates select="xalan:nodeset($xml)" mode="id_generate"/>
 				</xsl:variable>
-				<xsl:apply-templates select="xalan:nodeset($xml_with_id_new)" mode="id_replace"/>
+				<!-- generated ids must be unique (xs:ID), e.g. several 'Scope' clauses -->
+				<xsl:variable name="xml_with_unique_id_new">
+					<xsl:apply-templates select="xalan:nodeset($xml_with_id_new)" mode="id_unique"/>
+				</xsl:variable>
+				<xsl:apply-templates select="xalan:nodeset($xml_with_unique_id_new)" mode="id_replace"/>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:copy-of select="$xml"/>
@@ -895,6 +899,66 @@
 	<!-- ================================================== -->
 	<!-- END: id generation for IEC and ISO with Guidelines rules -->
 	<!-- ================================================== -->
+	
+	<!-- ================================== -->
+	<!-- uniquify generated ids (@id_new) -->
+	<!-- ================================== -->
+	<xsl:key name="element_by_id_new" match="*[@id_new != '']" use="@id_new"/>
+	
+	<xsl:template match="@*|node()" mode="id_unique">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="id_unique"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<!-- ids that stay as they are (elements without generated id) -->
+	<xsl:key name="element_by_preserved_id" match="*[@id and not(@id_new != '')]" use="@id"/>
+	
+	<!-- the first element keeps the generated id, the next ones get the first free suffix _2, _3, ...
+		(a suffix is free if it is neither a generated id nor an existing id of another element) -->
+	<xsl:template match="@id_new[. != '']" mode="id_unique">
+		<xsl:variable name="current_id" select="generate-id(..)"/>
+		<xsl:variable name="same" select="key('element_by_id_new', .)"/>
+		<xsl:variable name="number">
+			<xsl:for-each select="$same">
+				<xsl:if test="generate-id() = $current_id"><xsl:value-of select="position()"/></xsl:if>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:attribute name="id_new">
+			<xsl:value-of select="."/>
+			<xsl:if test="number($number) &gt; 1">
+				<xsl:text>_</xsl:text>
+				<xsl:call-template name="id_free_suffix">
+					<xsl:with-param name="base" select="."/>
+					<xsl:with-param name="skip" select="number($number) - 2"/>
+				</xsl:call-template>
+			</xsl:if>
+		</xsl:attribute>
+	</xsl:template>
+	
+	<xsl:template name="id_free_suffix">
+		<xsl:param name="base"/>
+		<xsl:param name="skip"/>
+		<xsl:param name="k" select="2"/>
+		<xsl:variable name="candidate" select="concat($base, '_', $k)"/>
+		<xsl:choose>
+			<xsl:when test="key('element_by_id_new', $candidate) or key('element_by_preserved_id', $candidate)">
+				<xsl:call-template name="id_free_suffix">
+					<xsl:with-param name="base" select="$base"/>
+					<xsl:with-param name="skip" select="$skip"/>
+					<xsl:with-param name="k" select="$k + 1"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:when test="$skip &gt; 0">
+				<xsl:call-template name="id_free_suffix">
+					<xsl:with-param name="base" select="$base"/>
+					<xsl:with-param name="skip" select="$skip - 1"/>
+					<xsl:with-param name="k" select="$k + 1"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise><xsl:value-of select="$k"/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 	
 	<!-- ================================== -->
 	<!-- id replacement for IEC/ISO ID scheme -->
