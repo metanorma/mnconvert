@@ -1333,6 +1333,15 @@
 				<xsl:with-param name="process">true</xsl:with-param>
 			</xsl:apply-templates>
 			
+			<!-- elements of bibdata that have no dedicated mapping -->
+			<xsl:variable name="front_check_">
+				<xsl:if test="self::bibdata">
+					<xsl:apply-templates mode="front_check"/>
+					<xsl:apply-templates select="../metanorma-extension" mode="front_check"/>
+				</xsl:if>
+			</xsl:variable>
+			<xsl:variable name="front_check" select="xalan:nodeset($front_check_)"/>
+			
 			<xsl:variable name="custom-meta-group_">
 				<xsl:choose>
 					<xsl:when test="$metanorma_type = 'IEC'">
@@ -1381,6 +1390,9 @@
 				<xsl:apply-templates select="../metanorma-extension/semantic-metadata/isoviennaagreement" mode="custom_meta"/>
 				
 				<xsl:apply-templates select="../metanorma-extension/attachment" mode="custom_meta"/>
+				
+				<!-- unprocessed simple elements are preserved as custom-meta, not leaked into the output -->
+				<xsl:apply-templates select="$front_check/*[not(*)]" mode="custom_meta_unprocessed"/>
 			</xsl:variable>
 			<xsl:variable name="custom-meta-group" select="xalan:nodeset($custom-meta-group_)"/>
 			
@@ -1390,19 +1402,12 @@
 				</custom-meta-group>
 			</xsl:if>
 			
-			<xsl:if test="self::bibdata">
-				<!-- check non-processed elements in bibdata -->
-				<xsl:variable name="front_check">
-					<xsl:apply-templates mode="front_check"/>
-					<xsl:apply-templates select="../metanorma-extension" mode="front_check"/>
+			<!-- report the remaining non-processed elements in bibdata to the log, not into the output -->
+			<xsl:if test="self::bibdata and ($front_check/*[*] or normalize-space($front_check/text()) != '')">
+				<xsl:variable name="front_check_report">
+					<xsl:apply-templates select="$front_check/*[*] | $front_check/text()" mode="display_check"/>
 				</xsl:variable>
-
-				<xsl:if test="normalize-space($front_check) != '' or count(xalan:nodeset($front_check)/*) &gt; 0">
-					<xsl:text>WARNING! There are unprocessed elements in bibdata:&#xa;</xsl:text>
-					<xsl:text>===================================&#xa;</xsl:text>
-					<xsl:apply-templates select="xalan:nodeset($front_check)" mode="display_check"/>
-					<xsl:text>&#xa;===================================&#xa;</xsl:text>
-				</xsl:if>
+				<xsl:message>WARNING! There are unprocessed elements in bibdata: <xsl:copy-of select="$front_check_report"/></xsl:message>
 			</xsl:if>
 		<!-- </iso-meta> </nat-meta> </std-meta> --> 
 		</xsl:element>
@@ -1765,6 +1770,13 @@
 		<custom-meta>
 			<meta-name><xsl:value-of select="local-name()"/></meta-name>
 			<meta-value><xsl:value-of select="."/></meta-value>
+		</custom-meta>
+	</xsl:template>
+	
+	<xsl:template match="*" mode="custom_meta_unprocessed">
+		<custom-meta>
+			<meta-name><xsl:value-of select="local-name()"/></meta-name>
+			<meta-value><xsl:value-of select="normalize-space(.)"/></meta-value>
 		</custom-meta>
 	</xsl:template>
 	
@@ -5900,6 +5912,13 @@
 		<monospace>
 			<xsl:apply-templates/>
 		</monospace>
+	</xsl:template>
+	
+	<!-- NISO STS has no inline 'identifier' element, e.g. identifiers of requirements -->
+	<xsl:template match="identifier[ancestor::requirement and not(ancestor::contributor)]">
+		<named-content content-type="identifier">
+			<xsl:apply-templates/>
+		</named-content>
 	</xsl:template>
 	
 	<xsl:template match="identifier/tt">

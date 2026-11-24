@@ -44,7 +44,11 @@
 				<xsl:variable name="xml_with_id_new">
 					<xsl:apply-templates select="xalan:nodeset($xml)" mode="id_generate"/>
 				</xsl:variable>
-				<xsl:apply-templates select="xalan:nodeset($xml_with_id_new)" mode="id_replace"/>
+				<!-- generated ids must be unique (xs:ID), e.g. several 'Scope' clauses -->
+				<xsl:variable name="xml_with_unique_id_new">
+					<xsl:apply-templates select="xalan:nodeset($xml_with_id_new)" mode="id_unique"/>
+				</xsl:variable>
+				<xsl:apply-templates select="xalan:nodeset($xml_with_unique_id_new)" mode="id_replace"/>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:copy-of select="$xml"/>
@@ -895,6 +899,32 @@
 	<!-- ================================================== -->
 	<!-- END: id generation for IEC and ISO with Guidelines rules -->
 	<!-- ================================================== -->
+	
+	<!-- ================================== -->
+	<!-- uniquify generated ids (@id_new) -->
+	<!-- ================================== -->
+	<xsl:key name="element_by_id_new" match="*[@id_new != '']" use="@id_new"/>
+	
+	<xsl:template match="@*|node()" mode="id_unique">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="id_unique"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<!-- the first element keeps the generated id, the next ones get the suffix _2, _3, ... -->
+	<xsl:template match="@id_new[. != '']" mode="id_unique">
+		<xsl:variable name="current_id" select="generate-id(..)"/>
+		<xsl:variable name="same" select="key('element_by_id_new', .)"/>
+		<xsl:variable name="number">
+			<xsl:for-each select="$same">
+				<xsl:if test="generate-id() = $current_id"><xsl:value-of select="position()"/></xsl:if>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:attribute name="id_new">
+			<xsl:value-of select="."/>
+			<xsl:if test="number($number) &gt; 1">_<xsl:value-of select="$number"/></xsl:if>
+		</xsl:attribute>
+	</xsl:template>
 	
 	<!-- ================================== -->
 	<!-- id replacement for IEC/ISO ID scheme -->
