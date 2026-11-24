@@ -135,8 +135,12 @@ public class mn2stsTests {
             Assertions.assertFalse(out.contains("<identifier>"));
             // generated section ids are unique
             Assertions.assertTrue(out.contains("<sec id=\"sec_scope\""));
-            Assertions.assertTrue(out.contains("<sec id=\"sec_scope_2\""));
+            // sec_scope_2 is already taken by a quote of the document, so the suffix skips it
             Assertions.assertTrue(out.contains("<sec id=\"sec_scope_3\""));
+            Assertions.assertTrue(out.contains("<sec id=\"sec_scope_4\""));
+            Assertions.assertFalse(out.contains("<sec id=\"sec_scope_2\""));
+            Assertions.assertTrue(out.contains("id=\"sec_scope_2\""));
+            Assertions.assertEquals(1, out.split("id=\"sec_scope_2\"", -1).length - 1);
         } finally {
             Files.deleteIfExists(xmlout);
         }

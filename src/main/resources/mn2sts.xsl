@@ -911,7 +911,11 @@
 		</xsl:copy>
 	</xsl:template>
 	
-	<!-- the first element keeps the generated id, the next ones get the suffix _2, _3, ... -->
+	<!-- ids that stay as they are (elements without generated id) -->
+	<xsl:key name="element_by_preserved_id" match="*[@id and not(@id_new != '')]" use="@id"/>
+	
+	<!-- the first element keeps the generated id, the next ones get the first free suffix _2, _3, ...
+		(a suffix is free if it is neither a generated id nor an existing id of another element) -->
 	<xsl:template match="@id_new[. != '']" mode="id_unique">
 		<xsl:variable name="current_id" select="generate-id(..)"/>
 		<xsl:variable name="same" select="key('element_by_id_new', .)"/>
@@ -922,8 +926,38 @@
 		</xsl:variable>
 		<xsl:attribute name="id_new">
 			<xsl:value-of select="."/>
-			<xsl:if test="number($number) &gt; 1">_<xsl:value-of select="$number"/></xsl:if>
+			<xsl:if test="number($number) &gt; 1">
+				<xsl:text>_</xsl:text>
+				<xsl:call-template name="id_free_suffix">
+					<xsl:with-param name="base" select="."/>
+					<xsl:with-param name="skip" select="number($number) - 2"/>
+				</xsl:call-template>
+			</xsl:if>
 		</xsl:attribute>
+	</xsl:template>
+	
+	<xsl:template name="id_free_suffix">
+		<xsl:param name="base"/>
+		<xsl:param name="skip"/>
+		<xsl:param name="k" select="2"/>
+		<xsl:variable name="candidate" select="concat($base, '_', $k)"/>
+		<xsl:choose>
+			<xsl:when test="key('element_by_id_new', $candidate) or key('element_by_preserved_id', $candidate)">
+				<xsl:call-template name="id_free_suffix">
+					<xsl:with-param name="base" select="$base"/>
+					<xsl:with-param name="skip" select="$skip"/>
+					<xsl:with-param name="k" select="$k + 1"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:when test="$skip &gt; 0">
+				<xsl:call-template name="id_free_suffix">
+					<xsl:with-param name="base" select="$base"/>
+					<xsl:with-param name="skip" select="$skip - 1"/>
+					<xsl:with-param name="k" select="$k + 1"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise><xsl:value-of select="$k"/></xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	<!-- ================================== -->
