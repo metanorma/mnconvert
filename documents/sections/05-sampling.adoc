@@ -1,0 +1,6 @@
+
+[[sec_5]]
+== Sampling
+
+Sampling shall be carried out in accordance with <<norm_ref_7,ISO 24333:2009>>.
+

@@ -1,0 +1,6 @@
+
+[abstract]
+== Abstract
+
+The Standards Tag Suite (STS) provides a common XML format that developers, publishers, and distributors of standards, including national standards bodies, regional and international standards bodies, and standards development organizations can use to publish and exchange full-text content and metadata of standards. STS is based on ANSI/NISO Z39.96 (JATS). Structures are provided to encode both the normative and non-normative content of: standards, adoptions of standards, and standards-like documents that are produced by standards organizations.
+

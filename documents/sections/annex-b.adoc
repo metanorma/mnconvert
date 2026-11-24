@@ -1,0 +1,267 @@
+
+[[sec_B]]
+[appendix,obligation=informative]
+== Determination of the waxy rice content of parboiled rice
+
+[[sec_B.1]]
+=== Principle
+
+Waxy rice kernels have a reddish brown colour when stained in an iodine solution, while non-waxy rice kernels show a dark blue colour.
+
+[[sec_B.2]]
+=== Apparatus
+
+The usual laboratory apparatus and, in particular, the following.
+
+[[sec_B.2.1]]
+==== Balance,
+
+capable of weighing to the nearest 0,01 g.
+
+[[sec_B.2.2]]
+==== Glass beaker,
+
+of capacity 250 ml.
+
+[[sec_B.2.3]]
+==== Small white colour bowls,
+
+or any white colour container of a suitable size.
+
+[[sec_B.2.4]]
+==== Wire sieve,
+
+with long rounded apertures of (1 mm 
+
+[stem]
+++++
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<mtable>
+<mtr>
+<mtd>
+<mrow>
+<mo>+</mo>
+<mn>0.02</mn>
+</mrow>
+</mtd>
+</mtr>
+<mtr>
+<mtd>
+<mn>0</mn>
+</mtd>
+</mtr>
+</mtable>
+</math>
+++++
+
+ mm) × (20 mm 
+
+[stem]
+++++
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<mtable>
+<mtr>
+<mtd>
+<mrow>
+<mo>+</mo>
+<mn>2</mn>
+</mrow>
+</mtd>
+</mtr>
+<mtr>
+<mtd>
+<mn>-1</mn>
+</mtd>
+</mtr>
+</mtable>
+</math>
+++++
+
+ mm).
+
+[[sec_B.2.5]]
+==== Stirrer rod.
+
+[[sec_B.2.6]]
+==== Tweezers or forceps.
+
+[[sec_B.2.7]]
+==== Tissue paper.
+
+[[sec_B.3]]
+=== Reagents
+
+NOTE: Direct contact of iodine with skin can cause lesions so care should be taken in handling iodine. Iodine vapour is very irritating to eyes and mucous membranes.
+
+[[sec_B.3.1]]
+==== Deionized water,
+
+Grade 3 quality as specified in <<ref_1,ISO 3696:1987>>.
+
+[[sec_B.3.2]]
+==== Iodine stock solution,
+
+containing a mass fraction of 4,1 % iodine and 6,3 % potassium iodide in deionized water such as Lugols. footnote:[Lugols is an example of a suitable product available commercially. This information is given for the convenience of users of this document and does not constitute an endorsement by ISO of this product.]
+
+[[sec_B.3.3]]
+==== Iodine working solution,
+
+obtained by diluting the stock solution (<<sec_B.3.2>>) two times (by volume) with deionized water (<<sec_B.3.1>>).
+
+Prepare fresh daily.
+
+[[sec_B.4]]
+=== Sampling
+
+Sampling shall be carried out in accordance with <<sec_5>>.
+
+[[sec_B.5]]
+=== Determination
+
+[[sec_B.5.1]]
+==== {blank}
+
+Weigh a portion of about 100 g of milled rice and put it into a glass beaker (<<sec_B.2.2>>).
+
+[[sec_B.5.2]]
+==== {blank}
+
+Add enough iodine working solution (<<sec_B.3.3>>) to soak the kernels, and stir (<<sec_B.2.5>>) until all the kernels are submerged under the solution. Let the kernels soak in the solution for 30 s.
+
+[[sec_B.5.3]]
+==== {blank}
+
+Pour the rice and solution into a wire sieve (<<sec_B.2.4>>), and shake the basket slightly in order to drain out the solution. Then place the wire sieve on a piece of tissue paper (<<sec_B.2.7>>) to absorb the excess liquid.
+
+[[sec_B.5.4]]
+==== {blank}
+
+Pour the stained kernels into a bowl (<<sec_B.2.3>>). Using tweezers or forceps (<<sec_B.2.6>>), separate the reddish brown kernels of waxy rice from the dark blue kernels of non-waxy rice.
+
+[[sec_B.5.5]]
+==== {blank}
+
+Weigh the waxy rice portion (
+
+[stem]
+++++
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<msub>
+<mi>m</mi>
+<mn>1</mn>
+</msub>
+</math>
+++++
+
+) and the non-waxy rice portion (
+
+[stem]
+++++
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<msub>
+<mi>m</mi>
+<mn>2</mn>
+</msub>
+</math>
+++++
+
+) to the nearest 0,1 g.
+
+[[sec_B.6]]
+=== Calculation
+
+Calculate the mass fraction, expressed as a percentage, of the waxy rice, 
+
+[stem]
+++++
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<msub>
+<mi>w</mi>
+<mrow>
+<mi>w</mi>
+<mi>a</mi>
+<mi>x</mi>
+</mrow>
+</msub>
+</math>
+++++
+
+, using <<formula_B.6>>:
+
+[[formula_B.6]]
+[stem]
+++++
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<msub>
+<mi>w</mi>
+<mrow>
+<mi>w</mi>
+<mi>a</mi>
+<mi>x</mi>
+</mrow>
+</msub>
+<mo>=</mo>
+<mfrac>
+<msub>
+<mi>m</mi>
+<mn>1</mn>
+</msub>
+<mrow>
+<msub>
+<mi>m</mi>
+<mn>1</mn>
+</msub>
+<mo>+</mo>
+<msub>
+<mi>m</mi>
+<mn>2</mn>
+</msub>
+</mrow>
+</mfrac>
+<mo>×</mo>
+<mn>100</mn>
+</math>
+++++
+
+
+[[array_tab_d]]
+[%unnumbered]
+[cols="1,1"]
+|===
+
+|
+
+[stem]
+++++
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<msub>
+<mi>m</mi>
+<mn>1</mn>
+</msub>
+</math>
+++++
+
+ |is the mass, expressed in grams, of the waxy rice portion; 
+|
+
+[stem]
+++++
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<msub>
+<mi>m</mi>
+<mn>2</mn>
+</msub>
+</math>
+++++
+
+ |is the mass, expressed in grams, of the non-waxy rice portion. 
+
+|===
+
+
+
+[[sec_B.7]]
+=== Test report
+
+Report the results as specified in <<sec_7>>, giving the results calculated using <<formula_B.6>>.
+

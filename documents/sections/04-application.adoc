@@ -1,0 +1,26 @@
+
+[[sec_4]]
+== Application Note: Namespace for STS Elements
+
+There is no default namespace required for the elements and attributes in the Standards Tag Suite. This has been done for two reasons:
+
+
+
+. The majority of the publishing consumers of STS are not using namespaces except for included vocabularies such as MathML; and
+
+. Introducing a default namespace would not be backwards compatible with ISO STS and would break the majority of existing ISO STS applications.
+
+
+Although a default namespace is not required for STS, some users may wish to namespace STS elements and attributes in their application of the standard.
+
+If a namespace is to be applied, the namespace URI should be "http://www.niso-sts.org[http://www.niso-sts.org]", and the namespace prefix should be “niso-sts” or similar.
+
+Using a namespace with STS will require a certain level of namespace and general XML sophistication. If it is done, it should be done in a manner that best facilitates interchange. The following items should be considered:
+
+
+
+* The MathML namespace (and the OASIS Exchange table model namespace if appropriate) should be retained.
+
+* When making HTML from STS, the STS table elements will need to be either stripped of the STS namespace or given their own HTML namespace. STS does not incorporate the XHTML 1.1 table model; it uses elements, attributes, and models inspired by and based on the XHTML 1.1 table model.
+
+
